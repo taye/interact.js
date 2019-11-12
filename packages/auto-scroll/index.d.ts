@@ -32,7 +32,7 @@ declare const autoScroll: {
     prevTime: number;
     margin: number;
     speed: number;
-    start(interaction: import("@interactjs/core/Interaction").Interaction<any>): void;
+    start(interaction: import("../types/types").Interaction<any>): void;
     stop(): void;
     scroll(): void;
     check(interactable: any, actionName: any): any;
@@ -60,5 +60,15 @@ export declare function getScrollSizeDelta({ interaction, element }: {
 declare const _default: {
     id: string;
     install: typeof install;
+    listeners: {
+        'interactions:new': ({ interaction }: {
+            interaction: any;
+        }) => void;
+        'interactions:destroy': ({ interaction }: {
+            interaction: any;
+        }) => void;
+        'interactions:stop': () => void;
+        'interactions:action-move': (arg: any) => void;
+    };
 };
 export default _default;

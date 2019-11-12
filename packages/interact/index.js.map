@@ -1,0 +1,33 @@
+{
+	"version": 3,
+	"sources": [
+		"index.ts"
+	],
+	"names": [
+		"actions",
+		"autoScroll",
+		"autoStart",
+		"interactablePreventDefault",
+		"devTools",
+		"inertia",
+		"modifiersBase",
+		"modifiers",
+		"pointerEvents",
+		"reflow",
+		"interact",
+		"scope",
+		"init",
+		"window",
+		"use",
+		"type",
+		"_defaults",
+		"_methods",
+		"defaults",
+		"perAction",
+		"version"
+	],
+	"mappings": "AAAA,OAAO,KAAKA,OAAZ;AACA,OAAOC,UAAP;AACA,OAAO,KAAKC,SAAZ;AACA,OAAOC,0BAAP;AACA,OAAOC,QAAP;AACA,OAAOC,OAAP;AACA,OAAOC,aAAP;AACA,OAAO,KAAKC,SAAZ;AACA,OAAO,KAAKC,aAAZ;AACA,OAAOC,MAAP;AACA,OAAOC,QAAP,IAAmBC,KAAnB;AAEA,OAAO,SAASC,IAAT,CAAeC,MAAf,EAA+B;AACpCF,EAAAA,KAAK,CAACC,IAAN,CAAWC,MAAX;AAEAH,EAAAA,QAAQ,CAACI,GAAT,CAAaX,0BAAb,EAHoC,CAKpC;;AACAO,EAAAA,QAAQ,CAACI,GAAT,CAAaN,aAAb,EANoC,CAQpC;;AACAE,EAAAA,QAAQ,CAACI,GAAT,CAAaT,OAAb,EAToC,CAWpC;;AACAK,EAAAA,QAAQ,CAACI,GAAT,CAAaR,aAAb,EAZoC,CAcpC;;AACAI,EAAAA,QAAQ,CAACI,GAAT,CAAaZ,SAAb,EAfoC,CAiBpC;;AACAQ,EAAAA,QAAQ,CAACI,GAAT,CAAad,OAAb,EAlBoC,CAoBpC;;AACA,OAAK,MAAMe,IAAX,IAAmBR,SAAnB,EAA8B;AAC5B,UAAM;AAAES,MAAAA,SAAF;AAAaC,MAAAA;AAAb,QAA0BV,SAAS,CAACQ,IAAD,CAAzC;AAEAC,IAAAA,SAAS,CAACC,QAAV,GAAqBA,QAArB;AACAN,IAAAA,KAAK,CAACO,QAAN,CAAeC,SAAf,CAAyBJ,IAAzB,IAAiCC,SAAjC;AACD,GA1BmC,CA4BpC;;;AACAN,EAAAA,QAAQ,CAACI,GAAT,CAAab,UAAb,EA7BoC,CA+BpC;;AACAS,EAAAA,QAAQ,CAACI,GAAT,CAAaL,MAAb,EAhCoC,CAkCpC;;AACA,MAAI,cAAyB,YAA7B,EAA2C;AACzCC,IAAAA,QAAQ,CAACI,GAAT,CAAaV,QAAb;AACD;;AAED,SAAOM,QAAP;AACD,C,CAED;;AACAA,QAAQ,CAACU,OAAT;AAEA,eAAeV,QAAf;AACA,SACEA,QADF,EAEEV,OAFF,EAGEC,UAHF,EAIEE,0BAJF,EAKEE,OALF,EAMEC,aAAa,IAAIC,SANnB,EAOEC,aAPF,EAQEC,MARF",
+	"sourcesContent": [
+		"import * as actions from '../actions/index'\nimport autoScroll from '../auto-scroll/index'\nimport * as autoStart from '../auto-start/index'\nimport interactablePreventDefault from '../core/interactablePreventDefault'\nimport devTools from '../dev-tools/index'\nimport inertia from '../inertia/index'\nimport modifiersBase from '../modifiers/base'\nimport * as modifiers from '../modifiers/index'\nimport * as pointerEvents from '../pointer-events/index'\nimport reflow from '../reflow/index'\nimport interact, { scope } from './interact'\n\nexport function init (window: Window) {\n  scope.init(window)\n\n  interact.use(interactablePreventDefault)\n\n  // pointerEvents\n  interact.use(pointerEvents)\n\n  // inertia\n  interact.use(inertia)\n\n  // snap, resize, etc.\n  interact.use(modifiersBase)\n\n  // autoStart, hold\n  interact.use(autoStart)\n\n  // drag and drop, resize, gesture\n  interact.use(actions)\n\n  // for backwrads compatibility\n  for (const type in modifiers) {\n    const { _defaults, _methods } = modifiers[type]\n\n    _defaults._methods = _methods\n    scope.defaults.perAction[type] = _defaults\n  }\n\n  // autoScroll\n  interact.use(autoScroll)\n\n  // reflow\n  interact.use(reflow)\n\n  // eslint-disable-next-line no-undef\n  if (process.env.NODE_ENV !== 'production') {\n    interact.use(devTools)\n  }\n\n  return interact\n}\n\n// eslint-disable-next-line no-undef\ninteract.version = process.env.npm_package_version\n\nexport default interact\nexport {\n  interact,\n  actions,\n  autoScroll,\n  interactablePreventDefault,\n  inertia,\n  modifiersBase as modifiers,\n  pointerEvents,\n  reflow,\n}\n"
+	]
+}

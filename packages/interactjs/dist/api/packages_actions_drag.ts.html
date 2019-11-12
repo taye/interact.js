@@ -41,9 +41,9 @@
     
     <section>
         <article>
-            <pre class="prettyprint source linenums"><code>import { ActionName, Scope } from '@interactjs/core/scope'
-import * as arr from '@interactjs/utils/arr'
-import * as is from '@interactjs/utils/is'
+            <pre class="prettyprint source linenums"><code>import { ActionName, Scope } from '../core/scope'
+import * as arr from '../utils/arr'
+import * as is from '../utils/is'
 
 declare module '@interactjs/core/Interactable' {
   interface Interactable {
@@ -78,15 +78,16 @@ function install (scope: Scope) {
   const {
     actions,
     Interactable,
-    interactions,
     defaults,
   } = scope
 
-  interactions.signals.on('before-action-move', beforeMove)
-  interactions.signals.on('action-resume', beforeMove)
+  scope.addListeners({
+    'interactions:before-action-move': beforeMove,
+    'interactions:action-resume': beforeMove,
 
-  // dragmove
-  interactions.signals.on('action-move', move)
+    // dragmove
+    'interactions:action-move': move,
+  })
 
   Interactable.prototype.draggable = drag.draggable
 

@@ -1,27 +1,32 @@
-import interact, { init as initInteract } from '@interactjs/interact';
-import * as modifiers from '@interactjs/modifiers';
-import '@interactjs/types';
-import extend from '@interactjs/utils/extend';
-import * as snappers from '@interactjs/utils/snappers';
+import interact, { init as initInteract } from "../interact/index.js";
+import * as modifiers from "../modifiers/index.js";
+import "../types/index.js";
+import extend from "../utils/extend.js";
+import * as snappers from "../utils/snappers/index.js";
+
 if (typeof window === 'object' && !!window) {
-    init(window);
+  init(window);
 }
+
 export function init(win) {
-    initInteract(win);
-    return interact.use({
-        id: 'interactjs',
-        install() {
-            interact.modifiers = extend({}, modifiers);
-            interact.snappers = snappers;
-            interact.createSnapGrid = interact.snappers.grid;
-        },
-    });
+  initInteract(win);
+  return interact.use({
+    id: 'interactjs',
+
+    install() {
+      interact.modifiers = extend({}, modifiers);
+      interact.snappers = snappers;
+      interact.createSnapGrid = interact.snappers.grid;
+    }
+
+  });
 }
 export default interact;
 interact.default = interact // tslint:disable-line no-string-literal
 ;
 interact.init = init; // tslint:disable-line no-string-literal
+
 if (typeof module === 'object' && !!module) {
-    module.exports = interact;
+  module.exports = interact;
 }
-//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiaW5kZXguanMiLCJzb3VyY2VSb290IjoiIiwic291cmNlcyI6WyJpbmRleC50cyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFBQSxPQUFPLFFBQVEsRUFBRSxFQUFFLElBQUksSUFBSSxZQUFZLEVBQUUsTUFBTSxzQkFBc0IsQ0FBQTtBQUNyRSxPQUFPLEtBQUssU0FBUyxNQUFNLHVCQUF1QixDQUFBO0FBRWxELE9BQU8sbUJBQW1CLENBQUE7QUFDMUIsT0FBTyxNQUFNLE1BQU0sMEJBQTBCLENBQUE7QUFDN0MsT0FBTyxLQUFLLFFBQVEsTUFBTSw0QkFBNEIsQ0FBQTtBQVV0RCxJQUFJLE9BQU8sTUFBTSxLQUFLLFFBQVEsSUFBSSxDQUFDLENBQUMsTUFBTSxFQUFFO0lBQzFDLElBQUksQ0FBQyxNQUFNLENBQUMsQ0FBQTtDQUNiO0FBRUQsTUFBTSxVQUFVLElBQUksQ0FBRSxHQUFXO0lBQy9CLFlBQVksQ0FBQyxHQUFHLENBQUMsQ0FBQTtJQUVqQixPQUFPLFFBQVEsQ0FBQyxHQUFHLENBQUM7UUFDbEIsRUFBRSxFQUFFLFlBQVk7UUFDaEIsT0FBTztZQUNMLFFBQVEsQ0FBQyxTQUFTLEdBQUcsTUFBTSxDQUFDLEVBQUUsRUFBRSxTQUFTLENBQUMsQ0FBQTtZQUMxQyxRQUFRLENBQUMsUUFBUSxHQUFHLFFBQVEsQ0FBQTtZQUM1QixRQUFRLENBQUMsY0FBYyxHQUFHLFFBQVEsQ0FBQyxRQUFRLENBQUMsSUFBSSxDQUFBO1FBQ2xELENBQUM7S0FDRixDQUFDLENBQUE7QUFDSixDQUFDO0FBRUQsZUFBZSxRQUFRLENBQ3RCO0FBQUMsUUFBZ0IsQ0FBQyxPQUFPLEdBQUcsUUFBUSxDQUFDLHdDQUF3QztDQUM3RTtBQUFDLFFBQWdCLENBQUMsSUFBSSxHQUFHLElBQUksQ0FBQSxDQUFDLHdDQUF3QztBQUV2RSxJQUFJLE9BQU8sTUFBTSxLQUFLLFFBQVEsSUFBSSxDQUFDLENBQUMsTUFBTSxFQUFFO0lBQzFDLE1BQU0sQ0FBQyxPQUFPLEdBQUcsUUFBUSxDQUFBO0NBQzFCIiwic291cmNlc0NvbnRlbnQiOlsiaW1wb3J0IGludGVyYWN0LCB7IGluaXQgYXMgaW5pdEludGVyYWN0IH0gZnJvbSAnQGludGVyYWN0anMvaW50ZXJhY3QnXG5pbXBvcnQgKiBhcyBtb2RpZmllcnMgZnJvbSAnQGludGVyYWN0anMvbW9kaWZpZXJzJ1xuaW1wb3J0IHsgTW9kaWZpZXIgfSBmcm9tICdAaW50ZXJhY3Rqcy9tb2RpZmllcnMvYmFzZSdcbmltcG9ydCAnQGludGVyYWN0anMvdHlwZXMnXG5pbXBvcnQgZXh0ZW5kIGZyb20gJ0BpbnRlcmFjdGpzL3V0aWxzL2V4dGVuZCdcbmltcG9ydCAqIGFzIHNuYXBwZXJzIGZyb20gJ0BpbnRlcmFjdGpzL3V0aWxzL3NuYXBwZXJzJ1xuXG5kZWNsYXJlIG1vZHVsZSAnQGludGVyYWN0anMvaW50ZXJhY3QvaW50ZXJhY3QnIHtcbiAgaW50ZXJmYWNlIEludGVyYWN0U3RhdGljIHtcbiAgICBtb2RpZmllcnM/OiB0eXBlb2YgbW9kaWZpZXJzICYgeyBba2V5OiBzdHJpbmddOiAob3B0aW9ucz8pID0+IE1vZGlmaWVyIH1cbiAgICBzbmFwcGVycz86IHR5cGVvZiBzbmFwcGVycyAmIHsgW2tleTogc3RyaW5nXTogYW55IH1cbiAgICBjcmVhdGVTbmFwR3JpZD86IHR5cGVvZiBzbmFwcGVycy5ncmlkXG4gIH1cbn1cblxuaWYgKHR5cGVvZiB3aW5kb3cgPT09ICdvYmplY3QnICYmICEhd2luZG93KSB7XG4gIGluaXQod2luZG93KVxufVxuXG5leHBvcnQgZnVuY3Rpb24gaW5pdCAod2luOiBXaW5kb3cpIHtcbiAgaW5pdEludGVyYWN0KHdpbilcblxuICByZXR1cm4gaW50ZXJhY3QudXNlKHtcbiAgICBpZDogJ2ludGVyYWN0anMnLFxuICAgIGluc3RhbGwgKCkge1xuICAgICAgaW50ZXJhY3QubW9kaWZpZXJzID0gZXh0ZW5kKHt9LCBtb2RpZmllcnMpXG4gICAgICBpbnRlcmFjdC5zbmFwcGVycyA9IHNuYXBwZXJzXG4gICAgICBpbnRlcmFjdC5jcmVhdGVTbmFwR3JpZCA9IGludGVyYWN0LnNuYXBwZXJzLmdyaWRcbiAgICB9LFxuICB9KVxufVxuXG5leHBvcnQgZGVmYXVsdCBpbnRlcmFjdFxuOyhpbnRlcmFjdCBhcyBhbnkpLmRlZmF1bHQgPSBpbnRlcmFjdCAvLyB0c2xpbnQ6ZGlzYWJsZS1saW5lIG5vLXN0cmluZy1saXRlcmFsXG47KGludGVyYWN0IGFzIGFueSkuaW5pdCA9IGluaXQgLy8gdHNsaW50OmRpc2FibGUtbGluZSBuby1zdHJpbmctbGl0ZXJhbFxuXG5pZiAodHlwZW9mIG1vZHVsZSA9PT0gJ29iamVjdCcgJiYgISFtb2R1bGUpIHtcbiAgbW9kdWxlLmV4cG9ydHMgPSBpbnRlcmFjdFxufVxuIl19
+//# sourceMappingURL=index.js.map

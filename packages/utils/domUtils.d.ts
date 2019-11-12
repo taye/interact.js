@@ -1,4 +1,4 @@
-export declare function nodeContains(parent: Node, child: Node): boolean;
+export declare function nodeContains(parent: Node | Interact.EventTarget, child: Node | Interact.EventTarget): boolean;
 export declare function closest(element: any, selector: any): import("../types/types").Element;
 export declare function parentNode(node: any): any;
 export declare function matchesSelector(element: any, selector: any): any;

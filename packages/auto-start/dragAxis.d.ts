@@ -1,7 +1,8 @@
-declare type Scope = import('@interactjs/core/scope').Scope;
-declare function install(scope: Scope): void;
+declare function beforeStart({ interaction, eventTarget, dx, dy }: Interact.SignalArgs['interactions:move'], scope: Interact.Scope): void;
 declare const _default: {
     id: string;
-    install: typeof install;
+    listeners: {
+        'autoStart:before-start': typeof beforeStart;
+    };
 };
 export default _default;

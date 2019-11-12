@@ -1,1 +1,1 @@
-export default function extend<T, U extends Partial<T>>(dest: U, source: T): T & U;
+export default function extend<T, U extends object>(dest: U, source: T): T & U;

@@ -41,13 +41,13 @@
     
     <section>
         <article>
-            <pre class="prettyprint source linenums"><code>import BaseEvent from '@interactjs/core/BaseEvent'
-import pointerUtils from '@interactjs/utils/pointerUtils'
+            <pre class="prettyprint source linenums"><code>import BaseEvent from '../core/BaseEvent'
+import pointerUtils from '../utils/pointerUtils'
 
 /** */
 export default class PointerEvent&lt;T extends string> extends BaseEvent {
   type: T
-  originalEvent: Interact.PointerEventType
+  originalEvent: Interact.PointerEventType | PointerEvent&lt;any>
   pointerId: number
   pointerType: string
   double: boolean
@@ -62,7 +62,7 @@ export default class PointerEvent&lt;T extends string> extends BaseEvent {
   constructor (
     type: T,
     pointer: Interact.PointerType | PointerEvent&lt;any>,
-    event: Interact.PointerEventType,
+    event: Interact.PointerEventType | PointerEvent&lt;any>,
     eventTarget: Interact.EventTarget,
     interaction: Interact.Interaction,
     timeStamp: number,

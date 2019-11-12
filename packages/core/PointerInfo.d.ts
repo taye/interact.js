@@ -3,7 +3,7 @@ export declare class PointerInfo {
     pointer: Interact.PointerType;
     event: Interact.PointerEventType;
     downTime: number;
-    downTarget: Node;
-    constructor(id: number, pointer: Interact.PointerType, event: Interact.PointerEventType, downTime: number, downTarget: Node);
+    downTarget: Interact.EventTarget;
+    constructor(id: number, pointer: Interact.PointerType, event: Interact.PointerEventType, downTime: number, downTarget: Interact.EventTarget);
 }
 export default PointerInfo;

@@ -1,225 +1,309 @@
-import * as utils from '@interactjs/utils';
-import InteractableMethods from './InteractableMethods';
+import * as utils from "../utils/index.js";
+import InteractableMethods from "./InteractableMethods.js";
+
 function install(scope) {
-    const { interact, interactions, defaults, } = scope;
-    scope.usePlugin(InteractableMethods);
-    // set cursor style on mousedown
-    interactions.signals.on('down', ({ interaction, pointer, event, eventTarget }) => {
-        if (interaction.interacting()) {
-            return;
-        }
-        const actionInfo = getActionInfo(interaction, pointer, event, eventTarget, scope);
-        prepare(interaction, actionInfo, scope);
-    });
-    // set cursor style on mousemove
-    interactions.signals.on('move', ({ interaction, pointer, event, eventTarget }) => {
-        if (interaction.pointerType !== 'mouse' ||
-            interaction.pointerIsDown ||
-            interaction.interacting()) {
-            return;
-        }
-        const actionInfo = getActionInfo(interaction, pointer, event, eventTarget, scope);
-        prepare(interaction, actionInfo, scope);
-    });
-    interactions.signals.on('move', arg => {
-        const { interaction } = arg;
-        if (!interaction.pointerIsDown ||
-            interaction.interacting() ||
-            !interaction.pointerWasMoved ||
-            !interaction.prepared.name) {
-            return;
-        }
-        scope.autoStart.signals.fire('before-start', arg);
-        const { interactable } = interaction;
-        if (interaction.prepared.name && interactable) {
-            // check manualStart and interaction limit
-            if (interactable.options[interaction.prepared.name].manualStart ||
-                !withinInteractionLimit(interactable, interaction.element, interaction.prepared, scope)) {
-                interaction.stop();
-            }
-            else {
-                interaction.start(interaction.prepared, interactable, interaction.element);
-                setInteractionCursor(interaction, scope);
-            }
-        }
-    });
-    interactions.signals.on('stop', ({ interaction }) => {
-        const { interactable } = interaction;
-        if (interactable && interactable.options.styleCursor) {
-            setCursor(interaction.element, '', scope);
-        }
-    });
-    defaults.base.actionChecker = null;
-    defaults.base.styleCursor = true;
-    utils.extend(defaults.perAction, {
-        manualStart: false,
-        max: Infinity,
-        maxPerElement: 1,
-        allowFrom: null,
-        ignoreFrom: null,
-        // only allow left button by default
-        // see https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/buttons#Return_value
-        mouseButtons: 1,
-    });
-    /**
-     * Returns or sets the maximum number of concurrent interactions allowed.  By
-     * default only 1 interaction is allowed at a time (for backwards
-     * compatibility). To allow multiple interactions on the same Interactables and
-     * elements, you need to enable it in the draggable, resizable and gesturable
-     * `'max'` and `'maxPerElement'` options.
-     *
-     * @alias module:interact.maxInteractions
-     *
-     * @param {number} [newValue] Any number. newValue <= 0 means no interactions.
-     */
-    interact.maxInteractions = newValue => maxInteractions(newValue, scope);
-    scope.autoStart = {
-        // Allow this many interactions to happen simultaneously
-        maxInteractions: Infinity,
-        withinInteractionLimit,
-        cursorElement: null,
-        signals: new utils.Signals(),
-    };
-}
-// Check if the current interactable supports the action.
-// If so, return the validated action. Otherwise, return null
-function validateAction(action, interactable, element, eventTarget, scope) {
-    if (interactable.testIgnoreAllow(interactable.options[action.name], element, eventTarget) &&
-        interactable.options[action.name].enabled &&
-        withinInteractionLimit(interactable, element, action, scope)) {
-        return action;
-    }
-    return null;
-}
-function validateMatches(interaction, pointer, event, matches, matchElements, eventTarget, scope) {
-    for (let i = 0, len = matches.length; i < len; i++) {
-        const match = matches[i];
-        const matchElement = matchElements[i];
-        const matchAction = match.getAction(pointer, event, interaction, matchElement);
-        if (!matchAction) {
-            continue;
-        }
-        const action = validateAction(matchAction, match, matchElement, eventTarget, scope);
-        if (action) {
-            return {
-                action,
-                interactable: match,
-                element: matchElement,
-            };
-        }
-    }
-    return { action: null, interactable: null, element: null };
-}
-function getActionInfo(interaction, pointer, event, eventTarget, scope) {
-    let matches = [];
-    let matchElements = [];
-    let element = eventTarget;
-    function pushMatches(interactable) {
-        matches.push(interactable);
-        matchElements.push(element);
-    }
-    while (utils.is.element(element)) {
-        matches = [];
-        matchElements = [];
-        scope.interactables.forEachMatch(element, pushMatches);
-        const actionInfo = validateMatches(interaction, pointer, event, matches, matchElements, eventTarget, scope);
-        if (actionInfo.action &&
-            !actionInfo.interactable.options[actionInfo.action.name].manualStart) {
-            return actionInfo;
-        }
-        element = utils.dom.parentNode(element);
-    }
-    return { action: null, interactable: null, element: null };
-}
-function prepare(interaction, { action, interactable, element }, scope) {
-    action = action || { name: null };
-    // clear previous target element cursor
-    if (interaction.interactable && interaction.interactable.options.styleCursor) {
-        setCursor(interaction.element, '', scope);
-    }
-    interaction.interactable = interactable;
-    interaction.element = element;
-    utils.copyAction(interaction.prepared, action);
-    interaction.rect = interactable && action.name
-        ? interactable.getRect(element)
-        : null;
-    setInteractionCursor(interaction, scope);
-    scope.autoStart.signals.fire('prepared', { interaction });
-}
-function withinInteractionLimit(interactable, element, action, scope) {
-    const options = interactable.options;
-    const maxActions = options[action.name].max;
-    const maxPerElement = options[action.name].maxPerElement;
-    const autoStartMax = scope.autoStart.maxInteractions;
-    let activeInteractions = 0;
-    let interactableCount = 0;
-    let elementCount = 0;
-    // no actions if any of these values == 0
-    if (!(maxActions && maxPerElement && autoStartMax)) {
-        return false;
-    }
-    for (const interaction of scope.interactions.list) {
-        const otherAction = interaction.prepared.name;
-        if (!interaction.interacting()) {
-            continue;
-        }
-        activeInteractions++;
-        if (activeInteractions >= autoStartMax) {
-            return false;
-        }
-        if (interaction.interactable !== interactable) {
-            continue;
-        }
-        interactableCount += otherAction === action.name ? 1 : 0;
-        if (interactableCount >= maxActions) {
-            return false;
-        }
-        if (interaction.element === element) {
-            elementCount++;
-            if (otherAction === action.name && elementCount >= maxPerElement) {
-                return false;
-            }
-        }
-    }
-    return autoStartMax > 0;
-}
-function maxInteractions(newValue, scope) {
-    if (utils.is.number(newValue)) {
-        scope.autoStart.maxInteractions = newValue;
-        return this;
-    }
-    return scope.autoStart.maxInteractions;
-}
-function setCursor(element, cursor, scope) {
-    if (scope.autoStart.cursorElement) {
-        scope.autoStart.cursorElement.style.cursor = '';
-    }
-    element.ownerDocument.documentElement.style.cursor = cursor;
-    element.style.cursor = cursor;
-    scope.autoStart.cursorElement = cursor ? element : null;
-}
-function setInteractionCursor(interaction, scope) {
-    const { interactable, element, prepared } = interaction;
-    if (!(interaction.pointerType === 'mouse' && interactable && interactable.options.styleCursor)) {
-        return;
-    }
-    let cursor = '';
-    if (prepared.name) {
-        const cursorChecker = interactable.options[prepared.name].cursorChecker;
-        if (utils.is.func(cursorChecker)) {
-            cursor = cursorChecker(prepared, interactable, element, interaction._interacting);
-        }
-        else {
-            cursor = scope.actions[prepared.name].getCursor(prepared);
-        }
-    }
-    setCursor(interaction.element, cursor || '', scope);
-}
-export default {
-    id: 'auto-start/base',
-    install,
-    maxInteractions,
+  const {
+    interact,
+    defaults
+  } = scope;
+  scope.usePlugin(InteractableMethods);
+  defaults.base.actionChecker = null;
+  defaults.base.styleCursor = true;
+  utils.extend(defaults.perAction, {
+    manualStart: false,
+    max: Infinity,
+    maxPerElement: 1,
+    allowFrom: null,
+    ignoreFrom: null,
+    // only allow left button by default
+    // see https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/buttons#Return_value
+    mouseButtons: 1
+  });
+  /**
+   * Returns or sets the maximum number of concurrent interactions allowed.  By
+   * default only 1 interaction is allowed at a time (for backwards
+   * compatibility). To allow multiple interactions on the same Interactables and
+   * elements, you need to enable it in the draggable, resizable and gesturable
+   * `'max'` and `'maxPerElement'` options.
+   *
+   * @alias module:interact.maxInteractions
+   *
+   * @param {number} [newValue] Any number. newValue <= 0 means no interactions.
+   */
+
+  interact.maxInteractions = newValue => maxInteractions(newValue, scope);
+
+  scope.autoStart = {
+    // Allow this many interactions to happen simultaneously
+    maxInteractions: Infinity,
     withinInteractionLimit,
-    validateAction,
+    cursorElement: null
+  };
+}
+
+function prepareOnDown({
+  interaction,
+  pointer,
+  event,
+  eventTarget
+}, scope) {
+  if (interaction.interacting()) {
+    return;
+  }
+
+  const actionInfo = getActionInfo(interaction, pointer, event, eventTarget, scope);
+  prepare(interaction, actionInfo, scope);
+}
+
+function prepareOnMove({
+  interaction,
+  pointer,
+  event,
+  eventTarget
+}, scope) {
+  if (interaction.pointerType !== 'mouse' || interaction.pointerIsDown || interaction.interacting()) {
+    return;
+  }
+
+  const actionInfo = getActionInfo(interaction, pointer, event, eventTarget, scope);
+  prepare(interaction, actionInfo, scope);
+}
+
+function startOnMove(arg, scope) {
+  const {
+    interaction
+  } = arg;
+
+  if (!interaction.pointerIsDown || interaction.interacting() || !interaction.pointerWasMoved || !interaction.prepared.name) {
+    return;
+  }
+
+  scope.fire('autoStart:before-start', arg);
+  const {
+    interactable
+  } = interaction;
+
+  if (interaction.prepared.name && interactable) {
+    // check manualStart and interaction limit
+    if (interactable.options[interaction.prepared.name].manualStart || !withinInteractionLimit(interactable, interaction.element, interaction.prepared, scope)) {
+      interaction.stop();
+    } else {
+      interaction.start(interaction.prepared, interactable, interaction.element);
+      setInteractionCursor(interaction, scope);
+    }
+  }
+}
+
+function clearCursorOnStop({
+  interaction
+}, scope) {
+  const {
+    interactable
+  } = interaction;
+
+  if (interactable && interactable.options.styleCursor) {
+    setCursor(interaction.element, '', scope);
+  }
+} // Check if the current interactable supports the action.
+// If so, return the validated action. Otherwise, return null
+
+
+function validateAction(action, interactable, element, eventTarget, scope) {
+  if (interactable.testIgnoreAllow(interactable.options[action.name], element, eventTarget) && interactable.options[action.name].enabled && withinInteractionLimit(interactable, element, action, scope)) {
+    return action;
+  }
+
+  return null;
+}
+
+function validateMatches(interaction, pointer, event, matches, matchElements, eventTarget, scope) {
+  for (let i = 0, len = matches.length; i < len; i++) {
+    const match = matches[i];
+    const matchElement = matchElements[i];
+    const matchAction = match.getAction(pointer, event, interaction, matchElement);
+
+    if (!matchAction) {
+      continue;
+    }
+
+    const action = validateAction(matchAction, match, matchElement, eventTarget, scope);
+
+    if (action) {
+      return {
+        action,
+        interactable: match,
+        element: matchElement
+      };
+    }
+  }
+
+  return {
+    action: null,
+    interactable: null,
+    element: null
+  };
+}
+
+function getActionInfo(interaction, pointer, event, eventTarget, scope) {
+  let matches = [];
+  let matchElements = [];
+  let element = eventTarget;
+
+  function pushMatches(interactable) {
+    matches.push(interactable);
+    matchElements.push(element);
+  }
+
+  while (utils.is.element(element)) {
+    matches = [];
+    matchElements = [];
+    scope.interactables.forEachMatch(element, pushMatches);
+    const actionInfo = validateMatches(interaction, pointer, event, matches, matchElements, eventTarget, scope);
+
+    if (actionInfo.action && !actionInfo.interactable.options[actionInfo.action.name].manualStart) {
+      return actionInfo;
+    }
+
+    element = utils.dom.parentNode(element);
+  }
+
+  return {
+    action: null,
+    interactable: null,
+    element: null
+  };
+}
+
+function prepare(interaction, {
+  action,
+  interactable,
+  element
+}, scope) {
+  action = action || {
+    name: null
+  }; // clear previous target element cursor
+
+  if (interaction.interactable && interaction.interactable.options.styleCursor) {
+    setCursor(interaction.element, '', scope);
+  }
+
+  interaction.interactable = interactable;
+  interaction.element = element;
+  utils.copyAction(interaction.prepared, action);
+  interaction.rect = interactable && action.name ? interactable.getRect(element) : null;
+  setInteractionCursor(interaction, scope);
+  scope.fire('autoStart:prepared', {
+    interaction
+  });
+}
+
+function withinInteractionLimit(interactable, element, action, scope) {
+  const options = interactable.options;
+  const maxActions = options[action.name].max;
+  const maxPerElement = options[action.name].maxPerElement;
+  const autoStartMax = scope.autoStart.maxInteractions;
+  let activeInteractions = 0;
+  let interactableCount = 0;
+  let elementCount = 0; // no actions if any of these values == 0
+
+  if (!(maxActions && maxPerElement && autoStartMax)) {
+    return false;
+  }
+
+  for (const interaction of scope.interactions.list) {
+    const otherAction = interaction.prepared.name;
+
+    if (!interaction.interacting()) {
+      continue;
+    }
+
+    activeInteractions++;
+
+    if (activeInteractions >= autoStartMax) {
+      return false;
+    }
+
+    if (interaction.interactable !== interactable) {
+      continue;
+    }
+
+    interactableCount += otherAction === action.name ? 1 : 0;
+
+    if (interactableCount >= maxActions) {
+      return false;
+    }
+
+    if (interaction.element === element) {
+      elementCount++;
+
+      if (otherAction === action.name && elementCount >= maxPerElement) {
+        return false;
+      }
+    }
+  }
+
+  return autoStartMax > 0;
+}
+
+function maxInteractions(newValue, scope) {
+  if (utils.is.number(newValue)) {
+    scope.autoStart.maxInteractions = newValue;
+    return this;
+  }
+
+  return scope.autoStart.maxInteractions;
+}
+
+function setCursor(element, cursor, scope) {
+  if (scope.autoStart.cursorElement) {
+    scope.autoStart.cursorElement.style.cursor = '';
+  }
+
+  element.ownerDocument.documentElement.style.cursor = cursor;
+  element.style.cursor = cursor;
+  scope.autoStart.cursorElement = cursor ? element : null;
+}
+
+function setInteractionCursor(interaction, scope) {
+  const {
+    interactable,
+    element,
+    prepared
+  } = interaction;
+
+  if (!(interaction.pointerType === 'mouse' && interactable && interactable.options.styleCursor)) {
+    return;
+  }
+
+  let cursor = '';
+
+  if (prepared.name) {
+    const cursorChecker = interactable.options[prepared.name].cursorChecker;
+
+    if (utils.is.func(cursorChecker)) {
+      cursor = cursorChecker(prepared, interactable, element, interaction._interacting);
+    } else {
+      cursor = scope.actions[prepared.name].getCursor(prepared);
+    }
+  }
+
+  setCursor(interaction.element, cursor || '', scope);
+}
+
+export default {
+  id: 'auto-start/base',
+  install,
+  listeners: {
+    'interactions:down': prepareOnDown,
+    'interactions:move': (arg, scope) => {
+      prepareOnMove(arg, scope);
+      startOnMove(arg, scope);
+    },
+    'interactions:stop': clearCursorOnStop
+  },
+  before: 'ations',
+  maxInteractions,
+  withinInteractionLimit,
+  validateAction
 };
-//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiYmFzZS5qcyIsInNvdXJjZVJvb3QiOiIiLCJzb3VyY2VzIjpbImJhc2UudHMiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IkFBQUEsT0FBTyxLQUFLLEtBQUssTUFBTSxtQkFBbUIsQ0FBQTtBQUMxQyxPQUFPLG1CQUFtQixNQUFNLHVCQUF1QixDQUFBO0FBMEN2RCxTQUFTLE9BQU8sQ0FBRSxLQUFxQjtJQUNyQyxNQUFNLEVBQ0osUUFBUSxFQUNSLFlBQVksRUFDWixRQUFRLEdBQ1QsR0FBRyxLQUFLLENBQUE7SUFFVCxLQUFLLENBQUMsU0FBUyxDQUFDLG1CQUFtQixDQUFDLENBQUE7SUFFcEMsZ0NBQWdDO0lBQ2hDLFlBQVksQ0FBQyxPQUFPLENBQUMsRUFBRSxDQUFDLE1BQU0sRUFBRSxDQUFDLEVBQUUsV0FBVyxFQUFFLE9BQU8sRUFBRSxLQUFLLEVBQUUsV0FBVyxFQUFFLEVBQUUsRUFBRTtRQUMvRSxJQUFJLFdBQVcsQ0FBQyxXQUFXLEVBQUUsRUFBRTtZQUFFLE9BQU07U0FBRTtRQUV6QyxNQUFNLFVBQVUsR0FBRyxhQUFhLENBQUMsV0FBVyxFQUFFLE9BQU8sRUFBRSxLQUFLLEVBQUUsV0FBVyxFQUFFLEtBQUssQ0FBQyxDQUFBO1FBQ2pGLE9BQU8sQ0FBQyxXQUFXLEVBQUUsVUFBVSxFQUFFLEtBQUssQ0FBQyxDQUFBO0lBQ3pDLENBQUMsQ0FBQyxDQUFBO0lBRUYsZ0NBQWdDO0lBQ2hDLFlBQVksQ0FBQyxPQUFPLENBQUMsRUFBRSxDQUFDLE1BQU0sRUFBRSxDQUFDLEVBQUUsV0FBVyxFQUFFLE9BQU8sRUFBRSxLQUFLLEVBQUUsV0FBVyxFQUFFLEVBQUUsRUFBRTtRQUMvRSxJQUFJLFdBQVcsQ0FBQyxXQUFXLEtBQUssT0FBTztZQUNuQyxXQUFXLENBQUMsYUFBYTtZQUN6QixXQUFXLENBQUMsV0FBVyxFQUFFLEVBQUU7WUFBRSxPQUFNO1NBQUU7UUFFekMsTUFBTSxVQUFVLEdBQUcsYUFBYSxDQUFDLFdBQVcsRUFBRSxPQUFPLEVBQUUsS0FBSyxF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QUFPLENBQUMsUUFBUSxDQUFDLElBQUksQ0FBQyxDQUFDLGFBQWEsQ0FBQTtRQUUvRixJQUFJLEtBQUssQ0FBQyxFQUFFLENBQUMsSUFBSSxDQUFDLGFBQWEsQ0FBQyxFQUFFO1lBQ2hDLE1BQU0sR0FBRyxhQUFhLENBQUMsUUFBUSxFQUFFLFlBQVksRUFBRSxPQUFPLEVBQUUsV0FBVyxDQUFDLFlBQVksQ0FBQyxDQUFBO1NBQ2xGO2FBQ0k7WUFDSCxNQUFNLEdBQUcsS0FBSyxDQUFDLE9BQU8sQ0FBQyxRQUFRLENBQUMsSUFBSSxDQUFDLENBQUMsU0FBUyxDQUFDLFFBQVEsQ0FBQyxDQUFBO1NBQzFEO0tBQ0Y7SUFFRCxTQUFTLENBQUMsV0FBVyxDQUFDLE9BQU8sRUFBRSxNQUFNLElBQUksRUFBRSxFQUFFLEtBQUssQ0FBQyxDQUFBO0FBQ3JELENBQUM7QUFFRCxlQUFlO0lBQ2IsRUFBRSxFQUFFLGlCQUFpQjtJQUNyQixPQUFPO0lBQ1AsZUFBZTtJQUNmLHNCQUFzQjtJQUN0QixjQUFjO0NBQ0ksQ0FBQSIsInNvdXJjZXNDb250ZW50IjpbImltcG9ydCAqIGFzIHV0aWxzIGZyb20gJ0BpbnRlcmFjdGpzL3V0aWxzJ1xuaW1wb3J0IEludGVyYWN0YWJsZU1ldGhvZHMgZnJvbSAnLi9JbnRlcmFjdGFibGVNZXRob2RzJ1xuXG5kZWNsYXJlIG1vZHVsZSAnQGludGVyYWN0anMvaW50ZXJhY3QvaW50ZXJhY3QnIHtcbiAgaW50ZXJmYWNlIEludGVyYWN0U3RhdGljIHtcbiAgICBtYXhJbnRlcmFjdGlvbnM6IChuZXdWYWx1ZTogYW55KSA9PiBhbnlcbiAgfVxufVxuXG5kZWNsYXJlIG1vZHVsZSAnQGludGVyYWN0anMvY29yZS9zY29wZScge1xuICBpbnRlcmZhY2UgU2NvcGUge1xuICAgIGF1dG9TdGFydDogQXV0b1N0YXJ0XG4gICAgbWF4SW50ZXJhY3Rpb25zOiAoLi4uYXJnczogYW55KSA9PiBhbnlcbiAgfVxufVxuXG5kZWNsYXJlIG1vZHVsZSAnQGludGVyYWN0anMvY29yZS9kZWZhdWx0T3B0aW9ucycge1xuICBpbnRlcmZhY2UgQmFzZURlZmF1bHRzIHtcbiAgICBhY3Rpb25DaGVja2VyP1xuICAgIHN0eWxlQ3Vyc29yP1xuICB9XG5cbiAgaW50ZXJmYWNlIFBlckFjdGlvbkRlZmF1bHRzIHtcbiAgICBtYW51YWxTdGFydD86IGJvb2xlYW5cbiAgICBtYXg/OiBudW1iZXJcbiAgICBtYXhQZXJFbGVtZW50PzogbnVtYmVyXG4gICAgYWxsb3dGcm9tPzogc3RyaW5nIHwgSW50ZXJhY3QuRWxlbWVudFxuICAgIGlnbm9yZUZyb20/OiBzdHJpbmcgfCBJbnRlcmFjdC5FbGVtZW50XG5cbiAgICAvLyBvbmx5IGFsbG93IGxlZnQgYnV0dG9uIGJ5IGRlZmF1bHRcbiAgICAvLyBzZWUgaHR0cHM6Ly9kZXZlbG9wZXIubW96aWxsYS5vcmcvZW4tVVMvZG9jcy9XZWIvQVBJL01vdXNlRXZlbnQvYnV0dG9ucyNSZXR1cm5fdmFsdWVcbiAgICBtb3VzZUJ1dHRvbnM/OiAwIHwgMSB8IDIgfCA0IHwgMTZcbiAgfVxufVxuXG5leHBvcnQgaW50ZXJmYWNlIEF1dG9TdGFydCB7XG4gIC8vIEFsbG93IHRoaXMgbWFueSBpbnRlcmFjdGlvbnMgdG8gaGFwcGVuIHNpbXVsdGFuZW91c2x5XG4gIG1heEludGVyYWN0aW9uczogbnVtYmVyXG4gIHdpdGhpbkludGVyYWN0aW9uTGltaXQ6IHR5cGVvZiB3aXRoaW5JbnRlcmFjdGlvbkxpbWl0XG4gIGN1cnNvckVsZW1lbnQ6IEludGVyYWN0LkVsZW1lbnRcbiAgc2lnbmFsczogdXRpbHMuU2lnbmFsc1xufVxuXG5mdW5jdGlvbiBpbnN0YWxsIChzY29wZTogSW50ZXJhY3QuU2NvcGUpIHtcbiAgY29uc3Qge1xuICAgIGludGVyYWN0LFxuICAgIGludGVyYWN0aW9ucyxcbiAgICBkZWZhdWx0cyxcbiAgfSA9IHNjb3BlXG5cbiAgc2NvcGUudXNlUGx1Z2luKEludGVyYWN0YWJsZU1ldGhvZHMpXG5cbiAgLy8gc2V0IGN1cnNvciBzdHlsZSBvbiBtb3VzZWRvd25cbiAgaW50ZXJhY3Rpb25zLnNpZ25hbHMub24oJ2Rvd24nLCAoeyBpbnRlcmFjdGlvbiwgcG9pbnRlciwgZXZlbnQsIGV2ZW50VGFyZ2V0IH0pID0+IHtcbiAgICBpZiAoaW50ZXJhY3Rpb24uaW50ZXJhY3RpbmcoKSkgeyByZXR1cm4gfVxuXG4gICAgY29uc3QgYWN0aW9uSW5mbyA9IGdldEFjdGlvbkluZm8oaW50ZXJhY3Rpb24sIHBvaW50ZXIsIGV2ZW50LCBldmVudFRhcmdldCwgc2NvcGUpXG4gICAgcHJlcGFyZShpbnRlcmFjdGlvbiwgYWN0aW9uSW5mbywgc2NvcGUpXG4gIH0pXG5cbiAgLy8gc2V0IGN1cnNvciBzdHlsZSBvbiBtb3VzZW1vdmVcbiAgaW50ZXJhY3Rpb25zLnNpZ25hbHMub24oJ21vdmUnLCAoeyBpbnRlcmFjdGlvbiwgcG9pbnRlciwgZXZlbnQsIGV2ZW50VGFyZ2V0IH0pID0+IHtcbiAgICBpZiAoaW50ZXJhY3Rpb24ucG9pbnRlclR5cGUgIT09ICdtb3VzZScgfHxcbiAgICAgICAgaW50ZXJhY3Rpb24ucG9pbnRlcklzRG93biB8fFxuICAgICAgICBpbnRlcmFjdGlvbi5pbnRlcmFjdGluZygpKSB7IHJldHVybiB9XG5cbiAgICBjb25zdCBhY3Rpb25JbmZvID0gZ2V0QWN0aW9uSW5mbyhpbnRlcmFjdGlvbiwgcG9pbnRlciwgZXZlbnQsIGV2ZW50VGFyZ2V0LCBzY29wZSlcbiAgICBwcmVwYXJlKGludGVyYWN0aW9uLCBhY3Rpb25JbmZvLCBzY29wZSlcbiAgfSlcblxuICBpbnRlcmFjdGlvbnMuc2lnbmFscy5vbignbW92ZScsIGFyZyA9PiB7XG4gICAgY29uc3QgeyBpbnRlcmFjdGlvbiB9ID0gYXJnXG5cbiAgICBpZiAoIWludGVyYWN0aW9uLnBvaW50ZXJJc0Rvd24gfHxcbiAgICAgICAgaW50ZXJhY3Rpb24uaW50ZXJhY3RpbmcoKSB8fFxuICAgICAgICAhaW50ZXJhY3Rpb24ucG9pbnRlcldhc01vdmVkIHx8XG4gICAgICAgICFpbnRlcmFjdGlvbi5wcmVwYXJlZC5uYW1lKSB7XG4gICAgICByZXR1cm5cbiAgICB9XG5cbiAgICBzY29wZS5hdXRvU3RhcnQuc2lnbmFscy5maXJlKCdiZWZvcmUtc3RhcnQnLCBhcmcpXG5cbiAgICBjb25zdCB7IGludGVyYWN0YWJsZSB9ID0gaW50ZXJhY3Rpb25cblxuICAgIGlmIChpbnRlcmFjdGlvbi5wcmVwYXJlZC5uYW1lICYmIGludGVyYWN0YWJsZSkge1xuICAgICAgLy8gY2hlY2sgbWFudWFsU3RhcnQgYW5kIGludGVyYWN0aW9uIGxpbWl0XG4gICAgICBpZiAoaW50ZXJhY3RhYmxlLm9wdGlvbnNbaW50ZXJhY3Rpb24ucHJlcGFyZWQubmFtZV0ubWFudWFsU3RhcnQgfHxcbiAgICAgICAgICAhd2l0aGluSW50ZXJhY3Rpb25MaW1pdChpbnRlcmFjdGFibGUsIGludGVyYWN0aW9uLmVsZW1lbnQsIGludGVyYWN0aW9uLnByZXBhcmVkLCBzY29wZSkpIHtcbiAgICAgICAgaW50ZXJhY3Rpb24uc3RvcCgpXG4gICAgICB9XG4gICAgICBlbHNlIHtcbiAgICAgICAgaW50ZXJhY3Rpb24uc3RhcnQoaW50ZXJhY3Rpb24ucHJlcGFyZWQsIGludGVyYWN0YWJsZSwgaW50ZXJhY3Rpb24uZWxlbWVudClcbiAgICAgICAgc2V0SW50ZXJhY3Rpb25DdXJzb3IoaW50ZXJhY3Rpb24sIHNjb3BlKVxuICAgICAgfVxuICAgIH1cbiAgfSlcblxuICBpbnRlcmFjdGlvbnMuc2lnbmFscy5vbignc3RvcCcsICh7IGludGVyYWN0aW9uIH0pID0+IHtcbiAgICBjb25zdCB7IGludGVyYWN0YWJsZSB9ID0gaW50ZXJhY3Rpb25cblxuICAgIGlmIChpbnRlcmFjdGFibGUgJiYgaW50ZXJhY3RhYmxlLm9wdGlvbnMuc3R5bGVDdXJzb3IpIHtcbiAgICAgIHNldEN1cnNvcihpbnRlcmFjdGlvbi5lbGVtZW50LCAnJywgc2NvcGUpXG4gICAgfVxuICB9KVxuXG4gIGRlZmF1bHRzLmJhc2UuYWN0aW9uQ2hlY2tlciA9IG51bGxcbiAgZGVmYXVsdHMuYmFzZS5zdHlsZUN1cnNvciA9IHRydWVcblxuICB1dGlscy5leHRlbmQoZGVmYXVsdHMucGVyQWN0aW9uLCB7XG4gICAgbWFudWFsU3RhcnQ6IGZhbHNlLFxuICAgIG1heDogSW5maW5pdHksXG4gICAgbWF4UGVyRWxlbWVudDogMSxcbiAgICBhbGxvd0Zyb206ICBudWxsLFxuICAgIGlnbm9yZUZyb206IG51bGwsXG5cbiAgICAvLyBvbmx5IGFsbG93IGxlZnQgYnV0dG9uIGJ5IGRlZmF1bHRcbiAgICAvLyBzZWUgaHR0cHM6Ly9kZXZlbG9wZXIubW96aWxsYS5vcmcvZW4tVVMvZG9jcy9XZWIvQVBJL01vdXNlRXZlbnQvYnV0dG9ucyNSZXR1cm5fdmFsdWVcbiAgICBtb3VzZUJ1dHRvbnM6IDEsXG4gIH0pXG5cbiAgLyoqXG4gICAqIFJldHVybnMgb3Igc2V0cyB0aGUgbWF4aW11bSBudW1iZXIgb2YgY29uY3VycmVudCBpbnRlcmFjdGlvbnMgYWxsb3dlZC4gIEJ5XG4gICAqIGRlZmF1bHQgb25seSAxIGludGVyYWN0aW9uIGlzIGFsbG93ZWQgYXQgYSB0aW1lIChmb3IgYmFja3dhcmRzXG4gICAqIGNvbXBhdGliaWxpdHkpLiBUbyBhbGxvdyBtdWx0aXBsZSBpbnRlcmFjdGlvbnMgb24gdGhlIHNhbWUgSW50ZXJhY3RhYmxlcyBhbmRcbiAgICogZWxlbWVudHMsIHlvdSBuZWVkIHRvIGVuYWJsZSBpdCBpbiB0aGUgZHJhZ2dhYmxlLCByZXNpemFibGUgYW5kIGdlc3R1cmFibGVcbiAgICogYCdtYXgnYCBhbmQgYCdtYXhQZXJFbGVtZW50J2Agb3B0aW9ucy5cbiAgICpcbiAgICogQGFsaWFzIG1vZHVsZTppbnRlcmFjdC5tYXhJbnRlcmFjdGlvbnNcbiAgICpcbiAgICogQHBhcmFtIHtudW1iZXJ9IFtuZXdWYWx1ZV0gQW55IG51bWJlci4gbmV3VmFsdWUgPD0gMCBtZWFucyBubyBpbnRlcmFjdGlvbnMuXG4gICAqL1xuICBpbnRlcmFjdC5tYXhJbnRlcmFjdGlvbnMgPSBuZXdWYWx1ZSA9PiBtYXhJbnRlcmFjdGlvbnMobmV3VmFsdWUsIHNjb3BlKVxuXG4gIHNjb3BlLmF1dG9TdGFydCA9IHtcbiAgICAvLyBBbGxvdyB0aGlzIG1hbnkgaW50ZXJhY3Rpb25zIHRvIGhhcHBlbiBzaW11bHRhbmVvdXNseVxuICAgIG1heEludGVyYWN0aW9uczogSW5maW5pdHksXG4gICAgd2l0aGluSW50ZXJhY3Rpb25MaW1pdCxcbiAgICBjdXJzb3JFbGVtZW50OiBudWxsLFxuICAgIHNpZ25hbHM6IG5ldyB1dGlscy5TaWduYWxzKCksXG4gIH1cbn1cblxuLy8gQ2hlY2sgaWYgdGhlIGN1cnJlbnQgaW50ZXJhY3RhYmxlIHN1cHBvcnRzIHRoZSBhY3Rpb24uXG4vLyBJZiBzbywgcmV0dXJuIHRoZSB2YWxpZGF0ZWQgYWN0aW9uLiBPdGhlcndpc2UsIHJldHVybiBudWxsXG5mdW5jdGlvbiB2YWxpZGF0ZUFjdGlvbiAoXG4gIGFjdGlvbjogSW50ZXJhY3QuQWN0aW9uUHJvcHMsXG4gIGludGVyYWN0YWJsZTogSW50ZXJhY3QuSW50ZXJhY3RhYmxlLFxuICBlbGVtZW50OiBJbnRlcmFjdC5FbGVtZW50LFxuICBldmVudFRhcmdldDogSW50ZXJhY3QuRWxlbWVudCxcbiAgc2NvcGU6IEludGVyYWN0LlNjb3BlLFxuKSB7XG4gIGlmIChpbnRlcmFjdGFibGUudGVzdElnbm9yZUFsbG93KGludGVyYWN0YWJsZS5vcHRpb25zW2FjdGlvbi5uYW1lXSwgZWxlbWVudCwgZXZlbnRUYXJnZXQpICYmXG4gICAgICBpbnRlcmFjdGFibGUub3B0aW9uc1thY3Rpb24ubmFtZV0uZW5hYmxlZCAmJlxuICAgICAgd2l0aGluSW50ZXJhY3Rpb25MaW1pdChpbnRlcmFjdGFibGUsIGVsZW1lbnQsIGFjdGlvbiwgc2NvcGUpKSB7XG4gICAgcmV0dXJuIGFjdGlvblxuICB9XG5cbiAgcmV0dXJuIG51bGxcbn1cblxuZnVuY3Rpb24gdmFsaWRhdGVNYXRjaGVzIChcbiAgaW50ZXJhY3Rpb246IEludGVyYWN0LkludGVyYWN0aW9uLFxuICBwb2ludGVyLFxuICBldmVudCxcbiAgbWF0Y2hlczogSW50ZXJhY3QuSW50ZXJhY3RhYmxlW10sXG4gIG1hdGNoRWxlbWVudHM6IEludGVyYWN0LkVsZW1lbnRbXSxcbiAgZXZlbnRUYXJnZXQ6IEludGVyYWN0LkVsZW1lbnQsXG4gIHNjb3BlOiBJbnRlcmFjdC5TY29wZSxcbikge1xuICBmb3IgKGxldCBpID0gMCwgbGVuID0gbWF0Y2hlcy5sZW5ndGg7IGkgPCBsZW47IGkrKykge1xuICAgIGNvbnN0IG1hdGNoID0gbWF0Y2hlc1tpXVxuICAgIGNvbnN0IG1hdGNoRWxlbWVudCA9IG1hdGNoRWxlbWVudHNbaV1cbiAgICBjb25zdCBtYXRjaEFjdGlvbiA9IG1hdGNoLmdldEFjdGlvbihwb2ludGVyLCBldmVudCwgaW50ZXJhY3Rpb24sIG1hdGNoRWxlbWVudClcblxuICAgIGlmICghbWF0Y2hBY3Rpb24pIHsgY29udGludWUgfVxuXG4gICAgY29uc3QgYWN0aW9uID0gdmFsaWRhdGVBY3Rpb24oXG4gICAgICBtYXRjaEFjdGlvbixcbiAgICAgIG1hdGNoLFxuICAgICAgbWF0Y2hFbGVtZW50LFxuICAgICAgZXZlbnRUYXJnZXQsXG4gICAgICBzY29wZSlcblxuICAgIGlmIChhY3Rpb24pIHtcbiAgICAgIHJldHVybiB7XG4gICAgICAgIGFjdGlvbixcbiAgICAgICAgaW50ZXJhY3RhYmxlOiBtYXRjaCxcbiAgICAgICAgZWxlbWVudDogbWF0Y2hFbGVtZW50LFxuICAgICAgfVxuICAgIH1cbiAgfVxuXG4gIHJldHVybiB7IGFjdGlvbjogbnVsbCwgaW50ZXJhY3RhYmxlOiBudWxsLCBlbGVtZW50OiBudWxsIH1cbn1cblxuZnVuY3Rpb24gZ2V0QWN0aW9uSW5mbyAoXG4gIGludGVyYWN0aW9uOiBJbnRlcmFjdC5JbnRlcmFjdGlvbixcbiAgcG9pbnRlcjogSW50ZXJhY3QuUG9pbnRlclR5cGUsXG4gIGV2ZW50OiBJbnRlcmFjdC5Qb2ludGVyRXZlbnRUeXBlLFxuICBldmVudFRhcmdldDogSW50ZXJhY3QuRWxlbWVudCxcbiAgc2NvcGU6IEludGVyYWN0LlNjb3BlLFxuKSB7XG4gIGxldCBtYXRjaGVzID0gW11cbiAgbGV0IG1hdGNoRWxlbWVudHMgPSBbXVxuXG4gIGxldCBlbGVtZW50ID0gZXZlbnRUYXJnZXRcblxuICBmdW5jdGlvbiBwdXNoTWF0Y2hlcyAoaW50ZXJhY3RhYmxlKSB7XG4gICAgbWF0Y2hlcy5wdXNoKGludGVyYWN0YWJsZSlcbiAgICBtYXRjaEVsZW1lbnRzLnB1c2goZWxlbWVudClcbiAgfVxuXG4gIHdoaWxlICh1dGlscy5pcy5lbGVtZW50KGVsZW1lbnQpKSB7XG4gICAgbWF0Y2hlcyA9IFtdXG4gICAgbWF0Y2hFbGVtZW50cyA9IFtdXG5cbiAgICBzY29wZS5pbnRlcmFjdGFibGVzLmZvckVhY2hNYXRjaChlbGVtZW50LCBwdXNoTWF0Y2hlcylcblxuICAgIGNvbnN0IGFjdGlvbkluZm8gPSB2YWxpZGF0ZU1hdGNoZXMoaW50ZXJhY3Rpb24sIHBvaW50ZXIsIGV2ZW50LCBtYXRjaGVzLCBtYXRjaEVsZW1lbnRzLCBldmVudFRhcmdldCwgc2NvcGUpXG5cbiAgICBpZiAoYWN0aW9uSW5mby5hY3Rpb24gJiZcbiAgICAgICFhY3Rpb25JbmZvLmludGVyYWN0YWJsZS5vcHRpb25zW2FjdGlvbkluZm8uYWN0aW9uLm5hbWVdLm1hbnVhbFN0YXJ0KSB7XG4gICAgICByZXR1cm4gYWN0aW9uSW5mb1xuICAgIH1cblxuICAgIGVsZW1lbnQgPSB1dGlscy5kb20ucGFyZW50Tm9kZShlbGVtZW50KVxuICB9XG5cbiAgcmV0dXJuIHsgYWN0aW9uOiBudWxsLCBpbnRlcmFjdGFibGU6IG51bGwsIGVsZW1lbnQ6IG51bGwgfVxufVxuXG5mdW5jdGlvbiBwcmVwYXJlIChcbiAgaW50ZXJhY3Rpb246IEludGVyYWN0LkludGVyYWN0aW9uLFxuICB7IGFjdGlvbiwgaW50ZXJhY3RhYmxlLCBlbGVtZW50IH06IHtcbiAgICBhY3Rpb246IEludGVyYWN0LkFjdGlvblByb3BzXG4gICAgaW50ZXJhY3RhYmxlOiBJbnRlcmFjdC5JbnRlcmFjdGFibGVcbiAgICBlbGVtZW50OiBJbnRlcmFjdC5FbGVtZW50XG4gIH0sXG4gIHNjb3BlOiBJbnRlcmFjdC5TY29wZSxcbikge1xuICBhY3Rpb24gPSBhY3Rpb24gfHwgeyBuYW1lOiBudWxsIH1cblxuICAvLyBjbGVhciBwcmV2aW91cyB0YXJnZXQgZWxlbWVudCBjdXJzb3JcbiAgaWYgKGludGVyYWN0aW9uLmludGVyYWN0YWJsZSAmJiBpbnRlcmFjdGlvbi5pbnRlcmFjdGFibGUub3B0aW9ucy5zdHlsZUN1cnNvcikge1xuICAgIHNldEN1cnNvcihpbnRlcmFjdGlvbi5lbGVtZW50LCAnJywgc2NvcGUpXG4gIH1cblxuICBpbnRlcmFjdGlvbi5pbnRlcmFjdGFibGUgPSBpbnRlcmFjdGFibGVcbiAgaW50ZXJhY3Rpb24uZWxlbWVudCA9IGVsZW1lbnRcbiAgdXRpbHMuY29weUFjdGlvbihpbnRlcmFjdGlvbi5wcmVwYXJlZCwgYWN0aW9uKVxuXG4gIGludGVyYWN0aW9uLnJlY3QgPSBpbnRlcmFjdGFibGUgJiYgYWN0aW9uLm5hbWVcbiAgICA/IGludGVyYWN0YWJsZS5nZXRSZWN0KGVsZW1lbnQpXG4gICAgOiBudWxsXG5cbiAgc2V0SW50ZXJhY3Rpb25DdXJzb3IoaW50ZXJhY3Rpb24sIHNjb3BlKVxuXG4gIHNjb3BlLmF1dG9TdGFydC5zaWduYWxzLmZpcmUoJ3ByZXBhcmVkJywgeyBpbnRlcmFjdGlvbiB9KVxufVxuXG5mdW5jdGlvbiB3aXRoaW5JbnRlcmFjdGlvbkxpbWl0IChpbnRlcmFjdGFibGU6IEludGVyYWN0LkludGVyYWN0YWJsZSwgZWxlbWVudDogSW50ZXJhY3QuRWxlbWVudCwgYWN0aW9uLCBzY29wZTogSW50ZXJhY3QuU2NvcGUpIHtcbiAgY29uc3Qgb3B0aW9ucyA9IGludGVyYWN0YWJsZS5vcHRpb25zXG4gIGNvbnN0IG1heEFjdGlvbnMgPSBvcHRpb25zW2FjdGlvbi5uYW1lXS5tYXhcbiAgY29uc3QgbWF4UGVyRWxlbWVudCA9IG9wdGlvbnNbYWN0aW9uLm5hbWVdLm1heFBlckVsZW1lbnRcbiAgY29uc3QgYXV0b1N0YXJ0TWF4ID0gc2NvcGUuYXV0b1N0YXJ0Lm1heEludGVyYWN0aW9uc1xuICBsZXQgYWN0aXZlSW50ZXJhY3Rpb25zID0gMFxuICBsZXQgaW50ZXJhY3RhYmxlQ291bnQgPSAwXG4gIGxldCBlbGVtZW50Q291bnQgPSAwXG5cbiAgLy8gbm8gYWN0aW9ucyBpZiBhbnkgb2YgdGhlc2UgdmFsdWVzID09IDBcbiAgaWYgKCEobWF4QWN0aW9ucyAmJiBtYXhQZXJFbGVtZW50ICYmIGF1dG9TdGFydE1heCkpIHsgcmV0dXJuIGZhbHNlIH1cblxuICBmb3IgKGNvbnN0IGludGVyYWN0aW9uIG9mIHNjb3BlLmludGVyYWN0aW9ucy5saXN0KSB7XG4gICAgY29uc3Qgb3RoZXJBY3Rpb24gPSBpbnRlcmFjdGlvbi5wcmVwYXJlZC5uYW1lXG5cbiAgICBpZiAoIWludGVyYWN0aW9uLmludGVyYWN0aW5nKCkpIHsgY29udGludWUgfVxuXG4gICAgYWN0aXZlSW50ZXJhY3Rpb25zKytcblxuICAgIGlmIChhY3RpdmVJbnRlcmFjdGlvbnMgPj0gYXV0b1N0YXJ0TWF4KSB7XG4gICAgICByZXR1cm4gZmFsc2VcbiAgICB9XG5cbiAgICBpZiAoaW50ZXJhY3Rpb24uaW50ZXJhY3RhYmxlICE9PSBpbnRlcmFjdGFibGUpIHsgY29udGludWUgfVxuXG4gICAgaW50ZXJhY3RhYmxlQ291bnQgKz0gb3RoZXJBY3Rpb24gPT09IGFjdGlvbi5uYW1lID8gMSA6IDBcblxuICAgIGlmIChpbnRlcmFjdGFibGVDb3VudCA+PSBtYXhBY3Rpb25zKSB7XG4gICAgICByZXR1cm4gZmFsc2VcbiAgICB9XG5cbiAgICBpZiAoaW50ZXJhY3Rpb24uZWxlbWVudCA9PT0gZWxlbWVudCkge1xuICAgICAgZWxlbWVudENvdW50KytcblxuICAgICAgaWYgKG90aGVyQWN0aW9uID09PSBhY3Rpb24ubmFtZSAmJiBlbGVtZW50Q291bnQgPj0gbWF4UGVyRWxlbWVudCkge1xuICAgICAgICByZXR1cm4gZmFsc2VcbiAgICAgIH1cbiAgICB9XG4gIH1cblxuICByZXR1cm4gYXV0b1N0YXJ0TWF4ID4gMFxufVxuXG5mdW5jdGlvbiBtYXhJbnRlcmFjdGlvbnMgKG5ld1ZhbHVlLCBzY29wZTogSW50ZXJhY3QuU2NvcGUpIHtcbiAgaWYgKHV0aWxzLmlzLm51bWJlcihuZXdWYWx1ZSkpIHtcbiAgICBzY29wZS5hdXRvU3RhcnQubWF4SW50ZXJhY3Rpb25zID0gbmV3VmFsdWVcblxuICAgIHJldHVybiB0aGlzXG4gIH1cblxuICByZXR1cm4gc2NvcGUuYXV0b1N0YXJ0Lm1heEludGVyYWN0aW9uc1xufVxuXG5mdW5jdGlvbiBzZXRDdXJzb3IgKGVsZW1lbnQ6IEludGVyYWN0LkVsZW1lbnQsIGN1cnNvciwgc2NvcGU6IEludGVyYWN0LlNjb3BlKSB7XG4gIGlmIChzY29wZS5hdXRvU3RhcnQuY3Vyc29yRWxlbWVudCkge1xuICAgIHNjb3BlLmF1dG9TdGFydC5jdXJzb3JFbGVtZW50LnN0eWxlLmN1cnNvciA9ICcnXG4gIH1cblxuICBlbGVtZW50Lm93bmVyRG9jdW1lbnQuZG9jdW1lbnRFbGVtZW50LnN0eWxlLmN1cnNvciA9IGN1cnNvclxuICBlbGVtZW50LnN0eWxlLmN1cnNvciA9IGN1cnNvclxuICBzY29wZS5hdXRvU3RhcnQuY3Vyc29yRWxlbWVudCA9IGN1cnNvciA/IGVsZW1lbnQgOiBudWxsXG59XG5cbmZ1bmN0aW9uIHNldEludGVyYWN0aW9uQ3Vyc29yIChpbnRlcmFjdGlvbjogSW50ZXJhY3QuSW50ZXJhY3Rpb24sIHNjb3BlOiBJbnRlcmFjdC5TY29wZSkge1xuICBjb25zdCB7IGludGVyYWN0YWJsZSwgZWxlbWVudCwgcHJlcGFyZWQgfSA9IGludGVyYWN0aW9uXG5cbiAgaWYgKCEoaW50ZXJhY3Rpb24ucG9pbnRlclR5cGUgPT09ICdtb3VzZScgJiYgaW50ZXJhY3RhYmxlICYmIGludGVyYWN0YWJsZS5vcHRpb25zLnN0eWxlQ3Vyc29yKSkge1xuICAgIHJldHVyblxuICB9XG5cbiAgbGV0IGN1cnNvciA9ICcnXG5cbiAgaWYgKHByZXBhcmVkLm5hbWUpIHtcbiAgICBjb25zdCBjdXJzb3JDaGVja2VyOiBJbnRlcmFjdC5DdXJzb3JDaGVja2VyID0gaW50ZXJhY3RhYmxlLm9wdGlvbnNbcHJlcGFyZWQubmFtZV0uY3Vyc29yQ2hlY2tlclxuXG4gICAgaWYgKHV0aWxzLmlzLmZ1bmMoY3Vyc29yQ2hlY2tlcikpIHtcbiAgICAgIGN1cnNvciA9IGN1cnNvckNoZWNrZXIocHJlcGFyZWQsIGludGVyYWN0YWJsZSwgZWxlbWVudCwgaW50ZXJhY3Rpb24uX2ludGVyYWN0aW5nKVxuICAgIH1cbiAgICBlbHNlIHtcbiAgICAgIGN1cnNvciA9IHNjb3BlLmFjdGlvbnNbcHJlcGFyZWQubmFtZV0uZ2V0Q3Vyc29yKHByZXBhcmVkKVxuICAgIH1cbiAgfVxuXG4gIHNldEN1cnNvcihpbnRlcmFjdGlvbi5lbGVtZW50LCBjdXJzb3IgfHwgJycsIHNjb3BlKVxufVxuXG5leHBvcnQgZGVmYXVsdCB7XG4gIGlkOiAnYXV0by1zdGFydC9iYXNlJyxcbiAgaW5zdGFsbCxcbiAgbWF4SW50ZXJhY3Rpb25zLFxuICB3aXRoaW5JbnRlcmFjdGlvbkxpbWl0LFxuICB2YWxpZGF0ZUFjdGlvbixcbn0gYXMgSW50ZXJhY3QuUGx1Z2luXG4iXX0=
+//# sourceMappingURL=base.js.map

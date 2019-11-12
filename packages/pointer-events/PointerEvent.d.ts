@@ -1,8 +1,8 @@
-import BaseEvent from '@interactjs/core/BaseEvent';
+import BaseEvent from '../core/BaseEvent';
 /** */
 export default class PointerEvent<T extends string> extends BaseEvent {
     type: T;
-    originalEvent: Interact.PointerEventType;
+    originalEvent: Interact.PointerEventType | PointerEvent<any>;
     pointerId: number;
     pointerType: string;
     double: boolean;
@@ -13,7 +13,7 @@ export default class PointerEvent<T extends string> extends BaseEvent {
     dt: number;
     eventable: any;
     /** */
-    constructor(type: T, pointer: Interact.PointerType | PointerEvent<any>, event: Interact.PointerEventType, eventTarget: Interact.EventTarget, interaction: Interact.Interaction, timeStamp: number);
+    constructor(type: T, pointer: Interact.PointerType | PointerEvent<any>, event: Interact.PointerEventType | PointerEvent<any>, eventTarget: Interact.EventTarget, interaction: Interact.Interaction, timeStamp: number);
     _subtractOrigin({ x: originX, y: originY }: {
         x: any;
         y: any;

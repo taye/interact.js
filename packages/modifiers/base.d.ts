@@ -1,4 +1,3 @@
-import { Scope } from '@interactjs/core/scope';
 declare module '@interactjs/core/scope' {
     interface Scope {
         modifiers?: any;
@@ -52,7 +51,11 @@ export declare type ModifierState<Defaults = {}, StateProps extends {
     index?: number;
     name?: Name;
 } & StateProps;
-export interface ModifierArg<State extends ModifierState = ModifierState> extends Pick<Interact.SignalArg, 'interaction' | 'interactable' | 'phase' | 'rect'> {
+export interface ModifierArg<State extends ModifierState = ModifierState> {
+    interaction: Interact.Interaction;
+    interactable: Interact.Interactable;
+    phase: Interact.EventPhase;
+    rect: Interact.Rect;
     states?: State[];
     state?: State;
     element: Interact.Element;
@@ -63,8 +66,19 @@ export interface ModifierArg<State extends ModifierState = ModifierState> extend
     preEnd?: boolean;
     requireEndOnly?: boolean;
 }
-declare function install(scope: Scope): void;
-declare function start({ interaction, phase }: Interact.SignalArg, pageCoords: Interact.Point, prevCoords: Interact.Point): {
+export interface ModifierModule<Defaults extends {
+    enabled?: boolean;
+}, State extends ModifierState> {
+    defaults?: Defaults;
+    start?(arg: ModifierArg<State>): void;
+    set?(arg: ModifierArg<State>): void;
+    beforeEnd?(arg: ModifierArg<State>): boolean;
+    stop?(arg: ModifierArg<State>): void;
+}
+declare function start({ interaction, phase }: {
+    interaction: Interact.Interaction;
+    phase: Interact.EventPhase;
+}, pageCoords: Interact.Point, prevCoords: Interact.Point): {
     delta: {
         x: number;
         y: number;
@@ -79,7 +93,7 @@ declare function start({ interaction, phase }: Interact.SignalArg, pageCoords: I
     changed: boolean;
 };
 export declare function startAll(arg: ModifierArg<any>): void;
-export declare function setAll(arg: Partial<Interact.SignalArg>): {
+export declare function setAll(arg: ModifierArg): {
     delta: {
         x: number;
         y: number;
@@ -93,9 +107,22 @@ export declare function setAll(arg: Partial<Interact.SignalArg>): {
     coords: import("../types/types").Point;
     changed: boolean;
 };
-declare function beforeMove(arg: Interact.SignalArg): void | false;
-declare function beforeEnd(arg: Interact.SignalArg): void | false;
-declare function stop(arg: Interact.SignalArg): void;
+declare function beforeMove(arg: Partial<Interact.DoPhaseArg> & {
+    interaction: Interact.Interaction;
+    phase: Interact.EventPhase;
+    preEnd?: boolean;
+    skipModifiers?: number;
+    prevCoords?: Interact.Point;
+    modifiedCoords?: Interact.Point;
+}): void | false;
+declare function beforeEnd(arg: Interact.DoPhaseArg & {
+    noPreEnd?: boolean;
+    state?: ModifierState;
+}): void | false;
+declare function stop(arg: {
+    interaction: Interact.Interaction;
+    phase: Interact.EventPhase;
+}): void;
 declare function getModifierList(interaction: any): any;
 export declare function prepareStates(modifierList: Modifier[]): {
     options: {};
@@ -125,22 +152,32 @@ declare function getRectOffset(rect: any, coords: any): {
 };
 export declare function makeModifier<Defaults extends {
     enabled?: boolean;
-}, State extends ModifierState, Name extends string>(module: {
-    defaults?: Defaults;
-    [key: string]: any;
-}, name?: Name): {
+}, State extends ModifierState, Name extends string>(module: ModifierModule<Defaults, State>, name?: Name): {
     (_options?: Partial<Defaults>): Modifier<Defaults, State, Name>;
     _defaults: Defaults;
     _methods: {
-        start: any;
-        set: any;
-        beforeEnd: any;
-        stop: any;
+        start: (arg: ModifierArg<State>) => void;
+        set: (arg: ModifierArg<State>) => void;
+        beforeEnd: (arg: ModifierArg<State>) => boolean;
+        stop: (arg: ModifierArg<State>) => void;
     };
 };
 declare const _default: {
     id: string;
-    install: typeof install;
+    install: (scope: any) => void;
+    listeners: {
+        'interactions:new': ({ interaction }: {
+            interaction: any;
+        }) => void;
+        'interactions:before-action-start': (arg: any) => void;
+        'interactions:action-resume': (arg: any) => void;
+        'interactions:after-action-move': typeof restoreCoords;
+        'interactions:before-action-move': typeof beforeMove;
+        'interactions:after-action-start': typeof restoreCoords;
+        'interactions:before-action-end': typeof beforeEnd;
+        'interactions:stop': typeof stop;
+    };
+    before: string;
     startAll: typeof startAll;
     setAll: typeof setAll;
     prepareStates: typeof prepareStates;

@@ -1,200 +1,222 @@
-import browser from './browser';
-import domObjects from './domObjects';
-import * as is from './is';
-import win, { getWindow } from './window';
+import browser from "./browser.js";
+import domObjects from "./domObjects.js";
+import * as is from "./is.js";
+import win, { getWindow } from "./window.js";
 export function nodeContains(parent, child) {
-    while (child) {
-        if (child === parent) {
-            return true;
-        }
-        child = child.parentNode;
+  while (child) {
+    if (child === parent) {
+      return true;
     }
-    return false;
+
+    child = child.parentNode;
+  }
+
+  return false;
 }
 export function closest(element, selector) {
-    while (is.element(element)) {
-        if (matchesSelector(element, selector)) {
-            return element;
-        }
-        element = parentNode(element);
+  while (is.element(element)) {
+    if (matchesSelector(element, selector)) {
+      return element;
     }
-    return null;
+
+    element = parentNode(element);
+  }
+
+  return null;
 }
 export function parentNode(node) {
-    let parent = node.parentNode;
-    if (is.docFrag(parent)) {
-        // skip past #shado-root fragments
-        // tslint:disable-next-line
-        while ((parent = parent.host) && is.docFrag(parent)) {
-            continue;
-        }
-        return parent;
+  let parent = node.parentNode;
+
+  if (is.docFrag(parent)) {
+    // skip past #shado-root fragments
+    // tslint:disable-next-line
+    while ((parent = parent.host) && is.docFrag(parent)) {
+      continue;
     }
+
     return parent;
+  }
+
+  return parent;
 }
 export function matchesSelector(element, selector) {
-    // remove /deep/ from selectors if shadowDOM polyfill is used
-    if (win.window !== win.realWindow) {
-        selector = selector.replace(/\/deep\//g, ' ');
-    }
-    return element[browser.prefixedMatchesSelector](selector);
+  // remove /deep/ from selectors if shadowDOM polyfill is used
+  if (win.window !== win.realWindow) {
+    selector = selector.replace(/\/deep\//g, ' ');
+  }
+
+  return element[browser.prefixedMatchesSelector](selector);
 }
-const getParent = el => el.parentNode ? el.parentNode : el.host;
-// Test for the element that's "above" all other qualifiers
+
+const getParent = el => el.parentNode ? el.parentNode : el.host; // Test for the element that's "above" all other qualifiers
+
+
 export function indexOfDeepestElement(elements) {
-    let deepestZoneParents = [];
-    let deepestZone = elements[0];
-    let index = deepestZone ? 0 : -1;
-    let i;
-    let n;
-    for (i = 1; i < elements.length; i++) {
-        const dropzone = elements[i];
-        // an element might belong to multiple selector dropzones
-        if (!dropzone || dropzone === deepestZone) {
-            continue;
-        }
-        if (!deepestZone) {
-            deepestZone = dropzone;
-            index = i;
-            continue;
-        }
-        // check if the deepest or current are document.documentElement or document.rootElement
-        // - if the current dropzone is, do nothing and continue
-        if (dropzone.parentNode === dropzone.ownerDocument) {
-            continue;
-        }
-        // - if deepest is, update with the current dropzone and continue to next
-        else if (deepestZone.parentNode === dropzone.ownerDocument) {
-            deepestZone = dropzone;
-            index = i;
-            continue;
-        }
-        // compare zIndex of siblings
-        if (dropzone.parentNode === deepestZone.parentNode) {
-            const deepestZIndex = parseInt(getWindow(deepestZone).getComputedStyle(deepestZone).zIndex, 10) || 0;
-            const dropzoneZIndex = parseInt(getWindow(dropzone).getComputedStyle(dropzone).zIndex, 10) || 0;
-            if (dropzoneZIndex >= deepestZIndex) {
-                deepestZone = dropzone;
-                index = i;
-            }
-            continue;
-        }
-        // populate the ancestry array for the latest deepest dropzone
-        if (!deepestZoneParents.length) {
-            let parent = deepestZone;
-            let parentParent;
-            while ((parentParent = getParent(parent)) && parentParent !== parent.ownerDocument) {
-                deepestZoneParents.unshift(parent);
-                parent = parentParent;
-            }
-        }
-        let parent;
-        // if this element is an svg element and the current deepest is an
-        // HTMLElement
-        if (deepestZone instanceof domObjects.HTMLElement &&
-            dropzone instanceof domObjects.SVGElement &&
-            !(dropzone instanceof domObjects.SVGSVGElement)) {
-            if (dropzone === deepestZone.parentNode) {
-                continue;
-            }
-            parent = dropzone.ownerSVGElement;
-        }
-        else {
-            parent = dropzone;
-        }
-        const dropzoneParents = [];
-        while (parent.parentNode !== parent.ownerDocument) {
-            dropzoneParents.unshift(parent);
-            parent = getParent(parent);
-        }
-        n = 0;
-        // get (position of last common ancestor) + 1
-        while (dropzoneParents[n] && dropzoneParents[n] === deepestZoneParents[n]) {
-            n++;
-        }
-        const parents = [
-            dropzoneParents[n - 1],
-            dropzoneParents[n],
-            deepestZoneParents[n],
-        ];
-        let child = parents[0].lastChild;
-        while (child) {
-            if (child === parents[1]) {
-                deepestZone = dropzone;
-                index = i;
-                deepestZoneParents = dropzoneParents;
-                break;
-            }
-            else if (child === parents[2]) {
-                break;
-            }
-            child = child.previousSibling;
-        }
+  let deepestZoneParents = [];
+  let deepestZone = elements[0];
+  let index = deepestZone ? 0 : -1;
+  let i;
+  let n;
+
+  for (i = 1; i < elements.length; i++) {
+    const dropzone = elements[i]; // an element might belong to multiple selector dropzones
+
+    if (!dropzone || dropzone === deepestZone) {
+      continue;
     }
-    return index;
+
+    if (!deepestZone) {
+      deepestZone = dropzone;
+      index = i;
+      continue;
+    } // check if the deepest or current are document.documentElement or document.rootElement
+    // - if the current dropzone is, do nothing and continue
+
+
+    if (dropzone.parentNode === dropzone.ownerDocument) {
+      continue;
+    } // - if deepest is, update with the current dropzone and continue to next
+    else if (deepestZone.parentNode === dropzone.ownerDocument) {
+        deepestZone = dropzone;
+        index = i;
+        continue;
+      } // compare zIndex of siblings
+
+
+    if (dropzone.parentNode === deepestZone.parentNode) {
+      const deepestZIndex = parseInt(getWindow(deepestZone).getComputedStyle(deepestZone).zIndex, 10) || 0;
+      const dropzoneZIndex = parseInt(getWindow(dropzone).getComputedStyle(dropzone).zIndex, 10) || 0;
+
+      if (dropzoneZIndex >= deepestZIndex) {
+        deepestZone = dropzone;
+        index = i;
+      }
+
+      continue;
+    } // populate the ancestry array for the latest deepest dropzone
+
+
+    if (!deepestZoneParents.length) {
+      let parent = deepestZone;
+      let parentParent;
+
+      while ((parentParent = getParent(parent)) && parentParent !== parent.ownerDocument) {
+        deepestZoneParents.unshift(parent);
+        parent = parentParent;
+      }
+    }
+
+    let parent; // if this element is an svg element and the current deepest is an
+    // HTMLElement
+
+    if (deepestZone instanceof domObjects.HTMLElement && dropzone instanceof domObjects.SVGElement && !(dropzone instanceof domObjects.SVGSVGElement)) {
+      if (dropzone === deepestZone.parentNode) {
+        continue;
+      }
+
+      parent = dropzone.ownerSVGElement;
+    } else {
+      parent = dropzone;
+    }
+
+    const dropzoneParents = [];
+
+    while (parent.parentNode !== parent.ownerDocument) {
+      dropzoneParents.unshift(parent);
+      parent = getParent(parent);
+    }
+
+    n = 0; // get (position of last common ancestor) + 1
+
+    while (dropzoneParents[n] && dropzoneParents[n] === deepestZoneParents[n]) {
+      n++;
+    }
+
+    const parents = [dropzoneParents[n - 1], dropzoneParents[n], deepestZoneParents[n]];
+    let child = parents[0].lastChild;
+
+    while (child) {
+      if (child === parents[1]) {
+        deepestZone = dropzone;
+        index = i;
+        deepestZoneParents = dropzoneParents;
+        break;
+      } else if (child === parents[2]) {
+        break;
+      }
+
+      child = child.previousSibling;
+    }
+  }
+
+  return index;
 }
 export function matchesUpTo(element, selector, limit) {
-    while (is.element(element)) {
-        if (matchesSelector(element, selector)) {
-            return true;
-        }
-        element = parentNode(element);
-        if (element === limit) {
-            return matchesSelector(element, selector);
-        }
+  while (is.element(element)) {
+    if (matchesSelector(element, selector)) {
+      return true;
     }
-    return false;
+
+    element = parentNode(element);
+
+    if (element === limit) {
+      return matchesSelector(element, selector);
+    }
+  }
+
+  return false;
 }
 export function getActualElement(element) {
-    return (element instanceof domObjects.SVGElementInstance
-        ? element.correspondingUseElement
-        : element);
+  return element instanceof domObjects.SVGElementInstance ? element.correspondingUseElement : element;
 }
 export function getScrollXY(relevantWindow) {
-    relevantWindow = relevantWindow || win.window;
-    return {
-        x: relevantWindow.scrollX || relevantWindow.document.documentElement.scrollLeft,
-        y: relevantWindow.scrollY || relevantWindow.document.documentElement.scrollTop,
-    };
+  relevantWindow = relevantWindow || win.window;
+  return {
+    x: relevantWindow.scrollX || relevantWindow.document.documentElement.scrollLeft,
+    y: relevantWindow.scrollY || relevantWindow.document.documentElement.scrollTop
+  };
 }
 export function getElementClientRect(element) {
-    const clientRect = (element instanceof domObjects.SVGElement
-        ? element.getBoundingClientRect()
-        : element.getClientRects()[0]);
-    return clientRect && {
-        left: clientRect.left,
-        right: clientRect.right,
-        top: clientRect.top,
-        bottom: clientRect.bottom,
-        width: clientRect.width || clientRect.right - clientRect.left,
-        height: clientRect.height || clientRect.bottom - clientRect.top,
-    };
+  const clientRect = element instanceof domObjects.SVGElement ? element.getBoundingClientRect() : element.getClientRects()[0];
+  return clientRect && {
+    left: clientRect.left,
+    right: clientRect.right,
+    top: clientRect.top,
+    bottom: clientRect.bottom,
+    width: clientRect.width || clientRect.right - clientRect.left,
+    height: clientRect.height || clientRect.bottom - clientRect.top
+  };
 }
 export function getElementRect(element) {
-    const clientRect = getElementClientRect(element);
-    if (!browser.isIOS7 && clientRect) {
-        const scroll = getScrollXY(win.getWindow(element));
-        clientRect.left += scroll.x;
-        clientRect.right += scroll.x;
-        clientRect.top += scroll.y;
-        clientRect.bottom += scroll.y;
-    }
-    return clientRect;
+  const clientRect = getElementClientRect(element);
+
+  if (!browser.isIOS7 && clientRect) {
+    const scroll = getScrollXY(win.getWindow(element));
+    clientRect.left += scroll.x;
+    clientRect.right += scroll.x;
+    clientRect.top += scroll.y;
+    clientRect.bottom += scroll.y;
+  }
+
+  return clientRect;
 }
 export function getPath(node) {
-    const path = [];
-    while (node) {
-        path.push(node);
-        node = parentNode(node);
-    }
-    return path;
+  const path = [];
+
+  while (node) {
+    path.push(node);
+    node = parentNode(node);
+  }
+
+  return path;
 }
 export function trySelector(value) {
-    if (!is.string(value)) {
-        return false;
-    }
-    // an exception will be raised if it is invalid
-    domObjects.document.querySelector(value);
-    return true;
+  if (!is.string(value)) {
+    return false;
+  } // an exception will be raised if it is invalid
+
+
+  domObjects.document.querySelector(value);
+  return true;
 }
-//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiZG9tVXRpbHMuanMiLCJzb3VyY2VSb290IjoiIiwic291cmNlcyI6WyJkb21VdGlscy50cyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFBQSxPQUFPLE9BQU8sTUFBTSxXQUFXLENBQUE7QUFDL0IsT0FBTyxVQUFVLE1BQU0sY0FBYyxDQUFBO0FBQ3JDLE9BQU8sS0FBSyxFQUFFLE1BQU0sTUFBTSxDQUFBO0FBQzFCLE9BQU8sR0FBRyxFQUFFLEVBQUUsU0FBUyxFQUFFLE1BQU0sVUFBVSxDQUFBO0FBRXpDLE1BQU0sVUFBVSxZQUFZLENBQUUsTUFBWSxFQUFFLEtBQVc7SUFDckQsT0FBTyxLQUFLLEVBQUU7UUFDWixJQUFJLEtBQUssS0FBSyxNQUFNLEVBQUU7WUFDcEIsT0FBTyxJQUFJLENBQUE7U0FDWjtRQUVELEtBQUssR0FBRyxLQUFLLENBQUMsVUFBVSxDQUFBO0tBQ3pCO0lBRUQsT0FBTyxLQUFLLENBQUE7QUFDZCxDQUFDO0FBRUQsTUFBTSxVQUFVLE9BQU8sQ0FBRSxPQUFPLEVBQUUsUUFBUTtJQUN4QyxPQUFPLEVBQUUsQ0FBQyxPQUFPLENBQUMsT0FBTyxDQUFDLEVBQUU7UUFDMUIsSUFBSSxlQUFlLENBQUMsT0FBTyxFQUFFLFFBQVEsQ0FBQyxFQUFFO1lBQUUsT0FBTyxPQUFPLENBQUE7U0FBRTtRQUUxRCxPQUFPLEdBQUcsVUFBVSxDQUFDLE9BQU8sQ0FBQyxDQUFBO0tBQzlCO0lBRUQsT0FBTyxJQUFJLENBQUE7QUFDYixDQUFDO0FBRUQsTUFBTSxVQUFVLFVBQVUsQ0FBRSxJQUFJO0lBQzlCLElBQUksTUFBTSxHQUFHLElBQUksQ0FBQyxVQUFVLENBQUE7SUFFNUIsSUFBSSxFQUFFLENBQUMsT0FBTyxDQUFDLE1BQU0sQ0FBQyxFQUFFO1FBQ3RCLGtDQUFrQztRQUNsQywyQkFBMkI7UUFDM0IsT0FBTyxDQUFDLE1BQU0sR0FBSSxNQUFjLENBQUMsSUFBSSxDQUFDLElBQUksRUFBRSxDQUFDLE9BQU8sQ0FBQyxNQUFNLENBQUMsRUFBRTtZ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QUFBO1FBQzdCLFVBQVUsQ0FBQyxNQUFNLElBQUksTUFBTSxDQUFDLENBQUMsQ0FBQTtLQUM5QjtJQUVELE9BQU8sVUFBVSxDQUFBO0FBQ25CLENBQUM7QUFFRCxNQUFNLFVBQVUsT0FBTyxDQUFFLElBQUk7SUFDM0IsTUFBTSxJQUFJLEdBQUcsRUFBRSxDQUFBO0lBRWYsT0FBTyxJQUFJLEVBQUU7UUFDWCxJQUFJLENBQUMsSUFBSSxDQUFDLElBQUksQ0FBQyxDQUFBO1FBQ2YsSUFBSSxHQUFHLFVBQVUsQ0FBQyxJQUFJLENBQUMsQ0FBQTtLQUN4QjtJQUVELE9BQU8sSUFBSSxDQUFBO0FBQ2IsQ0FBQztBQUVELE1BQU0sVUFBVSxXQUFXLENBQUUsS0FBSztJQUNoQyxJQUFJLENBQUMsRUFBRSxDQUFDLE1BQU0sQ0FBQyxLQUFLLENBQUMsRUFBRTtRQUFFLE9BQU8sS0FBSyxDQUFBO0tBQUU7SUFFdkMsK0NBQStDO0lBQy9DLFVBQVUsQ0FBQyxRQUFRLENBQUMsYUFBYSxDQUFDLEtBQUssQ0FBQyxDQUFBO0lBQ3hDLE9BQU8sSUFBSSxDQUFBO0FBQ2IsQ0FBQyIsInNvdXJjZXNDb250ZW50IjpbImltcG9ydCBicm93c2VyIGZyb20gJy4vYnJvd3NlcidcbmltcG9ydCBkb21PYmplY3RzIGZyb20gJy4vZG9tT2JqZWN0cydcbmltcG9ydCAqIGFzIGlzIGZyb20gJy4vaXMnXG5pbXBvcnQgd2luLCB7IGdldFdpbmRvdyB9IGZyb20gJy4vd2luZG93J1xuXG5leHBvcnQgZnVuY3Rpb24gbm9kZUNvbnRhaW5zIChwYXJlbnQ6IE5vZGUsIGNoaWxkOiBOb2RlKSB7XG4gIHdoaWxlIChjaGlsZCkge1xuICAgIGlmIChjaGlsZCA9PT0gcGFyZW50KSB7XG4gICAgICByZXR1cm4gdHJ1ZVxuICAgIH1cblxuICAgIGNoaWxkID0gY2hpbGQucGFyZW50Tm9kZVxuICB9XG5cbiAgcmV0dXJuIGZhbHNlXG59XG5cbmV4cG9ydCBmdW5jdGlvbiBjbG9zZXN0IChlbGVtZW50LCBzZWxlY3Rvcikge1xuICB3aGlsZSAoaXMuZWxlbWVudChlbGVtZW50KSkge1xuICAgIGlmIChtYXRjaGVzU2VsZWN0b3IoZWxlbWVudCwgc2VsZWN0b3IpKSB7IHJldHVybiBlbGVtZW50IH1cblxuICAgIGVsZW1lbnQgPSBwYXJlbnROb2RlKGVsZW1lbnQpXG4gIH1cblxuICByZXR1cm4gbnVsbFxufVxuXG5leHBvcnQgZnVuY3Rpb24gcGFyZW50Tm9kZSAobm9kZSkge1xuICBsZXQgcGFyZW50ID0gbm9kZS5wYXJlbnROb2RlXG5cbiAgaWYgKGlzLmRvY0ZyYWcocGFyZW50KSkge1xuICAgIC8vIHNraXAgcGFzdCAjc2hhZG8tcm9vdCBmcmFnbWVudHNcbiAgICAvLyB0c2xpbnQ6ZGlzYWJsZS1uZXh0LWxpbmVcbiAgICB3aGlsZSAoKHBhcmVudCA9IChwYXJlbnQgYXMgYW55KS5ob3N0KSAmJiBpcy5kb2NGcmFnKHBhcmVudCkpIHtcbiAgICAgIGNvbnRpbnVlXG4gICAgfVxuXG4gICAgcmV0dXJuIHBhcmVudFxuICB9XG5cbiAgcmV0dXJuIHBhcmVudFxufVxuXG5leHBvcnQgZnVuY3Rpb24gbWF0Y2hlc1NlbGVjdG9yIChlbGVtZW50LCBzZWxlY3Rvcikge1xuICAvLyByZW1vdmUgL2RlZXAvIGZyb20gc2VsZWN0b3JzIGlmIHNoYWRvd0RPTSBwb2x5ZmlsbCBpcyB1c2VkXG4gIGlmICh3aW4ud2luZG93ICE9PSB3aW4ucmVhbFdpbmRvdykge1xuICAgIHNlbGVjdG9yID0gc2VsZWN0b3IucmVwbGFjZSgvXFwvZGVlcFxcLy9nLCAnICcpXG4gIH1cblxuICByZXR1cm4gZWxlbWVudFticm93c2VyLnByZWZpeGVkTWF0Y2hlc1NlbGVjdG9yXShzZWxlY3Rvcilcbn1cblxuY29uc3QgZ2V0UGFyZW50ID0gZWwgPT4gZWwucGFyZW50Tm9kZSA/IGVsLnBhcmVudE5vZGUgOiBlbC5ob3N0XG5cbi8vIFRlc3QgZm9yIHRoZSBlbGVtZW50IHRoYXQncyBcImFib3ZlXCIgYWxsIG90aGVyIHF1YWxpZmllcnNcbmV4cG9ydCBmdW5jdGlvbiBpbmRleE9mRGVlcGVzdEVsZW1lbnQgKGVsZW1lbnRzOiBJbnRlcmFjdC5FbGVtZW50W10gfCBOb2RlTGlzdE9mPEVsZW1lbnQ+KSB7XG4gIGxldCBkZWVwZXN0Wm9uZVBhcmVudHMgPSBbXVxuICBsZXQgZGVlcGVzdFpvbmUgPSBlbGVtZW50c1swXVxuICBsZXQgaW5kZXggPSBkZWVwZXN0Wm9uZSA/IDAgOiAtMVxuICBsZXQgaVxuICBsZXQgblxuXG4gIGZvciAoaSA9IDE7IGkgPCBlbGVtZW50cy5sZW5ndGg7IGkrKykge1xuICAgIGNvbnN0IGRyb3B6b25lID0gZWxlbWVudHNbaV1cblxuICAgIC8vIGFuIGVsZW1lbnQgbWlnaHQgYmVsb25nIHRvIG11bHRpcGxlIHNlbGVjdG9yIGRyb3B6b25lc1xuICAgIGlmICghZHJvcHpvbmUgfHwgZHJvcHpvbmUgPT09IGRlZXBlc3Rab25lKSB7XG4gICAgICBjb250aW51ZVxuICAgIH1cblxuICAgIGlmICghZGVlcGVzdFpvbmUpIHtcbiAgICAgIGRlZXBlc3Rab25lID0gZHJvcHpvbmVcbiAgICAgIGluZGV4ID0gaVxuICAgICAgY29udGludWVcbiAgICB9XG5cbiAgICAvLyBjaGVjayBpZiB0aGUgZGVlcGVzdCBvciBjdXJyZW50IGFyZSBkb2N1bWVudC5kb2N1bWVudEVsZW1lbnQgb3IgZG9jdW1lbnQucm9vdEVsZW1lbnRcbiAgICAvLyAtIGlmIHRoZSBjdXJyZW50IGRyb3B6b25lIGlzLCBkbyBub3RoaW5nIGFuZCBjb250aW51ZVxuICAgIGlmIChkcm9wem9uZS5wYXJlbnROb2RlID09PSBkcm9wem9uZS5vd25lckRvY3VtZW50KSB7XG4gICAgICBjb250aW51ZVxuICAgIH1cbiAgICAvLyAtIGlmIGRlZXBlc3QgaXMsIHVwZGF0ZSB3aXRoIHRoZSBjdXJyZW50IGRyb3B6b25lIGFuZCBjb250aW51ZSB0byBuZXh0XG4gICAgZWxzZSBpZiAoZGVlcGVzdFpvbmUucGFyZW50Tm9kZSA9PT0gZHJvcHpvbmUub3duZXJEb2N1bWVudCkge1xuICAgICAgZGVlcGVzdFpvbmUgPSBkcm9wem9uZVxuICAgICAgaW5kZXggPSBpXG4gICAgICBjb250aW51ZVxuICAgIH1cblxuICAgIC8vIGNvbXBhcmUgekluZGV4IG9mIHNpYmxpbmdzXG4gICAgaWYgKGRyb3B6b25lLnBhcmVudE5vZGUgPT09IGRlZXBlc3Rab25lLnBhcmVudE5vZGUpIHtcbiAgICAgIGNvbnN0IGRlZXBlc3RaSW5kZXggPSBwYXJzZUludChnZXRXaW5kb3coZGVlcGVzdFpvbmUpLmdldENvbXB1dGVkU3R5bGUoZGVlcGVzdFpvbmUpLnpJbmRleCwgMTApIHx8IDBcbiAgICAgIGNvbnN0IGRyb3B6b25lWkluZGV4ID0gcGFyc2VJbnQoZ2V0V2luZG93KGRyb3B6b25lKS5nZXRDb21wdXRlZFN0eWxlKGRyb3B6b25lKS56SW5kZXgsIDEwKSB8fCAwXG5cbiAgICAgIGlmIChkcm9wem9uZVpJbmRleCA+PSBkZWVwZXN0WkluZGV4KSB7XG4gICAgICAgIGRlZXBlc3Rab25lID0gZHJvcHpvbmVcbiAgICAgICAgaW5kZXggPSBpXG4gICAgICB9XG5cbiAgICAgIGNvbnRpbnVlXG4gICAgfVxuXG4gICAgLy8gcG9wdWxhdGUgdGhlIGFuY2VzdHJ5IGFycmF5IGZvciB0aGUgbGF0ZXN0IGRlZXBlc3QgZHJvcHpvbmVcbiAgICBpZiAoIWRlZXBlc3Rab25lUGFyZW50cy5sZW5ndGgpIHtcbiAgICAgIGxldCBwYXJlbnQgPSBkZWVwZXN0Wm9uZVxuICAgICAgbGV0IHBhcmVudFBhcmVudFxuXG4gICAgICB3aGlsZSAoKHBhcmVudFBhcmVudCA9IGdldFBhcmVudChwYXJlbnQpKSAmJiBwYXJlbnRQYXJlbnQgIT09IHBhcmVudC5vd25lckRvY3VtZW50KSB7XG4gICAgICAgIGRlZXBlc3Rab25lUGFyZW50cy51bnNoaWZ0KHBhcmVudClcbiAgICAgICAgcGFyZW50ID0gcGFyZW50UGFyZW50XG4gICAgICB9XG4gICAgfVxuXG4gICAgbGV0IHBhcmVudFxuXG4gICAgLy8gaWYgdGhpcyBlbGVtZW50IGlzIGFuIHN2ZyBlbGVtZW50IGFuZCB0aGUgY3VycmVudCBkZWVwZXN0IGlzIGFuXG4gICAgLy8gSFRNTEVsZW1lbnRcbiAgICBpZiAoZGVlcGVzdFpvbmUgaW5zdGFuY2VvZiBkb21PYmplY3RzLkhUTUxFbGVtZW50ICYmXG4gICAgICAgIGRyb3B6b25lIGluc3RhbmNlb2YgZG9tT2JqZWN0cy5TVkdFbGVtZW50ICYmXG4gICAgICAgICEoZHJvcHpvbmUgaW5zdGFuY2VvZiBkb21PYmplY3RzLlNWR1NWR0VsZW1lbnQpKSB7XG4gICAgICBpZiAoZHJvcHpvbmUgPT09IGRlZXBlc3Rab25lLnBhcmVudE5vZGUpIHtcbiAgICAgICAgY29udGludWVcbiAgICAgIH1cblxuICAgICAgcGFyZW50ID0gZHJvcHpvbmUub3duZXJTVkdFbGVtZW50XG4gICAgfVxuICAgIGVsc2Uge1xuICAgICAgcGFyZW50ID0gZHJvcHpvbmVcbiAgICB9XG5cbiAgICBjb25zdCBkcm9wem9uZVBhcmVudHMgPSBbXVxuXG4gICAgd2hpbGUgKHBhcmVudC5wYXJlbnROb2RlICE9PSBwYXJlbnQub3duZXJEb2N1bWVudCkge1xuICAgICAgZHJvcHpvbmVQYXJlbnRzLnVuc2hpZnQocGFyZW50KVxuICAgICAgcGFyZW50ID0gZ2V0UGFyZW50KHBhcmVudClcbiAgICB9XG5cbiAgICBuID0gMFxuXG4gICAgLy8gZ2V0IChwb3NpdGlvbiBvZiBsYXN0IGNvbW1vbiBhbmNlc3RvcikgKyAxXG4gICAgd2hpbGUgKGRyb3B6b25lUGFyZW50c1tuXSAmJiBkcm9wem9uZVBhcmVudHNbbl0gPT09IGRlZXBlc3Rab25lUGFyZW50c1tuXSkge1xuICAgICAgbisrXG4gICAgfVxuXG4gICAgY29uc3QgcGFyZW50cyA9IFtcbiAgICAgIGRyb3B6b25lUGFyZW50c1tuIC0gMV0sXG4gICAgICBkcm9wem9uZVBhcmVudHNbbl0sXG4gICAgICBkZWVwZXN0Wm9uZVBhcmVudHNbbl0sXG4gICAgXVxuXG4gICAgbGV0IGNoaWxkID0gcGFyZW50c1swXS5sYXN0Q2hpbGRcblxuICAgIHdoaWxlIChjaGlsZCkge1xuICAgICAgaWYgKGNoaWxkID09PSBwYXJlbnRzWzFdKSB7XG4gICAgICAgIGRlZXBlc3Rab25lID0gZHJvcHpvbmVcbiAgICAgICAgaW5kZXggPSBpXG4gICAgICAgIGRlZXBlc3Rab25lUGFyZW50cyA9IGRyb3B6b25lUGFyZW50c1xuXG4gICAgICAgIGJyZWFrXG4gICAgICB9XG4gICAgICBlbHNlIGlmIChjaGlsZCA9PT0gcGFyZW50c1syXSkge1xuICAgICAgICBicmVha1xuICAgICAgfVxuXG4gICAgICBjaGlsZCA9IGNoaWxkLnByZXZpb3VzU2libGluZ1xuICAgIH1cbiAgfVxuXG4gIHJldHVybiBpbmRleFxufVxuXG5leHBvcnQgZnVuY3Rpb24gbWF0Y2hlc1VwVG8gKGVsZW1lbnQ6IEludGVyYWN0LkVsZW1lbnQsIHNlbGVjdG9yOiBzdHJpbmcsIGxpbWl0OiBOb2RlKSB7XG4gIHdoaWxlIChpcy5lbGVtZW50KGVsZW1lbnQpKSB7XG4gICAgaWYgKG1hdGNoZXNTZWxlY3RvcihlbGVtZW50LCBzZWxlY3RvcikpIHtcbiAgICAgIHJldHVybiB0cnVlXG4gICAgfVxuXG4gICAgZWxlbWVudCA9IHBhcmVudE5vZGUoZWxlbWVudClcblxuICAgIGlmIChlbGVtZW50ID09PSBsaW1pdCkge1xuICAgICAgcmV0dXJuIG1hdGNoZXNTZWxlY3RvcihlbGVtZW50LCBzZWxlY3RvcilcbiAgICB9XG4gIH1cblxuICByZXR1cm4gZmFsc2Vcbn1cblxuZXhwb3J0IGZ1bmN0aW9uIGdldEFjdHVhbEVsZW1lbnQgKGVsZW1lbnQpIHtcbiAgcmV0dXJuIChlbGVtZW50IGluc3RhbmNlb2YgZG9tT2JqZWN0cy5TVkdFbGVtZW50SW5zdGFuY2VcbiAgICA/IGVsZW1lbnQuY29ycmVzcG9uZGluZ1VzZUVsZW1lbnRcbiAgICA6IGVsZW1lbnQpXG59XG5cbmV4cG9ydCBmdW5jdGlvbiBnZXRTY3JvbGxYWSAocmVsZXZhbnRXaW5kb3cpIHtcbiAgcmVsZXZhbnRXaW5kb3cgPSByZWxldmFudFdpbmRvdyB8fCB3aW4ud2luZG93XG4gIHJldHVybiB7XG4gICAgeDogcmVsZXZhbnRXaW5kb3cuc2Nyb2xsWCB8fCByZWxldmFudFdpbmRvdy5kb2N1bWVudC5kb2N1bWVudEVsZW1lbnQuc2Nyb2xsTGVmdCxcbiAgICB5OiByZWxldmFudFdpbmRvdy5zY3JvbGxZIHx8IHJlbGV2YW50V2luZG93LmRvY3VtZW50LmRvY3VtZW50RWxlbWVudC5zY3JvbGxUb3AsXG4gIH1cbn1cblxuZXhwb3J0IGZ1bmN0aW9uIGdldEVsZW1lbnRDbGllbnRSZWN0IChlbGVtZW50KSB7XG4gIGNvbnN0IGNsaWVudFJlY3QgPSAoZWxlbWVudCBpbnN0YW5jZW9mIGRvbU9iamVjdHMuU1ZHRWxlbWVudFxuICAgID8gZWxlbWVudC5nZXRCb3VuZGluZ0NsaWVudFJlY3QoKVxuICAgIDogZWxlbWVudC5nZXRDbGllbnRSZWN0cygpWzBdKVxuXG4gIHJldHVybiBjbGllbnRSZWN0ICYmIHtcbiAgICBsZWZ0ICA6IGNsaWVudFJlY3QubGVmdCxcbiAgICByaWdodCA6IGNsaWVudFJlY3QucmlnaHQsXG4gICAgdG9wICAgOiBjbGllbnRSZWN0LnRvcCxcbiAgICBib3R0b206IGNsaWVudFJlY3QuYm90dG9tLFxuICAgIHdpZHRoIDogY2xpZW50UmVjdC53aWR0aCAgfHwgY2xpZW50UmVjdC5yaWdodCAgLSBjbGllbnRSZWN0LmxlZnQsXG4gICAgaGVpZ2h0OiBjbGllbnRSZWN0LmhlaWdodCB8fCBjbGllbnRSZWN0LmJvdHRvbSAtIGNsaWVudFJlY3QudG9wLFxuICB9XG59XG5cbmV4cG9ydCBmdW5jdGlvbiBnZXRFbGVtZW50UmVjdCAoZWxlbWVudCkge1xuICBjb25zdCBjbGllbnRSZWN0ID0gZ2V0RWxlbWVudENsaWVudFJlY3QoZWxlbWVudClcblxuICBpZiAoIWJyb3dzZXIuaXNJT1M3ICYmIGNsaWVudFJlY3QpIHtcbiAgICBjb25zdCBzY3JvbGwgPSBnZXRTY3JvbGxYWSh3aW4uZ2V0V2luZG93KGVsZW1lbnQpKVxuXG4gICAgY2xpZW50UmVjdC5sZWZ0ICAgKz0gc2Nyb2xsLnhcbiAgICBjbGllbnRSZWN0LnJpZ2h0ICArPSBzY3JvbGwueFxuICAgIGNsaWVudFJlY3QudG9wICAgICs9IHNjcm9sbC55XG4gICAgY2xpZW50UmVjdC5ib3R0b20gKz0gc2Nyb2xsLnlcbiAgfVxuXG4gIHJldHVybiBjbGllbnRSZWN0XG59XG5cbmV4cG9ydCBmdW5jdGlvbiBnZXRQYXRoIChub2RlKSB7XG4gIGNvbnN0IHBhdGggPSBbXVxuXG4gIHdoaWxlIChub2RlKSB7XG4gICAgcGF0aC5wdXNoKG5vZGUpXG4gICAgbm9kZSA9IHBhcmVudE5vZGUobm9kZSlcbiAgfVxuXG4gIHJldHVybiBwYXRoXG59XG5cbmV4cG9ydCBmdW5jdGlvbiB0cnlTZWxlY3RvciAodmFsdWUpIHtcbiAgaWYgKCFpcy5zdHJpbmcodmFsdWUpKSB7IHJldHVybiBmYWxzZSB9XG5cbiAgLy8gYW4gZXhjZXB0aW9uIHdpbGwgYmUgcmFpc2VkIGlmIGl0IGlzIGludmFsaWRcbiAgZG9tT2JqZWN0cy5kb2N1bWVudC5xdWVyeVNlbGVjdG9yKHZhbHVlKVxuICByZXR1cm4gdHJ1ZVxufVxuIl19
+//# sourceMappingURL=domUtils.js.map

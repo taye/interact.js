@@ -1,0 +1,24 @@
+{
+	"version": 3,
+	"sources": [
+		"rect.ts"
+	],
+	"names": [
+		"extend",
+		"restrictPointer",
+		"defaults",
+		"elementRect",
+		"top",
+		"left",
+		"bottom",
+		"right",
+		"_",
+		"restrictRect",
+		"start",
+		"set"
+	],
+	"mappings": "AAAA,OAAOA,MAAP;AACA,OAAOC,eAAP;AAEA,MAAMC,QAAQ,GAAGF,MAAM,CAAC;AACtB,MAAIG,WAAJ,GAAmB;AACjB,WAAO;AAAEC,MAAAA,GAAG,EAAE,CAAP;AAAUC,MAAAA,IAAI,EAAE,CAAhB;AAAmBC,MAAAA,MAAM,EAAE,CAA3B;AAA8BC,MAAAA,KAAK,EAAE;AAArC,KAAP;AACD,GAHqB;;AAItB,MAAIJ,WAAJ,CAAiBK,CAAjB,EAAoB,CAAE;;AAJA,CAAD,EAKpBP,eAAe,CAACC,QALI,CAAvB;AAOA,MAAMO,YAAY,GAAG;AACnBC,EAAAA,KAAK,EAAET,eAAe,CAACS,KADJ;AAEnBC,EAAAA,GAAG,EAAEV,eAAe,CAACU,GAFF;AAGnBT,EAAAA;AAHmB,CAArB;AAMA,eAAeO,YAAf",
+	"sourcesContent": [
+		"import extend from '../../utils/extend'\nimport restrictPointer from './pointer'\n\nconst defaults = extend({\n  get elementRect () {\n    return { top: 0, left: 0, bottom: 1, right: 1 }\n  },\n  set elementRect (_) {},\n}, restrictPointer.defaults)\n\nconst restrictRect = {\n  start: restrictPointer.start,\n  set: restrictPointer.set,\n  defaults,\n}\n\nexport default restrictRect\n"
+	]
+}

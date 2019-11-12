@@ -27,7 +27,6 @@ declare const restrictEdges: {
         bottom: number;
         right: number;
     };
-    getRestrictionRect: (value: any, interaction: any, coords?: import("../../types/types").Point) => import("../../types/types").Rect;
     start: typeof start;
     set: typeof set;
     defaults: RestrictEdgesOptions;

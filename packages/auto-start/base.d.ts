@@ -1,4 +1,3 @@
-import * as utils from '@interactjs/utils';
 declare module '@interactjs/interact/interact' {
     interface InteractStatic {
         maxInteractions: (newValue: any) => any;
@@ -24,11 +23,18 @@ declare module '@interactjs/core/defaultOptions' {
         mouseButtons?: 0 | 1 | 2 | 4 | 16;
     }
 }
+declare module '@interactjs/core/scope' {
+    interface SignalArgs {
+        'autoStart:before-start': Interact.SignalArgs['interactions:move'];
+        'autoStart:prepared': {
+            interaction: Interact.Interaction;
+        };
+    }
+}
 export interface AutoStart {
     maxInteractions: number;
     withinInteractionLimit: typeof withinInteractionLimit;
     cursorElement: Interact.Element;
-    signals: utils.Signals;
 }
 declare function withinInteractionLimit(interactable: Interact.Interactable, element: Interact.Element, action: any, scope: Interact.Scope): boolean;
 declare const _default: import("@interactjs/core/scope").Plugin;

@@ -1,36 +1,40 @@
-import extend from './extend';
-import * as is from './is';
+import extend from "./extend.js";
+import * as is from "./is.js";
 export default function normalize(type, listeners, result) {
-    result = result || {};
-    if (is.string(type) && type.search(' ') !== -1) {
-        type = split(type);
+  result = result || {};
+
+  if (is.string(type) && type.search(' ') !== -1) {
+    type = split(type);
+  }
+
+  if (is.array(type)) {
+    return type.reduce((acc, t) => extend(acc, normalize(t, listeners, result)), result);
+  } // ({ type: fn }) -> ('', { type: fn })
+
+
+  if (is.object(type)) {
+    listeners = type;
+    type = '';
+  }
+
+  if (is.func(listeners)) {
+    result[type] = result[type] || [];
+    result[type].push(listeners);
+  } else if (is.array(listeners)) {
+    for (const l of listeners) {
+      normalize(type, l, result);
     }
-    if (is.array(type)) {
-        return type.reduce((acc, t) => extend(acc, normalize(t, listeners, result)), result);
+  } else if (is.object(listeners)) {
+    for (const prefix in listeners) {
+      const combinedTypes = split(prefix).map(p => `${type}${p}`);
+      normalize(combinedTypes, listeners[prefix], result);
     }
-    // ({ type: fn }) -> ('', { type: fn })
-    if (is.object(type)) {
-        listeners = type;
-        type = '';
-    }
-    if (is.func(listeners)) {
-        result[type] = result[type] || [];
-        result[type].push(listeners);
-    }
-    else if (is.array(listeners)) {
-        for (const l of listeners) {
-            normalize(type, l, result);
-        }
-    }
-    else if (is.object(listeners)) {
-        for (const prefix in listeners) {
-            const combinedTypes = split(prefix).map(p => `${type}${p}`);
-            normalize(combinedTypes, listeners[prefix], result);
-        }
-    }
-    return result;
+  }
+
+  return result;
 }
+
 function split(type) {
-    return type.trim().split(/ +/);
+  return type.trim().split(/ +/);
 }
-//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoibm9ybWFsaXplTGlzdGVuZXJzLmpzIiwic291cmNlUm9vdCI6IiIsInNvdXJjZXMiOlsibm9ybWFsaXplTGlzdGVuZXJzLnRzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBLE9BQU8sTUFBTSxNQUFNLFVBQVUsQ0FBQTtBQUM3QixPQUFPLEtBQUssRUFBRSxNQUFNLE1BQU0sQ0FBQTtBQU0xQixNQUFNLENBQUMsT0FBTyxVQUFVLFNBQVMsQ0FDL0IsSUFBeUIsRUFDekIsU0FBMkQsRUFDM0QsTUFBNEI7SUFFNUIsTUFBTSxHQUFHLE1BQU0sSUFBSSxFQUFFLENBQUE7SUFFckIsSUFBSSxFQUFFLENBQUMsTUFBTSxDQUFDLElBQUksQ0FBQyxJQUFJLElBQUksQ0FBQyxNQUFNLENBQUMsR0FBRyxDQUFDLEtBQUssQ0FBQyxDQUFDLEVBQUU7UUFDOUMsSUFBSSxHQUFHLEtBQUssQ0FBQyxJQUFJLENBQUMsQ0FBQTtLQUNuQjtJQUVELElBQUksRUFBRSxDQUFDLEtBQUssQ0FBQyxJQUFJLENBQUMsRUFBRTtRQUNsQixPQUFPLElBQUksQ0FBQyxNQUFNLENBQ2hCLENBQUMsR0FBRyxFQUFFLENBQUMsRUFBRSxFQUFFLENBQUMsTUFBTSxDQUFDLEdBQUcsRUFBRSxTQUFTLENBQUMsQ0FBQyxFQUFFLFNBQVMsRUFBRSxNQUFNLENBQUMsQ0FBQyxFQUN4RCxNQUFNLENBQ1AsQ0FBQTtLQUNGO0lBRUQsdUNBQXVDO0lBQ3ZDLElBQUksRUFBRSxDQUFDLE1BQU0sQ0FBQyxJQUFJLENBQUMsRUFBRTtRQUNuQixTQUFTLEdBQUcsSUFBSSxDQUFBO1FBQ2hCLElBQUksR0FBRyxFQUFFLENBQUE7S0FDVjtJQUVELElBQUksRUFBRSxDQUFDLElBQUksQ0FBQyxTQUFTLENBQUMsRUFBRTtRQUN0QixNQUFNLENBQUMsSUFBSSxDQUFDLEdBQUcsTUFBTSxDQUFDLElBQUksQ0FBQyxJQUFJLEVBQUUsQ0FBQTtRQUNqQyxNQUFNLENBQUMsSUFBSSxDQUFDLENBQUMsSUFBSSxDQUFDLFNBQVMsQ0FBQyxDQUFBO0tBQzdCO1NBQ0ksSUFBSSxFQUFFLENBQUMsS0FBSyxDQUFDLFNBQVMsQ0FBQyxFQUFFO1FBQzVCLEtBQUssTUFBTSxDQUFDLElBQUksU0FBUyxFQUFFO1lBQ3pCLFNBQVMsQ0FBQyxJQUFJLEVBQUUsQ0FBQyxFQUFFLE1BQU0sQ0FBQyxDQUFBO1NBQzNCO0tBQ0Y7U0FDSSxJQUFJLEVBQUUsQ0FBQyxNQUFNLENBQUMsU0FBUyxDQUFDLEVBQUU7UUFDN0IsS0FBSyxNQUFNLE1BQU0sSUFBSSxTQUFTLEVBQUU7WUFDOUIsTUFBTSxhQUFhLEdBQUcsS0FBSyxDQUFDLE1BQU0sQ0FBQyxDQUFDLEdBQUcsQ0FBQyxDQUFDLENBQUMsRUFBRSxDQUFDLEdBQUcsSUFBSSxHQUFHLENBQUMsRUFBRSxDQUFDLENBQUE7WUFFM0QsU0FBUyxDQUFDLGFBQWEsRUFBRSxTQUFTLENBQUMsTUFBTSxDQUFDLEVBQUUsTUFBTSxDQUFDLENBQUE7U0FDcEQ7S0FDRjtJQUVELE9BQU8sTUFBNkIsQ0FBQTtBQUN0QyxDQUFDO0FBRUQsU0FBUyxLQUFLLENBQUUsSUFBWTtJQUMxQixPQUFPLElBQUksQ0FBQyxJQUFJLEVBQUUsQ0FBQyxLQUFLLENBQUMsSUFBSSxDQUFDLENBQUE7QUFDaEMsQ0FBQyIsInNvdXJjZXNDb250ZW50IjpbImltcG9ydCBleHRlbmQgZnJvbSAnLi9leHRlbmQnXG5pbXBvcnQgKiBhcyBpcyBmcm9tICcuL2lzJ1xuXG5leHBvcnQgaW50ZXJmYWNlIE5vcm1hbGl6ZWRMaXN0ZW5lcnMge1xuICBbdHlwZTogc3RyaW5nXTogSW50ZXJhY3QuTGlzdGVuZXJbXVxufVxuXG5leHBvcnQgZGVmYXVsdCBmdW5jdGlvbiBub3JtYWxpemUgKFxuICB0eXBlOiBJbnRlcmFjdC5FdmVudFR5cGVzLFxuICBsaXN0ZW5lcnM/OiBJbnRlcmFjdC5MaXN0ZW5lcnNBcmcgfCBJbnRlcmFjdC5MaXN0ZW5lcnNBcmdbXSxcbiAgcmVzdWx0PzogTm9ybWFsaXplZExpc3RlbmVycyxcbik6IE5vcm1hbGl6ZWRMaXN0ZW5lcnMge1xuICByZXN1bHQgPSByZXN1bHQgfHwge31cblxuICBpZiAoaXMuc3RyaW5nKHR5cGUpICYmIHR5cGUuc2VhcmNoKCcgJykgIT09IC0xKSB7XG4gICAgdHlwZSA9IHNwbGl0KHR5cGUpXG4gIH1cblxuICBpZiAoaXMuYXJyYXkodHlwZSkpIHtcbiAgICByZXR1cm4gdHlwZS5yZWR1Y2U8Tm9ybWFsaXplZExpc3RlbmVycz4oXG4gICAgICAoYWNjLCB0KSA9PiBleHRlbmQoYWNjLCBub3JtYWxpemUodCwgbGlzdGVuZXJzLCByZXN1bHQpKSxcbiAgICAgIHJlc3VsdFxuICAgIClcbiAgfVxuXG4gIC8vICh7IHR5cGU6IGZuIH0pIC0+ICgnJywgeyB0eXBlOiBmbiB9KVxuICBpZiAoaXMub2JqZWN0KHR5cGUpKSB7XG4gICAgbGlzdGVuZXJzID0gdHlwZVxuICAgIHR5cGUgPSAnJ1xuICB9XG5cbiAgaWYgKGlzLmZ1bmMobGlzdGVuZXJzKSkge1xuICAgIHJlc3VsdFt0eXBlXSA9IHJlc3VsdFt0eXBlXSB8fCBbXVxuICAgIHJlc3VsdFt0eXBlXS5wdXNoKGxpc3RlbmVycylcbiAgfVxuICBlbHNlIGlmIChpcy5hcnJheShsaXN0ZW5lcnMpKSB7XG4gICAgZm9yIChjb25zdCBsIG9mIGxpc3RlbmVycykge1xuICAgICAgbm9ybWFsaXplKHR5cGUsIGwsIHJlc3VsdClcbiAgICB9XG4gIH1cbiAgZWxzZSBpZiAoaXMub2JqZWN0KGxpc3RlbmVycykpIHtcbiAgICBmb3IgKGNvbnN0IHByZWZpeCBpbiBsaXN0ZW5lcnMpIHtcbiAgICAgIGNvbnN0IGNvbWJpbmVkVHlwZXMgPSBzcGxpdChwcmVmaXgpLm1hcChwID0+IGAke3R5cGV9JHtwfWApXG5cbiAgICAgIG5vcm1hbGl6ZShjb21iaW5lZFR5cGVzLCBsaXN0ZW5lcnNbcHJlZml4XSwgcmVzdWx0KVxuICAgIH1cbiAgfVxuXG4gIHJldHVybiByZXN1bHQgYXMgTm9ybWFsaXplZExpc3RlbmVyc1xufVxuXG5mdW5jdGlvbiBzcGxpdCAodHlwZTogc3RyaW5nKSB7XG4gIHJldHVybiB0eXBlLnRyaW0oKS5zcGxpdCgvICsvKVxufVxuIl19
+//# sourceMappingURL=normalizeListeners.js.map

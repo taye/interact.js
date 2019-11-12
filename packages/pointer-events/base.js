@@ -1,196 +1,274 @@
-import * as utils from '@interactjs/utils';
-import PointerEvent from './PointerEvent';
-const signals = new utils.Signals();
-const simpleSignals = ['down', 'up', 'cancel'];
-const simpleEvents = ['down', 'up', 'cancel'];
+import Interaction from "../core/Interaction.js";
+import { Scope } from "../core/scope.js";
+import * as utils from "../utils/index.js";
+import PointerEvent from "./PointerEvent.js";
 const defaults = {
-    holdDuration: 600,
-    ignoreFrom: null,
-    allowFrom: null,
-    origin: { x: 0, y: 0 },
+  holdDuration: 600,
+  ignoreFrom: null,
+  allowFrom: null,
+  origin: {
+    x: 0,
+    y: 0
+  }
 };
 const pointerEvents = {
-    id: 'pointer-events/base',
-    install,
-    signals,
-    PointerEvent,
-    fire,
-    collectEventTargets,
-    createSignalListener,
-    defaults,
-    types: [
-        'down',
-        'move',
-        'up',
-        'cancel',
-        'tap',
-        'doubletap',
-        'hold',
-    ],
+  id: 'pointer-events/base',
+  install,
+  listeners: {
+    'interactions:new': addInteractionProps,
+    'interactions:update-pointer': addHoldInfo,
+    'interactions:move': moveAndClearHold,
+    'interactions:down': (arg, scope) => {
+      downAndStartHold(arg, scope);
+      fire(arg, scope);
+    },
+    'interactions:up': (arg, scope) => {
+      clearHold(arg);
+      fire(arg, scope);
+      tapAfterUp(arg, scope);
+    },
+    'interactions:cancel': (arg, scope) => {
+      clearHold(arg);
+      fire(arg, scope);
+    }
+  },
+  PointerEvent,
+  fire,
+  collectEventTargets,
+  defaults,
+  types: ['down', 'move', 'up', 'cancel', 'tap', 'doubletap', 'hold']
 };
+
 function fire(arg, scope) {
-    const { interaction, pointer, event, eventTarget, type = arg.pointerEvent.type, targets = collectEventTargets(arg), } = arg;
-    const { pointerEvent = new PointerEvent(type, pointer, event, eventTarget, interaction, scope.now()), } = arg;
-    const signalArg = {
-        interaction,
-        pointer,
-        event,
-        eventTarget,
-        targets,
-        type,
-        pointerEvent,
-    };
-    for (let i = 0; i < targets.length; i++) {
-        const target = targets[i];
-        for (const prop in target.props || {}) {
-            pointerEvent[prop] = target.props[prop];
-        }
-        const origin = utils.getOriginXY(target.eventable, target.node);
-        pointerEvent._subtractOrigin(origin);
-        pointerEvent.eventable = target.eventable;
-        pointerEvent.currentTarget = target.node;
-        target.eventable.fire(pointerEvent);
-        pointerEvent._addOrigin(origin);
-        if (pointerEvent.immediatePropagationStopped ||
-            (pointerEvent.propagationStopped &&
-                (i + 1) < targets.length && targets[i + 1].node !== pointerEvent.currentTarget)) {
-            break;
-        }
+  const {
+    interaction,
+    pointer,
+    event,
+    eventTarget,
+    type,
+    targets = collectEventTargets(arg, scope)
+  } = arg;
+  const pointerEvent = new PointerEvent(type, pointer, event, eventTarget, interaction, scope.now());
+  scope.fire('pointerEvents:new', {
+    pointerEvent
+  });
+  const signalArg = {
+    interaction,
+    pointer,
+    event,
+    eventTarget,
+    targets,
+    type,
+    pointerEvent
+  };
+
+  for (let i = 0; i < targets.length; i++) {
+    const target = targets[i];
+
+    for (const prop in target.props || {}) {
+      pointerEvent[prop] = target.props[prop];
     }
-    signals.fire('fired', signalArg);
-    if (type === 'tap') {
-        // if pointerEvent should make a double tap, create and fire a doubletap
-        // PointerEvent and use that as the prevTap
-        const prevTap = pointerEvent.double
-            ? fire({
-                interaction,
-                pointer,
-                event,
-                eventTarget,
-                type: 'doubletap',
-            }, scope)
-            : pointerEvent;
-        interaction.prevTap = prevTap;
-        interaction.tapTime = prevTap.timeStamp;
+
+    const origin = utils.getOriginXY(target.eventable, target.node);
+
+    pointerEvent._subtractOrigin(origin);
+
+    pointerEvent.eventable = target.eventable;
+    pointerEvent.currentTarget = target.node;
+    target.eventable.fire(pointerEvent);
+
+    pointerEvent._addOrigin(origin);
+
+    if (pointerEvent.immediatePropagationStopped || pointerEvent.propagationStopped && i + 1 < targets.length && targets[i + 1].node !== pointerEvent.currentTarget) {
+      break;
     }
-    return pointerEvent;
+  }
+
+  scope.fire('pointerEvents:fired', signalArg);
+
+  if (type === 'tap') {
+    // if pointerEvent should make a double tap, create and fire a doubletap
+    // PointerEvent and use that as the prevTap
+    const prevTap = pointerEvent.double ? fire({
+      interaction,
+      pointer,
+      event,
+      eventTarget,
+      type: 'doubletap'
+    }, scope) : pointerEvent;
+    interaction.prevTap = prevTap;
+    interaction.tapTime = prevTap.timeStamp;
+  }
+
+  return pointerEvent;
 }
-function collectEventTargets({ interaction, pointer, event, eventTarget, type }) {
-    const pointerIndex = interaction.getPointerIndex(pointer);
-    const pointerInfo = interaction.pointers[pointerIndex];
-    // do not fire a tap event if the pointer was moved before being lifted
-    if (type === 'tap' && (interaction.pointerWasMoved ||
-        // or if the pointerup target is different to the pointerdown target
-        !(pointerInfo && pointerInfo.downTarget === eventTarget))) {
-        return [];
-    }
-    const path = utils.dom.getPath(eventTarget);
-    const signalArg = {
-        interaction,
-        pointer,
-        event,
-        eventTarget,
-        type,
-        path,
-        targets: [],
-        node: null,
-    };
-    for (const node of path) {
-        signalArg.node = node;
-        signals.fire('collect-targets', signalArg);
-    }
-    if (type === 'hold') {
-        signalArg.targets = signalArg.targets.filter(target => target.eventable.options.holdDuration === interaction.pointers[pointerIndex].hold.duration);
-    }
-    return signalArg.targets;
+
+function collectEventTargets({
+  interaction,
+  pointer,
+  event,
+  eventTarget,
+  type
+}, scope) {
+  const pointerIndex = interaction.getPointerIndex(pointer);
+  const pointerInfo = interaction.pointers[pointerIndex]; // do not fire a tap event if the pointer was moved before being lifted
+
+  if (type === 'tap' && (interaction.pointerWasMoved || // or if the pointerup target is different to the pointerdown target
+  !(pointerInfo && pointerInfo.downTarget === eventTarget))) {
+    return [];
+  }
+
+  const path = utils.dom.getPath(eventTarget);
+  const signalArg = {
+    interaction,
+    pointer,
+    event,
+    eventTarget,
+    type,
+    path,
+    targets: [],
+    node: null
+  };
+
+  for (const node of path) {
+    signalArg.node = node;
+    scope.fire('pointerEvents:collect-targets', signalArg);
+  }
+
+  if (type === 'hold') {
+    signalArg.targets = signalArg.targets.filter(target => target.eventable.options.holdDuration === interaction.pointers[pointerIndex].hold.duration);
+  }
+
+  return signalArg.targets;
 }
+
+function addInteractionProps({
+  interaction
+}) {
+  interaction.prevTap = null; // the most recent tap event on this interaction
+
+  interaction.tapTime = 0; // time of the most recent tap event
+}
+
+function addHoldInfo({
+  down,
+  pointerInfo
+}) {
+  if (!down && pointerInfo.hold) {
+    return;
+  }
+
+  pointerInfo.hold = {
+    duration: Infinity,
+    timeout: null
+  };
+}
+
+function clearHold({
+  interaction,
+  pointerIndex
+}) {
+  if (interaction.pointers[pointerIndex].hold) {
+    clearTimeout(interaction.pointers[pointerIndex].hold.timeout);
+  }
+}
+
+function moveAndClearHold({
+  interaction,
+  pointer,
+  event,
+  eventTarget,
+  duplicate
+}, scope) {
+  const pointerIndex = interaction.getPointerIndex(pointer);
+
+  if (!duplicate && (!interaction.pointerIsDown || interaction.pointerWasMoved)) {
+    if (interaction.pointerIsDown) {
+      clearTimeout(interaction.pointers[pointerIndex].hold.timeout);
+    }
+
+    fire({
+      interaction,
+      pointer,
+      event,
+      eventTarget: eventTarget,
+      type: 'move'
+    }, scope);
+  }
+}
+
+function downAndStartHold({
+  interaction,
+  pointer,
+  event,
+  eventTarget,
+  pointerIndex
+}, scope) {
+  const timer = interaction.pointers[pointerIndex].hold;
+  const path = utils.dom.getPath(eventTarget);
+  const signalArg = {
+    interaction,
+    pointer,
+    event,
+    eventTarget,
+    type: 'hold',
+    targets: [],
+    path,
+    node: null
+  };
+
+  for (const node of path) {
+    signalArg.node = node;
+    scope.fire('pointerEvents:collect-targets', signalArg);
+  }
+
+  if (!signalArg.targets.length) {
+    return;
+  }
+
+  let minDuration = Infinity;
+
+  for (const target of signalArg.targets) {
+    const holdDuration = target.eventable.options.holdDuration;
+
+    if (holdDuration < minDuration) {
+      minDuration = holdDuration;
+    }
+  }
+
+  timer.duration = minDuration;
+  timer.timeout = setTimeout(() => {
+    fire({
+      interaction,
+      eventTarget,
+      pointer,
+      event,
+      type: 'hold'
+    }, scope);
+  }, minDuration);
+}
+
+function tapAfterUp({
+  interaction,
+  pointer,
+  event,
+  eventTarget
+}, scope) {
+  if (!interaction.pointerWasMoved) {
+    fire({
+      interaction,
+      eventTarget,
+      pointer,
+      event,
+      type: 'tap'
+    }, scope);
+  }
+}
+
 function install(scope) {
-    const { interactions, } = scope;
-    scope.pointerEvents = pointerEvents;
-    scope.defaults.actions.pointerEvents = pointerEvents.defaults;
-    interactions.signals.on('new', ({ interaction }) => {
-        interaction.prevTap = null; // the most recent tap event on this interaction
-        interaction.tapTime = 0; // time of the most recent tap event
-    });
-    interactions.signals.on('update-pointer', ({ down, pointerInfo }) => {
-        if (!down && pointerInfo.hold) {
-            return;
-        }
-        pointerInfo.hold = { duration: Infinity, timeout: null };
-    });
-    interactions.signals.on('move', ({ interaction, pointer, event, eventTarget, duplicateMove }) => {
-        const pointerIndex = interaction.getPointerIndex(pointer);
-        if (!duplicateMove && (!interaction.pointerIsDown || interaction.pointerWasMoved)) {
-            if (interaction.pointerIsDown) {
-                clearTimeout(interaction.pointers[pointerIndex].hold.timeout);
-            }
-            fire({
-                interaction,
-                pointer,
-                event,
-                eventTarget,
-                type: 'move',
-            }, scope);
-        }
-    });
-    interactions.signals.on('down', ({ interaction, pointer, event, eventTarget, pointerIndex }) => {
-        const timer = interaction.pointers[pointerIndex].hold;
-        const path = utils.dom.getPath(eventTarget);
-        const signalArg = {
-            interaction,
-            pointer,
-            event,
-            eventTarget,
-            type: 'hold',
-            targets: [],
-            path,
-            node: null,
-        };
-        for (const node of path) {
-            signalArg.node = node;
-            signals.fire('collect-targets', signalArg);
-        }
-        if (!signalArg.targets.length) {
-            return;
-        }
-        let minDuration = Infinity;
-        for (const target of signalArg.targets) {
-            const holdDuration = target.eventable.options.holdDuration;
-            if (holdDuration < minDuration) {
-                minDuration = holdDuration;
-            }
-        }
-        timer.duration = minDuration;
-        timer.timeout = setTimeout(() => {
-            fire({
-                interaction,
-                eventTarget,
-                pointer,
-                event,
-                type: 'hold',
-            }, scope);
-        }, minDuration);
-    });
-    for (const signalName of ['up', 'cancel']) {
-        interactions.signals.on(signalName, ({ interaction, pointerIndex }) => {
-            if (interaction.pointers[pointerIndex].hold) {
-                clearTimeout(interaction.pointers[pointerIndex].hold.timeout);
-            }
-        });
-    }
-    for (let i = 0; i < simpleSignals.length; i++) {
-        interactions.signals.on(simpleSignals[i], createSignalListener(simpleEvents[i], scope));
-    }
-    interactions.signals.on('up', ({ interaction, pointer, event, eventTarget }) => {
-        if (!interaction.pointerWasMoved) {
-            fire({ interaction, eventTarget, pointer, event, type: 'tap' }, scope);
-        }
-    });
+  scope.pointerEvents = pointerEvents;
+  scope.defaults.actions.pointerEvents = pointerEvents.defaults;
 }
-function createSignalListener(type, scope) {
-    return function ({ interaction, pointer, event, eventTarget }) {
-        fire({ interaction, eventTarget, pointer, event, type }, scope);
-    };
-}
+
 export default pointerEvents;
-//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiYmFzZS5qcyIsInNvdXJjZVJvb3QiOiIiLCJzb3VyY2VzIjpbImJhc2UudHMiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IkFBSUEsT0FBTyxLQUFLLEtBQUssTUFBTSxtQkFBbUIsQ0FBQTtBQUMxQyxPQUFPLFlBQVksTUFBTSxnQkFBZ0IsQ0FBQTtBQTRDekMsTUFBTSxPQUFPLEdBQVMsSUFBSSxLQUFLLENBQUMsT0FBTyxFQUFFLENBQUE7QUFDekMsTUFBTSxhQUFhLEdBQUcsQ0FBQyxNQUFNLEVBQUUsSUFBSSxFQUFFLFFBQVEsQ0FBQyxDQUFBO0FBQzlDLE1BQU0sWUFBWSxHQUFJLENBQUMsTUFBTSxFQUFFLElBQUksRUFBRSxRQUFRLENBQUMsQ0FBQTtBQUU5QyxNQUFNLFFBQVEsR0FBd0I7SUFDcEMsWUFBWSxFQUFFLEdBQUc7SUFDakIsVUFBVSxFQUFJLElBQUk7SUFDbEIsU0FBUyxFQUFLLElBQUk7SUFDbEIsTUFBTSxFQUFRLEVBQUUsQ0FBQyxFQUFFLENBQUMsRUFBRSxDQUFDLEVBQUUsQ0FBQyxFQUFFO0NBQzdCLENBQUE7QUFFRCxNQUFNLGFBQWEsR0FBRztJQUNwQixFQUFFLEVBQUUscUJBQXFCO0lBQ3pCLE9BQU87SUFDUCxPQUFPO0lBQ1AsWUFBWTtJQUNaLElBQUk7SUFDSixtQkFBbUI7SUFDbkIsb0JBQW9CO0lBQ3BCLFFBQVE7SUFDUixLQUFLLEVBQUU7UUFDTCxNQUFNO1FBQ04sTUFBTTtRQUNOLElBQUk7UUFDSixRQUFRO1FBQ1IsS0FBSztRQUNMLFdBQVc7UUFDWCxNQUFNO0tBQ1A7Q0FDRixDQUFBO0FBRUQsU0FBUyxJQUFJLENBQW9CLEdBUWhDLEVBQUUsS0FBcUI7SUFDdEIsTUFBTSxFQUNKLFdBQVcsRUFBRSxPQUFPLEVBQUUsS0FBSyxFQUFFLFdBQVcsRUFDeEMsSUFBSSxHQUFJLEdBQVcsQ0FBQyxZQUFZLENBQUMsSUFBSSxFQUNyQyxPQUFPLEdBQUcsbUJBQW1CLENBQUMsR0FBRyxDQUFDLEdBQ25DLEdBQUcsR0FBRyxDQUFB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LE9BQU8sRUFBRSxLQUFLLEVBQUUsSUFBSSxFQUFFLEVBQUUsS0FBSyxDQUFDLENBQUE7SUFDakUsQ0FBQyxDQUFBO0FBQ0gsQ0FBQztBQUVELGVBQWUsYUFBYSxDQUFBIiwic291cmNlc0NvbnRlbnQiOlsiaW1wb3J0IHsgUGVyQWN0aW9uRGVmYXVsdHMgfSBmcm9tICdAaW50ZXJhY3Rqcy9jb3JlL2RlZmF1bHRPcHRpb25zJ1xuaW1wb3J0IEV2ZW50YWJsZSBmcm9tICdAaW50ZXJhY3Rqcy9jb3JlL0V2ZW50YWJsZSdcbmltcG9ydCBJbnRlcmFjdGlvbiBmcm9tICdAaW50ZXJhY3Rqcy9jb3JlL0ludGVyYWN0aW9uJ1xuaW1wb3J0IHsgU2NvcGUgfSBmcm9tICdAaW50ZXJhY3Rqcy9jb3JlL3Njb3BlJ1xuaW1wb3J0ICogYXMgdXRpbHMgZnJvbSAnQGludGVyYWN0anMvdXRpbHMnXG5pbXBvcnQgUG9pbnRlckV2ZW50IGZyb20gJy4vUG9pbnRlckV2ZW50J1xuXG5leHBvcnQgdHlwZSBFdmVudFRhcmdldExpc3QgPSBBcnJheTx7XG4gIG5vZGU6IE5vZGVcbiAgZXZlbnRhYmxlOiBFdmVudGFibGVcbiAgcHJvcHM6IHsgW2tleTogc3RyaW5nXTogYW55IH1cbn0+XG5cbmV4cG9ydCBpbnRlcmZhY2UgUG9pbnRlckV2ZW50T3B0aW9ucyBleHRlbmRzIFBlckFjdGlvbkRlZmF1bHRzIHtcbiAgZW5hYmxlZD86IHVuZGVmaW5lZCAvLyBub3QgdXNlZFxuICBob2xkRHVyYXRpb24/OiBudW1iZXJcbiAgaWdub3JlRnJvbT86IGFueVxuICBhbGxvd0Zyb20/OiBhbnlcbiAgb3JpZ2luPzogSW50ZXJhY3QuUG9pbnQgfCBzdHJpbmcgfCBJbnRlcmFjdC5FbGVtZW50XG59XG5cbmRlY2xhcmUgbW9kdWxlICdAaW50ZXJhY3Rqcy9jb3JlL3Njb3BlJyB7XG4gIGludGVyZmFjZSBTY29wZSB7XG4gICAgcG9pbnRlckV2ZW50czogdHlwZW9mIHBvaW50ZXJFdmVudHNcbiAgfVxufVxuXG5kZWNsYXJlIG1vZHVsZSAnQGludGVyYWN0anMvY29yZS9JbnRlcmFjdGlvbicge1xuICBpbnRlcmZhY2UgSW50ZXJhY3Rpb24ge1xuICAgIHByZXZUYXA/OiBQb2ludGVyRXZlbnQ8c3RyaW5nPlxuICAgIHRhcFRpbWU/OiBudW1iZXJcbiAgfVxufVxuXG5kZWNsYXJlIG1vZHVsZSAnQGludGVyYWN0anMvY29yZS9Qb2ludGVySW5mbycge1xuICBpbnRlcmZhY2UgUG9pbnRlckluZm8ge1xuICAgIGhvbGQ/OiB7XG4gICAgICBkdXJhdGlvbjogbnVtYmVyXG4gICAgICB0aW1lb3V0OiBhbnlcbiAgICB9XG4gIH1cbn1cblxuZGVjbGFyZSBtb2R1bGUgJ0BpbnRlcmFjdGpzL2NvcmUvZGVmYXVsdE9wdGlvbnMnIHtcbiAgaW50ZXJmYWNlIEFjdGlvbkRlZmF1bHRzIHtcbiAgICBwb2ludGVyRXZlbnRzOiBJbnRlcmFjdC5PcHRpb25zXG4gIH1cbn1cblxuY29uc3Qgc2lnbmFscyAgICAgICA9IG5ldyB1dGlscy5TaWduYWxzKClcbmNvbnN0IHNpbXBsZVNpZ25hbHMgPSBbJ2Rvd24nLCAndXAnLCAnY2FuY2VsJ11cbmNvbnN0IHNpbXBsZUV2ZW50cyAgPSBbJ2Rvd24nLCAndXAnLCAnY2FuY2VsJ11cblxuY29uc3QgZGVmYXVsdHM6IFBvaW50ZXJFdmVudE9wdGlvbnMgPSB7XG4gIGhvbGREdXJhdGlvbjogNjAwLFxuICBpZ25vcmVGcm9tICA6IG51bGwsXG4gIGFsbG93RnJvbSAgIDogbnVsbCxcbiAgb3JpZ2luICAgICAgOiB7IHg6IDAsIHk6IDAgfSxcbn1cblxuY29uc3QgcG9pbnRlckV2ZW50cyA9IHtcbiAgaWQ6ICdwb2ludGVyLWV2ZW50cy9iYXNlJyxcbiAgaW5zdGFsbCxcbiAgc2lnbmFscyxcbiAgUG9pbnRlckV2ZW50LFxuICBmaXJlLFxuICBjb2xsZWN0RXZlbnRUYXJnZXRzLFxuICBjcmVhdGVTaWduYWxMaXN0ZW5lcixcbiAgZGVmYXVsdHMsXG4gIHR5cGVzOiBbXG4gICAgJ2Rvd24nLFxuICAgICdtb3ZlJyxcbiAgICAndXAnLFxuICAgICdjYW5jZWwnLFxuICAgICd0YXAnLFxuICAgICdkb3VibGV0YXAnLFxuICAgICdob2xkJyxcbiAgXSxcbn1cblxuZnVuY3Rpb24gZmlyZTxUIGV4dGVuZHMgc3RyaW5nPiAoYXJnOiB7XG4gIGludGVyYWN0aW9uOiBJbnRlcmFjdGlvblxuICBwb2ludGVyOiBJbnRlcmFjdC5Qb2ludGVyVHlwZVxuICBldmVudDogSW50ZXJhY3QuUG9pbnRlckV2ZW50VHlwZVxuICBldmVudFRhcmdldDogSW50ZXJhY3QuRXZlbnRUYXJnZXRcbiAgdGFyZ2V0cz86IEV2ZW50VGFyZ2V0TGlzdFxuICBwb2ludGVyRXZlbnQ/OiBQb2ludGVyRXZlbnQ8VD5cbiAgdHlwZTogVFxufSwgc2NvcGU6IEludGVyYWN0LlNjb3BlKSB7XG4gIGNvbnN0IHtcbiAgICBpbnRlcmFjdGlvbiwgcG9pbnRlciwgZXZlbnQsIGV2ZW50VGFyZ2V0LFxuICAgIHR5cGUgPSAoYXJnIGFzIGFueSkucG9pbnRlckV2ZW50LnR5cGUsXG4gICAgdGFyZ2V0cyA9IGNvbGxlY3RFdmVudFRhcmdldHMoYXJnKSxcbiAgfSA9IGFyZ1xuXG4gIGNvbnN0IHtcbiAgICBwb2ludGVyRXZlbnQgPSBuZXcgUG9pbnRlckV2ZW50KHR5cGUsIHBvaW50ZXIsIGV2ZW50LCBldmVudFRhcmdldCwgaW50ZXJhY3Rpb24sIHNjb3BlLm5vdygpKSxcbiAgfSA9IGFyZ1xuXG4gIGNvbnN0IHNpZ25hbEFyZyA9IHtcbiAgICBpbnRlcmFjdGlvbixcbiAgICBwb2ludGVyLFxuICAgIGV2ZW50LFxuICAgIGV2ZW50VGFyZ2V0LFxuICAgIHRhcmdldHMsXG4gICAgdHlwZSxcbiAgICBwb2ludGVyRXZlbnQsXG4gIH1cblxuICBmb3IgKGxldCBpID0gMDsgaSA8IHRhcmdldHMubGVuZ3RoOyBpKyspIHtcbiAgICBjb25zdCB0YXJnZXQgPSB0YXJnZXRzW2ldXG5cbiAgICBmb3IgKGNvbnN0IHByb3AgaW4gdGFyZ2V0LnByb3BzIHx8IHt9KSB7XG4gICAgICAocG9pbnRlckV2ZW50IGFzIGFueSlbcHJvcF0gPSB0YXJnZXQucHJvcHNbcHJvcF1cbiAgICB9XG5cbiAgICBjb25zdCBvcmlnaW4gPSB1dGlscy5nZXRPcmlnaW5YWSh0YXJnZXQuZXZlbnRhYmxlLCB0YXJnZXQubm9kZSlcblxuICAgIHBvaW50ZXJFdmVudC5fc3VidHJhY3RPcmlnaW4ob3JpZ2luKVxuICAgIHBvaW50ZXJFdmVudC5ldmVudGFibGUgPSB0YXJnZXQuZXZlbnRhYmxlXG4gICAgcG9pbnRlckV2ZW50LmN1cnJlbnRUYXJnZXQgPSB0YXJnZXQubm9kZVxuXG4gICAgdGFyZ2V0LmV2ZW50YWJsZS5maXJlKHBvaW50ZXJFdmVudClcblxuICAgIHBvaW50ZXJFdmVudC5fYWRkT3JpZ2luKG9yaWdpbilcblxuICAgIGlmIChwb2ludGVyRXZlbnQuaW1tZWRpYXRlUHJvcGFnYXRpb25TdG9wcGVkIHx8XG4gICAgICAgIChwb2ludGVyRXZlbnQucHJvcGFnYXRpb25TdG9wcGVkICYmXG4gICAgICAgICAgICAoaSArIDEpIDwgdGFyZ2V0cy5sZW5ndGggJiYgdGFyZ2V0c1tpICsgMV0ubm9kZSAhPT0gcG9pbnRlckV2ZW50LmN1cnJlbnRUYXJnZXQpKSB7XG4gICAgICBicmVha1xuICAgIH1cbiAgfVxuXG4gIHNpZ25hbHMuZmlyZSgnZmlyZWQnLCBzaWduYWxBcmcpXG5cbiAgaWYgKHR5cGUgPT09ICd0YXAnKSB7XG4gICAgLy8gaWYgcG9pbnRlckV2ZW50IHNob3VsZCBtYWtlIGEgZG91YmxlIHRhcCwgY3JlYXRlIGFuZCBmaXJlIGEgZG91YmxldGFwXG4gICAgLy8gUG9pbnRlckV2ZW50IGFuZCB1c2UgdGhhdCBhcyB0aGUgcHJldlRhcFxuICAgIGNvbnN0IHByZXZUYXAgPSBwb2ludGVyRXZlbnQuZG91YmxlXG4gICAgICA/IGZpcmUoe1xuICAgICAgICBpbnRlcmFjdGlvbixcbiAgICAgICAgcG9pbnRlcixcbiAgICAgICAgZXZlbnQsXG4gICAgICAgIGV2ZW50VGFyZ2V0LFxuICAgICAgICB0eXBlOiAnZG91YmxldGFwJyxcbiAgICAgIH0sIHNjb3BlKVxuICAgICAgOiBwb2ludGVyRXZlbnRcblxuICAgIGludGVyYWN0aW9uLnByZXZUYXAgPSBwcmV2VGFwXG4gICAgaW50ZXJhY3Rpb24udGFwVGltZSA9IHByZXZUYXAudGltZVN0YW1wXG4gIH1cblxuICByZXR1cm4gcG9pbnRlckV2ZW50XG59XG5cbmZ1bmN0aW9uIGNvbGxlY3RFdmVudFRhcmdldHM8VCBleHRlbmRzIHN0cmluZz4gKHsgaW50ZXJhY3Rpb24sIHBvaW50ZXIsIGV2ZW50LCBldmVudFRhcmdldCwgdHlwZSB9OiB7XG4gIGludGVyYWN0aW9uOiBJbnRlcmFjdGlvblxuICBwb2ludGVyOiBJbnRlcmFjdC5Qb2ludGVyVHlwZVxuICBldmVudDogSW50ZXJhY3QuUG9pbnRlckV2ZW50VHlwZVxuICBldmVudFRhcmdldDogSW50ZXJhY3QuRXZlbnRUYXJnZXRcbiAgdHlwZTogVFxufSkge1xuICBjb25zdCBwb2ludGVySW5kZXggPSBpbnRlcmFjdGlvbi5nZXRQb2ludGVySW5kZXgocG9pbnRlcilcbiAgY29uc3QgcG9pbnRlckluZm8gPSBpbnRlcmFjdGlvbi5wb2ludGVyc1twb2ludGVySW5kZXhdXG5cbiAgLy8gZG8gbm90IGZpcmUgYSB0YXAgZXZlbnQgaWYgdGhlIHBvaW50ZXIgd2FzIG1vdmVkIGJlZm9yZSBiZWluZyBsaWZ0ZWRcbiAgaWYgKHR5cGUgPT09ICd0YXAnICYmIChpbnRlcmFjdGlvbi5wb2ludGVyV2FzTW92ZWQgfHxcbiAgICAgIC8vIG9yIGlmIHRoZSBwb2ludGVydXAgdGFyZ2V0IGlzIGRpZmZlcmVudCB0byB0aGUgcG9pbnRlcmRvd24gdGFyZ2V0XG4gICAgICAhKHBvaW50ZXJJbmZvICYmIHBvaW50ZXJJbmZvLmRvd25UYXJnZXQgPT09IGV2ZW50VGFyZ2V0KSkpIHtcbiAgICByZXR1cm4gW11cbiAgfVxuXG4gIGNvbnN0IHBhdGggPSB1dGlscy5kb20uZ2V0UGF0aChldmVudFRhcmdldClcbiAgY29uc3Qgc2lnbmFsQXJnID0ge1xuICAgIGludGVyYWN0aW9uLFxuICAgIHBvaW50ZXIsXG4gICAgZXZlbnQsXG4gICAgZXZlbnRUYXJnZXQsXG4gICAgdHlwZSxcbiAgICBwYXRoLFxuICAgIHRhcmdldHM6IFtdIGFzIEV2ZW50VGFyZ2V0TGlzdCxcbiAgICBub2RlOiBudWxsLFxuICB9XG5cbiAgZm9yIChjb25zdCBub2RlIG9mIHBhdGgpIHtcbiAgICBzaWduYWxBcmcubm9kZSA9IG5vZGVcblxuICAgIHNpZ25hbHMuZmlyZSgnY29sbGVjdC10YXJnZXRzJywgc2lnbmFsQXJnKVxuICB9XG5cbiAgaWYgKHR5cGUgPT09ICdob2xkJykge1xuICAgIHNpZ25hbEFyZy50YXJnZXRzID0gc2lnbmFsQXJnLnRhcmdldHMuZmlsdGVyKHRhcmdldCA9PlxuICAgICAgdGFyZ2V0LmV2ZW50YWJsZS5vcHRpb25zLmhvbGREdXJhdGlvbiA9PT0gaW50ZXJhY3Rpb24ucG9pbnRlcnNbcG9pbnRlckluZGV4XS5ob2xkLmR1cmF0aW9uKVxuICB9XG5cbiAgcmV0dXJuIHNpZ25hbEFyZy50YXJnZXRzXG59XG5cbmZ1bmN0aW9uIGluc3RhbGwgKHNjb3BlOiBTY29wZSkge1xuICBjb25zdCB7XG4gICAgaW50ZXJhY3Rpb25zLFxuICB9ID0gc2NvcGVcblxuICBzY29wZS5wb2ludGVyRXZlbnRzID0gcG9pbnRlckV2ZW50c1xuICBzY29wZS5kZWZhdWx0cy5hY3Rpb25zLnBvaW50ZXJFdmVudHMgPSBwb2ludGVyRXZlbnRzLmRlZmF1bHRzXG5cbiAgaW50ZXJhY3Rpb25zLnNpZ25hbHMub24oJ25ldycsICh7IGludGVyYWN0aW9uIH0pID0+IHtcbiAgICBpbnRlcmFjdGlvbi5wcmV2VGFwICAgID0gbnVsbCAgLy8gdGhlIG1vc3QgcmVjZW50IHRhcCBldmVudCBvbiB0aGlzIGludGVyYWN0aW9uXG4gICAgaW50ZXJhY3Rpb24udGFwVGltZSAgICA9IDAgICAgIC8vIHRpbWUgb2YgdGhlIG1vc3QgcmVjZW50IHRhcCBldmVudFxuICB9KVxuXG4gIGludGVyYWN0aW9ucy5zaWduYWxzLm9uKCd1cGRhdGUtcG9pbnRlcicsICh7IGRvd24sIHBvaW50ZXJJbmZvIH0pID0+IHtcbiAgICBpZiAoIWRvd24gJiYgcG9pbnRlckluZm8uaG9sZCkge1xuICAgICAgcmV0dXJuXG4gICAgfVxuXG4gICAgcG9pbnRlckluZm8uaG9sZCA9IHsgZHVyYXRpb246IEluZmluaXR5LCB0aW1lb3V0OiBudWxsIH1cbiAgfSlcblxuICBpbnRlcmFjdGlvbnMuc2lnbmFscy5vbignbW92ZScsICh7IGludGVyYWN0aW9uLCBwb2ludGVyLCBldmVudCwgZXZlbnRUYXJnZXQsIGR1cGxpY2F0ZU1vdmUgfSkgPT4ge1xuICAgIGNvbnN0IHBvaW50ZXJJbmRleCA9IGludGVyYWN0aW9uLmdldFBvaW50ZXJJbmRleChwb2ludGVyKVxuXG4gICAgaWYgKCFkdXBsaWNhdGVNb3ZlICYmICghaW50ZXJhY3Rpb24ucG9pbnRlcklzRG93biB8fCBpbnRlcmFjdGlvbi5wb2ludGVyV2FzTW92ZWQpKSB7XG4gICAgICBpZiAoaW50ZXJhY3Rpb24ucG9pbnRlcklzRG93bikge1xuICAgICAgICBjbGVhclRpbWVvdXQoaW50ZXJhY3Rpb24ucG9pbnRlcnNbcG9pbnRlckluZGV4XS5ob2xkLnRpbWVvdXQpXG4gICAgICB9XG5cbiAgICAgIGZpcmUoe1xuICAgICAgICBpbnRlcmFjdGlvbixcbiAgICAgICAgcG9pbnRlcixcbiAgICAgICAgZXZlbnQsXG4gICAgICAgIGV2ZW50VGFyZ2V0LFxuICAgICAgICB0eXBlOiAnbW92ZScsXG4gICAgICB9LCBzY29wZSlcbiAgICB9XG4gIH0pXG5cbiAgaW50ZXJhY3Rpb25zLnNpZ25hbHMub24oJ2Rvd24nLCAoeyBpbnRlcmFjdGlvbiwgcG9pbnRlciwgZXZlbnQsIGV2ZW50VGFyZ2V0LCBwb2ludGVySW5kZXggfSkgPT4ge1xuICAgIGNvbnN0IHRpbWVyID0gaW50ZXJhY3Rpb24ucG9pbnRlcnNbcG9pbnRlckluZGV4XS5ob2xkXG4gICAgY29uc3QgcGF0aCA9IHV0aWxzLmRvbS5nZXRQYXRoKGV2ZW50VGFyZ2V0KVxuICAgIGNvbnN0IHNpZ25hbEFyZyA9IHtcbiAgICAgIGludGVyYWN0aW9uLFxuICAgICAgcG9pbnRlcixcbiAgICAgIGV2ZW50LFxuICAgICAgZXZlbnRUYXJnZXQsXG4gICAgICB0eXBlOiAnaG9sZCcsXG4gICAgICB0YXJnZXRzOiBbXSBhcyBFdmVudFRhcmdldExpc3QsXG4gICAgICBwYXRoLFxuICAgICAgbm9kZTogbnVsbCxcbiAgICB9XG5cbiAgICBmb3IgKGNvbnN0IG5vZGUgb2YgcGF0aCkge1xuICAgICAgc2lnbmFsQXJnLm5vZGUgPSBub2RlXG5cbiAgICAgIHNpZ25hbHMuZmlyZSgnY29sbGVjdC10YXJnZXRzJywgc2lnbmFsQXJnKVxuICAgIH1cblxuICAgIGlmICghc2lnbmFsQXJnLnRhcmdldHMubGVuZ3RoKSB7IHJldHVybiB9XG5cbiAgICBsZXQgbWluRHVyYXRpb24gPSBJbmZpbml0eVxuXG4gICAgZm9yIChjb25zdCB0YXJnZXQgb2Ygc2lnbmFsQXJnLnRhcmdldHMpIHtcbiAgICAgIGNvbnN0IGhvbGREdXJhdGlvbiA9IHRhcmdldC5ldmVudGFibGUub3B0aW9ucy5ob2xkRHVyYXRpb25cblxuICAgICAgaWYgKGhvbGREdXJhdGlvbiA8IG1pbkR1cmF0aW9uKSB7XG4gICAgICAgIG1pbkR1cmF0aW9uID0gaG9sZER1cmF0aW9uXG4gICAgICB9XG4gICAgfVxuXG4gICAgdGltZXIuZHVyYXRpb24gPSBtaW5EdXJhdGlvblxuICAgIHRpbWVyLnRpbWVvdXQgPSBzZXRUaW1lb3V0KCgpID0+IHtcbiAgICAgIGZpcmUoe1xuICAgICAgICBpbnRlcmFjdGlvbixcbiAgICAgICAgZXZlbnRUYXJnZXQsXG4gICAgICAgIHBvaW50ZXIsXG4gICAgICAgIGV2ZW50LFxuICAgICAgICB0eXBlOiAnaG9sZCcsXG4gICAgICB9LCBzY29wZSlcbiAgICB9LCBtaW5EdXJhdGlvbilcbiAgfSlcblxuICBmb3IgKGNvbnN0IHNpZ25hbE5hbWUgb2YgWyd1cCcsICdjYW5jZWwnXSkge1xuICAgIGludGVyYWN0aW9ucy5zaWduYWxzLm9uKHNpZ25hbE5hbWUsICh7IGludGVyYWN0aW9uLCBwb2ludGVySW5kZXggfSkgPT4ge1xuICAgICAgaWYgKGludGVyYWN0aW9uLnBvaW50ZXJzW3BvaW50ZXJJbmRleF0uaG9sZCkge1xuICAgICAgICBjbGVhclRpbWVvdXQoaW50ZXJhY3Rpb24ucG9pbnRlcnNbcG9pbnRlckluZGV4XS5ob2xkLnRpbWVvdXQpXG4gICAgICB9XG4gICAgfSlcbiAgfVxuXG4gIGZvciAobGV0IGkgPSAwOyBpIDwgc2ltcGxlU2lnbmFscy5sZW5ndGg7IGkrKykge1xuICAgIGludGVyYWN0aW9ucy5zaWduYWxzLm9uKHNpbXBsZVNpZ25hbHNbaV0sIGNyZWF0ZVNpZ25hbExpc3RlbmVyKHNpbXBsZUV2ZW50c1tpXSwgc2NvcGUpKVxuICB9XG5cbiAgaW50ZXJhY3Rpb25zLnNpZ25hbHMub24oJ3VwJywgKHsgaW50ZXJhY3Rpb24sIHBvaW50ZXIsIGV2ZW50LCBldmVudFRhcmdldCB9KSA9PiB7XG4gICAgaWYgKCFpbnRlcmFjdGlvbi5wb2ludGVyV2FzTW92ZWQpIHtcbiAgICAgIGZpcmUoeyBpbnRlcmFjdGlvbiwgZXZlbnRUYXJnZXQsIHBvaW50ZXIsIGV2ZW50LCB0eXBlOiAndGFwJyB9LCBzY29wZSlcbiAgICB9XG4gIH0pXG59XG5cbmZ1bmN0aW9uIGNyZWF0ZVNpZ25hbExpc3RlbmVyICh0eXBlOiBzdHJpbmcsIHNjb3BlKSB7XG4gIHJldHVybiBmdW5jdGlvbiAoeyBpbnRlcmFjdGlvbiwgcG9pbnRlciwgZXZlbnQsIGV2ZW50VGFyZ2V0IH06IGFueSkge1xuICAgIGZpcmUoeyBpbnRlcmFjdGlvbiwgZXZlbnRUYXJnZXQsIHBvaW50ZXIsIGV2ZW50LCB0eXBlIH0sIHNjb3BlKVxuICB9XG59XG5cbmV4cG9ydCBkZWZhdWx0IHBvaW50ZXJFdmVudHNcbiJdfQ==
+//# sourceMappingURL=base.js.map

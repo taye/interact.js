@@ -1,6 +1,6 @@
-import Interactable from '@interactjs/core/Interactable';
-import { ActionProps } from '@interactjs/core/Interaction';
-import { Scope } from '@interactjs/core/scope';
+import Interactable from '../core/Interactable';
+import { ActionProps } from '../core/Interaction';
+import { Scope } from '../core/scope';
 declare module '@interactjs/core/Interactable' {
     interface Interactable {
         reflow: (action: ActionProps) => ReturnType<typeof reflow>;

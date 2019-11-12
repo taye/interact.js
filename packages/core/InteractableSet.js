@@ -1,89 +1,107 @@
-import * as arr from '@interactjs/utils/arr';
-import * as domUtils from '@interactjs/utils/domUtils';
-import extend from '@interactjs/utils/extend';
-import * as is from '@interactjs/utils/is';
-import Signals from '@interactjs/utils/Signals';
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+import * as arr from "../utils/arr.js";
+import * as domUtils from "../utils/domUtils.js";
+import extend from "../utils/extend.js";
+import * as is from "../utils/is.js";
 export default class InteractableSet {
-    constructor(scope) {
-        this.scope = scope;
-        this.signals = new Signals();
-        // all set interactables
-        this.list = [];
-        this.selectorMap = {};
-        this.signals.on('unset', ({ interactable }) => {
-            const { target, _context: context } = interactable;
-            const targetMappings = is.string(target)
-                ? this.selectorMap[target]
-                : target[this.scope.id];
-            const targetIndex = targetMappings.findIndex(m => m.context === context);
-            if (targetMappings[targetIndex]) {
-                // Destroying mappingInfo's context and interactable
-                targetMappings[targetIndex].context = null;
-                targetMappings[targetIndex].interactable = null;
-            }
-            targetMappings.splice(targetIndex, 1);
+  // all set interactables
+  constructor(scope) {
+    this.scope = scope;
+
+    _defineProperty(this, "list", []);
+
+    _defineProperty(this, "selectorMap", {});
+
+    scope.addListeners({
+      'interactable:unset': ({
+        interactable
+      }) => {
+        const {
+          target,
+          _context: context
+        } = interactable;
+        const targetMappings = is.string(target) ? this.selectorMap[target] : target[this.scope.id];
+        const targetIndex = targetMappings.findIndex(m => m.context === context);
+
+        if (targetMappings[targetIndex]) {
+          // Destroying mappingInfo's context and interactable
+          targetMappings[targetIndex].context = null;
+          targetMappings[targetIndex].interactable = null;
+        }
+
+        targetMappings.splice(targetIndex, 1);
+      }
+    });
+  }
+
+  new(target, options) {
+    options = extend(options || {}, {
+      actions: this.scope.actions
+    });
+    const interactable = new this.scope.Interactable(target, options, this.scope.document);
+    const mappingInfo = {
+      context: interactable._context,
+      interactable
+    };
+    this.scope.addDocument(interactable._doc);
+    this.list.push(interactable);
+
+    if (is.string(target)) {
+      if (!this.selectorMap[target]) {
+        this.selectorMap[target] = [];
+      }
+
+      this.selectorMap[target].push(mappingInfo);
+    } else {
+      if (!interactable.target[this.scope.id]) {
+        Object.defineProperty(target, this.scope.id, {
+          value: [],
+          configurable: true
         });
+      }
+
+      target[this.scope.id].push(mappingInfo);
     }
-    new(target, options) {
-        options = extend(options || {}, {
-            actions: this.scope.actions,
-        });
-        const interactable = new this.scope.Interactable(target, options, this.scope.document);
-        const mappingInfo = { context: interactable._context, interactable };
-        this.scope.addDocument(interactable._doc);
-        this.list.push(interactable);
-        if (is.string(target)) {
-            if (!this.selectorMap[target]) {
-                this.selectorMap[target] = [];
-            }
-            this.selectorMap[target].push(mappingInfo);
-        }
-        else {
-            if (!interactable.target[this.scope.id]) {
-                Object.defineProperty(target, this.scope.id, {
-                    value: [],
-                    configurable: true,
-                });
-            }
-            target[this.scope.id].push(mappingInfo);
-        }
-        this.signals.fire('new', {
-            target,
-            options,
-            interactable,
-            win: this.scope._win,
-        });
-        return interactable;
+
+    this.scope.fire('interactable:new', {
+      target,
+      options,
+      interactable,
+      win: this.scope._win
+    });
+    return interactable;
+  }
+
+  get(target, options) {
+    const context = options && options.context || this.scope.document;
+    const isSelector = is.string(target);
+    const targetMappings = isSelector ? this.selectorMap[target] : target[this.scope.id];
+
+    if (!targetMappings) {
+      return null;
     }
-    get(target, options) {
-        const context = (options && options.context) || this.scope.document;
-        const isSelector = is.string(target);
-        const targetMappings = isSelector
-            ? this.selectorMap[target]
-            : target[this.scope.id];
-        if (!targetMappings) {
-            return null;
-        }
-        const found = arr.find(targetMappings, m => m.context === context &&
-            (isSelector || m.interactable.inContext(target)));
-        return found && found.interactable;
+
+    const found = arr.find(targetMappings, m => m.context === context && (isSelector || m.interactable.inContext(target)));
+    return found && found.interactable;
+  }
+
+  forEachMatch(node, callback) {
+    for (const interactable of this.list) {
+      let ret;
+
+      if ((is.string(interactable.target) // target is a selector and the element matches
+      ? is.element(node) && domUtils.matchesSelector(node, interactable.target) : // target is the element
+      node === interactable.target) && // the element is in context
+      interactable.inContext(node)) {
+        ret = callback(interactable);
+      }
+
+      if (ret !== undefined) {
+        return ret;
+      }
     }
-    forEachMatch(node, callback) {
-        for (const interactable of this.list) {
-            let ret;
-            if ((is.string(interactable.target)
-                // target is a selector and the element matches
-                ? (is.element(node) && domUtils.matchesSelector(node, interactable.target))
-                // target is the element
-                : node === interactable.target) &&
-                // the element is in context
-                (interactable.inContext(node))) {
-                ret = callback(interactable);
-            }
-            if (ret !== undefined) {
-                return ret;
-            }
-        }
-    }
+  }
+
 }
-//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiSW50ZXJhY3RhYmxlU2V0LmpzIiwic291cmNlUm9vdCI6IiIsInNvdXJjZXMiOlsiSW50ZXJhY3RhYmxlU2V0LnRzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBLE9BQU8sS0FBSyxHQUFHLE1BQU0sdUJBQXVCLENBQUE7QUFDNUMsT0FBTyxLQUFLLFFBQVEsTUFBTSw0QkFBNEIsQ0FBQTtBQUN0RCxPQUFPLE1BQU0sTUFBTSwwQkFBMEIsQ0FBQTtBQUM3QyxPQUFPLEtBQUssRUFBRSxNQUFNLHNCQUFzQixDQUFBO0FBQzFDLE9BQU8sT0FBTyxNQUFNLDJCQUEyQixDQUFBO0FBRS9DLE1BQU0sQ0FBQyxPQUFPLE9BQU8sZUFBZTtJQVVsQyxZQUF1QixLQUFxQjtRQUFyQixVQUFLLEdBQUwsS0FBSyxDQUFnQjtRQVQ1QyxZQUFPLEdBQUcsSUFBSSxPQUFPLEVBQUUsQ0FBQTtRQUV2Qix3QkFBd0I7UUFDeEIsU0FBSSxHQUE0QixFQUFFLENBQUE7UUFFbEMsZ0JBQVcsR0FFUCxFQUFFLENBQUE7UUFHSixJQUFJLENBQUMsT0FBTyxDQUFDLEVBQUUsQ0FBQyxPQUFPLEVBQUUsQ0FBQyxFQUFFLFlBQVksRUFBRSxFQUFFLEVBQUU7WUFDNUMsTUFBTSxFQUFFLE1BQU0sRUFBRSxRQUFRLEVBQUUsT0FBTyxFQUFFLEdBQUcsWUFBWSxDQUFBO1lBQ2xELE1BQU0sY0FBYyxHQUFHLEVBQUUsQ0FBQyxNQUFNLENBQUMsTUFBTSxDQUFDO2dCQUN0QyxDQUFDLENBQUMsSUFBSSxDQUFDLFdBQVcsQ0FBQyxNQUFNLENBQUM7Z0JBQzFCLENBQUMsQ0FBQyxNQUFNLENBQUMsSUFBSSxDQUFDLEtBQUssQ0FBQyxFQUFFLENBQUMsQ0FBQTtZQUV6QixNQUFNLFdBQVcsR0FBRyxjQUFjLENBQUMsU0FBUyxDQUFDLENBQUMsQ0FBQyxFQUFFLENBQUMsQ0FBQyxDQUFDLE9BQU8sS0FBSyxPQUFPLENBQUMsQ0FBQTtZQUN4RSxJQUFJLGNBQWMsQ0FBQyxXQUFXLENBQUMsRUFBRTtn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QVksQ0FBQyxTQUFTLENBQUMsTUFBTSxDQUFDLENBQUMsQ0FBQyxDQUFBO1FBRXJELE9BQU8sS0FBSyxJQUFJLEtBQUssQ0FBQyxZQUFZLENBQUE7SUFDcEMsQ0FBQztJQUVELFlBQVksQ0FBSyxJQUFVLEVBQUUsUUFBb0Q7UUFDL0UsS0FBSyxNQUFNLFlBQVksSUFBSSxJQUFJLENBQUMsSUFBSSxFQUFFO1lBQ3BDLElBQUksR0FBRyxDQUFBO1lBRVAsSUFBSSxDQUFDLEVBQUUsQ0FBQyxNQUFNLENBQUMsWUFBWSxDQUFDLE1BQU0sQ0FBQztnQkFDbkMsK0NBQStDO2dCQUM3QyxDQUFDLENBQUMsQ0FBQyxFQUFFLENBQUMsT0FBTyxDQUFDLElBQUksQ0FBQyxJQUFJLFFBQVEsQ0FBQyxlQUFlLENBQUMsSUFBSSxFQUFFLFlBQVksQ0FBQyxNQUFNLENBQUMsQ0FBQztnQkFDM0Usd0JBQXdCO2dCQUN4QixDQUFDLENBQUMsSUFBSSxLQUFLLFlBQVksQ0FBQyxNQUFNLENBQUM7Z0JBQy9CLDRCQUE0QjtnQkFDNUIsQ0FBQyxZQUFZLENBQUMsU0FBUyxDQUFDLElBQUksQ0FBQyxDQUFDLEVBQUU7Z0JBQ2hDLEdBQUcsR0FBRyxRQUFRLENBQUMsWUFBWSxDQUFDLENBQUE7YUFDN0I7WUFFRCxJQUFJLEdBQUcsS0FBSyxTQUFTLEVBQUU7Z0JBQ3JCLE9BQU8sR0FBRyxDQUFBO2FBQ1g7U0FDRjtJQUNILENBQUM7Q0FDRiIsInNvdXJjZXNDb250ZW50IjpbImltcG9ydCAqIGFzIGFyciBmcm9tICdAaW50ZXJhY3Rqcy91dGlscy9hcnInXG5pbXBvcnQgKiBhcyBkb21VdGlscyBmcm9tICdAaW50ZXJhY3Rqcy91dGlscy9kb21VdGlscydcbmltcG9ydCBleHRlbmQgZnJvbSAnQGludGVyYWN0anMvdXRpbHMvZXh0ZW5kJ1xuaW1wb3J0ICogYXMgaXMgZnJvbSAnQGludGVyYWN0anMvdXRpbHMvaXMnXG5pbXBvcnQgU2lnbmFscyBmcm9tICdAaW50ZXJhY3Rqcy91dGlscy9TaWduYWxzJ1xuXG5leHBvcnQgZGVmYXVsdCBjbGFzcyBJbnRlcmFjdGFibGVTZXQge1xuICBzaWduYWxzID0gbmV3IFNpZ25hbHMoKVxuXG4gIC8vIGFsbCBzZXQgaW50ZXJhY3RhYmxlc1xuICBsaXN0OiBJbnRlcmFjdC5JbnRlcmFjdGFibGVbXSA9IFtdXG5cbiAgc2VsZWN0b3JNYXA6IHtcbiAgICBbc2VsZWN0b3I6IHN0cmluZ106IEFycmF5PHsgY29udGV4dDogRG9jdW1lbnQgfCBJbnRlcmFjdC5FbGVtZW50LCBpbnRlcmFjdGFibGU6IEludGVyYWN0LkludGVyYWN0YWJsZSB9PlxuICB9ID0ge31cblxuICBjb25zdHJ1Y3RvciAocHJvdGVjdGVkIHNjb3BlOiBJbnRlcmFjdC5TY29wZSkge1xuICAgIHRoaXMuc2lnbmFscy5vbigndW5zZXQnLCAoeyBpbnRlcmFjdGFibGUgfSkgPT4ge1xuICAgICAgY29uc3QgeyB0YXJnZXQsIF9jb250ZXh0OiBjb250ZXh0IH0gPSBpbnRlcmFjdGFibGVcbiAgICAgIGNvbnN0IHRhcmdldE1hcHBpbmdzID0gaXMuc3RyaW5nKHRhcmdldClcbiAgICAgICAgPyB0aGlzLnNlbGVjdG9yTWFwW3RhcmdldF1cbiAgICAgICAgOiB0YXJnZXRbdGhpcy5zY29wZS5pZF1cblxuICAgICAgY29uc3QgdGFyZ2V0SW5kZXggPSB0YXJnZXRNYXBwaW5ncy5maW5kSW5kZXgobSA9PiBtLmNvbnRleHQgPT09IGNvbnRleHQpXG4gICAgICBpZiAodGFyZ2V0TWFwcGluZ3NbdGFyZ2V0SW5kZXhdKSB7XG4gICAgICAgIC8vIERlc3Ryb3lpbmcgbWFwcGluZ0luZm8ncyBjb250ZXh0IGFuZCBpbnRlcmFjdGFibGVcbiAgICAgICAgdGFyZ2V0TWFwcGluZ3NbdGFyZ2V0SW5kZXhdLmNvbnRleHQgPSBudWxsXG4gICAgICAgIHRhcmdldE1hcHBpbmdzW3RhcmdldEluZGV4XS5pbnRlcmFjdGFibGUgPSBudWxsXG4gICAgICB9XG4gICAgICB0YXJnZXRNYXBwaW5ncy5zcGxpY2UodGFyZ2V0SW5kZXgsIDEpXG4gICAgfSlcbiAgfVxuXG4gIG5ldyAodGFyZ2V0OiBJbnRlcmFjdC5UYXJnZXQsIG9wdGlvbnM/OiBhbnkpOiBJbnRlcmFjdC5JbnRlcmFjdGFibGUge1xuICAgIG9wdGlvbnMgPSBleHRlbmQob3B0aW9ucyB8fCB7fSwge1xuICAgICAgYWN0aW9uczogdGhpcy5zY29wZS5hY3Rpb25zLFxuICAgIH0pXG4gICAgY29uc3QgaW50ZXJhY3RhYmxlID0gbmV3IHRoaXMuc2NvcGUuSW50ZXJhY3RhYmxlKHRhcmdldCwgb3B0aW9ucywgdGhpcy5zY29wZS5kb2N1bWVudClcbiAgICBjb25zdCBtYXBwaW5nSW5mbyA9IHsgY29udGV4dDogaW50ZXJhY3RhYmxlLl9jb250ZXh0LCBpbnRlcmFjdGFibGUgfVxuXG4gICAgdGhpcy5zY29wZS5hZGREb2N1bWVudChpbnRlcmFjdGFibGUuX2RvYylcbiAgICB0aGlzLmxpc3QucHVzaChpbnRlcmFjdGFibGUpXG5cbiAgICBpZiAoaXMuc3RyaW5nKHRhcmdldCkpIHtcbiAgICAgIGlmICghdGhpcy5zZWxlY3Rvck1hcFt0YXJnZXRdKSB7IHRoaXMuc2VsZWN0b3JNYXBbdGFyZ2V0XSA9IFtdIH1cbiAgICAgIHRoaXMuc2VsZWN0b3JNYXBbdGFyZ2V0XS5wdXNoKG1hcHBpbmdJbmZvKVxuICAgIH0gZWxzZSB7XG4gICAgICBpZiAoIWludGVyYWN0YWJsZS50YXJnZXRbdGhpcy5zY29wZS5pZF0pIHtcbiAgICAgICAgT2JqZWN0LmRlZmluZVByb3BlcnR5KHRhcmdldCwgdGhpcy5zY29wZS5pZCwge1xuICAgICAgICAgIHZhbHVlOiBbXSxcbiAgICAgICAgICBjb25maWd1cmFibGU6IHRydWUsXG4gICAgICAgIH0pXG4gICAgICB9XG5cbiAgICAgIHRhcmdldFt0aGlzLnNjb3BlLmlkXS5wdXNoKG1hcHBpbmdJbmZvKVxuICAgIH1cblxuICAgIHRoaXMuc2lnbmFscy5maXJlKCduZXcnLCB7XG4gICAgICB0YXJnZXQsXG4gICAgICBvcHRpb25zLFxuICAgICAgaW50ZXJhY3RhYmxlLFxuICAgICAgd2luOiB0aGlzLnNjb3BlLl93aW4sXG4gICAgfSlcblxuICAgIHJldHVybiBpbnRlcmFjdGFibGVcbiAgfVxuXG4gIGdldCAodGFyZ2V0OiBJbnRlcmFjdC5UYXJnZXQsIG9wdGlvbnMpIHtcbiAgICBjb25zdCBjb250ZXh0ID0gKG9wdGlvbnMgJiYgb3B0aW9ucy5jb250ZXh0KSB8fCB0aGlzLnNjb3BlLmRvY3VtZW50XG4gICAgY29uc3QgaXNTZWxlY3RvciA9IGlzLnN0cmluZyh0YXJnZXQpXG4gICAgY29uc3QgdGFyZ2V0TWFwcGluZ3MgPSBpc1NlbGVjdG9yXG4gICAgICA/IHRoaXMuc2VsZWN0b3JNYXBbdGFyZ2V0IGFzIHN0cmluZ11cbiAgICAgIDogdGFyZ2V0W3RoaXMuc2NvcGUuaWRdXG5cbiAgICBpZiAoIXRhcmdldE1hcHBpbmdzKSB7IHJldHVybiBudWxsIH1cblxuICAgIGNvbnN0IGZvdW5kID0gYXJyLmZpbmQoXG4gICAgICB0YXJnZXRNYXBwaW5ncyxcbiAgICAgIG0gPT4gbS5jb250ZXh0ID09PSBjb250ZXh0ICYmXG4gICAgICAgIChpc1NlbGVjdG9yIHx8IG0uaW50ZXJhY3RhYmxlLmluQ29udGV4dCh0YXJnZXQpKSlcblxuICAgIHJldHVybiBmb3VuZCAmJiBmb3VuZC5pbnRlcmFjdGFibGVcbiAgfVxuXG4gIGZvckVhY2hNYXRjaDxUPiAobm9kZTogTm9kZSwgY2FsbGJhY2s6IChpbnRlcmFjdGFibGU6IEludGVyYWN0LkludGVyYWN0YWJsZSkgPT4gVCk6IFQgfCB2b2lkIHtcbiAgICBmb3IgKGNvbnN0IGludGVyYWN0YWJsZSBvZiB0aGlzLmxpc3QpIHtcbiAgICAgIGxldCByZXRcblxuICAgICAgaWYgKChpcy5zdHJpbmcoaW50ZXJhY3RhYmxlLnRhcmdldClcbiAgICAgIC8vIHRhcmdldCBpcyBhIHNlbGVjdG9yIGFuZCB0aGUgZWxlbWVudCBtYXRjaGVzXG4gICAgICAgID8gKGlzLmVsZW1lbnQobm9kZSkgJiYgZG9tVXRpbHMubWF0Y2hlc1NlbGVjdG9yKG5vZGUsIGludGVyYWN0YWJsZS50YXJnZXQpKVxuICAgICAgICAvLyB0YXJnZXQgaXMgdGhlIGVsZW1lbnRcbiAgICAgICAgOiBub2RlID09PSBpbnRlcmFjdGFibGUudGFyZ2V0KSAmJlxuICAgICAgICAvLyB0aGUgZWxlbWVudCBpcyBpbiBjb250ZXh0XG4gICAgICAgIChpbnRlcmFjdGFibGUuaW5Db250ZXh0KG5vZGUpKSkge1xuICAgICAgICByZXQgPSBjYWxsYmFjayhpbnRlcmFjdGFibGUpXG4gICAgICB9XG5cbiAgICAgIGlmIChyZXQgIT09IHVuZGVmaW5lZCkge1xuICAgICAgICByZXR1cm4gcmV0XG4gICAgICB9XG4gICAgfVxuICB9XG59XG4iXX0=
+//# sourceMappingURL=InteractableSet.js.map

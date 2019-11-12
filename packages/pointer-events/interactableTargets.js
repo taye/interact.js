@@ -1,48 +1,72 @@
-import { merge } from '@interactjs/utils/arr';
-import extend from '@interactjs/utils/extend';
+import { merge } from "../utils/arr.js";
+import extend from "../utils/extend.js";
+
 function install(scope) {
-    const { pointerEvents, actions, Interactable, interactables, } = scope;
-    pointerEvents.signals.on('collect-targets', ({ targets, node, type, eventTarget, }) => {
-        scope.interactables.forEachMatch(node, (interactable) => {
-            const eventable = interactable.events;
-            const options = eventable.options;
-            if (eventable.types[type] &&
-                eventable.types[type].length &&
-                interactable.testIgnoreAllow(options, node, eventTarget)) {
-                targets.push({
-                    node,
-                    eventable,
-                    props: { interactable },
-                });
-            }
-        });
-    });
-    interactables.signals.on('new', ({ interactable }) => {
-        interactable.events.getRect = function (element) {
-            return interactable.getRect(element);
-        };
-    });
-    interactables.signals.on('set', ({ interactable, options }) => {
-        extend(interactable.events.options, pointerEvents.defaults);
-        extend(interactable.events.options, options.pointerEvents || {});
-    });
-    merge(actions.eventTypes, pointerEvents.types);
-    Interactable.prototype.pointerEvents = pointerEventsMethod;
-    const __backCompatOption = Interactable.prototype._backCompatOption;
-    Interactable.prototype._backCompatOption = function (optionName, newValue) {
-        const ret = __backCompatOption.call(this, optionName, newValue);
-        if (ret === this) {
-            this.events.options[optionName] = newValue;
-        }
-        return ret;
-    };
+  const {
+    pointerEvents,
+    actions,
+    Interactable
+  } = scope;
+  merge(actions.eventTypes, pointerEvents.types);
+  Interactable.prototype.pointerEvents = pointerEventsMethod;
+  const __backCompatOption = Interactable.prototype._backCompatOption;
+
+  Interactable.prototype._backCompatOption = function (optionName, newValue) {
+    const ret = __backCompatOption.call(this, optionName, newValue);
+
+    if (ret === this) {
+      this.events.options[optionName] = newValue;
+    }
+
+    return ret;
+  };
 }
+
 function pointerEventsMethod(options) {
-    extend(this.events.options, options);
-    return this;
+  extend(this.events.options, options);
+  return this;
 }
-export default {
-    id: 'pointer-events/interactableTargets',
-    install,
+
+const plugin = {
+  id: 'pointer-events/interactableTargets',
+  install,
+  listeners: {
+    'pointerEvents:collect-targets': ({
+      targets,
+      node,
+      type,
+      eventTarget
+    }, scope) => {
+      scope.interactables.forEachMatch(node, interactable => {
+        const eventable = interactable.events;
+        const options = eventable.options;
+
+        if (eventable.types[type] && eventable.types[type].length && interactable.testIgnoreAllow(options, node, eventTarget)) {
+          targets.push({
+            node,
+            eventable,
+            props: {
+              interactable
+            }
+          });
+        }
+      });
+    },
+    'interactable:new': ({
+      interactable
+    }) => {
+      interactable.events.getRect = function (element) {
+        return interactable.getRect(element);
+      };
+    },
+    'interactable:set': ({
+      interactable,
+      options
+    }, scope) => {
+      extend(interactable.events.options, scope.pointerEvents.defaults);
+      extend(interactable.events.options, options.pointerEvents || {});
+    }
+  }
 };
-//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiaW50ZXJhY3RhYmxlVGFyZ2V0cy5qcyIsInNvdXJjZVJvb3QiOiIiLCJzb3VyY2VzIjpbImludGVyYWN0YWJsZVRhcmdldHMudHMiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IkFBQ0EsT0FBTyxFQUFFLEtBQUssRUFBRSxNQUFNLHVCQUF1QixDQUFBO0FBQzdDLE9BQU8sTUFBTSxNQUFNLDBCQUEwQixDQUFBO0FBWTdDLFNBQVMsT0FBTyxDQUFFLEtBQVk7SUFDNUIsTUFBTSxFQUNKLGFBQWEsRUFDYixPQUFPLEVBQ1AsWUFBWSxFQUNaLGFBQWEsR0FDZCxHQUFHLEtBQUssQ0FBQTtJQUVULGFBQWEsQ0FBQyxPQUFPLENBQUMsRUFBRSxDQUFDLGlCQUFpQixFQUFFLENBQUMsRUFDM0MsT0FBTyxFQUNQLElBQUksRUFDSixJQUFJLEVBQ0osV0FBVyxHQU1aLEVBQUUsRUFBRTtRQUNILEtBQUssQ0FBQyxhQUFhLENBQUMsWUFBWSxDQUFDLElBQUksRUFBRSxDQUFDLFlBQTBCLEVBQUUsRUFBRTtZQUNwRSxNQUFNLFNBQVMsR0FBRyxZQUFZLENBQUMsTUFBTSxDQUFBO1lBQ3JDLE1BQU0sT0FBTyxHQUFHLFNBQVMsQ0FBQyxPQUFPLENBQUE7WUFFakMsSUFDRSxTQUFTLENBQUMsS0FBSyxDQUFDLElBQUksQ0FBQztnQkFDckIsU0FBUyxDQUFDLEtBQUssQ0FBQyxJQUFJLENBQUMsQ0FBQyxNQUFNO2dCQUM1QixZQUFZLENBQUMsZUFBZSxDQUFDLE9BQU8sRUFBRSxJQUFJLEVBQUUsV0FBVyxDQUFDLEVBQUU7Z0JBQzFELE9BQU8sQ0FBQyxJQUFJLENBQUM7b0JBQ1gsSUFBSTtvQkFDSixTQUFTO29CQUNULEtBQUssRUFBRSxFQUFFLFlBQVksRUFBRTtpQkFDeEIsQ0FBQyxDQUFBO2FBQ0g7UUFDSCxDQUFDLENBQUMsQ0FBQTtJQUNKLENBQUMsQ0FBQyxDQUFBO0lBRUYsYUFBYSxDQUFDLE9BQU8sQ0FBQyxFQUFFLENBQUMsS0FBSyxFQUFFLENBQUMsRUFBRSxZQUFZLEVBQUUsRUFBRSxFQUFFO1FBQ25ELFlBQVksQ0FBQyxNQUFNLENBQUMsT0FBTyxHQUFHLFVBQVUsT0FBeUI7WUFDL0QsT0FBTyxZQUFZLENBQUMsT0FBTyxDQUFDLE9BQU8sQ0FBQyxDQUFBO1FBQ3RDLENBQUMsQ0FBQTtJQUNILENBQUMsQ0FBQyxDQUFBO0lBRUYsYUFBYSxDQUFDLE9BQU8sQ0FBQyxFQUFFLENBQUMsS0FBSyxFQUFFLENBQUMsRUFBRSxZQUFZLEVBQUUsT0FBTyxFQUFFLEVBQUUsRUFBRTtRQUM1RCxNQUFNLENBQUMsWUFBWSxDQUFDLE1BQU0sQ0FBQyxPQUFPLEVBQUUsYUFBYSxDQUFDLFFBQVEsQ0FBQyxDQUFBO1FBQzNELE1BQU0sQ0FBQyxZQUFZLENBQUMsTUFBTSxDQUFDLE9BQU8sRUFBRSxPQUFPLENBQUMsYUFBYSxJQUFJLEVBQUUsQ0FBQyxDQUFBO0lBQ2xFLENBQUMsQ0FBQyxDQUFBO0lBRUYsS0FBSyxDQUFDLE9BQU8sQ0FBQyxVQUFVLEVBQUUsYUFBYSxDQUFDLEtBQUssQ0FBQyxDQUFBO0lBRTlDLFlBQVksQ0FBQyxTQUFTLENBQUMsYUFBYSxHQUFHLG1CQUFtQixDQUFBO0lBRTFELE1BQU0sa0JBQWtCLEdBQUcsWUFBWSxDQUFDLFNBQVMsQ0FBQyxpQkFBaUIsQ0FBQTtJQUVuRSxZQUFZLENBQUMsU0FBUyxDQUFDLGlCQUFpQixHQUFHLFVBQVUsVUFBVSxFQUFFLFFBQVE7UUFDdkUsTUFBTSxHQUFHLEdBQUcsa0JBQWtCLENBQUMsSUFBSSxDQUFDLElBQUksRUFBRSxVQUFVLEVBQUUsUUFBUSxDQUFDLENBQUE7UUFFL0QsSUFBSSxHQUFHLEtBQUssSUFBSSxFQUFFO1lBQ2hCLElBQUksQ0FBQyxNQUFNLENBQUMsT0FBTyxDQUFDLFVBQVUsQ0FBQyxHQUFHLFFBQVEsQ0FBQTtTQUMzQztRQUVELE9BQU8sR0FBRyxDQUFBO0lBQ1osQ0FBQyxDQUFBO0FBQ0gsQ0FBQztBQUVELFNBQVMsbUJBQW1CLENBQXNCLE9BQVk7SUFDNUQsTUFBTSxDQUFDLElBQUksQ0FBQyxNQUFNLENBQUMsT0FBTyxFQUFFLE9BQU8sQ0FBQyxDQUFBO0lBRXBDLE9BQU8sSUFBSSxDQUFBO0FBQ2IsQ0FBQztBQUVELGVBQWU7SUFDYixFQUFFLEVBQUUsb0NBQW9DO0lBQ3hDLE9BQU87Q0FDUixDQUFBIiwic291cmNlc0NvbnRlbnQiOlsiaW1wb3J0IHsgU2NvcGUgfSBmcm9tICdAaW50ZXJhY3Rqcy9jb3JlL3Njb3BlJ1xuaW1wb3J0IHsgbWVyZ2UgfSBmcm9tICdAaW50ZXJhY3Rqcy91dGlscy9hcnInXG5pbXBvcnQgZXh0ZW5kIGZyb20gJ0BpbnRlcmFjdGpzL3V0aWxzL2V4dGVuZCdcblxudHlwZSBJbnRlcmFjdGFibGUgPSBpbXBvcnQgKCdAaW50ZXJhY3Rqcy9jb3JlL0ludGVyYWN0YWJsZScpLmRlZmF1bHRcbnR5cGUgRXZlbnRUYXJnZXRMaXN0ID0gaW1wb3J0ICgnLi9iYXNlJykuRXZlbnRUYXJnZXRMaXN0XG5cbmRlY2xhcmUgbW9kdWxlICdAaW50ZXJhY3Rqcy9jb3JlL0ludGVyYWN0YWJsZScge1xuICBpbnRlcmZhY2UgSW50ZXJhY3RhYmxlIHtcbiAgICBwb2ludGVyRXZlbnRzOiB0eXBlb2YgcG9pbnRlckV2ZW50c01ldGhvZFxuICAgIF9fYmFja0NvbXBhdE9wdGlvbjogKG9wdGlvbk5hbWU6IHN0cmluZywgbmV3VmFsdWU6IGFueSkgPT4gYW55XG4gIH1cbn1cblxuZnVuY3Rpb24gaW5zdGFsbCAoc2NvcGU6IFNjb3BlKSB7XG4gIGNvbnN0IHtcbiAgICBwb2ludGVyRXZlbnRzLFxuICAgIGFjdGlvbnMsXG4gICAgSW50ZXJhY3RhYmxlLFxuICAgIGludGVyYWN0YWJsZXMsXG4gIH0gPSBzY29wZVxuXG4gIHBvaW50ZXJFdmVudHMuc2lnbmFscy5vbignY29sbGVjdC10YXJnZXRzJywgKHtcbiAgICB0YXJnZXRzLFxuICAgIG5vZGUsXG4gICAgdHlwZSxcbiAgICBldmVudFRhcmdldCxcbiAgfToge1xuICAgIHRhcmdldHM6IEV2ZW50VGFyZ2V0TGlzdFxuICAgIG5vZGU6IE5vZGVcbiAgICB0eXBlOiBzdHJpbmdcbiAgICBldmVudFRhcmdldDogSW50ZXJhY3QuRWxlbWVudFxuICB9KSA9PiB7XG4gICAgc2NvcGUuaW50ZXJhY3RhYmxlcy5mb3JFYWNoTWF0Y2gobm9kZSwgKGludGVyYWN0YWJsZTogSW50ZXJhY3RhYmxlKSA9PiB7XG4gICAgICBjb25zdCBldmVudGFibGUgPSBpbnRlcmFjdGFibGUuZXZlbnRzXG4gICAgICBjb25zdCBvcHRpb25zID0gZXZlbnRhYmxlLm9wdGlvbnNcblxuICAgICAgaWYgKFxuICAgICAgICBldmVudGFibGUudHlwZXNbdHlwZV0gJiZcbiAgICAgICAgZXZlbnRhYmxlLnR5cGVzW3R5cGVdLmxlbmd0aCAmJlxuICAgICAgICBpbnRlcmFjdGFibGUudGVzdElnbm9yZUFsbG93KG9wdGlvbnMsIG5vZGUsIGV2ZW50VGFyZ2V0KSkge1xuICAgICAgICB0YXJnZXRzLnB1c2goe1xuICAgICAgICAgIG5vZGUsXG4gICAgICAgICAgZXZlbnRhYmxlLFxuICAgICAgICAgIHByb3BzOiB7IGludGVyYWN0YWJsZSB9LFxuICAgICAgICB9KVxuICAgICAgfVxuICAgIH0pXG4gIH0pXG5cbiAgaW50ZXJhY3RhYmxlcy5zaWduYWxzLm9uKCduZXcnLCAoeyBpbnRlcmFjdGFibGUgfSkgPT4ge1xuICAgIGludGVyYWN0YWJsZS5ldmVudHMuZ2V0UmVjdCA9IGZ1bmN0aW9uIChlbGVtZW50OiBJbnRlcmFjdC5FbGVtZW50KSB7XG4gICAgICByZXR1cm4gaW50ZXJhY3RhYmxlLmdldFJlY3QoZWxlbWVudClcbiAgICB9XG4gIH0pXG5cbiAgaW50ZXJhY3RhYmxlcy5zaWduYWxzLm9uKCdzZXQnLCAoeyBpbnRlcmFjdGFibGUsIG9wdGlvbnMgfSkgPT4ge1xuICAgIGV4dGVuZChpbnRlcmFjdGFibGUuZXZlbnRzLm9wdGlvbnMsIHBvaW50ZXJFdmVudHMuZGVmYXVsdHMpXG4gICAgZXh0ZW5kKGludGVyYWN0YWJsZS5ldmVudHMub3B0aW9ucywgb3B0aW9ucy5wb2ludGVyRXZlbnRzIHx8IHt9KVxuICB9KVxuXG4gIG1lcmdlKGFjdGlvbnMuZXZlbnRUeXBlcywgcG9pbnRlckV2ZW50cy50eXBlcylcblxuICBJbnRlcmFjdGFibGUucHJvdG90eXBlLnBvaW50ZXJFdmVudHMgPSBwb2ludGVyRXZlbnRzTWV0aG9kXG5cbiAgY29uc3QgX19iYWNrQ29tcGF0T3B0aW9uID0gSW50ZXJhY3RhYmxlLnByb3RvdHlwZS5fYmFja0NvbXBhdE9wdGlvblxuXG4gIEludGVyYWN0YWJsZS5wcm90b3R5cGUuX2JhY2tDb21wYXRPcHRpb24gPSBmdW5jdGlvbiAob3B0aW9uTmFtZSwgbmV3VmFsdWUpIHtcbiAgICBjb25zdCByZXQgPSBfX2JhY2tDb21wYXRPcHRpb24uY2FsbCh0aGlzLCBvcHRpb25OYW1lLCBuZXdWYWx1ZSlcblxuICAgIGlmIChyZXQgPT09IHRoaXMpIHtcbiAgICAgIHRoaXMuZXZlbnRzLm9wdGlvbnNbb3B0aW9uTmFtZV0gPSBuZXdWYWx1ZVxuICAgIH1cblxuICAgIHJldHVybiByZXRcbiAgfVxufVxuXG5mdW5jdGlvbiBwb2ludGVyRXZlbnRzTWV0aG9kICh0aGlzOiBJbnRlcmFjdGFibGUsIG9wdGlvbnM6IGFueSkge1xuICBleHRlbmQodGhpcy5ldmVudHMub3B0aW9ucywgb3B0aW9ucylcblxuICByZXR1cm4gdGhpc1xufVxuXG5leHBvcnQgZGVmYXVsdCB7XG4gIGlkOiAncG9pbnRlci1ldmVudHMvaW50ZXJhY3RhYmxlVGFyZ2V0cycsXG4gIGluc3RhbGwsXG59XG4iXX0=
+export default plugin;
+//# sourceMappingURL=interactableTargets.js.map

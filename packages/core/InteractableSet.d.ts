@@ -1,7 +1,15 @@
-import Signals from '@interactjs/utils/Signals';
+declare module '@interactjs/core/scope' {
+    interface SignalArgs {
+        'interactable:new': {
+            interactable: Interact.Interactable;
+            target: Interact.Target;
+            options: Interact.OptionsArg;
+            win: Window;
+        };
+    }
+}
 export default class InteractableSet {
     protected scope: Interact.Scope;
-    signals: Signals;
     list: Interact.Interactable[];
     selectorMap: {
         [selector: string]: Array<{

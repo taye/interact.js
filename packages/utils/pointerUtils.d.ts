@@ -19,7 +19,7 @@ declare const pointerUtils: {
         screenX: number;
         screenY: number;
     };
-    touchBBox(event: Event | (Touch | MouseEvent | PointerEvent | TouchEvent | import("@interactjs/core/InteractEvent").InteractEvent<any, any>)[]): {
+    touchBBox(event: Event | (MouseEvent | Touch | PointerEvent | import("../types/types").InteractEvent<any, any> | TouchEvent)[]): {
         x: number;
         y: number;
         left: number;
@@ -45,62 +45,6 @@ declare const pointerUtils: {
         timeStamp: number;
     };
     coordsToEvent(coords: MockCoords): ({
-        coords: MockCoords;
-        readonly page: any;
-        readonly client: any;
-        readonly timeStamp: any;
-        readonly pageX: any;
-        readonly pageY: any;
-        readonly clientX: any;
-        readonly clientY: any;
-        readonly pointerId: any;
-        readonly target: any;
-        readonly type: any;
-        readonly pointerType: any;
-        readonly buttons: any;
-    } & Touch & MouseEvent) | ({
-        coords: MockCoords;
-        readonly page: any;
-        readonly client: any;
-        readonly timeStamp: any;
-        readonly pageX: any;
-        readonly pageY: any;
-        readonly clientX: any;
-        readonly clientY: any;
-        readonly pointerId: any;
-        readonly target: any;
-        readonly type: any;
-        readonly pointerType: any;
-        readonly buttons: any;
-    } & Touch & PointerEvent) | ({
-        coords: MockCoords;
-        readonly page: any;
-        readonly client: any;
-        readonly timeStamp: any;
-        readonly pageX: any;
-        readonly pageY: any;
-        readonly clientX: any;
-        readonly clientY: any;
-        readonly pointerId: any;
-        readonly target: any;
-        readonly type: any;
-        readonly pointerType: any;
-        readonly buttons: any;
-    } & Touch & TouchEvent) | ({
-        coords: MockCoords;
-        readonly page: any;
-        readonly client: any;
-        readonly timeStamp: any;
-        readonly pageX: any;
-        readonly pageY: any;
-        readonly clientX: any;
-        readonly clientY: any;
-        readonly pointerId: any;
-        readonly target: any;
-        readonly type: any;
-        readonly pointerType: any;
-        readonly buttons: any;
-    } & Touch & import("@interactjs/core/InteractEvent").InteractEvent<any, any>) | ({
         coords: MockCoords;
         readonly page: any;
         readonly client: any;
@@ -142,6 +86,20 @@ declare const pointerUtils: {
         readonly type: any;
         readonly pointerType: any;
         readonly buttons: any;
+    } & MouseEvent & import("../types/types").InteractEvent<any, any>) | ({
+        coords: MockCoords;
+        readonly page: any;
+        readonly client: any;
+        readonly timeStamp: any;
+        readonly pageX: any;
+        readonly pageY: any;
+        readonly clientX: any;
+        readonly clientY: any;
+        readonly pointerId: any;
+        readonly target: any;
+        readonly type: any;
+        readonly pointerType: any;
+        readonly buttons: any;
     } & MouseEvent & TouchEvent) | ({
         coords: MockCoords;
         readonly page: any;
@@ -156,7 +114,49 @@ declare const pointerUtils: {
         readonly type: any;
         readonly pointerType: any;
         readonly buttons: any;
-    } & MouseEvent & import("@interactjs/core/InteractEvent").InteractEvent<any, any>) | ({
+    } & Touch & MouseEvent) | ({
+        coords: MockCoords;
+        readonly page: any;
+        readonly client: any;
+        readonly timeStamp: any;
+        readonly pageX: any;
+        readonly pageY: any;
+        readonly clientX: any;
+        readonly clientY: any;
+        readonly pointerId: any;
+        readonly target: any;
+        readonly type: any;
+        readonly pointerType: any;
+        readonly buttons: any;
+    } & Touch & PointerEvent) | ({
+        coords: MockCoords;
+        readonly page: any;
+        readonly client: any;
+        readonly timeStamp: any;
+        readonly pageX: any;
+        readonly pageY: any;
+        readonly clientX: any;
+        readonly clientY: any;
+        readonly pointerId: any;
+        readonly target: any;
+        readonly type: any;
+        readonly pointerType: any;
+        readonly buttons: any;
+    } & Touch & import("../types/types").InteractEvent<any, any>) | ({
+        coords: MockCoords;
+        readonly page: any;
+        readonly client: any;
+        readonly timeStamp: any;
+        readonly pageX: any;
+        readonly pageY: any;
+        readonly clientX: any;
+        readonly clientY: any;
+        readonly pointerId: any;
+        readonly target: any;
+        readonly type: any;
+        readonly pointerType: any;
+        readonly buttons: any;
+    } & Touch & TouchEvent) | ({
         coords: MockCoords;
         readonly page: any;
         readonly client: any;
@@ -198,6 +198,20 @@ declare const pointerUtils: {
         readonly type: any;
         readonly pointerType: any;
         readonly buttons: any;
+    } & PointerEvent & import("../types/types").InteractEvent<any, any>) | ({
+        coords: MockCoords;
+        readonly page: any;
+        readonly client: any;
+        readonly timeStamp: any;
+        readonly pageX: any;
+        readonly pageY: any;
+        readonly clientX: any;
+        readonly clientY: any;
+        readonly pointerId: any;
+        readonly target: any;
+        readonly type: any;
+        readonly pointerType: any;
+        readonly buttons: any;
     } & PointerEvent & TouchEvent) | ({
         coords: MockCoords;
         readonly page: any;
@@ -212,7 +226,7 @@ declare const pointerUtils: {
         readonly type: any;
         readonly pointerType: any;
         readonly buttons: any;
-    } & PointerEvent & import("@interactjs/core/InteractEvent").InteractEvent<any, any>) | ({
+    } & import("../types/types").InteractEvent<any, any> & MouseEvent) | ({
         coords: MockCoords;
         readonly page: any;
         readonly client: any;
@@ -226,7 +240,7 @@ declare const pointerUtils: {
         readonly type: any;
         readonly pointerType: any;
         readonly buttons: any;
-    } & import("@interactjs/core/InteractEvent").InteractEvent<any, any> & MouseEvent) | ({
+    } & import("../types/types").InteractEvent<any, any> & PointerEvent) | ({
         coords: MockCoords;
         readonly page: any;
         readonly client: any;
@@ -240,7 +254,7 @@ declare const pointerUtils: {
         readonly type: any;
         readonly pointerType: any;
         readonly buttons: any;
-    } & import("@interactjs/core/InteractEvent").InteractEvent<any, any> & PointerEvent) | ({
+    } & import("../types/types").InteractEvent<any, any>) | ({
         coords: MockCoords;
         readonly page: any;
         readonly client: any;
@@ -254,21 +268,7 @@ declare const pointerUtils: {
         readonly type: any;
         readonly pointerType: any;
         readonly buttons: any;
-    } & import("@interactjs/core/InteractEvent").InteractEvent<any, any> & TouchEvent) | ({
-        coords: MockCoords;
-        readonly page: any;
-        readonly client: any;
-        readonly timeStamp: any;
-        readonly pageX: any;
-        readonly pageY: any;
-        readonly clientX: any;
-        readonly clientY: any;
-        readonly pointerId: any;
-        readonly target: any;
-        readonly type: any;
-        readonly pointerType: any;
-        readonly buttons: any;
-    } & import("@interactjs/core/InteractEvent").InteractEvent<any, any>);
+    } & import("../types/types").InteractEvent<any, any> & TouchEvent);
 };
 export default pointerUtils;
 export interface MockCoords {

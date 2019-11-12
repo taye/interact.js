@@ -1,53 +1,74 @@
-import basePlugin from './base';
+import basePlugin from "./base.js";
+
 function install(scope) {
-    const { pointerEvents, interactions, } = scope;
-    scope.usePlugin(basePlugin);
-    pointerEvents.signals.on('new', onNew);
-    pointerEvents.signals.on('fired', arg => onFired(arg, scope));
-    for (const signal of ['move', 'up', 'cancel', 'endall']) {
-        interactions.signals.on(signal, endHoldRepeat);
-    }
-    // don't repeat by default
-    pointerEvents.defaults.holdRepeatInterval = 0;
-    pointerEvents.types.push('holdrepeat');
+  scope.usePlugin(basePlugin);
+  const {
+    pointerEvents
+  } = scope; // don't repeat by default
+
+  pointerEvents.defaults.holdRepeatInterval = 0;
+  pointerEvents.types.push('holdrepeat');
 }
-function onNew({ pointerEvent }) {
-    if (pointerEvent.type !== 'hold') {
-        return;
-    }
-    pointerEvent.count = (pointerEvent.count || 0) + 1;
+
+function onNew({
+  pointerEvent
+}) {
+  if (pointerEvent.type !== 'hold') {
+    return;
+  }
+
+  pointerEvent.count = (pointerEvent.count || 0) + 1;
 }
-function onFired({ interaction, pointerEvent, eventTarget, targets }, scope) {
-    if (pointerEvent.type !== 'hold' || !targets.length) {
-        return;
-    }
-    // get the repeat interval from the first eventable
-    const interval = targets[0].eventable.options.holdRepeatInterval;
-    // don't repeat if the interval is 0 or less
-    if (interval <= 0) {
-        return;
-    }
-    // set a timeout to fire the holdrepeat event
-    interaction.holdIntervalHandle = setTimeout(() => {
-        scope.pointerEvents.fire({
-            interaction,
-            eventTarget,
-            type: 'hold',
-            pointer: pointerEvent,
-            event: pointerEvent,
-        }, scope);
-    }, interval);
+
+function onFired({
+  interaction,
+  pointerEvent,
+  eventTarget,
+  targets
+}, scope) {
+  if (pointerEvent.type !== 'hold' || !targets.length) {
+    return;
+  } // get the repeat interval from the first eventable
+
+
+  const interval = targets[0].eventable.options.holdRepeatInterval; // don't repeat if the interval is 0 or less
+
+  if (interval <= 0) {
+    return;
+  } // set a timeout to fire the holdrepeat event
+
+
+  interaction.holdIntervalHandle = setTimeout(() => {
+    scope.pointerEvents.fire({
+      interaction,
+      eventTarget,
+      type: 'hold',
+      pointer: pointerEvent,
+      event: pointerEvent
+    }, scope);
+  }, interval);
 }
-function endHoldRepeat({ interaction }) {
-    // set the interaction's holdStopTime property
-    // to stop further holdRepeat events
-    if (interaction.holdIntervalHandle) {
-        clearInterval(interaction.holdIntervalHandle);
-        interaction.holdIntervalHandle = null;
-    }
+
+function endHoldRepeat({
+  interaction
+}) {
+  // set the interaction's holdStopTime property
+  // to stop further holdRepeat events
+  if (interaction.holdIntervalHandle) {
+    clearInterval(interaction.holdIntervalHandle);
+    interaction.holdIntervalHandle = null;
+  }
 }
+
 export default {
-    id: 'pointer-events/holdRepeat',
-    install,
+  id: 'pointer-events/holdRepeat',
+  install,
+  listeners: ['move', 'up', 'cancel', 'endall'].reduce((acc, enderTypes) => {
+    acc[`pointerEvents:${enderTypes}`] = endHoldRepeat;
+    return acc;
+  }, {
+    'pointerEvents:new': onNew,
+    'pointerEvents:fired': onFired
+  })
 };
-//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiaG9sZFJlcGVhdC5qcyIsInNvdXJjZVJvb3QiOiIiLCJzb3VyY2VzIjpbImhvbGRSZXBlYXQudHMiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IkFBQUEsT0FBTyxVQUFVLE1BQU0sUUFBUSxDQUFBO0FBYy9CLFNBQVMsT0FBTyxDQUFFLEtBQXFCO0lBQ3JDLE1BQU0sRUFDSixhQUFhLEVBQ2IsWUFBWSxHQUNiLEdBQUcsS0FBSyxDQUFBO0lBRVQsS0FBSyxDQUFDLFNBQVMsQ0FBQyxVQUFVLENBQUMsQ0FBQTtJQUUzQixhQUFhLENBQUMsT0FBTyxDQUFDLEVBQUUsQ0FBQyxLQUFLLEVBQUUsS0FBSyxDQUFDLENBQUE7SUFDdEMsYUFBYSxDQUFDLE9BQU8sQ0FBQyxFQUFFLENBQUMsT0FBTyxFQUFFLEdBQUcsQ0FBQyxFQUFFLENBQUMsT0FBTyxDQUFDLEdBQVUsRUFBRSxLQUFLLENBQUMsQ0FBQyxDQUFBO0lBRXBFLEtBQUssTUFBTSxNQUFNLElBQUksQ0FBQyxNQUFNLEVBQUUsSUFBSSxFQUFFLFFBQVEsRUFBRSxRQUFRLENBQUMsRUFBRTtRQUN2RCxZQUFZLENBQUMsT0FBTyxDQUFDLEVBQUUsQ0FBQyxNQUFNLEVBQUUsYUFBYSxDQUFDLENBQUE7S0FDL0M7SUFFRCwwQkFBMEI7SUFDMUIsYUFBYSxDQUFDLFFBQVEsQ0FBQyxrQkFBa0IsR0FBRyxDQUFDLENBQUE7SUFDN0MsYUFBYSxDQUFDLEtBQUssQ0FBQyxJQUFJLENBQUMsWUFBWSxDQUFDLENBQUE7QUFDeEMsQ0FBQztBQUVELFNBQVMsS0FBSyxDQUFFLEVBQUUsWUFBWSxFQUFFO0lBQzlCLElBQUksWUFBWSxDQUFDLElBQUksS0FBSyxNQUFNLEVBQUU7UUFBRSxPQUFNO0tBQUU7SUFFNUMsWUFBWSxDQUFDLEtBQUssR0FBRyxDQUFDLFlBQVksQ0FBQyxLQUFLLElBQUksQ0FBQyxDQUFDLEdBQUcsQ0FBQyxDQUFBO0FBQ3BELENBQUM7QUFFRCxTQUFTLE9BQU8sQ0FDZCxFQUFFLFdBQVcsRUFBRSxZQUFZLEVBQUUsV0FBVyxFQUFFLE9BQU8sRUFBc0IsRUFDdkUsS0FBcUI7SUFFckIsSUFBSSxZQUFZLENBQUMsSUFBSSxLQUFLLE1BQU0sSUFBSSxDQUFDLE9BQU8sQ0FBQyxNQUFNLEVBQUU7UUFBRSxPQUFNO0tBQUU7SUFFL0QsbURBQW1EO0lBQ25ELE1BQU0sUUFBUSxHQUFHLE9BQU8sQ0FBQyxDQUFDLENBQUMsQ0FBQyxTQUFTLENBQUMsT0FBTyxDQUFDLGtCQUFrQixDQUFBO0lBRWhFLDRDQUE0QztJQUM1QyxJQUFJLFFBQVEsSUFBSSxDQUFDLEVBQUU7UUFBRSxPQUFNO0tBQUU7SUFFN0IsNkNBQTZDO0lBQzdDLFdBQVcsQ0FBQyxrQkFBa0IsR0FBRyxVQUFVLENBQUMsR0FBRyxFQUFFO1FBQy9DLEtBQUssQ0FBQyxhQUFhLENBQUMsSUFBSSxDQUFDO1lBQ3ZCLFdBQVc7WUFDWCxXQUFXO1lBQ1gsSUFBSSxFQUFFLE1BQU07WUFDWixPQUFPLEVBQUUsWUFBWTtZQUNyQixLQUFLLEVBQUUsWUFBWTtTQUNwQixFQUFFLEtBQUssQ0FBQyxDQUFBO0lBQ1gsQ0FBQyxFQUFFLFFBQVEsQ0FBQyxDQUFBO0FBQ2QsQ0FBQztBQUVELFNBQVMsYUFBYSxDQUFFLEVBQUUsV0FBVyxFQUFFO0lBQ3JDLDhDQUE4QztJQUM5QyxvQ0FBb0M7SUFDcEMsSUFBSSxXQUFXLENBQUMsa0JBQWtCLEVBQUU7UUFDbEMsYUFBYSxDQUFDLFdBQVcsQ0FBQyxrQkFBa0IsQ0FBQyxDQUFBO1FBQzdDLFdBQVcsQ0FBQyxrQkFBa0IsR0FBRyxJQUFJLENBQUE7S0FDdEM7QUFDSCxDQUFDO0FBRUQsZUFBZTtJQUNiLEVBQUUsRUFBRSwyQkFBMkI7SUFDL0IsT0FBTztDQUNXLENBQUEiLCJzb3VyY2VzQ29udGVudCI6WyJpbXBvcnQgYmFzZVBsdWdpbiBmcm9tICcuL2Jhc2UnXG5cbmRlY2xhcmUgbW9kdWxlICdAaW50ZXJhY3Rqcy9jb3JlL0ludGVyYWN0aW9uJyB7XG4gIGludGVyZmFjZSBJbnRlcmFjdGlvbiB7XG4gICAgaG9sZEludGVydmFsSGFuZGxlPzogYW55XG4gIH1cbn1cblxuZGVjbGFyZSBtb2R1bGUgJ0BpbnRlcmFjdGpzL3BvaW50ZXItZXZlbnRzL2Jhc2UnIHtcbiAgaW50ZXJmYWNlIFBvaW50ZXJFdmVudE9wdGlvbnMge1xuICAgIGhvbGRSZXBlYXRJbnRlcnZhbD86IG51bWJlclxuICB9XG59XG5cbmZ1bmN0aW9uIGluc3RhbGwgKHNjb3BlOiBJbnRlcmFjdC5TY29wZSkge1xuICBjb25zdCB7XG4gICAgcG9pbnRlckV2ZW50cyxcbiAgICBpbnRlcmFjdGlvbnMsXG4gIH0gPSBzY29wZVxuXG4gIHNjb3BlLnVzZVBsdWdpbihiYXNlUGx1Z2luKVxuXG4gIHBvaW50ZXJFdmVudHMuc2lnbmFscy5vbignbmV3Jywgb25OZXcpXG4gIHBvaW50ZXJFdmVudHMuc2lnbmFscy5vbignZmlyZWQnLCBhcmcgPT4gb25GaXJlZChhcmcgYXMgYW55LCBzY29wZSkpXG5cbiAgZm9yIChjb25zdCBzaWduYWwgb2YgWydtb3ZlJywgJ3VwJywgJ2NhbmNlbCcsICdlbmRhbGwnXSkge1xuICAgIGludGVyYWN0aW9ucy5zaWduYWxzLm9uKHNpZ25hbCwgZW5kSG9sZFJlcGVhdClcbiAgfVxuXG4gIC8vIGRvbid0IHJlcGVhdCBieSBkZWZhdWx0XG4gIHBvaW50ZXJFdmVudHMuZGVmYXVsdHMuaG9sZFJlcGVhdEludGVydmFsID0gMFxuICBwb2ludGVyRXZlbnRzLnR5cGVzLnB1c2goJ2hvbGRyZXBlYXQnKVxufVxuXG5mdW5jdGlvbiBvbk5ldyAoeyBwb2ludGVyRXZlbnQgfSkge1xuICBpZiAocG9pbnRlckV2ZW50LnR5cGUgIT09ICdob2xkJykgeyByZXR1cm4gfVxuXG4gIHBvaW50ZXJFdmVudC5jb3VudCA9IChwb2ludGVyRXZlbnQuY291bnQgfHwgMCkgKyAxXG59XG5cbmZ1bmN0aW9uIG9uRmlyZWQgKFxuICB7IGludGVyYWN0aW9uLCBwb2ludGVyRXZlbnQsIGV2ZW50VGFyZ2V0LCB0YXJnZXRzIH06IEludGVyYWN0LlNpZ25hbEFyZyxcbiAgc2NvcGU6IEludGVyYWN0LlNjb3BlXG4pIHtcbiAgaWYgKHBvaW50ZXJFdmVudC50eXBlICE9PSAnaG9sZCcgfHwgIXRhcmdldHMubGVuZ3RoKSB7IHJldHVybiB9XG5cbiAgLy8gZ2V0IHRoZSByZXBlYXQgaW50ZXJ2YWwgZnJvbSB0aGUgZmlyc3QgZXZlbnRhYmxlXG4gIGNvbnN0IGludGVydmFsID0gdGFyZ2V0c1swXS5ldmVudGFibGUub3B0aW9ucy5ob2xkUmVwZWF0SW50ZXJ2YWxcblxuICAvLyBkb24ndCByZXBlYXQgaWYgdGhlIGludGVydmFsIGlzIDAgb3IgbGVzc1xuICBpZiAoaW50ZXJ2YWwgPD0gMCkgeyByZXR1cm4gfVxuXG4gIC8vIHNldCBhIHRpbWVvdXQgdG8gZmlyZSB0aGUgaG9sZHJlcGVhdCBldmVudFxuICBpbnRlcmFjdGlvbi5ob2xkSW50ZXJ2YWxIYW5kbGUgPSBzZXRUaW1lb3V0KCgpID0+IHtcbiAgICBzY29wZS5wb2ludGVyRXZlbnRzLmZpcmUoe1xuICAgICAgaW50ZXJhY3Rpb24sXG4gICAgICBldmVudFRhcmdldCxcbiAgICAgIHR5cGU6ICdob2xkJyxcbiAgICAgIHBvaW50ZXI6IHBvaW50ZXJFdmVudCxcbiAgICAgIGV2ZW50OiBwb2ludGVyRXZlbnQsXG4gICAgfSwgc2NvcGUpXG4gIH0sIGludGVydmFsKVxufVxuXG5mdW5jdGlvbiBlbmRIb2xkUmVwZWF0ICh7IGludGVyYWN0aW9uIH0pIHtcbiAgLy8gc2V0IHRoZSBpbnRlcmFjdGlvbidzIGhvbGRTdG9wVGltZSBwcm9wZXJ0eVxuICAvLyB0byBzdG9wIGZ1cnRoZXIgaG9sZFJlcGVhdCBldmVudHNcbiAgaWYgKGludGVyYWN0aW9uLmhvbGRJbnRlcnZhbEhhbmRsZSkge1xuICAgIGNsZWFySW50ZXJ2YWwoaW50ZXJhY3Rpb24uaG9sZEludGVydmFsSGFuZGxlKVxuICAgIGludGVyYWN0aW9uLmhvbGRJbnRlcnZhbEhhbmRsZSA9IG51bGxcbiAgfVxufVxuXG5leHBvcnQgZGVmYXVsdCB7XG4gIGlkOiAncG9pbnRlci1ldmVudHMvaG9sZFJlcGVhdCcsXG4gIGluc3RhbGwsXG59IGFzIEludGVyYWN0LlBsdWdpblxuIl19
+//# sourceMappingURL=holdRepeat.js.map

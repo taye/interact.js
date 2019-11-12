@@ -1,5 +1,5 @@
-import { ActionProps, Interaction } from '@interactjs/core/Interaction';
-import { ActionName, Scope } from '@interactjs/core/scope';
+import { Interaction } from '../core/Interaction';
+import { ActionName, Scope } from '../core/scope';
 export declare type EdgeName = 'top' | 'left' | 'bottom' | 'right';
 export declare type ResizableMethod = Interact.ActionMethod<Interact.ResizableOptions>;
 declare module '@interactjs/core/Interactable' {
@@ -49,6 +49,14 @@ declare function install(scope: Scope): void;
 declare const resize: {
     id: string;
     install: typeof install;
+    listeners: {
+        'interactions:new': ({ interaction }: {
+            interaction: any;
+        }) => void;
+        'interactions:action-start': (arg: any) => void;
+        'interactions:action-move': (arg: any) => void;
+        'interactions:action-end': typeof end;
+    };
     defaults: import("../types/types").ResizableOptions;
     checker(_pointer: import("../types/types").PointerType, _event: import("../types/types").PointerEventType, interactable: import("@interactjs/core/Interactable").Interactable, element: import("../types/types").Element, interaction: Interaction<any>, rect: import("../types/types").Rect): {
         name: string;
@@ -74,7 +82,11 @@ declare const resize: {
         topright: string;
         bottomleft: string;
     };
-    getCursor({ edges, axis, name }: ActionProps<any>): string;
+    getCursor({ edges, axis, name }: import("../types/types").ActionProps<any>): string;
     defaultMargin: number;
 };
+declare function end({ iEvent, interaction }: {
+    iEvent: ResizeEvent;
+    interaction: Interaction;
+}): void;
 export default resize;

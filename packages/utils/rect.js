@@ -1,58 +1,63 @@
-import { closest, getElementRect, parentNode } from './domUtils';
-import extend from './extend';
-import * as is from './is';
+import { closest, getElementRect, parentNode } from "./domUtils.js";
+import extend from "./extend.js";
+import * as is from "./is.js";
 export function getStringOptionResult(value, target, element) {
-    if (value === 'parent') {
-        return parentNode(element);
-    }
-    if (value === 'self') {
-        return target.getRect(element);
-    }
-    return closest(element, value);
+  if (value === 'parent') {
+    return parentNode(element);
+  }
+
+  if (value === 'self') {
+    return target.getRect(element);
+  }
+
+  return closest(element, value);
 }
 export function resolveRectLike(value, target, element, functionArgs) {
-    if (is.string(value)) {
-        value = getStringOptionResult(value, target, element);
-    }
-    else if (is.func(value)) {
-        value = value(...functionArgs);
-    }
-    if (is.element(value)) {
-        value = getElementRect(value);
-    }
-    return value;
+  if (is.string(value)) {
+    value = getStringOptionResult(value, target, element);
+  } else if (is.func(value)) {
+    value = value(...functionArgs);
+  }
+
+  if (is.element(value)) {
+    value = getElementRect(value);
+  }
+
+  return value;
 }
 export function rectToXY(rect) {
-    return rect && {
-        x: 'x' in rect ? rect.x : rect.left,
-        y: 'y' in rect ? rect.y : rect.top,
-    };
+  return rect && {
+    x: 'x' in rect ? rect.x : rect.left,
+    y: 'y' in rect ? rect.y : rect.top
+  };
 }
 export function xywhToTlbr(rect) {
-    if (rect && !('left' in rect && 'top' in rect)) {
-        rect = extend({}, rect);
-        rect.left = rect.x || 0;
-        rect.top = rect.y || 0;
-        rect.right = rect.right || (rect.left + rect.width);
-        rect.bottom = rect.bottom || (rect.top + rect.height);
-    }
-    return rect;
+  if (rect && !('left' in rect && 'top' in rect)) {
+    rect = extend({}, rect);
+    rect.left = rect.x || 0;
+    rect.top = rect.y || 0;
+    rect.right = rect.right || rect.left + rect.width;
+    rect.bottom = rect.bottom || rect.top + rect.height;
+  }
+
+  return rect;
 }
 export function tlbrToXywh(rect) {
-    if (rect && !('x' in rect && 'y' in rect)) {
-        rect = extend({}, rect);
-        rect.x = rect.left || 0;
-        rect.y = rect.top || 0;
-        rect.width = rect.width || (rect.right - rect.x);
-        rect.height = rect.height || (rect.bottom - rect.y);
-    }
-    return rect;
+  if (rect && !('x' in rect && 'y' in rect)) {
+    rect = extend({}, rect);
+    rect.x = rect.left || 0;
+    rect.y = rect.top || 0;
+    rect.width = rect.width || rect.right - rect.x;
+    rect.height = rect.height || rect.bottom - rect.y;
+  }
+
+  return rect;
 }
 export default {
-    getStringOptionResult,
-    resolveRectLike,
-    rectToXY,
-    xywhToTlbr,
-    tlbrToXywh,
+  getStringOptionResult,
+  resolveRectLike,
+  rectToXY,
+  xywhToTlbr,
+  tlbrToXywh
 };
-//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoicmVjdC5qcyIsInNvdXJjZVJvb3QiOiIiLCJzb3VyY2VzIjpbInJlY3QudHMiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IkFBQUEsT0FBTyxFQUFFLE9BQU8sRUFBRSxjQUFjLEVBQUUsVUFBVSxFQUFFLE1BQU0sWUFBWSxDQUFBO0FBQ2hFLE9BQU8sTUFBTSxNQUFNLFVBQVUsQ0FBQTtBQUM3QixPQUFPLEtBQUssRUFBRSxNQUFNLE1BQU0sQ0FBQTtBQUUxQixNQUFNLFVBQVUscUJBQXFCLENBQUUsS0FBVSxFQUFFLE1BQTJCLEVBQUUsT0FBTztJQUNyRixJQUFJLEtBQUssS0FBSyxRQUFRLEVBQUU7UUFBRSxPQUFPLFVBQVUsQ0FBQyxPQUFPLENBQUMsQ0FBQTtLQUFFO0lBRXRELElBQUksS0FBSyxLQUFLLE1BQU0sRUFBRTtRQUFFLE9BQU8sTUFBTSxDQUFDLE9BQU8sQ0FBQyxPQUFPLENBQUMsQ0FBQTtLQUFFO0lBRXhELE9BQU8sT0FBTyxDQUFDLE9BQU8sRUFBRSxLQUFLLENBQUMsQ0FBQTtBQUNoQyxDQUFDO0FBRUQsTUFBTSxVQUFVLGVBQWUsQ0FDN0IsS0FBaUMsRUFDakMsTUFBNEIsRUFDNUIsT0FBMEIsRUFDMUIsWUFBZ0I7SUFFaEIsSUFBSSxFQUFFLENBQUMsTUFBTSxDQUFDLEtBQUssQ0FBQyxFQUFFO1FBQ3BCLEtBQUssR0FBRyxxQkFBcUIsQ0FBQyxLQUFLLEVBQUUsTUFBTSxFQUFFLE9BQU8sQ0FBQyxDQUFBO0tBQ3REO1NBQ0ksSUFBSSxFQUFFLENBQUMsSUFBSSxDQUFDLEtBQUssQ0FBQyxFQUFFO1FBQ3ZCLEtBQUssR0FBRyxLQUFLLENBQUMsR0FBRyxZQUFZLENBQUMsQ0FBQTtLQUMvQjtJQUVELElBQUksRUFBRSxDQUFDLE9BQU8sQ0FBQyxLQUFLLENBQUMsRUFBRTtRQUNyQixLQUFLLEdBQUcsY0FBYyxDQUFDLEtBQUssQ0FBQyxDQUFBO0tBQzlCO0lBRUQsT0FBTyxLQUFzQixDQUFBO0FBQy9CLENBQUM7QUFFRCxNQUFNLFVBQVUsUUFBUSxDQUFFLElBQUk7SUFDNUIsT0FBUSxJQUFJLElBQUk7UUFDZCxDQUFDLEVBQUUsR0FBRyxJQUFJLElBQUksQ0FBQyxDQUFDLENBQUMsSUFBSSxDQUFDLENBQUMsQ0FBQyxDQUFDLENBQUMsSUFBSSxDQUFDLElBQUk7UUFDbkMsQ0FBQyxFQUFFLEdBQUcsSUFBSSxJQUFJLENBQUMsQ0FBQyxDQUFDLElBQUksQ0FBQyxDQUFDLENBQUMsQ0FBQyxDQUFDLElBQUksQ0FBQyxHQUFHO0tBQ25DLENBQUE7QUFDSCxDQUFDO0FBRUQsTUFBTSxVQUFVLFVBQVUsQ0FBRSxJQUFJO0lBQzlCLElBQUksSUFBSSxJQUFJLENBQUMsQ0FBQyxNQUFNLElBQUksSUFBSSxJQUFJLEtBQUssSUFBSSxJQUFJLENBQUMsRUFBRTtRQUM5QyxJQUFJLEdBQUcsTUFBTSxDQUFDLEVBQUUsRUFBRSxJQUFJLENBQUMsQ0FBQTtRQUV2QixJQUFJLENBQUMsSUFBSSxHQUFLLElBQUksQ0FBQyxDQUFDLElBQUksQ0FBQyxDQUFBO1FBQ3pCLElBQUksQ0FBQyxHQUFHLEdBQU0sSUFBSSxDQUFDLENBQUMsSUFBSSxDQUFDLENBQUE7UUFDekIsSUFBSSxDQUFDLEtBQUssR0FBSSxJQUFJLENBQUMsS0FBSyxJQUFNLENBQUMsSUFBSSxDQUFDLElBQUksR0FBRyxJQUFJLENBQUMsS0FBSyxDQUFDLENBQUE7UUFDdEQsSUFBSSxDQUFDLE1BQU0sR0FBRyxJQUFJLENBQUMsTUFBTSxJQUFLLENBQUMsSUFBSSxDQUFDLEdBQUcsR0FBRyxJQUFJLENBQUMsTUFBTSxDQUFDLENBQUE7S0FDdkQ7SUFFRCxPQUFPLElBQUksQ0FBQTtBQUNiLENBQUM7QUFFRCxNQUFNLFVBQVUsVUFBVSxDQUFFLElBQUk7SUFDOUIsSUFBSSxJQUFJLElBQUksQ0FBQyxDQUFDLEdBQUcsSUFBSSxJQUFJLElBQUksR0FBRyxJQUFJLElBQUksQ0FBQyxFQUFFO1FBQ3pDLElBQUksR0FBRyxNQUFNLENBQUMsRUFBRSxFQUFFLElBQUksQ0FBQyxDQUFBO1FBRXZCLElBQUksQ0FBQyxDQUFDLEdBQVEsSUFBSSxDQUFDLElBQUksSUFBSSxDQUFDLENBQUE7UUFDNUIsSUFBSSxDQUFDLENBQUMsR0FBUSxJQUFJLENBQUMsR0FBRyxJQUFLLENBQUMsQ0FBQTtRQUM1QixJQUFJLENBQUMsS0FBSyxHQUFJLElBQUksQ0FBQyxLQUFLLElBQUssQ0FBQyxJQUFJLENBQUMsS0FBSyxHQUFJLElBQUksQ0FBQyxDQUFDLENBQUMsQ0FBQTtRQUNuRCxJQUFJLENBQUMsTUFBTSxHQUFHLElBQUksQ0FBQyxNQUFNLElBQUksQ0FBQyxJQUFJLENBQUMsTUFBTSxHQUFHLElBQUksQ0FBQyxDQUFDLENBQUMsQ0FBQTtLQUNwRDtJQUVELE9BQU8sSUFBSSxDQUFBO0FBQ2IsQ0FBQztBQUVELGVBQWU7SUFDYixxQkFBcUI7SUFDckIsZUFBZTtJQUNmLFFBQVE7SUFDUixVQUFVO0lBQ1YsVUFBVTtDQUNYLENBQUEiLCJzb3VyY2VzQ29udGVudCI6WyJpbXBvcnQgeyBjbG9zZXN0LCBnZXRFbGVtZW50UmVjdCwgcGFyZW50Tm9kZSB9IGZyb20gJy4vZG9tVXRpbHMnXG5pbXBvcnQgZXh0ZW5kIGZyb20gJy4vZXh0ZW5kJ1xuaW1wb3J0ICogYXMgaXMgZnJvbSAnLi9pcydcblxuZXhwb3J0IGZ1bmN0aW9uIGdldFN0cmluZ09wdGlvblJlc3VsdCAodmFsdWU6IGFueSwgdGFyZ2V0OiBJbnRlcmFjdC5IYXNHZXRSZWN0LCBlbGVtZW50KSB7XG4gIGlmICh2YWx1ZSA9PT0gJ3BhcmVudCcpIHsgcmV0dXJuIHBhcmVudE5vZGUoZWxlbWVudCkgfVxuXG4gIGlmICh2YWx1ZSA9PT0gJ3NlbGYnKSB7IHJldHVybiB0YXJnZXQuZ2V0UmVjdChlbGVtZW50KSB9XG5cbiAgcmV0dXJuIGNsb3Nlc3QoZWxlbWVudCwgdmFsdWUpXG59XG5cbmV4cG9ydCBmdW5jdGlvbiByZXNvbHZlUmVjdExpa2U8VCBleHRlbmRzIGFueVtdPiAoXG4gIHZhbHVlOiBJbnRlcmFjdC5SZWN0UmVzb2x2YWJsZTxUPixcbiAgdGFyZ2V0PzogSW50ZXJhY3QuSGFzR2V0UmVjdCxcbiAgZWxlbWVudD86IEludGVyYWN0LkVsZW1lbnQsXG4gIGZ1bmN0aW9uQXJncz86IFRcbikge1xuICBpZiAoaXMuc3RyaW5nKHZhbHVlKSkge1xuICAgIHZhbHVlID0gZ2V0U3RyaW5nT3B0aW9uUmVzdWx0KHZhbHVlLCB0YXJnZXQsIGVsZW1lbnQpXG4gIH1cbiAgZWxzZSBpZiAoaXMuZnVuYyh2YWx1ZSkpIHtcbiAgICB2YWx1ZSA9IHZhbHVlKC4uLmZ1bmN0aW9uQXJncylcbiAgfVxuXG4gIGlmIChpcy5lbGVtZW50KHZhbHVlKSkge1xuICAgIHZhbHVlID0gZ2V0RWxlbWVudFJlY3QodmFsdWUpXG4gIH1cblxuICByZXR1cm4gdmFsdWUgYXMgSW50ZXJhY3QuUmVjdFxufVxuXG5leHBvcnQgZnVuY3Rpb24gcmVjdFRvWFkgKHJlY3QpIHtcbiAgcmV0dXJuICByZWN0ICYmIHtcbiAgICB4OiAneCcgaW4gcmVjdCA/IHJlY3QueCA6IHJlY3QubGVmdCxcbiAgICB5OiAneScgaW4gcmVjdCA/IHJlY3QueSA6IHJlY3QudG9wLFxuICB9XG59XG5cbmV4cG9ydCBmdW5jdGlvbiB4eXdoVG9UbGJyIChyZWN0KSB7XG4gIGlmIChyZWN0ICYmICEoJ2xlZnQnIGluIHJlY3QgJiYgJ3RvcCcgaW4gcmVjdCkpIHtcbiAgICByZWN0ID0gZXh0ZW5kKHt9LCByZWN0KVxuXG4gICAgcmVjdC5sZWZ0ICAgPSByZWN0LnggfHwgMFxuICAgIHJlY3QudG9wICAgID0gcmVjdC55IHx8IDBcbiAgICByZWN0LnJpZ2h0ICA9IHJlY3QucmlnaHQgICB8fCAocmVjdC5sZWZ0ICsgcmVjdC53aWR0aClcbiAgICByZWN0LmJvdHRvbSA9IHJlY3QuYm90dG9tICB8fCAocmVjdC50b3AgKyByZWN0LmhlaWdodClcbiAgfVxuXG4gIHJldHVybiByZWN0XG59XG5cbmV4cG9ydCBmdW5jdGlvbiB0bGJyVG9YeXdoIChyZWN0KSB7XG4gIGlmIChyZWN0ICYmICEoJ3gnIGluIHJlY3QgJiYgJ3knIGluIHJlY3QpKSB7XG4gICAgcmVjdCA9IGV4dGVuZCh7fSwgcmVjdClcblxuICAgIHJlY3QueCAgICAgID0gcmVjdC5sZWZ0IHx8IDBcbiAgICByZWN0LnkgICAgICA9IHJlY3QudG9wICB8fCAwXG4gICAgcmVjdC53aWR0aCAgPSByZWN0LndpZHRoICB8fCAocmVjdC5yaWdodCAgLSByZWN0LngpXG4gICAgcmVjdC5oZWlnaHQgPSByZWN0LmhlaWdodCB8fCAocmVjdC5ib3R0b20gLSByZWN0LnkpXG4gIH1cblxuICByZXR1cm4gcmVjdFxufVxuXG5leHBvcnQgZGVmYXVsdCB7XG4gIGdldFN0cmluZ09wdGlvblJlc3VsdCxcbiAgcmVzb2x2ZVJlY3RMaWtlLFxuICByZWN0VG9YWSxcbiAgeHl3aFRvVGxicixcbiAgdGxiclRvWHl3aCxcbn1cbiJdfQ==
+//# sourceMappingURL=rect.js.map

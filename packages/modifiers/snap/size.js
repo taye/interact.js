@@ -1,78 +1,100 @@
 // This module allows snapping of the size of targets during resize
 // interactions.
-import extend from '@interactjs/utils/extend';
-import * as is from '@interactjs/utils/is';
-import snap from './pointer';
+import extend from "../../utils/extend.js";
+import * as is from "../../utils/is.js";
+import snap from "./pointer.js";
+
 function start(arg) {
-    const { interaction, state } = arg;
-    const { options } = state;
-    const edges = interaction.prepared.edges;
-    if (!edges) {
-        return null;
+  const {
+    interaction,
+    state
+  } = arg;
+  const {
+    options
+  } = state;
+  const edges = interaction.prepared.edges;
+
+  if (!edges) {
+    return null;
+  }
+
+  arg.state = {
+    options: {
+      targets: null,
+      relativePoints: [{
+        x: edges.left ? 0 : 1,
+        y: edges.top ? 0 : 1
+      }],
+      offset: options.offset || 'self',
+      origin: {
+        x: 0,
+        y: 0
+      },
+      range: options.range
     }
-    arg.state = {
-        options: {
-            targets: null,
-            relativePoints: [{
-                    x: edges.left ? 0 : 1,
-                    y: edges.top ? 0 : 1,
-                }],
-            offset: options.offset || 'self',
-            origin: { x: 0, y: 0 },
-            range: options.range,
-        },
-    };
-    state.targetFields = state.targetFields || [
-        ['width', 'height'],
-        ['x', 'y'],
-    ];
-    snap.start(arg);
-    state.offsets = arg.state.offsets;
-    arg.state = state;
+  };
+  state.targetFields = state.targetFields || [['width', 'height'], ['x', 'y']];
+  snap.start(arg);
+  state.offsets = arg.state.offsets;
+  arg.state = state;
 }
+
 function set(arg) {
-    const { interaction, state, coords } = arg;
-    const { options, offsets } = state;
-    const relative = {
-        x: coords.x - offsets[0].x,
-        y: coords.y - offsets[0].y,
-    };
-    state.options = extend({}, options);
-    state.options.targets = [];
-    for (const snapTarget of (options.targets || [])) {
-        let target;
-        if (is.func(snapTarget)) {
-            target = snapTarget(relative.x, relative.y, interaction);
-        }
-        else {
-            target = snapTarget;
-        }
-        if (!target) {
-            continue;
-        }
-        for (const [xField, yField] of state.targetFields) {
-            if (xField in target || yField in target) {
-                target.x = target[xField];
-                target.y = target[yField];
-                break;
-            }
-        }
-        state.options.targets.push(target);
+  const {
+    interaction,
+    state,
+    coords
+  } = arg;
+  const {
+    options,
+    offsets
+  } = state;
+  const relative = {
+    x: coords.x - offsets[0].x,
+    y: coords.y - offsets[0].y
+  };
+  state.options = extend({}, options);
+  state.options.targets = [];
+
+  for (const snapTarget of options.targets || []) {
+    let target;
+
+    if (is.func(snapTarget)) {
+      target = snapTarget(relative.x, relative.y, interaction);
+    } else {
+      target = snapTarget;
     }
-    snap.set(arg);
-    state.options = options;
+
+    if (!target) {
+      continue;
+    }
+
+    for (const [xField, yField] of state.targetFields) {
+      if (xField in target || yField in target) {
+        target.x = target[xField];
+        target.y = target[yField];
+        break;
+      }
+    }
+
+    state.options.targets.push(target);
+  }
+
+  snap.set(arg);
+  state.options = options;
 }
+
 const defaults = {
-    range: Infinity,
-    targets: null,
-    offset: null,
-    endOnly: false,
-    enabled: false,
+  range: Infinity,
+  targets: null,
+  offset: null,
+  endOnly: false,
+  enabled: false
 };
 const snapSize = {
-    start,
-    set,
-    defaults,
+  start,
+  set,
+  defaults
 };
 export default snapSize;
-//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoic2l6ZS5qcyIsInNvdXJjZVJvb3QiOiIiLCJzb3VyY2VzIjpbInNpemUudHMiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IkFBQUEsbUVBQW1FO0FBQ25FLGdCQUFnQjtBQUVoQixPQUFPLE1BQU0sTUFBTSwwQkFBMEIsQ0FBQTtBQUM3QyxPQUFPLEtBQUssRUFBRSxNQUFNLHNCQUFzQixDQUFBO0FBRTFDLE9BQU8sSUFBZ0MsTUFBTSxXQUFXLENBQUE7QUFPeEQsU0FBUyxLQUFLLENBQUUsR0FBMkI7SUFDekMsTUFBTSxFQUFFLFdBQVcsRUFBRSxLQUFLLEVBQUUsR0FBRyxHQUFHLENBQUE7SUFDbEMsTUFBTSxFQUFFLE9BQU8sRUFBRSxHQUFHLEtBQUssQ0FBQTtJQUN6QixNQUFNLEtBQUssR0FBRyxXQUFXLENBQUMsUUFBUSxDQUFDLEtBQUssQ0FBQTtJQUV4QyxJQUFJLENBQUMsS0FBSyxFQUFFO1FBQUUsT0FBTyxJQUFJLENBQUE7S0FBRTtJQUUzQixHQUFHLENBQUMsS0FBSyxHQUFHO1FBQ1YsT0FBTyxFQUFFO1lBQ1AsT0FBTyxFQUFFLElBQUk7WUFDYixjQUFjLEVBQUUsQ0FBQztvQkFDZixDQUFDLEVBQUUsS0FBSyxDQUFDLElBQUksQ0FBQyxDQUFDLENBQUMsQ0FBQyxDQUFDLENBQUMsQ0FBQyxDQUFDO29CQUNyQixDQUFDLEVBQUUsS0FBSyxDQUFDLEdBQUcsQ0FBQyxDQUFDLENBQUMsQ0FBQyxDQUFDLENBQUMsQ0FBQyxDQUFDO2lCQUNyQixDQUFDO1lBQ0YsTUFBTSxFQUFFLE9BQU8sQ0FBQyxNQUFNLElBQUksTUFBTTtZQUNoQyxNQUFNLEVBQUUsRUFBRSxDQUFDLEVBQUUsQ0FBQyxFQUFFLENBQUMsRUFBRSxDQUFDLEVBQUU7WUFDdEIsS0FBSyxFQUFFLE9BQU8sQ0FBQyxLQUFLO1NBQ3JCO0tBQ0YsQ0FBQTtJQUVELEtBQUssQ0FBQyxZQUFZLEdBQUcsS0FBSyxDQUFDLFlBQVksSUFBSTtRQUN6QyxDQUFDLE9BQU8sRUFBRSxRQUFRLENBQUM7UUFDbkIsQ0FBQyxHQUFHLEVBQUUsR0FBRyxDQUFDO0tBQ1gsQ0FBQTtJQUVELElBQUksQ0FBQyxLQUFLLENBQUMsR0FBRyxDQUFDLENBQUE7SUFDZixLQUFLLENBQUMsT0FBTyxHQUFHLEdBQUcsQ0FBQyxLQUFLLENBQUMsT0FBTyxDQUFBO0lBRWpDLEdBQUcsQ0FBQyxLQUFLLEdBQUcsS0FBSyxDQUFBO0FBQ25CLENBQUM7QUFFRCxTQUFTLEdBQUcsQ0FBRSxHQUFHO0lBQ2YsTUFBTSxFQUFFLFdBQVcsRUFBRSxLQUFLLEVBQUUsTUFBTSxFQUFFLEdBQUcsR0FBRyxDQUFBO0lBQzFDLE1BQU0sRUFBRSxPQUFPLEVBQUUsT0FBTyxFQUFFLEdBQUcsS0FBSyxDQUFBO0lBQ2xDLE1BQU0sUUFBUSxHQUFHO1FBQ2YsQ0FBQyxFQUFFLE1BQU0sQ0FBQyxDQUFDLEdBQUcsT0FBTyxDQUFDLENBQUMsQ0FBQyxDQUFDLENBQUM7UUFDMUIsQ0FBQyxFQUFFLE1BQU0sQ0FBQyxDQUFDLEdBQUcsT0FBTyxDQUFDLENBQUMsQ0FBQyxDQUFDLENBQUM7S0FDM0IsQ0FBQTtJQUVELEtBQUssQ0FBQyxPQUFPLEdBQUcsTUFBTSxDQUFDLEVBQUUsRUFBRSxPQUFPLENBQUMsQ0FBQTtJQUNuQyxLQUFLLENBQUMsT0FBTyxDQUFDLE9BQU8sR0FBRyxFQUFFLENBQUE7SUFFMUIsS0FBSyxNQUFNLFVBQVUsSUFBSSxDQUFDLE9BQU8sQ0FBQyxPQUFPLElBQUksRUFBRSxDQUFDLEVBQUU7UUFDaEQsSUFBSSxNQUFNLENBQUE7UUFFVixJQUFJLEVBQUUsQ0FBQyxJQUFJLENBQUMsVUFBVSxDQUFDLEVBQUU7WUFDdkIsTUFBTSxHQUFHLFVBQVUsQ0FBQyxRQUFRLENBQUMsQ0FBQyxFQUFFLFFBQVEsQ0FBQyxDQUFDLEVBQUUsV0FBVyxDQUFDLENBQUE7U0FDekQ7YUFDSTtZQUNILE1BQU0sR0FBRyxVQUFVLENBQUE7U0FDcEI7UUFFRCxJQUFJLENBQUMsTUFBTSxFQUFFO1lBQUUsU0FBUTtTQUFFO1FBRXpCLEtBQUssTUFBTSxDQUFDLE1BQU0sRUFBRSxNQUFNLENBQUMsSUFBSSxLQUFLLENBQUMsWUFBWSxFQUFFO1lBQ2pELElBQUksTUFBTSxJQUFJLE1BQU0sSUFBSSxNQUFNLElBQUksTUFBTSxFQUFFO2dCQUN4QyxNQUFNLENBQUMsQ0FBQyxHQUFHLE1BQU0sQ0FBQyxNQUFNLENBQUMsQ0FBQTtnQkFDekIsTUFBTSxDQUFDLENBQUMsR0FBRyxNQUFNLENBQUMsTUFBTSxDQUFDLENBQUE7Z0JBRXpCLE1BQUs7YUFDTjtTQUNGO1FBRUQsS0FBSyxDQUFDLE9BQU8sQ0FBQyxPQUFPLENBQUMsSUFBSSxDQUFDLE1BQU0sQ0FBQyxDQUFBO0tBQ25DO0lBRUQsSUFBSSxDQUFDLEdBQUcsQ0FBQyxHQUFHLENBQUMsQ0FBQTtJQUViLEtBQUssQ0FBQyxPQUFPLEdBQUcsT0FBTyxDQUFBO0FBQ3pCLENBQUM7QUFFRCxNQUFNLFFBQVEsR0FBb0I7SUFDaEMsS0FBSyxFQUFFLFFBQVE7SUFDZixPQUFPLEVBQUUsSUFBSTtJQUNiLE1BQU0sRUFBRSxJQUFJO0lBQ1osT0FBTyxFQUFFLEtBQUs7SUFDZCxPQUFPLEVBQUUsS0FBSztDQUNmLENBQUE7QUFFRCxNQUFNLFFBQVEsR0FBRztJQUNmLEtBQUs7SUFDTCxHQUFHO0lBQ0gsUUFBUTtDQUNULENBQUE7QUFFRCxlQUFlLFFBQVEsQ0FBQSIsInNvdXJjZXNDb250ZW50IjpbIi8vIFRoaXMgbW9kdWxlIGFsbG93cyBzbmFwcGluZyBvZiB0aGUgc2l6ZSBvZiB0YXJnZXRzIGR1cmluZyByZXNpemVcbi8vIGludGVyYWN0aW9ucy5cblxuaW1wb3J0IGV4dGVuZCBmcm9tICdAaW50ZXJhY3Rqcy91dGlscy9leHRlbmQnXG5pbXBvcnQgKiBhcyBpcyBmcm9tICdAaW50ZXJhY3Rqcy91dGlscy9pcydcbmltcG9ydCB7IE1vZGlmaWVyQXJnIH0gZnJvbSAnLi4vYmFzZSdcbmltcG9ydCBzbmFwLCB7IFNuYXBPcHRpb25zLCBTbmFwU3RhdGUgfSBmcm9tICcuL3BvaW50ZXInXG5cbmV4cG9ydCB0eXBlIFNuYXBTaXplT3B0aW9ucyA9IFBpY2s8XG5TbmFwT3B0aW9ucyxcbid0YXJnZXRzJyB8ICdvZmZzZXQnIHwgJ2VuZE9ubHknIHwgJ3JhbmdlJyB8ICdlbmFibGVkJ1xuPlxuXG5mdW5jdGlvbiBzdGFydCAoYXJnOiBNb2RpZmllckFyZzxTbmFwU3RhdGU+KSB7XG4gIGNvbnN0IHsgaW50ZXJhY3Rpb24sIHN0YXRlIH0gPSBhcmdcbiAgY29uc3QgeyBvcHRpb25zIH0gPSBzdGF0ZVxuICBjb25zdCBlZGdlcyA9IGludGVyYWN0aW9uLnByZXBhcmVkLmVkZ2VzXG5cbiAgaWYgKCFlZGdlcykgeyByZXR1cm4gbnVsbCB9XG5cbiAgYXJnLnN0YXRlID0ge1xuICAgIG9wdGlvbnM6IHtcbiAgICAgIHRhcmdldHM6IG51bGwsXG4gICAgICByZWxhdGl2ZVBvaW50czogW3tcbiAgICAgICAgeDogZWRnZXMubGVmdCA/IDAgOiAxLFxuICAgICAgICB5OiBlZGdlcy50b3AgPyAwIDogMSxcbiAgICAgIH1dLFxuICAgICAgb2Zmc2V0OiBvcHRpb25zLm9mZnNldCB8fCAnc2VsZicsXG4gICAgICBvcmlnaW46IHsgeDogMCwgeTogMCB9LFxuICAgICAgcmFuZ2U6IG9wdGlvbnMucmFuZ2UsXG4gICAgfSxcbiAgfVxuXG4gIHN0YXRlLnRhcmdldEZpZWxkcyA9IHN0YXRlLnRhcmdldEZpZWxkcyB8fCBbXG4gICAgWyd3aWR0aCcsICdoZWlnaHQnXSxcbiAgICBbJ3gnLCAneSddLFxuICBdXG5cbiAgc25hcC5zdGFydChhcmcpXG4gIHN0YXRlLm9mZnNldHMgPSBhcmcuc3RhdGUub2Zmc2V0c1xuXG4gIGFyZy5zdGF0ZSA9IHN0YXRlXG59XG5cbmZ1bmN0aW9uIHNldCAoYXJnKSB7XG4gIGNvbnN0IHsgaW50ZXJhY3Rpb24sIHN0YXRlLCBjb29yZHMgfSA9IGFyZ1xuICBjb25zdCB7IG9wdGlvbnMsIG9mZnNldHMgfSA9IHN0YXRlXG4gIGNvbnN0IHJlbGF0aXZlID0ge1xuICAgIHg6IGNvb3Jkcy54IC0gb2Zmc2V0c1swXS54LFxuICAgIHk6IGNvb3Jkcy55IC0gb2Zmc2V0c1swXS55LFxuICB9XG5cbiAgc3RhdGUub3B0aW9ucyA9IGV4dGVuZCh7fSwgb3B0aW9ucylcbiAgc3RhdGUub3B0aW9ucy50YXJnZXRzID0gW11cblxuICBmb3IgKGNvbnN0IHNuYXBUYXJnZXQgb2YgKG9wdGlvbnMudGFyZ2V0cyB8fCBbXSkpIHtcbiAgICBsZXQgdGFyZ2V0XG5cbiAgICBpZiAoaXMuZnVuYyhzbmFwVGFyZ2V0KSkge1xuICAgICAgdGFyZ2V0ID0gc25hcFRhcmdldChyZWxhdGl2ZS54LCByZWxhdGl2ZS55LCBpbnRlcmFjdGlvbilcbiAgICB9XG4gICAgZWxzZSB7XG4gICAgICB0YXJnZXQgPSBzbmFwVGFyZ2V0XG4gICAgfVxuXG4gICAgaWYgKCF0YXJnZXQpIHsgY29udGludWUgfVxuXG4gICAgZm9yIChjb25zdCBbeEZpZWxkLCB5RmllbGRdIG9mIHN0YXRlLnRhcmdldEZpZWxkcykge1xuICAgICAgaWYgKHhGaWVsZCBpbiB0YXJnZXQgfHwgeUZpZWxkIGluIHRhcmdldCkge1xuICAgICAgICB0YXJnZXQueCA9IHRhcmdldFt4RmllbGRdXG4gICAgICAgIHRhcmdldC55ID0gdGFyZ2V0W3lGaWVsZF1cblxuICAgICAgICBicmVha1xuICAgICAgfVxuICAgIH1cblxuICAgIHN0YXRlLm9wdGlvbnMudGFyZ2V0cy5wdXNoKHRhcmdldClcbiAgfVxuXG4gIHNuYXAuc2V0KGFyZylcblxuICBzdGF0ZS5vcHRpb25zID0gb3B0aW9uc1xufVxuXG5jb25zdCBkZWZhdWx0czogU25hcFNpemVPcHRpb25zID0ge1xuICByYW5nZTogSW5maW5pdHksXG4gIHRhcmdldHM6IG51bGwsXG4gIG9mZnNldDogbnVsbCxcbiAgZW5kT25seTogZmFsc2UsXG4gIGVuYWJsZWQ6IGZhbHNlLFxufVxuXG5jb25zdCBzbmFwU2l6ZSA9IHtcbiAgc3RhcnQsXG4gIHNldCxcbiAgZGVmYXVsdHMsXG59XG5cbmV4cG9ydCBkZWZhdWx0IHNuYXBTaXplXG4iXX0=
+//# sourceMappingURL=size.js.map

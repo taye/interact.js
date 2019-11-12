@@ -1,8 +1,8 @@
 /** @module interact */
-import { Options } from '@interactjs/core/defaultOptions';
-import Interactable from '@interactjs/core/Interactable';
-import { Scope } from '@interactjs/core/scope';
-import * as utils from '@interactjs/utils';
+import { Options } from '../core/defaultOptions';
+import Interactable from '../core/Interactable';
+import { Scope } from '../core/scope';
+import * as utils from '../utils/index';
 declare module '@interactjs/core/scope' {
     interface Scope {
         interact: InteractStatic;

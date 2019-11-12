@@ -40,6 +40,7 @@ declare function install(scope: Interact.Scope, { logger }?: {
 declare const defaultExport: {
     id: string;
     install: () => void;
+    listeners?: undefined;
     checks?: undefined;
     CheckName?: undefined;
     links?: undefined;
@@ -47,6 +48,11 @@ declare const defaultExport: {
 } | {
     id: string;
     install: typeof install;
+    listeners: {
+        'interactions:action-start': ({ interaction }: {
+            interaction: any;
+        }, scope: any) => void;
+    };
     checks: Check[];
     CheckName: typeof CheckName;
     links: {

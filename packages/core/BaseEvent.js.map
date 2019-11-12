@@ -1,0 +1,23 @@
+{
+	"version": 3,
+	"sources": [
+		"BaseEvent.ts"
+	],
+	"names": [
+		"EventPhase",
+		"BaseEvent",
+		"interaction",
+		"_interaction",
+		"_proxy",
+		"constructor",
+		"preventDefault",
+		"stopPropagation",
+		"propagationStopped",
+		"stopImmediatePropagation",
+		"immediatePropagationStopped"
+	],
+	"mappings": ";;AAIA,WAAYA,UAAZ;;WAAYA,U;AAAAA,EAAAA,U;AAAAA,EAAAA,U;AAAAA,EAAAA,U;AAAAA,EAAAA,U;GAAAA,U,KAAAA,U;;AAOZ,OAAO,MAAMC,SAAN,CAA4C;AAUjD,MAAIC,WAAJ,GAAmB;AACjB,WAAO,KAAKC,YAAL,CAAkBC,MAAzB;AACD;;AAEDC,EAAAA,WAAW,CAAEH,WAAF,EAAe;AAAA;;AAAA;;AAAA;;AAAA;;AAAA;;AAAA;;AAAA,yDAPI,KAOJ;;AAAA,gDANL,KAMK;;AACxB,SAAKC,YAAL,GAAoBD,WAApB;AACD;;AAEDI,EAAAA,cAAc,GAAI,CAAE;AAEpB;;;;;AAGAC,EAAAA,eAAe,GAAI;AACjB,SAAKC,kBAAL,GAA0B,IAA1B;AACD;AAED;;;;;AAGAC,EAAAA,wBAAwB,GAAI;AAC1B,SAAKC,2BAAL,GAAmC,KAAKF,kBAAL,GAA0B,IAA7D;AACD;;AAhCgD;AAmCnD,eAAeP,SAAf",
+	"sourcesContent": [
+		"import Interactable from './Interactable'\nimport Interaction from './Interaction'\nimport { ActionName } from './scope'\n\nexport enum EventPhase {\n  Start = 'start',\n  Move = 'move',\n  End = 'end',\n  _NONE = '',\n}\n\nexport class BaseEvent<T extends ActionName = any> {\n  type: string\n  target: EventTarget\n  currentTarget: EventTarget\n  interactable: Interactable\n  _interaction: Interaction<T>\n  timeStamp: any\n  immediatePropagationStopped = false\n  propagationStopped = false\n\n  get interaction () {\n    return this._interaction._proxy\n  }\n\n  constructor (interaction) {\n    this._interaction = interaction\n  }\n\n  preventDefault () {}\n\n  /**\n   * Don't call any other listeners (even on the current target)\n   */\n  stopPropagation () {\n    this.propagationStopped = true\n  }\n\n  /**\n   * Don't call listeners on the remaining targets\n   */\n  stopImmediatePropagation () {\n    this.immediatePropagationStopped = this.propagationStopped = true\n  }\n}\n\nexport default BaseEvent\n"
+	]
+}

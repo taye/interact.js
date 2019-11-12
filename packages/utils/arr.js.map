@@ -1,0 +1,28 @@
+{
+	"version": 3,
+	"sources": [
+		"arr.ts"
+	],
+	"names": [
+		"contains",
+		"array",
+		"target",
+		"indexOf",
+		"remove",
+		"splice",
+		"merge",
+		"source",
+		"item",
+		"push",
+		"from",
+		"findIndex",
+		"func",
+		"i",
+		"length",
+		"find"
+	],
+	"mappings": "AAAA,OAAO,SAASA,QAAT,CAAmBC,KAAnB,EAA0BC,MAA1B,EAAkC;AACvC,SAAOD,KAAK,CAACE,OAAN,CAAcD,MAAd,MAA0B,CAAC,CAAlC;AACD;AAED,OAAO,SAASE,MAAT,CAAiBH,KAAjB,EAAwBC,MAAxB,EAAgC;AACrC,SAAOD,KAAK,CAACI,MAAN,CAAaJ,KAAK,CAACE,OAAN,CAAcD,MAAd,CAAb,EAAoC,CAApC,CAAP;AACD;AAED,OAAO,SAASI,KAAT,CAAgBJ,MAAhB,EAAwBK,MAAxB,EAAgC;AACrC,OAAK,MAAMC,IAAX,IAAmBD,MAAnB,EAA2B;AACzBL,IAAAA,MAAM,CAACO,IAAP,CAAYD,IAAZ;AACD;;AAED,SAAON,MAAP;AACD;AAED,OAAO,SAASQ,IAAT,CAAeH,MAAf,EAAuB;AAC5B,SAAOD,KAAK,CAAC,EAAD,EAAKC,MAAL,CAAZ;AACD;AAED,OAAO,SAASI,SAAT,CAAoBV,KAApB,EAA2BW,IAA3B,EAAiC;AACtC,OAAK,IAAIC,CAAC,GAAG,CAAb,EAAgBA,CAAC,GAAGZ,KAAK,CAACa,MAA1B,EAAkCD,CAAC,EAAnC,EAAuC;AACrC,QAAID,IAAI,CAACX,KAAK,CAACY,CAAD,CAAN,EAAWA,CAAX,EAAcZ,KAAd,CAAR,EAA8B;AAC5B,aAAOY,CAAP;AACD;AACF;;AAED,SAAO,CAAC,CAAR;AACD;AAED,OAAO,SAASE,IAAT,CAAed,KAAf,EAAsBW,IAAtB,EAA4B;AACjC,SAAOX,KAAK,CAACU,SAAS,CAACV,KAAD,EAAQW,IAAR,CAAV,CAAZ;AACD",
+	"sourcesContent": [
+		"export function contains (array, target) {\n  return array.indexOf(target) !== -1\n}\n\nexport function remove (array, target) {\n  return array.splice(array.indexOf(target), 1)\n}\n\nexport function merge (target, source) {\n  for (const item of source) {\n    target.push(item)\n  }\n\n  return target\n}\n\nexport function from (source) {\n  return merge([], source)\n}\n\nexport function findIndex (array, func) {\n  for (let i = 0; i < array.length; i++) {\n    if (func(array[i], i, array)) {\n      return i\n    }\n  }\n\n  return -1\n}\n\nexport function find (array, func) {\n  return array[findIndex(array, func)]\n}\n"
+	]
+}

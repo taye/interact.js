@@ -1,6 +1,6 @@
-import Interactable from '@interactjs/core/Interactable';
-import InteractEvent from '@interactjs/core/InteractEvent';
-import { Scope } from '@interactjs/core/scope';
+import Interactable from '../../core/Interactable';
+import InteractEvent from '../../core/InteractEvent';
+import { Scope } from '../../core/scope';
 export interface DropzoneMethod {
     (options: Interact.DropzoneOptions | boolean): Interact.Interactable;
     (): Interact.DropzoneOptions;
@@ -63,9 +63,31 @@ declare function getDropEvents(interaction: Interact.Interaction, _pointerEvent:
     drop: any;
 };
 declare function fireDropEvents(interaction: Interact.Interaction, events: any): void;
+declare function onEventCreated({ interaction, iEvent, event }: Interact.DoPhaseArg, scope: any): void;
 declare const drop: {
     id: string;
     install: typeof install;
+    listeners: {
+        'interactions:before-action-start': ({ interaction }: {
+            interaction: any;
+        }) => void;
+        'interactions:after-action-start': ({ interaction, event, iEvent: dragEvent }: {
+            interaction: any;
+            event: any;
+            iEvent: any;
+        }, scope: any) => void;
+        'interactions:action-move': typeof onEventCreated;
+        'interactions:action-end': typeof onEventCreated;
+        'interactions:after-action-move': ({ interaction }: {
+            interaction: any;
+        }) => void;
+        'interactions:after-action-end': ({ interaction }: {
+            interaction: any;
+        }) => void;
+        'interactions:stop': ({ interaction }: {
+            interaction: any;
+        }) => void;
+    };
     getActiveDrops: typeof getActiveDrops;
     getDrop: typeof getDrop;
     getDropEvents: typeof getDropEvents;

@@ -1,0 +1,19 @@
+{
+	"version": 3,
+	"sources": [
+		"PointerInfo.ts"
+	],
+	"names": [
+		"PointerInfo",
+		"constructor",
+		"id",
+		"pointer",
+		"event",
+		"downTime",
+		"downTarget"
+	],
+	"mappings": "AAAA;AACA,OAAO,MAAMA,WAAN,CAAkB;AACvBC,EAAAA,WAAW,CACFC,EADE,EAEFC,OAFE,EAGFC,KAHE,EAIFC,QAJE,EAKFC,UALE,EAMT;AAAA,SALOJ,EAKP,GALOA,EAKP;AAAA,SAJOC,OAIP,GAJOA,OAIP;AAAA,SAHOC,KAGP,GAHOA,KAGP;AAAA,SAFOC,QAEP,GAFOA,QAEP;AAAA,SADOC,UACP,GADOA,UACP;AAAE;;AAPmB;AAUzB,eAAeN,WAAf",
+	"sourcesContent": [
+		"/* eslint-disable @typescript-eslint/no-parameter-properties */\nexport class PointerInfo {\n  constructor (\n    public id: number,\n    public pointer: Interact.PointerType,\n    public event: Interact.PointerEventType,\n    public downTime: number,\n    public downTarget: Interact.EventTarget,\n  ) {}\n}\n\nexport default PointerInfo\n"
+	]
+}

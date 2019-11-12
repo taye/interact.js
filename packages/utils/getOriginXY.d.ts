@@ -1,5 +1,4 @@
-import { HasGetRect } from '@interactjs/types/types';
-export default function (target: HasGetRect & {
+export default function (target: Interact.HasGetRect & {
     options: Interact.PerActionDefaults;
 }, element: any, action?: any): {
     x: any;

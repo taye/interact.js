@@ -1,0 +1,20 @@
+{
+	"version": 3,
+	"sources": [
+		"index.ts"
+	],
+	"names": [
+		"drag",
+		"drop",
+		"gesture",
+		"resize",
+		"install",
+		"scope",
+		"usePlugin",
+		"id"
+	],
+	"mappings": "AACA,OAAOA,IAAP;AACA,OAAOC,IAAP;AACA,OAAOC,OAAP;AACA,OAAOC,MAAP;;AAEA,SAASC,OAAT,CAAkBC,KAAlB,EAAgC;AAC9BA,EAAAA,KAAK,CAACC,SAAN,CAAgBJ,OAAhB;AACAG,EAAAA,KAAK,CAACC,SAAN,CAAgBH,MAAhB;AACAE,EAAAA,KAAK,CAACC,SAAN,CAAgBN,IAAhB;AACAK,EAAAA,KAAK,CAACC,SAAN,CAAgBL,IAAhB;AACD;;AAED,MAAMM,EAAE,GAAG,SAAX;AAEA,SACEA,EADF,EAEEH,OAFF,EAGEF,OAHF,EAIEC,MAJF,EAKEH,IALF,EAMEC,IANF",
+	"sourcesContent": [
+		"import { Scope } from '../core/scope'\nimport drag from './drag'\nimport drop from './drop/index'\nimport gesture from './gesture'\nimport resize from './resize'\n\nfunction install (scope: Scope) {\n  scope.usePlugin(gesture)\n  scope.usePlugin(resize)\n  scope.usePlugin(drag)\n  scope.usePlugin(drop)\n}\n\nconst id = 'actions'\n\nexport {\n  id,\n  install,\n  gesture,\n  resize,\n  drag,\n  drop,\n}\n"
+	]
+}

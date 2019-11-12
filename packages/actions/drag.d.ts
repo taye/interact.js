@@ -1,4 +1,4 @@
-import { ActionName } from '@interactjs/core/scope';
+import { ActionName } from '../core/scope';
 declare module '@interactjs/core/Interactable' {
     interface Interactable {
         draggable: DraggableMethod;

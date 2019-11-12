@@ -4,7 +4,7 @@ import { Actions } from './scope';
 declare type IgnoreValue = string | Interact.Element | boolean;
 /** */
 export declare class Interactable implements Partial<Eventable> {
-    protected readonly _defaults: Defaults;
+    protected get _defaults(): Defaults;
     readonly options: Required<Options>;
     readonly _actions: Actions;
     readonly target: Interact.Target;
@@ -68,21 +68,21 @@ export declare class Interactable implements Partial<Eventable> {
      * interacting; Use 'page' if you want autoScroll to work
      * @return {string | object} The current deltaSource or this Interactable
      */
-    deltaSource(newValue: any): "client" | "page" | this;
+    deltaSource(newValue: any): "page" | "client" | this;
     /**
      * Gets the selector context Node of the Interactable. The default is
      * `window.document`.
      *
      * @return {Node} The context Node of this Interactable
      */
-    context(): HTMLElement | SVGElement | Document;
+    context(): Document | HTMLElement | SVGElement;
     inContext(element: any): boolean;
     testIgnoreAllow(this: Interactable, options: {
         ignoreFrom: IgnoreValue;
         allowFrom: IgnoreValue;
-    }, targetNode: Node, eventTarget: Interact.Element): any;
-    testAllow(this: Interactable, allowFrom: IgnoreValue, targetNode: Node, element: Interact.Element): any;
-    testIgnore(this: Interactable, ignoreFrom: IgnoreValue, targetNode: Node, element: Interact.Element): any;
+    }, targetNode: Node, eventTarget: Interact.EventTarget): any;
+    testAllow(this: Interactable, allowFrom: IgnoreValue, targetNode: Node, element: Interact.EventTarget): any;
+    testIgnore(this: Interactable, ignoreFrom: IgnoreValue, targetNode: Node, element: Interact.EventTarget): any;
     /**
      * Calls listeners for the given InteractEvent type bound globally
      * and directly to this Interactable

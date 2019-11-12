@@ -40,14 +40,22 @@ export declare class InteractEvent<T extends ActionName = any, P extends EventPh
     preEnd?: boolean;
     /** */
     constructor(interaction: Interaction, event: Interact.PointerEventType, actionName: T, phase: P, element: Interact.Element, related?: Interact.Element, preEnd?: boolean, type?: string);
-    pageX: number;
-    pageY: number;
-    clientX: number;
-    clientY: number;
-    dx: number;
-    dy: number;
-    velocityX: number;
-    velocityY: number;
+    get pageX(): number;
+    set pageX(value: number);
+    get pageY(): number;
+    set pageY(value: number);
+    get clientX(): number;
+    set clientX(value: number);
+    get clientY(): number;
+    set clientY(value: number);
+    get dx(): number;
+    set dx(value: number);
+    get dy(): number;
+    set dy(value: number);
+    get velocityX(): number;
+    set velocityX(value: number);
+    get velocityY(): number;
+    set velocityY(value: number);
     getSwipe(): {
         up: boolean;
         down: boolean;

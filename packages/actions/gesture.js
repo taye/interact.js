@@ -1,124 +1,147 @@
-import InteractEvent from '@interactjs/core/InteractEvent';
-import { ActionName } from '@interactjs/core/scope';
-import * as utils from '@interactjs/utils';
+import InteractEvent from "../core/InteractEvent.js";
+import { ActionName } from "../core/scope.js";
+import * as utils from "../utils/index.js";
 ActionName.Gesture = 'gesture';
+
 function install(scope) {
-    const { actions, Interactable, interactions, defaults, } = scope;
-    /**
-     * ```js
-     * interact(element).gesturable({
-     *     onstart: function (event) {},
-     *     onmove : function (event) {},
-     *     onend  : function (event) {},
-     *
-     *     // limit multiple gestures.
-     *     // See the explanation in {@link Interactable.draggable} example
-     *     max: Infinity,
-     *     maxPerElement: 1,
-     * })
-     *
-     * var isGestureable = interact(element).gesturable()
-     * ```
-     *
-     * Gets or sets whether multitouch gestures can be performed on the target
-     *
-     * @param {boolean | object} [options] true/false or An object with event
-     * listeners to be fired on gesture events (makes the Interactable gesturable)
-     * @return {boolean | Interactable} A boolean indicating if this can be the
-     * target of gesture events, or this Interactable
-     */
-    Interactable.prototype.gesturable = function (options) {
-        if (utils.is.object(options)) {
-            this.options.gesture.enabled = options.enabled !== false;
-            this.setPerAction('gesture', options);
-            this.setOnEvents('gesture', options);
-            return this;
-        }
-        if (utils.is.bool(options)) {
-            this.options.gesture.enabled = options;
-            return this;
-        }
-        return this.options.gesture;
-    };
-    interactions.signals.on('action-start', updateGestureProps);
-    interactions.signals.on('action-move', updateGestureProps);
-    interactions.signals.on('action-end', updateGestureProps);
-    interactions.signals.on('new', ({ interaction }) => {
-        interaction.gesture = {
-            angle: 0,
-            distance: 0,
-            scale: 1,
-            startAngle: 0,
-            startDistance: 0,
-        };
-    });
-    actions[ActionName.Gesture] = gesture;
-    actions.names.push(ActionName.Gesture);
-    utils.arr.merge(actions.eventTypes, [
-        'gesturestart',
-        'gesturemove',
-        'gestureend',
-    ]);
-    actions.methodDict.gesture = 'gesturable';
-    defaults.actions.gesture = gesture.defaults;
+  const {
+    actions,
+    Interactable,
+    defaults
+  } = scope;
+  /**
+   * ```js
+   * interact(element).gesturable({
+   *     onstart: function (event) {},
+   *     onmove : function (event) {},
+   *     onend  : function (event) {},
+   *
+   *     // limit multiple gestures.
+   *     // See the explanation in {@link Interactable.draggable} example
+   *     max: Infinity,
+   *     maxPerElement: 1,
+   * })
+   *
+   * var isGestureable = interact(element).gesturable()
+   * ```
+   *
+   * Gets or sets whether multitouch gestures can be performed on the target
+   *
+   * @param {boolean | object} [options] true/false or An object with event
+   * listeners to be fired on gesture events (makes the Interactable gesturable)
+   * @return {boolean | Interactable} A boolean indicating if this can be the
+   * target of gesture events, or this Interactable
+   */
+
+  Interactable.prototype.gesturable = function (options) {
+    if (utils.is.object(options)) {
+      this.options.gesture.enabled = options.enabled !== false;
+      this.setPerAction('gesture', options);
+      this.setOnEvents('gesture', options);
+      return this;
+    }
+
+    if (utils.is.bool(options)) {
+      this.options.gesture.enabled = options;
+      return this;
+    }
+
+    return this.options.gesture;
+  };
+
+  actions[ActionName.Gesture] = gesture;
+  actions.names.push(ActionName.Gesture);
+  utils.arr.merge(actions.eventTypes, ['gesturestart', 'gesturemove', 'gestureend']);
+  actions.methodDict.gesture = 'gesturable';
+  defaults.actions.gesture = gesture.defaults;
 }
+
 const gesture = {
-    id: 'actions/gesture',
-    install,
-    defaults: {},
-    checker(_pointer, _event, _interactable, _element, interaction) {
-        if (interaction.pointers.length >= 2) {
-            return { name: 'gesture' };
-        }
-        return null;
-    },
-    getCursor() {
-        return '';
-    },
+  id: 'actions/gesture',
+  install,
+  listeners: {
+    'interactions:action-start': updateGestureProps,
+    'interactions:action-move': updateGestureProps,
+    'interactions:action-end': updateGestureProps,
+    'interactions:new': ({
+      interaction
+    }) => {
+      interaction.gesture = {
+        angle: 0,
+        distance: 0,
+        scale: 1,
+        startAngle: 0,
+        startDistance: 0
+      };
+    }
+  },
+  defaults: {},
+
+  checker(_pointer, _event, _interactable, _element, interaction) {
+    if (interaction.pointers.length >= 2) {
+      return {
+        name: 'gesture'
+      };
+    }
+
+    return null;
+  },
+
+  getCursor() {
+    return '';
+  }
+
 };
-function updateGestureProps({ interaction, iEvent, event, phase }) {
-    if (interaction.prepared.name !== 'gesture') {
-        return;
-    }
-    const pointers = interaction.pointers.map(p => p.pointer);
-    const starting = phase === 'start';
-    const ending = phase === 'end';
-    const deltaSource = interaction.interactable.options.deltaSource;
-    iEvent.touches = [pointers[0], pointers[1]];
-    if (starting) {
-        iEvent.distance = utils.pointer.touchDistance(pointers, deltaSource);
-        iEvent.box = utils.pointer.touchBBox(pointers);
-        iEvent.scale = 1;
-        iEvent.ds = 0;
-        iEvent.angle = utils.pointer.touchAngle(pointers, deltaSource);
-        iEvent.da = 0;
-        interaction.gesture.startDistance = iEvent.distance;
-        interaction.gesture.startAngle = iEvent.angle;
-    }
-    else if (ending || event instanceof InteractEvent) {
-        const prevEvent = interaction.prevEvent;
-        iEvent.distance = prevEvent.distance;
-        iEvent.box = prevEvent.box;
-        iEvent.scale = prevEvent.scale;
-        iEvent.ds = 0;
-        iEvent.angle = prevEvent.angle;
-        iEvent.da = 0;
-    }
-    else {
-        iEvent.distance = utils.pointer.touchDistance(pointers, deltaSource);
-        iEvent.box = utils.pointer.touchBBox(pointers);
-        iEvent.scale = iEvent.distance / interaction.gesture.startDistance;
-        iEvent.angle = utils.pointer.touchAngle(pointers, deltaSource);
-        iEvent.ds = iEvent.scale - interaction.gesture.scale;
-        iEvent.da = iEvent.angle - interaction.gesture.angle;
-    }
-    interaction.gesture.distance = iEvent.distance;
-    interaction.gesture.angle = iEvent.angle;
-    if (utils.is.number(iEvent.scale) &&
-        iEvent.scale !== Infinity &&
-        !isNaN(iEvent.scale)) {
-        interaction.gesture.scale = iEvent.scale;
-    }
+
+function updateGestureProps({
+  interaction,
+  iEvent,
+  event,
+  phase
+}) {
+  if (interaction.prepared.name !== 'gesture') {
+    return;
+  }
+
+  const pointers = interaction.pointers.map(p => p.pointer);
+  const starting = phase === 'start';
+  const ending = phase === 'end';
+  const deltaSource = interaction.interactable.options.deltaSource;
+  iEvent.touches = [pointers[0], pointers[1]];
+
+  if (starting) {
+    iEvent.distance = utils.pointer.touchDistance(pointers, deltaSource);
+    iEvent.box = utils.pointer.touchBBox(pointers);
+    iEvent.scale = 1;
+    iEvent.ds = 0;
+    iEvent.angle = utils.pointer.touchAngle(pointers, deltaSource);
+    iEvent.da = 0;
+    interaction.gesture.startDistance = iEvent.distance;
+    interaction.gesture.startAngle = iEvent.angle;
+  } else if (ending || event instanceof InteractEvent) {
+    const prevEvent = interaction.prevEvent;
+    iEvent.distance = prevEvent.distance;
+    iEvent.box = prevEvent.box;
+    iEvent.scale = prevEvent.scale;
+    iEvent.ds = 0;
+    iEvent.angle = prevEvent.angle;
+    iEvent.da = 0;
+  } else {
+    iEvent.distance = utils.pointer.touchDistance(pointers, deltaSource);
+    iEvent.box = utils.pointer.touchBBox(pointers);
+    iEvent.scale = iEvent.distance / interaction.gesture.startDistance;
+    iEvent.angle = utils.pointer.touchAngle(pointers, deltaSource);
+    iEvent.ds = iEvent.scale - interaction.gesture.scale;
+    iEvent.da = iEvent.angle - interaction.gesture.angle;
+  }
+
+  interaction.gesture.distance = iEvent.distance;
+  interaction.gesture.angle = iEvent.angle;
+
+  if (utils.is.number(iEvent.scale) && iEvent.scale !== Infinity && !isNaN(iEvent.scale)) {
+    interaction.gesture.scale = iEvent.scale;
+  }
 }
+
 export default gesture;
-//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiZ2VzdHVyZS5qcyIsInNvdXJjZVJvb3QiOiIiLCJzb3VyY2VzIjpbImdlc3R1cmUudHMiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IkFBQUEsT0FBTyxhQUFhLE1BQU0sZ0NBQWdDLENBQUE7QUFDMUQsT0FBTyxFQUFFLFVBQVUsRUFBUyxNQUFNLHdCQUF3QixDQUFBO0FBQzFELE9BQU8sS0FBSyxLQUFLLE1BQU0sbUJBQW1CLENBQUE7QUF1Q3pDLFVBQWtCLENBQUMsT0FBTyxHQUFHLFNBQVMsQ0FBQTtBQWtCdkMsU0FBUyxPQUFPLENBQUUsS0FBWTtJQUM1QixNQUFNLEVBQ0osT0FBTyxFQUNQLFlBQVksRUFDWixZQUFZLEVBQ1osUUFBUSxHQUNULEdBQUcsS0FBSyxDQUFBO0lBRVQ7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7T0FzQkc7SUFDSCxZQUFZLENBQUMsU0FBUyxDQUFDLFVBQVUsR0FBRyxVQUF1QyxPQUE2QztRQUN0SCxJQUFJLEtBQUssQ0FBQyxFQUFFLENBQUMsTUFBTSxDQUFDLE9BQU8sQ0FBQyxFQUFFO1lBQzVCLElBQUksQ0FBQyxPQUFPLENBQUMsT0FBTyxDQUFDLE9BQU8sR0FBRyxPQUFPLENBQUMsT0FBTyxLQUFLLEtBQUssQ0FBQTtZQUN4RCxJQUFJLENBQUMsWUFBWSxDQUFDLFNBQVMsRUFBRSxPQUFPLENBQUMsQ0FBQTtZQUNyQyxJQUFJLENBQUMsV0FBVyxDQUFDLFNBQVMsRUFBRSxPQUFPLENBQUMsQ0FBQTtZQUVwQyxPQUFPLElBQUksQ0FBQTtTQUNaO1FBRUQsSUFBSSxLQUFLLENBQUMsRUFBRSxDQUFDLElBQUksQ0FBQyxPQUFPLENBQUMsRUFBRTtZQUMxQixJQUFJLENBQUMsT0FBTyxDQUFDLE9BQU8sQ0FBQyxPQUFPLEdBQUcsT0FBTyxDQUFBO1lBRXRDLE9BQU8sSUFBSSxDQUFBO1NBQ1o7UUFFRCxPQUFPLElBQUksQ0FBQyxPQUFPLENBQUMsT0FBMkIsQ0FBQTtJQUNqRCxDQUFxQixDQUFBO0lBRXJCLFlBQVksQ0FBQyxPQUFP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LEtBQUssQ0FBQTtRQUNwRCxNQUFNLENBQUMsRUFBRSxHQUFHLE1BQU0sQ0FBQyxLQUFLLEdBQUcsV0FBVyxDQUFDLE9BQU8sQ0FBQyxLQUFLLENBQUE7S0FDckQ7SUFFRCxXQUFXLENBQUMsT0FBTyxDQUFDLFFBQVEsR0FBRyxNQUFNLENBQUMsUUFBUSxDQUFBO0lBQzlDLFdBQVcsQ0FBQyxPQUFPLENBQUMsS0FBSyxHQUFHLE1BQU0sQ0FBQyxLQUFLLENBQUE7SUFFeEMsSUFBSSxLQUFLLENBQUMsRUFBRSxDQUFDLE1BQU0sQ0FBQyxNQUFNLENBQUMsS0FBSyxDQUFDO1FBQzdCLE1BQU0sQ0FBQyxLQUFLLEtBQUssUUFBUTtRQUN6QixDQUFDLEtBQUssQ0FBQyxNQUFNLENBQUMsS0FBSyxDQUFDLEVBQUU7UUFDeEIsV0FBVyxDQUFDLE9BQU8sQ0FBQyxLQUFLLEdBQUcsTUFBTSxDQUFDLEtBQUssQ0FBQTtLQUN6QztBQUNILENBQUM7QUFFRCxlQUFlLE9BQU8sQ0FBQSIsInNvdXJjZXNDb250ZW50IjpbImltcG9ydCBJbnRlcmFjdEV2ZW50IGZyb20gJ0BpbnRlcmFjdGpzL2NvcmUvSW50ZXJhY3RFdmVudCdcbmltcG9ydCB7IEFjdGlvbk5hbWUsIFNjb3BlIH0gZnJvbSAnQGludGVyYWN0anMvY29yZS9zY29wZSdcbmltcG9ydCAqIGFzIHV0aWxzIGZyb20gJ0BpbnRlcmFjdGpzL3V0aWxzJ1xuXG5leHBvcnQgdHlwZSBHZXN0dXJhYmxlTWV0aG9kID0gSW50ZXJhY3QuQWN0aW9uTWV0aG9kPEludGVyYWN0Lkdlc3R1cmFibGVPcHRpb25zPlxuXG5kZWNsYXJlIG1vZHVsZSAnQGludGVyYWN0anMvY29yZS9JbnRlcmFjdGlvbicge1xuICBpbnRlcmZhY2UgSW50ZXJhY3Rpb24ge1xuICAgIGdlc3R1cmU/OiB7XG4gICAgICBhbmdsZTogbnVtYmVyICAgICAgICAgICAvLyBhbmdsZSBmcm9tIGZpcnN0IHRvIHNlY29uZCB0b3VjaFxuICAgICAgZGlzdGFuY2U6IG51bWJlclxuICAgICAgc2NhbGU6IG51bWJlciAgICAgICAgICAgLy8gZ2VzdHVyZS5kaXN0YW5jZSAvIGdlc3R1cmUuc3RhcnREaXN0YW5jZVxuICAgICAgc3RhcnRBbmdsZTogbnVtYmVyICAgICAgLy8gYW5nbGUgb2YgbGluZSBqb2luaW5nIHR3byB0b3VjaGVzXG4gICAgICBzdGFydERpc3RhbmNlOiBudW1iZXIgICAvLyBkaXN0YW5jZSBiZXR3ZWVuIHR3byB0b3VjaGVzIG9mIHRvdWNoU3RhcnRcbiAgICB9XG4gIH1cbn1cblxuZGVjbGFyZSBtb2R1bGUgJ0BpbnRlcmFjdGpzL2NvcmUvSW50ZXJhY3RhYmxlJyB7XG4gIGludGVyZmFjZSBJbnRlcmFjdGFibGUge1xuICAgIGdlc3R1cmFibGU6IEdlc3R1cmFibGVNZXRob2RcbiAgfVxufVxuXG5kZWNsYXJlIG1vZHVsZSAnQGludGVyYWN0anMvY29yZS9kZWZhdWx0T3B0aW9ucycge1xuICBpbnRlcmZhY2UgQWN0aW9uRGVmYXVsdHMge1xuICAgIGdlc3R1cmU6IEludGVyYWN0Lkdlc3R1cmFibGVPcHRpb25zXG4gIH1cbn1cblxuZGVjbGFyZSBtb2R1bGUgJ0BpbnRlcmFjdGpzL2NvcmUvc2NvcGUnIHtcbiAgaW50ZXJmYWNlIEFjdGlvbnMge1xuICAgIFtBY3Rpb25OYW1lLkdlc3R1cmVdPzogdHlwZW9mIGdlc3R1cmVcbiAgfVxuXG4gIC8vIGVzbGludC1kaXNhYmxlLW5leHQtbGluZSBuby1zaGFkb3dcbiAgZW51bSBBY3Rpb25OYW1lIHtcbiAgICBHZXN0dXJlID0gJ2dlc3R1cmUnXG4gIH1cbn1cblxuKEFjdGlvbk5hbWUgYXMgYW55KS5HZXN0dXJlID0gJ2dlc3R1cmUnXG5cbmV4cG9ydCBpbnRlcmZhY2UgR2VzdHVyZUV2ZW50IGV4dGVuZHMgSW50ZXJhY3QuSW50ZXJhY3RFdmVudDxBY3Rpb25OYW1lLkdlc3R1cmU+IHtcbiAgZGlzdGFuY2U6IG51bWJlclxuICBhbmdsZTogbnVtYmVyXG4gIGRhOiBudW1iZXIgLy8gYW5nbGUgY2hhbmdlXG4gIHNjYWxlOiBudW1iZXIgLy8gcmF0aW8gb2YgZGlzdGFuY2Ugc3RhcnQgdG8gY3VycmVudCBldmVudFxuICBkczogbnVtYmVyIC8vIHNjYWxlIGNoYW5nZVxuICBib3g6IEludGVyYWN0LlJlY3QgLy8gZW5jbG9zaW5nIGJveCBvZiBhbGwgcG9pbnRzXG4gIHRvdWNoZXM6IEludGVyYWN0LlBvaW50ZXJUeXBlW11cbn1cblxuZXhwb3J0IGludGVyZmFjZSBHZXN0dXJlU2lnbmFsQXJnIGV4dGVuZHMgSW50ZXJhY3QuU2lnbmFsQXJnIHtcbiAgaUV2ZW50OiBHZXN0dXJlRXZlbnRcbiAgaW50ZXJhY3Rpb246IEludGVyYWN0LkludGVyYWN0aW9uPEFjdGlvbk5hbWUuR2VzdHVyZT5cbiAgZXZlbnQ6IEludGVyYWN0LlBvaW50ZXJFdmVudFR5cGUgfCBHZXN0dXJlRXZlbnRcbn1cblxuZnVuY3Rpb24gaW5zdGFsbCAoc2NvcGU6IFNjb3BlKSB7XG4gIGNvbnN0IHtcbiAgICBhY3Rpb25zLFxuICAgIEludGVyYWN0YWJsZSxcbiAgICBpbnRlcmFjdGlvbnMsXG4gICAgZGVmYXVsdHMsXG4gIH0gPSBzY29wZVxuXG4gIC8qKlxuICAgKiBgYGBqc1xuICAgKiBpbnRlcmFjdChlbGVtZW50KS5nZXN0dXJhYmxlKHtcbiAgICogICAgIG9uc3RhcnQ6IGZ1bmN0aW9uIChldmVudCkge30sXG4gICAqICAgICBvbm1vdmUgOiBmdW5jdGlvbiAoZXZlbnQpIHt9LFxuICAgKiAgICAgb25lbmQgIDogZnVuY3Rpb24gKGV2ZW50KSB7fSxcbiAgICpcbiAgICogICAgIC8vIGxpbWl0IG11bHRpcGxlIGdlc3R1cmVzLlxuICAgKiAgICAgLy8gU2VlIHRoZSBleHBsYW5hdGlvbiBpbiB7QGxpbmsgSW50ZXJhY3RhYmxlLmRyYWdnYWJsZX0gZXhhbXBsZVxuICAgKiAgICAgbWF4OiBJbmZpbml0eSxcbiAgICogICAgIG1heFBlckVsZW1lbnQ6IDEsXG4gICAqIH0pXG4gICAqXG4gICAqIHZhciBpc0dlc3R1cmVhYmxlID0gaW50ZXJhY3QoZWxlbWVudCkuZ2VzdHVyYWJsZSgpXG4gICAqIGBgYFxuICAgKlxuICAgKiBHZXRzIG9yIHNldHMgd2hldGhlciBtdWx0aXRvdWNoIGdlc3R1cmVzIGNhbiBiZSBwZXJmb3JtZWQgb24gdGhlIHRhcmdldFxuICAgKlxuICAgKiBAcGFyYW0ge2Jvb2xlYW4gfCBvYmplY3R9IFtvcHRpb25zXSB0cnVlL2ZhbHNlIG9yIEFuIG9iamVjdCB3aXRoIGV2ZW50XG4gICAqIGxpc3RlbmVycyB0byBiZSBmaXJlZCBvbiBnZXN0dXJlIGV2ZW50cyAobWFrZXMgdGhlIEludGVyYWN0YWJsZSBnZXN0dXJhYmxlKVxuICAgKiBAcmV0dXJuIHtib29sZWFuIHwgSW50ZXJhY3RhYmxlfSBBIGJvb2xlYW4gaW5kaWNhdGluZyBpZiB0aGlzIGNhbiBiZSB0aGVcbiAgICogdGFyZ2V0IG9mIGdlc3R1cmUgZXZlbnRzLCBvciB0aGlzIEludGVyYWN0YWJsZVxuICAgKi9cbiAgSW50ZXJhY3RhYmxlLnByb3RvdHlwZS5nZXN0dXJhYmxlID0gZnVuY3Rpb24gKHRoaXM6IEludGVyYWN0LkludGVyYWN0YWJsZSwgb3B0aW9uczogSW50ZXJhY3QuR2VzdHVyYWJsZU9wdGlvbnMgfCBib29sZWFuKSB7XG4gICAgaWYgKHV0aWxzLmlzLm9iamVjdChvcHRpb25zKSkge1xuICAgICAgdGhpcy5vcHRpb25zLmdlc3R1cmUuZW5hYmxlZCA9IG9wdGlvbnMuZW5hYmxlZCAhPT0gZmFsc2VcbiAgICAgIHRoaXMuc2V0UGVyQWN0aW9uKCdnZXN0dXJlJywgb3B0aW9ucylcbiAgICAgIHRoaXMuc2V0T25FdmVudHMoJ2dlc3R1cmUnLCBvcHRpb25zKVxuXG4gICAgICByZXR1cm4gdGhpc1xuICAgIH1cblxuICAgIGlmICh1dGlscy5pcy5ib29sKG9wdGlvbnMpKSB7XG4gICAgICB0aGlzLm9wdGlvbnMuZ2VzdHVyZS5lbmFibGVkID0gb3B0aW9uc1xuXG4gICAgICByZXR1cm4gdGhpc1xuICAgIH1cblxuICAgIHJldHVybiB0aGlzLm9wdGlvbnMuZ2VzdHVyZSBhcyBJbnRlcmFjdC5PcHRpb25zXG4gIH0gYXMgR2VzdHVyYWJsZU1ldGhvZFxuXG4gIGludGVyYWN0aW9ucy5zaWduYWxzLm9uKCdhY3Rpb24tc3RhcnQnLCB1cGRhdGVHZXN0dXJlUHJvcHMpXG4gIGludGVyYWN0aW9ucy5zaWduYWxzLm9uKCdhY3Rpb24tbW92ZScsIHVwZGF0ZUdlc3R1cmVQcm9wcylcbiAgaW50ZXJhY3Rpb25zLnNpZ25hbHMub24oJ2FjdGlvbi1lbmQnLCB1cGRhdGVHZXN0dXJlUHJvcHMpXG5cbiAgaW50ZXJhY3Rpb25zLnNpZ25hbHMub24oJ25ldycsICh7IGludGVyYWN0aW9uIH0pID0+IHtcbiAgICBpbnRlcmFjdGlvbi5nZXN0dXJlID0ge1xuICAgICAgYW5nbGU6IDAsXG4gICAgICBkaXN0YW5jZTogMCxcbiAgICAgIHNjYWxlOiAxLFxuICAgICAgc3RhcnRBbmdsZTogMCxcbiAgICAgIHN0YXJ0RGlzdGFuY2U6IDAsXG4gICAgfVxuICB9KVxuXG4gIGFjdGlvbnNbQWN0aW9uTmFtZS5HZXN0dXJlXSA9IGdlc3R1cmVcbiAgYWN0aW9ucy5uYW1lcy5wdXNoKEFjdGlvbk5hbWUuR2VzdHVyZSlcbiAgdXRpbHMuYXJyLm1lcmdlKGFjdGlvbnMuZXZlbnRUeXBlcywgW1xuICAgICdnZXN0dXJlc3RhcnQnLFxuICAgICdnZXN0dXJlbW92ZScsXG4gICAgJ2dlc3R1cmVlbmQnLFxuICBdKVxuICBhY3Rpb25zLm1ldGhvZERpY3QuZ2VzdHVyZSA9ICdnZXN0dXJhYmxlJ1xuXG4gIGRlZmF1bHRzLmFjdGlvbnMuZ2VzdHVyZSA9IGdlc3R1cmUuZGVmYXVsdHNcbn1cblxuY29uc3QgZ2VzdHVyZSA9IHtcbiAgaWQ6ICdhY3Rpb25zL2dlc3R1cmUnLFxuICBpbnN0YWxsLFxuICBkZWZhdWx0czoge1xuICB9LFxuXG4gIGNoZWNrZXIgKF9wb2ludGVyLCBfZXZlbnQsIF9pbnRlcmFjdGFibGUsIF9lbGVtZW50LCBpbnRlcmFjdGlvbjogeyBwb2ludGVyczogeyBsZW5ndGg6IG51bWJlciB9IH0pIHtcbiAgICBpZiAoaW50ZXJhY3Rpb24ucG9pbnRlcnMubGVuZ3RoID49IDIpIHtcbiAgICAgIHJldHVybiB7IG5hbWU6ICdnZXN0dXJlJyB9XG4gICAgfVxuXG4gICAgcmV0dXJuIG51bGxcbiAgfSxcblxuICBnZXRDdXJzb3IgKCkge1xuICAgIHJldHVybiAnJ1xuICB9LFxufVxuXG5mdW5jdGlvbiB1cGRhdGVHZXN0dXJlUHJvcHMgKHsgaW50ZXJhY3Rpb24sIGlFdmVudCwgZXZlbnQsIHBoYXNlIH06IEdlc3R1cmVTaWduYWxBcmcpIHtcbiAgaWYgKGludGVyYWN0aW9uLnByZXBhcmVkLm5hbWUgIT09ICdnZXN0dXJlJykgeyByZXR1cm4gfVxuXG4gIGNvbnN0IHBvaW50ZXJzID0gaW50ZXJhY3Rpb24ucG9pbnRlcnMubWFwKHAgPT4gcC5wb2ludGVyKVxuICBjb25zdCBzdGFydGluZyA9IHBoYXNlID09PSAnc3RhcnQnXG4gIGNvbnN0IGVuZGluZyA9IHBoYXNlID09PSAnZW5kJ1xuICBjb25zdCBkZWx0YVNvdXJjZSA9IGludGVyYWN0aW9uLmludGVyYWN0YWJsZS5vcHRpb25zLmRlbHRhU291cmNlXG5cbiAgaUV2ZW50LnRvdWNoZXMgPSBbcG9pbnRlcnNbMF0sIHBvaW50ZXJzWzFdXVxuXG4gIGlmIChzdGFydGluZykge1xuICAgIGlFdmVudC5kaXN0YW5jZSA9IHV0aWxzLnBvaW50ZXIudG91Y2hEaXN0YW5jZShwb2ludGVycywgZGVsdGFTb3VyY2UpXG4gICAgaUV2ZW50LmJveCAgICAgID0gdXRpbHMucG9pbnRlci50b3VjaEJCb3gocG9pbnRlcnMpXG4gICAgaUV2ZW50LnNjYWxlICAgID0gMVxuICAgIGlFdmVudC5kcyAgICAgICA9IDBcbiAgICBpRXZlbnQuYW5nbGUgICAgPSB1dGlscy5wb2ludGVyLnRvdWNoQW5nbGUocG9pbnRlcnMsIGRlbHRhU291cmNlKVxuICAgIGlFdmVudC5kYSAgICAgICA9IDBcblxuICAgIGludGVyYWN0aW9uLmdlc3R1cmUuc3RhcnREaXN0YW5jZSA9IGlFdmVudC5kaXN0YW5jZVxuICAgIGludGVyYWN0aW9uLmdlc3R1cmUuc3RhcnRBbmdsZSA9IGlFdmVudC5hbmdsZVxuICB9XG4gIGVsc2UgaWYgKGVuZGluZyB8fCBldmVudCBpbnN0YW5jZW9mIEludGVyYWN0RXZlbnQpIHtcbiAgICBjb25zdCBwcmV2RXZlbnQgPSBpbnRlcmFjdGlvbi5wcmV2RXZlbnQgYXMgR2VzdHVyZUV2ZW50XG5cbiAgICBpRXZlbnQuZGlzdGFuY2UgPSBwcmV2RXZlbnQuZGlzdGFuY2VcbiAgICBpRXZlbnQuYm94ICAgICAgPSBwcmV2RXZlbnQuYm94XG4gICAgaUV2ZW50LnNjYWxlICAgID0gcHJldkV2ZW50LnNjYWxlXG4gICAgaUV2ZW50LmRzICAgICAgID0gMFxuICAgIGlFdmVudC5hbmdsZSAgICA9IHByZXZFdmVudC5hbmdsZVxuICAgIGlFdmVudC5kYSAgICAgICA9IDBcbiAgfVxuICBlbHNlIHtcbiAgICBpRXZlbnQuZGlzdGFuY2UgPSB1dGlscy5wb2ludGVyLnRvdWNoRGlzdGFuY2UocG9pbnRlcnMsIGRlbHRhU291cmNlKVxuICAgIGlFdmVudC5ib3ggICAgICA9IHV0aWxzLnBvaW50ZXIudG91Y2hCQm94KHBvaW50ZXJzKVxuICAgIGlFdmVudC5zY2FsZSAgICA9IGlFdmVudC5kaXN0YW5jZSAvIGludGVyYWN0aW9uLmdlc3R1cmUuc3RhcnREaXN0YW5jZVxuICAgIGlFdmVudC5hbmdsZSAgICA9IHV0aWxzLnBvaW50ZXIudG91Y2hBbmdsZShwb2ludGVycywgZGVsdGFTb3VyY2UpXG5cbiAgICBpRXZlbnQuZHMgPSBpRXZlbnQuc2NhbGUgLSBpbnRlcmFjdGlvbi5nZXN0dXJlLnNjYWxlXG4gICAgaUV2ZW50LmRhID0gaUV2ZW50LmFuZ2xlIC0gaW50ZXJhY3Rpb24uZ2VzdHVyZS5hbmdsZVxuICB9XG5cbiAgaW50ZXJhY3Rpb24uZ2VzdHVyZS5kaXN0YW5jZSA9IGlFdmVudC5kaXN0YW5jZVxuICBpbnRlcmFjdGlvbi5nZXN0dXJlLmFuZ2xlID0gaUV2ZW50LmFuZ2xlXG5cbiAgaWYgKHV0aWxzLmlzLm51bWJlcihpRXZlbnQuc2NhbGUpICYmXG4gICAgICBpRXZlbnQuc2NhbGUgIT09IEluZmluaXR5ICYmXG4gICAgICAhaXNOYU4oaUV2ZW50LnNjYWxlKSkge1xuICAgIGludGVyYWN0aW9uLmdlc3R1cmUuc2NhbGUgPSBpRXZlbnQuc2NhbGVcbiAgfVxufVxuXG5leHBvcnQgZGVmYXVsdCBnZXN0dXJlXG4iXX0=
+//# sourceMappingURL=gesture.js.map

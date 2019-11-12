@@ -1,4 +1,4 @@
-import { NormalizedListeners } from '@interactjs/utils/normalizeListeners';
+import { NormalizedListeners } from '../utils/normalizeListeners';
 declare class Eventable {
     options: any;
     types: NormalizedListeners;

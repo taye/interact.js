@@ -9,7 +9,7 @@ export declare function getQuadraticCurvePoint(startX: number, startY: number, c
     y: number;
 };
 export declare function easeOutQuad(t: number, b: number, c: number, d: number): number;
-export declare function copyAction(dest: Interact.ActionProps, src: Interact.ActionProps): import("@interactjs/core/Interaction").ActionProps<any>;
+export declare function copyAction(dest: Interact.ActionProps, src: Interact.ActionProps): import("../types/types").ActionProps<any>;
 export { default as browser } from './browser';
 export { default as clone } from './clone';
 export { default as events } from './events';
@@ -20,5 +20,4 @@ export { default as normalizeListeners } from './normalizeListeners';
 export { default as pointer } from './pointerUtils';
 export { default as raf } from './raf';
 export { default as rect } from './rect';
-export { default as Signals } from './Signals';
 export { win, arr, dom, is };

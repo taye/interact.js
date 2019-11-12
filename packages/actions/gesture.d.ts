@@ -1,4 +1,4 @@
-import { ActionName, Scope } from '@interactjs/core/scope';
+import { ActionName, Scope } from '../core/scope';
 export declare type GesturableMethod = Interact.ActionMethod<Interact.GesturableOptions>;
 declare module '@interactjs/core/Interaction' {
     interface Interaction {
@@ -38,7 +38,7 @@ export interface GestureEvent extends Interact.InteractEvent<ActionName.Gesture>
     box: Interact.Rect;
     touches: Interact.PointerType[];
 }
-export interface GestureSignalArg extends Interact.SignalArg {
+export interface GestureSignalArg extends Interact.DoPhaseArg {
     iEvent: GestureEvent;
     interaction: Interact.Interaction<ActionName.Gesture>;
     event: Interact.PointerEventType | GestureEvent;
@@ -47,6 +47,14 @@ declare function install(scope: Scope): void;
 declare const gesture: {
     id: string;
     install: typeof install;
+    listeners: {
+        'interactions:action-start': typeof updateGestureProps;
+        'interactions:action-move': typeof updateGestureProps;
+        'interactions:action-end': typeof updateGestureProps;
+        'interactions:new': ({ interaction }: {
+            interaction: any;
+        }) => void;
+    };
     defaults: {};
     checker(_pointer: any, _event: any, _interactable: any, _element: any, interaction: {
         pointers: {
@@ -57,4 +65,5 @@ declare const gesture: {
     };
     getCursor(): string;
 };
+declare function updateGestureProps({ interaction, iEvent, event, phase }: GestureSignalArg): void;
 export default gesture;

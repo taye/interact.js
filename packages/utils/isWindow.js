@@ -1,2 +1,2 @@
-export default thing => !!(thing && thing.Window) && (thing instanceof thing.Window);
-//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiaXNXaW5kb3cuanMiLCJzb3VyY2VSb290IjoiIiwic291cmNlcyI6WyJpc1dpbmRvdy50cyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFBQSxlQUFlLEtBQUssQ0FBQyxFQUFFLENBQUMsQ0FBQyxDQUFDLENBQUMsS0FBSyxJQUFJLEtBQUssQ0FBQyxNQUFNLENBQUMsSUFBSSxDQUFDLEtBQUssWUFBWSxLQUFLLENBQUMsTUFBTSxDQUFDLENBQUEiLCJzb3VyY2VzQ29udGVudCI6WyJleHBvcnQgZGVmYXVsdCB0aGluZyA9PiAhISh0aGluZyAmJiB0aGluZy5XaW5kb3cpICYmICh0aGluZyBpbnN0YW5jZW9mIHRoaW5nLldpbmRvdylcbiJdfQ==
+export default (thing => !!(thing && thing.Window) && thing instanceof thing.Window);
+//# sourceMappingURL=isWindow.js.map

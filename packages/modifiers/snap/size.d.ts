@@ -6,6 +6,6 @@ declare function set(arg: any): void;
 declare const snapSize: {
     start: typeof start;
     set: typeof set;
-    defaults: Pick<SnapOptions, "enabled" | "offset" | "endOnly" | "targets" | "range">;
+    defaults: Pick<SnapOptions, "enabled" | "offset" | "targets" | "endOnly" | "range">;
 };
 export default snapSize;

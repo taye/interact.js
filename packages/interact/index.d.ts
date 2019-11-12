@@ -1,10 +1,10 @@
-import * as actions from '@interactjs/actions';
-import autoScroll from '@interactjs/auto-scroll';
-import interactablePreventDefault from '@interactjs/core/interactablePreventDefault';
-import inertia from '@interactjs/inertia';
-import modifiersBase from '@interactjs/modifiers/base';
-import * as pointerEvents from '@interactjs/pointer-events';
-import reflow from '@interactjs/reflow';
+import * as actions from '../actions/index';
+import autoScroll from '../auto-scroll/index';
+import interactablePreventDefault from '../core/interactablePreventDefault';
+import inertia from '../inertia/index';
+import modifiersBase from '../modifiers/base';
+import * as pointerEvents from '../pointer-events/index';
+import reflow from '../reflow/index';
 import interact from './interact';
 export declare function init(window: Window): import("@interactjs/interact/interact").InteractStatic;
 export default interact;

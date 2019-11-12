@@ -1,0 +1,38 @@
+{
+	"version": 3,
+	"sources": [
+		"rect.ts"
+	],
+	"names": [
+		"closest",
+		"getElementRect",
+		"parentNode",
+		"extend",
+		"is",
+		"getStringOptionResult",
+		"value",
+		"target",
+		"element",
+		"getRect",
+		"resolveRectLike",
+		"functionArgs",
+		"string",
+		"func",
+		"rectToXY",
+		"rect",
+		"x",
+		"left",
+		"y",
+		"top",
+		"xywhToTlbr",
+		"right",
+		"width",
+		"bottom",
+		"height",
+		"tlbrToXywh"
+	],
+	"mappings": "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",
+	"sourcesContent": [
+		"import { closest, getElementRect, parentNode } from './domUtils'\nimport extend from './extend'\nimport * as is from './is'\n\nexport function getStringOptionResult (value: any, target: Interact.HasGetRect, element) {\n  if (value === 'parent') { return parentNode(element) }\n\n  if (value === 'self') { return target.getRect(element) }\n\n  return closest(element, value)\n}\n\nexport function resolveRectLike<T extends any[]> (\n  value: Interact.RectResolvable<T>,\n  target?: Interact.HasGetRect,\n  element?: Interact.Element,\n  functionArgs?: T,\n) {\n  if (is.string(value)) {\n    value = getStringOptionResult(value, target, element)\n  }\n  else if (is.func(value)) {\n    value = value(...functionArgs)\n  }\n\n  if (is.element(value)) {\n    value = getElementRect(value)\n  }\n\n  return value as Interact.Rect\n}\n\nexport function rectToXY (rect) {\n  return  rect && {\n    x: 'x' in rect ? rect.x : rect.left,\n    y: 'y' in rect ? rect.y : rect.top,\n  }\n}\n\nexport function xywhToTlbr (rect) {\n  if (rect && !('left' in rect && 'top' in rect)) {\n    rect = extend({}, rect)\n\n    rect.left   = rect.x || 0\n    rect.top    = rect.y || 0\n    rect.right  = rect.right   || (rect.left + rect.width)\n    rect.bottom = rect.bottom  || (rect.top + rect.height)\n  }\n\n  return rect\n}\n\nexport function tlbrToXywh (rect) {\n  if (rect && !('x' in rect && 'y' in rect)) {\n    rect = extend({}, rect)\n\n    rect.x      = rect.left || 0\n    rect.y      = rect.top  || 0\n    rect.width  = rect.width  || (rect.right  - rect.x)\n    rect.height = rect.height || (rect.bottom - rect.y)\n  }\n\n  return rect\n}\n\nexport default {\n  getStringOptionResult,\n  resolveRectLike,\n  rectToXY,\n  xywhToTlbr,\n  tlbrToXywh,\n}\n"
+	]
+}
