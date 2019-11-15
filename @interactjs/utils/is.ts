@@ -39,7 +39,7 @@ export const plainObject: typeof object = (thing: any): thing is { [index: strin
   !!thing.constructor &&
   /function Object\b/.test(thing.constructor.toString())
 
-export const array = (thing: any): thing is any[] =>
+export const array = <T extends unknown>(thing: any): thing is T[] =>
   (object(thing) &&
   (typeof thing.length !== 'undefined') &&
   func(thing.splice))

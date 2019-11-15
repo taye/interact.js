@@ -1,5 +1,5 @@
 import extend from '../../utils/extend'
-import rectUtils from '../../utils/rect'
+import * as rectUtils from '../../utils/rect'
 import { ModifierArg, ModifierState } from '../base'
 import restrictEdges, { RestrictEdgesState } from './edges'
 import { getRestrictionRect, RestrictOptions } from './pointer'

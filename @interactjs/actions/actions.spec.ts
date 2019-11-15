@@ -1,6 +1,6 @@
 import test from '@interactjs/_dev/test/test'
 import * as helpers from '../core/tests/_helpers'
-import pointerUtils from '../utils/pointerUtils'
+import * as pointerUtils from '../utils/pointerUtils'
 import * as actions from './index'
 
 test('actions integration', t => {

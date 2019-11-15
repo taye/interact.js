@@ -1,6 +1,8 @@
 import * as arr from './arr'
 import * as dom from './domUtils'
 import * as is from './is'
+import * as pointer from './pointerUtils'
+import * as rect from './rect'
 import win from './window'
 
 export function warnOnce<T> (this: T, method: (...args: any) => any, message: string) {
@@ -52,7 +54,5 @@ export { default as extend } from './extend'
 export { default as getOriginXY } from './getOriginXY'
 export { default as hypot } from './hypot'
 export { default as normalizeListeners } from './normalizeListeners'
-export { default as pointer } from './pointerUtils'
 export { default as raf } from './raf'
-export { default as rect } from './rect'
-export { win, arr, dom, is }
+export { win, arr, dom, is, pointer, rect }

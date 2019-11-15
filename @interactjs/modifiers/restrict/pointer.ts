@@ -1,6 +1,6 @@
 import extend from '../../utils/extend'
 import * as is from '../../utils/is'
-import rectUtils from '../../utils/rect'
+import * as rectUtils from '../../utils/rect'
 import { ModifierArg, ModifierModule, ModifierState } from '../base'
 
 export interface RestrictOptions {

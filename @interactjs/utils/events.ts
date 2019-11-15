@@ -2,7 +2,7 @@ import { contains } from './arr'
 import * as domUtils from './domUtils'
 import * as is from './is'
 import pExtend from './pointerExtend'
-import pointerUtils from './pointerUtils'
+import * as pointerUtils from './pointerUtils'
 
 type Listener = (event: Event | FakeEvent) => any
 
