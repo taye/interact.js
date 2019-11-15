@@ -10,33 +10,27 @@ test('modifiers/base', t => {
     target,
     interaction,
     interactable,
+    coords,
+    event,
   } = helpers.testEnv({ plugins: [modifiersBase] })
 
   scope.actions.eventTypes.push('TESTstart', 'TESTmove', 'TESTend')
 
   t.ok(utils.is.object(interaction.modifiers), 'modifiers prop is added new Interaction')
 
+  coords.client = coords.page
+
   const element = target as Interact.Element
-  const startEvent = {
-    pageX: 100,
-    pageY: 200,
-    clientX: 100,
-    clientY: 200,
-    target: element,
-  } as any
-  const moveEvent = {
-    pageX: 400,
-    pageY: 500,
-    clientX: 400,
-    clientY: 500,
-    target: element,
-  } as any
+  const startCoords = { x: 100, y: 200 }
+  const moveCoords = { x: 400, y: 500 }
   const options: any = { target: { x: 100, y: 100 }, setStart: true }
   let firedEvents = []
 
   interactable.rectChecker(() => ({ top: 0, left: 0, bottom: 50, right: 50 }))
-  interactable.on('TESTstart TESTmove TESTend', event => firedEvents.push(event))
-  interaction.pointerDown(startEvent, startEvent, element)
+  interactable.on('TESTstart TESTmove TESTend', e => firedEvents.push(e))
+
+  utils.extend(coords.page, startCoords)
+  interaction.pointerDown(event, event, element)
 
   ;(interactable.options as any).TEST = {
     enabled: true,
@@ -67,24 +61,25 @@ test('modifiers/base', t => {
 
   t.deepEqual(
     interaction.coords.start.page,
-    { x: 100, y: 200 },
+    startCoords,
     'interaction.coords.start are restored after action start phase')
 
   t.deepEqual(
     interaction.coords.cur.page,
-    { x: 100, y: 200 },
+    startCoords,
     'interaction.coords.cur are restored after action start phase')
 
-  interaction.pointerMove(moveEvent, moveEvent, element)
+  utils.extend(coords.page, moveCoords)
+  interaction.pointerMove(event, event, element)
 
   t.deepEqual(
     interaction.coords.cur.page,
-    { x: moveEvent.pageX, y: moveEvent.pageY },
+    moveCoords,
     'interaction.coords.cur are restored after action move phase')
 
   t.deepEqual(
     interaction.coords.start.page,
-    { x: startEvent.pageX, y: startEvent.pageY },
+    startCoords,
     'interaction.coords.start are restored after action move phase')
 
   t.deepEqual(
@@ -93,8 +88,8 @@ test('modifiers/base', t => {
     'move event start coords are modified')
 
   firedEvents = []
-  const similarMoveEvent = { ...moveEvent, pageX: moveEvent.pageX + 0.5 }
-  interaction.pointerMove(similarMoveEvent, similarMoveEvent, element)
+  scope.interactions.pointerMoveTolerance = 0
+  interaction.pointerMove(event, event, element)
   t.equal(firedEvents.length, 0, 'duplicate result coords are ignored')
 
   interaction.stop()
@@ -112,7 +107,8 @@ test('modifiers/base', t => {
     methods: doubleModifier,
   })
 
-  interaction.pointerDown(startEvent, startEvent, element)
+  utils.extend(coords.page, startCoords)
+  interaction.pointerDown(event, event, element)
   interaction.start({ name: 'TEST' }, interactable, element)
 
   t.notOk(
@@ -130,14 +126,15 @@ test('modifiers/base', t => {
     { x: 100, y: 200 },
     'interaction.coords.start are not modified without options.setStart')
 
-  interaction.pointerMove(moveEvent, moveEvent, element)
+  utils.extend(coords.page, moveCoords)
+  interaction.pointerMove(event, event, element)
 
   t.deepEqual(
     interaction.prevEvent.page,
     { x: 200, y: 200 },
     'move event coords are modified by all modifiers')
 
-  interaction.pointerMove(moveEvent, moveEvent, element)
+  interaction.pointerMove(event, event, element)
 
   t.doesNotThrow(() => {
     interaction._scopeFire('interactions:action-resume', {
@@ -148,10 +145,10 @@ test('modifiers/base', t => {
 
   interaction.stop()
 
-  interaction.pointerUp(moveEvent, moveEvent, element, element)
+  interaction.pointerUp(event, event, element, element)
   t.deepEqual(
     interaction.coords.cur.page,
-    { x: moveEvent.pageX, y: moveEvent.pageY },
+    moveCoords,
     'interaction coords after stopping are as expected')
 
   t.end()

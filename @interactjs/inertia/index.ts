@@ -1,5 +1,5 @@
 import { EventPhase } from '../core/InteractEvent'
-import modifiers, { restoreCoords, setCoords } from '../modifiers/base'
+import modifiers, { ModifierArg, restoreCoords, setCoords } from '../modifiers/base'
 import * as utils from '../utils/index'
 import raf from '../utils/raf'
 
@@ -169,7 +169,7 @@ function release<T extends Interact.ActionName> (
     pointerSpeed > options.minSpeed &&
     pointerSpeed > options.endSpeed)
 
-  const modifierArg = {
+  const modifierArg: ModifierArg = {
     interaction,
     interactable: interaction.interactable,
     element: interaction.element,
@@ -180,21 +180,19 @@ function release<T extends Interact.ActionName> (
     ),
     preEnd: true,
     prevCoords: null,
+    prevRect: null,
     requireEndOnly: null,
     phase: EventPhase.InertiaStart,
   }
 
   // smoothEnd
   if (inertiaPossible && !inertia) {
-    modifierArg.prevCoords = interaction.modifiers.result
-      ? interaction.modifiers.result.coords
-      : interaction.prevEvent.page
+    modifierArg.prevCoords = interaction.modifiers.result.coords
+    modifierArg.prevRect = interaction.modifiers.result.rect
     modifierArg.requireEndOnly = false
     modifierResult = modifiers.setAll(modifierArg)
 
-    if (modifierResult.changed) {
-      smoothEnd = true
-    }
+    smoothEnd = modifierResult.changed
   }
 
   if (!(inertia || smoothEnd)) { return null }
@@ -232,6 +230,7 @@ function release<T extends Interact.ActionName> (
     modifierArg.pageCoords.x += state.xe
     modifierArg.pageCoords.y += state.ye
     modifierArg.prevCoords = null
+    modifierArg.prevRect = null
     modifierArg.requireEndOnly = true
 
     modifierResult = modifiers.setAll(modifierArg)
@@ -309,7 +308,7 @@ function inertiaTick (interaction: Interact.Interaction) {
       state.sy = quadPoint.y
     }
 
-    interaction.move()
+    interaction.move({ event: state.startEvent })
 
     state.timeout = raf.request(() => inertiaTick(interaction))
   }
@@ -317,7 +316,7 @@ function inertiaTick (interaction: Interact.Interaction) {
     state.sx = state.modifiedXe
     state.sy = state.modifiedYe
 
-    interaction.move()
+    interaction.move({ event: state.startEvent })
     interaction.end(state.startEvent)
     state.active = false
     interaction.simulation = null
@@ -337,7 +336,7 @@ function smothEndTick (interaction: Interact.Interaction) {
     state.sx = utils.easeOutQuad(t, 0, state.xe, duration)
     state.sy = utils.easeOutQuad(t, 0, state.ye, duration)
 
-    interaction.move()
+    interaction.move({ event: state.startEvent })
 
     state.timeout = raf.request(() => smothEndTick(interaction))
   }
@@ -345,7 +344,7 @@ function smothEndTick (interaction: Interact.Interaction) {
     state.sx = state.xe
     state.sy = state.ye
 
-    interaction.move()
+    interaction.move({ event: state.startEvent })
     interaction.end(state.startEvent)
 
     state.smoothEnd =
