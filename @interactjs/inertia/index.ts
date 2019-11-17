@@ -174,7 +174,7 @@ function release<T extends Interact.ActionName> (
     interactable: interaction.interactable,
     element: interaction.element,
     rect: interaction.rect,
-    edges: interaction.prepared.edges,
+    edges: interaction.edges,
     pageCoords: interaction.coords.cur.page,
     states: inertiaPossible && interaction.modifiers.states.map(
       modifierState => utils.extend({}, modifierState),

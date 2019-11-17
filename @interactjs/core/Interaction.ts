@@ -107,6 +107,7 @@ export class Interaction<T extends ActionName = any> {
     previous: Interact.FullRect
     delta: Interact.FullRect
   }
+  edges: Interact.EdgeOptions
 
   _scopeFire: Interact.Scope['fire']
 
@@ -259,6 +260,7 @@ export class Interaction<T extends ActionName = any> {
     this.interactable = interactable
     this.element      = element
     this.rect         = interactable.getRect(element)
+    this.edges        = utils.extend({}, this.prepared.edges)
     this._stopped     = false
     this._interacting = this._doPhase({
       interaction: this,
@@ -569,7 +571,7 @@ export class Interaction<T extends ActionName = any> {
 
     if (rect && phase === EventPhase.Move) {
       // update the rect modifications
-      const edges = this.prepared.edges || { left: true, right: true, top: true, bottom: true }
+      const edges = this.edges || this.prepared.edges || { left: true, right: true, top: true, bottom: true }
       utils.rect.addEdges(edges, rect, delta[this.interactable.options.deltaSource])
 
       rect.width = rect.right - rect.left

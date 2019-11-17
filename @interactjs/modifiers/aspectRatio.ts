@@ -102,7 +102,7 @@ const aspectRatio: ModifierModule<AspectRatioOptions, AspectRatioState> = {
     const initialCoords = extend({}, coords)
     const aspectMethod = state.equalDelta ? setEqualDelta : setRatio
 
-    aspectMethod(state, coords, rect)
+    aspectMethod(state, state.xIsPrimaryAxis, coords, rect)
 
     if (!state.subStates) { return }
 
@@ -127,7 +127,7 @@ const aspectRatio: ModifierModule<AspectRatioOptions, AspectRatioState> = {
     const { delta } = result
 
     // do aspect modification again with critical edge as primary
-    aspectMethod({ ...state, xIsPrimaryAxis: Math.abs(delta.x) > Math.abs(delta.y) }, result.coords, result.rect)
+    aspectMethod(state, Math.abs(delta.x) > Math.abs(delta.y), result.coords, result.rect)
     extend(coords, result.coords)
   },
 
@@ -139,7 +139,7 @@ const aspectRatio: ModifierModule<AspectRatioOptions, AspectRatioState> = {
   },
 }
 
-function setEqualDelta ({ startCoords, xIsPrimaryAxis, edgeSign }: AspectRatioState, coords: Interact.Point) {
+function setEqualDelta ({ startCoords, edgeSign }: AspectRatioState, xIsPrimaryAxis, coords: Interact.Point) {
   if (xIsPrimaryAxis) {
     coords.y = startCoords.y + (coords.x - startCoords.x) * edgeSign
   }
@@ -148,7 +148,7 @@ function setEqualDelta ({ startCoords, xIsPrimaryAxis, edgeSign }: AspectRatioSt
   }
 }
 
-function setRatio ({ startRect, startCoords, ratio, xIsPrimaryAxis, edgeSign }: AspectRatioState, coords: Interact.Point, rect: Interact.Rect) {
+function setRatio ({ startRect, startCoords, ratio, edgeSign }: AspectRatioState, xIsPrimaryAxis, coords: Interact.Point, rect: Interact.Rect) {
   if (xIsPrimaryAxis) {
     const newHeight = rect.width / ratio
 
