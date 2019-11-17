@@ -1,4 +1,4 @@
-import pointerEvents from './base'
+import * as pointerEvents from './base'
 import holdRepeat from './holdRepeat'
 import interactableTargets from './interactableTargets'
 

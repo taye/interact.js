@@ -62,11 +62,3 @@ export function tlbrToXywh (rect) {
 
   return rect
 }
-
-export default {
-  getStringOptionResult,
-  resolveRectLike,
-  rectToXY,
-  xywhToTlbr,
-  tlbrToXywh,
-}

@@ -1,6 +1,6 @@
 import test from '@interactjs/_dev/test/test'
 import * as helpers from '../../core/tests/_helpers'
-import rectUtils from '../../utils/rect'
+import * as rectUtils from '../../utils/rect'
 import base from './../base'
 import restrictSize from './../restrict/size'
 

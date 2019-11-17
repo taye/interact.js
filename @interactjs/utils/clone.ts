@@ -11,7 +11,7 @@ export default function clone<T extends { [key: string]: any }> (source: T): Par
       dest[prop] = clone(value) as any
     }
     else if (is.array(value)) {
-      dest[prop] = arr.from(value)
+      dest[prop] = arr.from(value) as typeof value
     }
     else {
       dest[prop] = value

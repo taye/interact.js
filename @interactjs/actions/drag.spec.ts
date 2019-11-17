@@ -2,7 +2,7 @@ import test from '@interactjs/_dev/test/test'
 import { ActionName } from '../core/scope'
 import * as helpers from '../core/tests/_helpers'
 import { extend } from '../utils'
-import pointerUtils from '../utils/pointerUtils'
+import * as pointerUtils from '../utils/pointerUtils'
 import drag from './drag'
 
 test('drag action init', t => {
