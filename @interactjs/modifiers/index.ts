@@ -1,3 +1,4 @@
+import aspectRatioModule from './aspectRatio'
 import base from './base'
 import restrictEdgesModule from './restrict/edges'
 import restrictModule from './restrict/pointer'
@@ -16,3 +17,4 @@ export const restrict = makeModifier(restrictModule, 'restrict')
 export const restrictRect = makeModifier(restrictRectModule, 'restrictRect')
 export const restrictEdges = makeModifier(restrictEdgesModule, 'restrictEdges')
 export const restrictSize = makeModifier(restrictSizeModule, 'restrictSize')
+export const aspectRatio = makeModifier(aspectRatioModule, 'aspectRatio')

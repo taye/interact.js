@@ -7,6 +7,7 @@ import { ActionName } from './scope'
 export interface ActionProps<T extends ActionName = any> {
   name: T
   axis?: 'x' | 'y' | 'xy'
+  edges?: Interact.EdgeOptions
 }
 
 export interface StartAction extends ActionProps {
@@ -99,10 +100,14 @@ export class Interaction<T extends ActionName = any> {
 
   // the target element of the interactable
   element: Interact.Element = null
-  rect: Interact.Rect & Interact.Size
-  edges: {
-    [P in keyof Interact.Rect]?: boolean
+  rect: Interact.FullRect
+  _rects?: {
+    start: Interact.FullRect
+    corrected: Interact.FullRect
+    previous: Interact.FullRect
+    delta: Interact.FullRect
   }
+  edges: Interact.EdgeOptions
 
   _scopeFire: Interact.Scope['fire']
 
@@ -255,7 +260,7 @@ export class Interaction<T extends ActionName = any> {
     this.interactable = interactable
     this.element      = element
     this.rect         = interactable.getRect(element)
-    this.edges        = this.prepared.edges
+    this.edges        = utils.extend({}, this.prepared.edges)
     this._stopped     = false
     this._interacting = this._doPhase({
       interaction: this,
@@ -340,6 +345,10 @@ export class Interaction<T extends ActionName = any> {
    * settings.
    */
   move (signalArg?) {
+    if (!signalArg || !signalArg.event) {
+      utils.pointer.setZeroCoords(this.coords.delta)
+    }
+
     signalArg = utils.extend({
       pointer: this._latestPointer.pointer,
       event: this._latestPointer.event,
@@ -558,6 +567,17 @@ export class Interaction<T extends ActionName = any> {
 
   _doPhase (signalArg: Omit<DoPhaseArg, 'iEvent'> & { iEvent?: InteractEvent<T> }) {
     const { event, phase, preEnd, type } = signalArg
+    const { rect, coords: { delta } } = this
+
+    if (rect && phase === EventPhase.Move) {
+      // update the rect modifications
+      const edges = this.edges || this.prepared.edges || { left: true, right: true, top: true, bottom: true }
+      utils.rect.addEdges(edges, rect, delta[this.interactable.options.deltaSource])
+
+      rect.width = rect.right - rect.left
+      rect.height = rect.bottom - rect.top
+    }
+
     const beforeResult = this._scopeFire(`interactions:before-action-${phase}` as any, signalArg)
 
     if (beforeResult === false) {
@@ -565,20 +585,6 @@ export class Interaction<T extends ActionName = any> {
     }
 
     const iEvent = signalArg.iEvent = this._createPreparedEvent(event, phase, preEnd, type)
-    const { rect } = this
-
-    if (rect) {
-      // update the rect modifications
-      const edges = this.edges || this.prepared.edges || { left: true, right: true, top: true, bottom: true }
-
-      if (edges.top)    { rect.top    += iEvent.delta.y }
-      if (edges.bottom) { rect.bottom += iEvent.delta.y }
-      if (edges.left)   { rect.left   += iEvent.delta.x }
-      if (edges.right)  { rect.right  += iEvent.delta.x }
-
-      rect.width = rect.right - rect.left
-      rect.height = rect.bottom - rect.top
-    }
 
     this._scopeFire(`interactions:action-${phase}` as any, signalArg)
 

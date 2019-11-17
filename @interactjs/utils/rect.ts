@@ -62,3 +62,13 @@ export function tlbrToXywh (rect) {
 
   return rect
 }
+
+export function addEdges (edges: Interact.EdgeOptions, rect: Interact.Rect, delta: Interact.Point) {
+  if (edges.left)   { rect.left   += delta.x }
+  if (edges.right)  { rect.right  += delta.x }
+  if (edges.top)    { rect.top    += delta.y }
+  if (edges.bottom) { rect.bottom += delta.y }
+
+  rect.width = rect.right - rect.left
+  rect.height = rect.bottom - rect.top
+}

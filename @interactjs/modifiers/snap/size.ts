@@ -14,7 +14,7 @@ SnapOptions,
 function start (arg: ModifierArg<SnapState>) {
   const { interaction, state } = arg
   const { options } = state
-  const edges = interaction.prepared.edges
+  const { edges } = interaction.prepared
 
   if (!edges) { return null }
 
