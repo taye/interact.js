@@ -3,7 +3,9 @@ module.exports = {
     ...process.env.NODE_ENV === 'test'
       ? []
       : [require('@babel/preset-env').default],
-    require('@babel/preset-typescript').default,
+    [require('@babel/preset-typescript').default, {
+      allExtensions: true,
+    }],
   ],
 
   plugins:
@@ -19,13 +21,16 @@ module.exports = {
           helpers: false,
           regenerator: false,
         }],
-        require('@babel/plugin-proposal-class-properties').default,
+        require('@babel/plugin-proposal-class-properties'),
+        require('babel-plugin-transform-inline-environment-variables'),
       ],
 
   ignore: [/\/node_modules\/(?!@interactjs\/)/],
 
   extensions: [
     '.ts',
+    '.tsx',
     '.js',
+    '.jsx',
   ]
 }

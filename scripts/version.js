@@ -31,7 +31,7 @@ if (!module.parent) {
 
     const versionTable = []
 
-    for (const file of ['package.json', ...glob.sync('packages/*/package.json')]) {
+    for (const file of ['package.json', ...glob.sync('{@interactjs/*,interactjs}/package.json')]) {
       const pkg = require(path.resolve(file))
 
       versionTable.push({ package: pkg.name, old: pkg.version, new: newVersion })

@@ -1,14 +1,135 @@
-## v1.4.0-alpha
- - `interactable.reflow(action)` to re-run modifiers, drop, etc [PR #610](https://github.com/taye/interact.js/pull/610).
- - `dropEvent.reject()` [PR #613](https://github.com/taye/interact.js/pull/613).
- - `dropEvent.reject()` [PR #613](https://github.com/taye/interact.js/pull/613).
- - snapEdges modifier [PR #620](https://github.com/taye/interact.js/pull/620).
- - per-action modifiers array [PR #625](https://github.com/taye/interact.js/pull/625).
- - autoStart set cursor on both target and &lt;html&gt; [PR #639](https://github.com/taye/interact.js/pull/639).
+## v1.7.1
 
-## v1.3.4
+ - reorganized modules for esnext resolution
+
+## v1.7.0
+
+ - fixed hold repeat `event.count`
+ - added esnext js builds (#769)
+
+## v1.6.3
+
+ - fixed issue with inertia resume with `endOnly: false` (#765)
+
+## v1.6.2
+
+ - @mlucool added license field to package.json of sub modules (#755)
+ - added `rect`, `deltaRect` and `edges` to resizestart and resizeend events (#754)
+
+## v1.6.1
+
+ - fixed resize without invert
+
+## v1.6.0
+
+ - avoided accessing deprecated event.mozPressure (#751)
+ - changed typings to use `HTMLElement | SVGElement` for `event.target` (#747)
+ - added `interacting` arg to cursorChecker (#739)
+ - added zIndex compare for sibling dropzones
+
+## v1.5.4
+
+ - fixed broken modifiers (#746)
+
+## v1.5.3
+
+ - fixed issues with old modifiers API
+
+## v1.5.2
+
+ - fixed null restriction issue (#737)
+ - improved typings for modifiers
+
+## v1.5.1
+
+ - fixed typing issues (#738)
+
+## v1.5.0
+
+ - added `cursorChecker` option for drag and resize (#736)
+ - allowed restrictions larger than the target element (#735)
+ - added `interact.modifiers.restrictRect` with pre-set elementRect (#735)
+
+## v1.4.14
+
+ - fixed issue with string restriction values that don't resolve to a rect
+   (#731)
+ - changed plugin order so that `pointer-events` is installed before `inertia`
+
+## v1.4.13
+
+ - fixed restrictSize min and max function restrictions
+
+## v1.4.12
+
+ - fixed errors from calling `interaction.stop()` in start event (#725)
+
+## v1.4.11
+
+ - fixed hold events (#730)
+
+## v1.4.10
+
+ - fixed regression of preventing native drag behaviour (#729)
+
+## v1.4.9
+
+ - fixed modifiers with inertia action-resume (#728)
+ - fixed docs for snap grid limits (#717)
+
+## v1.4.8
+
+ - fixed exports in generated typings (#727)
+
+## v1.4.7
+
+ - fixed exports in generated typings (#726)
+
+## v1.4.6
+
+ - fixed pointerEvents currentTarget
+
+## v1.4.5
+
+ - @0xflotus fixed typos in docs (#724)
+ - fixed error on iOS (#682)
+
+## v1.4.4
+
+ - fixed an issue with interactions lingering on removed elements (#723)
+
+## v1.4.3
+
+ - destroy only relevant interactions on interactable.unset()
+
+## v1.4.2
+
+ - @jf-m fixed memory leaks and a bug on interactions stop [PR #715](https://github.com/taye/interact.js/pull/715)
+ - fixed dropzones in shadow DOM [PR #722](https://github.com/taye/interact.js/pull/722)
+
+## v1.4.1
+
+ - fixed scripts to run bundle optimizations and fix issues with browserify
+
+# v1.4.0
+
+Most notablly:
+
+ - `interactable.reflow(action)` to re-run modifiers, drop, etc [PR #610](https://github.com/taye/interact.js/pull/610)
+ - `dropEvent.reject()` [PR #613](https://github.com/taye/interact.js/pull/613)
+ - snapEdges modifier [PR #620](https://github.com/taye/interact.js/pull/620)
+ - per-action modifiers array [PR #625](https://github.com/taye/interact.js/pull/625)
+ - autoStart set cursor on both target and &lt;html&gt; [PR #639](https://github.com/taye/interact.js/pull/639)
+ - inertia: rename resume event to `${action}resume`
+ - `interactable.reflow(action)` to re-run modifiers, drop, etc [PR #610](https://github.com/taye/interact.js/pull/610)
+ - added `options.listeners` array/object for actions
+ - `snapEdges` modifier [PR #620](https://github.com/taye/interact.js/pull/620)
  - fixed iOS preventDefault passive event issue ([issue #631](https://github.com/taye/interact.js/issues/631))
+ - added `console.warn` messages for common, easily detected issues
+ - improved docs
+ - various fixes
 
+Full list of [changes on Github](https://github.com/taye/interact.js/compare/1.3.4...v1.4.0).
 
 ## v1.3.3
  - fixed issues with action options ([PR #567](https://github.com/taye/interact.js/pull/567), [issue #570](https://github.com/taye/interact.js/issues/570))
@@ -69,7 +190,7 @@ Most notably:
  - added `restrictEdges`, `restrictSize` and `snapSize` resize modifiers ([PR
    #455](https://github.com/taye/interact.js/pull/455))
 
-Full list of [changes on Github](https://github.com/taye/interact.js/compare/1.2.6...master).
+Full list of [changes on Github](https://github.com/taye/interact.js/compare/v1.2.6...v1.3.0).
 
 ## 1.2.6
 
@@ -92,7 +213,7 @@ See [PR #260](https://github.com/taye/interact.js/pull/260).
  - iPad 1, iOS 5.1.1 error "undefined is not a function" when autoScroll is set
    to true ([PR #194](https://github.com/taye/interact.js/pull/194))
 
-Full list of [changes on Github](https://github.com/taye/interact.js/compare/v1.2.5...master)
+Full list of [changes on Github](https://github.com/taye/interact.js/compare/v1.2.5...v1.2.6)
 
 ## 1.2.5
 

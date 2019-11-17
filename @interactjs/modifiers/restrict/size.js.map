@@ -1,0 +1,52 @@
+{
+	"version": 3,
+	"sources": [
+		"size.ts"
+	],
+	"names": [
+		"extend",
+		"rectUtils",
+		"restrictEdges",
+		"getRestrictionRect",
+		"noMin",
+		"width",
+		"Infinity",
+		"height",
+		"noMax",
+		"start",
+		"arg",
+		"set",
+		"interaction",
+		"state",
+		"options",
+		"edges",
+		"prepared",
+		"_linkedEdges",
+		"rect",
+		"xywhToTlbr",
+		"resizeRects",
+		"inverted",
+		"minSize",
+		"tlbrToXywh",
+		"min",
+		"coords",
+		"maxSize",
+		"max",
+		"endOnly",
+		"inner",
+		"noInner",
+		"outer",
+		"noOuter",
+		"top",
+		"bottom",
+		"left",
+		"right",
+		"defaults",
+		"enabled",
+		"restrictSize"
+	],
+	"mappings": "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",
+	"sourcesContent": [
+		"import extend from '../../utils/extend'\nimport rectUtils from '../../utils/rect'\nimport { ModifierArg, ModifierState } from '../base'\nimport restrictEdges, { RestrictEdgesState } from './edges'\nimport { getRestrictionRect, RestrictOptions } from './pointer'\n\nconst noMin = { width: -Infinity, height: -Infinity }\nconst noMax = { width: +Infinity, height: +Infinity }\n\nexport interface RestrictSizeOptions {\n  min?: Interact.Size | Interact.Point | RestrictOptions['restriction']\n  max?: Interact.Size | Interact.Point | RestrictOptions['restriction']\n  endOnly: boolean\n  enabled?: boolean\n}\n\nfunction start (arg: ModifierArg<RestrictEdgesState>) {\n  return restrictEdges.start(arg)\n}\n\nexport type RestrictSizeState =\n  RestrictEdgesState & ModifierState<RestrictSizeOptions & { inner: Interact.Rect, outer: Interact.Rect }, {\n    min: Interact.Rect\n    max: Interact.Rect\n  }>\n\nfunction set (arg: ModifierArg<RestrictSizeState>) {\n  const { interaction, state } = arg\n  const { options } = state\n  const edges = interaction.prepared._linkedEdges || interaction.prepared.edges\n\n  if (!edges) {\n    return\n  }\n\n  const rect = rectUtils.xywhToTlbr(interaction.resizeRects.inverted)\n\n  const minSize = rectUtils.tlbrToXywh(getRestrictionRect(options.min, interaction, arg.coords)) || noMin\n  const maxSize = rectUtils.tlbrToXywh(getRestrictionRect(options.max, interaction, arg.coords)) || noMax\n\n  state.options = {\n    endOnly: options.endOnly,\n    inner: extend({}, restrictEdges.noInner),\n    outer: extend({}, restrictEdges.noOuter),\n  }\n\n  if (edges.top) {\n    state.options.inner.top = rect.bottom - minSize.height\n    state.options.outer.top = rect.bottom - maxSize.height\n  }\n  else if (edges.bottom) {\n    state.options.inner.bottom = rect.top + minSize.height\n    state.options.outer.bottom = rect.top + maxSize.height\n  }\n  if (edges.left) {\n    state.options.inner.left = rect.right - minSize.width\n    state.options.outer.left = rect.right - maxSize.width\n  }\n  else if (edges.right) {\n    state.options.inner.right = rect.left + minSize.width\n    state.options.outer.right = rect.left + maxSize.width\n  }\n\n  restrictEdges.set(arg)\n\n  state.options = options\n}\n\nconst defaults: RestrictSizeOptions = {\n  min: null,\n  max: null,\n  endOnly: false,\n  enabled: false,\n}\n\nconst restrictSize = {\n  start,\n  set,\n  defaults,\n}\n\nexport default restrictSize\n"
+	]
+}

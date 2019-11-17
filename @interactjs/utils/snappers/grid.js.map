@@ -1,0 +1,38 @@
+{
+	"version": 3,
+	"sources": [
+		"grid.ts"
+	],
+	"names": [
+		"createGrid",
+		"grid",
+		"coordFields",
+		"filter",
+		"xField",
+		"yField",
+		"gridFunc",
+		"snapGrid",
+		"x",
+		"y",
+		"range",
+		"limits",
+		"left",
+		"Infinity",
+		"right",
+		"top",
+		"bottom",
+		"offset",
+		"result",
+		"gridx",
+		"Math",
+		"round",
+		"gridy",
+		"max",
+		"min",
+		"_isSnapGrid"
+	],
+	"mappings": "AAAA,SAASA,UAAT,CAAqBC,IAArB,EAAiI;AAC/H,QAAMC,WAAW,GAAG,CAClB,CAAC,GAAD,EAAM,GAAN,CADkB,EAElB,CAAC,MAAD,EAAS,KAAT,CAFkB,EAGlB,CAAC,OAAD,EAAU,QAAV,CAHkB,EAIlB,CAAC,OAAD,EAAU,QAAV,CAJkB,EAKlBC,MALkB,CAKX,CAAC,CAACC,MAAD,EAASC,MAAT,CAAD,KAAsBD,MAAM,IAAIH,IAAV,IAAkBI,MAAM,IAAIJ,IALvC,CAApB;;AAOA,QAAMK,QAAQ,GAAG,SAASC,QAAT,CAAmBC,CAAnB,EAAsBC,CAAtB,EAAyB;AACxC,UAAM;AACJC,MAAAA,KADI;AAEJC,MAAAA,MAAM,GAAG;AACPC,QAAAA,IAAI,EAAI,CAACC,QADF;AAEPC,QAAAA,KAAK,EAAID,QAFF;AAGPE,QAAAA,GAAG,EAAK,CAACF,QAHF;AAIPG,QAAAA,MAAM,EAAGH;AAJF,OAFL;AAQJI,MAAAA,MAAM,GAAG;AAAET,QAAAA,CAAC,EAAE,CAAL;AAAQC,QAAAA,CAAC,EAAE;AAAX;AARL,QASFR,IATJ;AAWA,UAAMiB,MAAM,GAAG;AAAER,MAAAA;AAAF,KAAf;;AAEA,SAAK,MAAM,CAACN,MAAD,EAASC,MAAT,CAAX,IAA+BH,WAA/B,EAA4C;AAC1C,YAAMiB,KAAK,GAAGC,IAAI,CAACC,KAAL,CAAW,CAACb,CAAC,GAAGS,MAAM,CAACT,CAAZ,IAAiBP,IAAI,CAACG,MAAD,CAAhC,CAAd;AACA,YAAMkB,KAAK,GAAGF,IAAI,CAACC,KAAL,CAAW,CAACZ,CAAC,GAAGQ,MAAM,CAACR,CAAZ,IAAiBR,IAAI,CAACI,MAAD,CAAhC,CAAd;AAEAa,MAAAA,MAAM,CAACd,MAAD,CAAN,GAAiBgB,IAAI,CAACG,GAAL,CAASZ,MAAM,CAACC,IAAhB,EAAsBQ,IAAI,CAACI,GAAL,CAASb,MAAM,CAACG,KAAhB,EAAuBK,KAAK,GAAGlB,IAAI,CAACG,MAAD,CAAZ,GAAuBa,MAAM,CAACT,CAArD,CAAtB,CAAjB;AACAU,MAAAA,MAAM,CAACb,MAAD,CAAN,GAAiBe,IAAI,CAACG,GAAL,CAASZ,MAAM,CAACI,GAAhB,EAAqBK,IAAI,CAACI,GAAL,CAASb,MAAM,CAACK,MAAhB,EAAwBM,KAAK,GAAGrB,IAAI,CAACI,MAAD,CAAZ,GAAuBY,MAAM,CAACR,CAAtD,CAArB,CAAjB;AACD;;AAED,WAAOS,MAAP;AACD,GAvBD;;AAyBAZ,EAAAA,QAAQ,CAACmB,WAAT,GAAuB,IAAvB;AACAnB,EAAAA,QAAQ,CAACL,IAAT,GAAgBA,IAAhB;AACAK,EAAAA,QAAQ,CAACJ,WAAT,GAAuBA,WAAvB;AAEA,SAAOI,QAAP;AACD;;AAED,eAAeN,UAAf",
+	"sourcesContent": [
+		"function createGrid (grid: (Interact.Rect | Interact.Point) & { range?: number, limits: Interact.Rect, offset: Interact.Point }) {\n  const coordFields = [\n    ['x', 'y'],\n    ['left', 'top'],\n    ['right', 'bottom'],\n    ['width', 'height'],\n  ].filter(([xField, yField]) => xField in grid || yField in grid)\n\n  const gridFunc = function snapGrid (x, y) {\n    const {\n      range,\n      limits = {\n        left  : -Infinity,\n        right :  Infinity,\n        top   : -Infinity,\n        bottom:  Infinity,\n      },\n      offset = { x: 0, y: 0 },\n    } = grid\n\n    const result = { range }\n\n    for (const [xField, yField] of coordFields) {\n      const gridx = Math.round((x - offset.x) / grid[xField])\n      const gridy = Math.round((y - offset.y) / grid[yField])\n\n      result[xField] = Math.max(limits.left, Math.min(limits.right, gridx * grid[xField] + offset.x))\n      result[yField] = Math.max(limits.top, Math.min(limits.bottom, gridy * grid[yField] + offset.y))\n    }\n\n    return result\n  }\n\n  gridFunc._isSnapGrid = true\n  gridFunc.grid = grid\n  gridFunc.coordFields = coordFields\n\n  return gridFunc\n}\n\nexport default createGrid\n"
+	]
+}

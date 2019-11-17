@@ -1,7 +1,0 @@
-{
-  "name": "@interactjs/utils",
-  "version": "1.4.0-rc.13",
-  "publishConfig": {
-    "access": "public"
-  }
-}

@@ -1,0 +1,13 @@
+{
+	"version": 3,
+	"sources": [
+		"index.ts"
+	],
+	"names": [
+		"grid"
+	],
+	"mappings": "AAAA,OAAOA,IAAP;AAEA,SAASA,IAAT",
+	"sourcesContent": [
+		"import grid from './grid'\n\nexport { grid }\n"
+	]
+}

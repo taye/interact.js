@@ -1,0 +1,15 @@
+{
+  "name": "@interactjs/reflow",
+  "version": "1.7.1",
+  "license": "MIT",
+  "peerDependencies": {
+    "@interactjs/core": "1.7.1",
+    "@interactjs/utils": "1.7.1"
+  },
+  "devDependencies": {
+    "promise-polyfill": "latest"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

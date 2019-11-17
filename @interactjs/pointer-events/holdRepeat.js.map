@@ -1,0 +1,45 @@
+{
+	"version": 3,
+	"sources": [
+		"holdRepeat.ts"
+	],
+	"names": [
+		"basePlugin",
+		"install",
+		"scope",
+		"usePlugin",
+		"pointerEvents",
+		"defaults",
+		"holdRepeatInterval",
+		"types",
+		"push",
+		"onNew",
+		"pointerEvent",
+		"type",
+		"count",
+		"onFired",
+		"interaction",
+		"eventTarget",
+		"targets",
+		"length",
+		"interval",
+		"eventable",
+		"options",
+		"holdIntervalHandle",
+		"setTimeout",
+		"fire",
+		"pointer",
+		"event",
+		"endHoldRepeat",
+		"clearInterval",
+		"id",
+		"listeners",
+		"reduce",
+		"acc",
+		"enderTypes"
+	],
+	"mappings": "AAAA,OAAOA,UAAP;;AAcA,SAASC,OAAT,CAAkBC,KAAlB,EAAyC;AACvCA,EAAAA,KAAK,CAACC,SAAN,CAAgBH,UAAhB;AAEA,QAAM;AACJI,IAAAA;AADI,MAEFF,KAFJ,CAHuC,CAOvC;;AACAE,EAAAA,aAAa,CAACC,QAAd,CAAuBC,kBAAvB,GAA4C,CAA5C;AACAF,EAAAA,aAAa,CAACG,KAAd,CAAoBC,IAApB,CAAyB,YAAzB;AACD;;AAED,SAASC,KAAT,CAAgB;AAAEC,EAAAA;AAAF,CAAhB,EAAkC;AAChC,MAAIA,YAAY,CAACC,IAAb,KAAsB,MAA1B,EAAkC;AAAE;AAAQ;;AAE5CD,EAAAA,YAAY,CAACE,KAAb,GAAqB,CAACF,YAAY,CAACE,KAAb,IAAsB,CAAvB,IAA4B,CAAjD;AACD;;AAED,SAASC,OAAT,CACE;AAAEC,EAAAA,WAAF;AAAeJ,EAAAA,YAAf;AAA6BK,EAAAA,WAA7B;AAA0CC,EAAAA;AAA1C,CADF,EAEEd,KAFF,EAGE;AACA,MAAIQ,YAAY,CAACC,IAAb,KAAsB,MAAtB,IAAgC,CAACK,OAAO,CAACC,MAA7C,EAAqD;AAAE;AAAQ,GAD/D,CAGA;;;AACA,QAAMC,QAAQ,GAAGF,OAAO,CAAC,CAAD,CAAP,CAAWG,SAAX,CAAqBC,OAArB,CAA6Bd,kBAA9C,CAJA,CAMA;;AACA,MAAIY,QAAQ,IAAI,CAAhB,EAAmB;AAAE;AAAQ,GAP7B,CASA;;;AACAJ,EAAAA,WAAW,CAACO,kBAAZ,GAAiCC,UAAU,CAAC,MAAM;AAChDpB,IAAAA,KAAK,CAACE,aAAN,CAAoBmB,IAApB,CAAyB;AACvBT,MAAAA,WADuB;AAEvBC,MAAAA,WAFuB;AAGvBJ,MAAAA,IAAI,EAAE,MAHiB;AAIvBa,MAAAA,OAAO,EAAEd,YAJc;AAKvBe,MAAAA,KAAK,EAAEf;AALgB,KAAzB,EAMGR,KANH;AAOD,GAR0C,EAQxCgB,QARwC,CAA3C;AASD;;AAED,SAASQ,aAAT,CAAwB;AAAEZ,EAAAA;AAAF,CAAxB,EAAyC;AACvC;AACA;AACA,MAAIA,WAAW,CAACO,kBAAhB,EAAoC;AAClCM,IAAAA,aAAa,CAACb,WAAW,CAACO,kBAAb,CAAb;AACAP,IAAAA,WAAW,CAACO,kBAAZ,GAAiC,IAAjC;AACD;AACF;;AAED,eAAe;AACbO,EAAAA,EAAE,EAAE,2BADS;AAEb3B,EAAAA,OAFa;AAGb4B,EAAAA,SAAS,EAAE,CAAC,MAAD,EAAS,IAAT,EAAe,QAAf,EAAyB,QAAzB,EAAmCC,MAAnC,CACT,CAACC,GAAD,EAAMC,UAAN,KAAqB;AACnBD,IAAAA,GAAG,CAAE,iBAAgBC,UAAW,EAA7B,CAAH,GAAqCN,aAArC;AACA,WAAOK,GAAP;AACD,GAJQ,EAKT;AACE,yBAAqBtB,KADvB;AAEE,2BAAuBI;AAFzB,GALS;AAHE,CAAf",
+	"sourcesContent": [
+		"import basePlugin from './base'\n\ndeclare module '@interactjs/core/Interaction' {\n  interface Interaction {\n    holdIntervalHandle?: any\n  }\n}\n\ndeclare module '@interactjs/pointer-events/base' {\n  interface PointerEventOptions {\n    holdRepeatInterval?: number\n  }\n}\n\nfunction install (scope: Interact.Scope) {\n  scope.usePlugin(basePlugin)\n\n  const {\n    pointerEvents,\n  } = scope\n\n  // don't repeat by default\n  pointerEvents.defaults.holdRepeatInterval = 0\n  pointerEvents.types.push('holdrepeat')\n}\n\nfunction onNew ({ pointerEvent }) {\n  if (pointerEvent.type !== 'hold') { return }\n\n  pointerEvent.count = (pointerEvent.count || 0) + 1\n}\n\nfunction onFired (\n  { interaction, pointerEvent, eventTarget, targets }: Interact.SignalArgs['pointerEvents:fired'],\n  scope: Interact.Scope,\n) {\n  if (pointerEvent.type !== 'hold' || !targets.length) { return }\n\n  // get the repeat interval from the first eventable\n  const interval = targets[0].eventable.options.holdRepeatInterval\n\n  // don't repeat if the interval is 0 or less\n  if (interval <= 0) { return }\n\n  // set a timeout to fire the holdrepeat event\n  interaction.holdIntervalHandle = setTimeout(() => {\n    scope.pointerEvents.fire({\n      interaction,\n      eventTarget,\n      type: 'hold',\n      pointer: pointerEvent,\n      event: pointerEvent,\n    }, scope)\n  }, interval)\n}\n\nfunction endHoldRepeat ({ interaction }) {\n  // set the interaction's holdStopTime property\n  // to stop further holdRepeat events\n  if (interaction.holdIntervalHandle) {\n    clearInterval(interaction.holdIntervalHandle)\n    interaction.holdIntervalHandle = null\n  }\n}\n\nexport default {\n  id: 'pointer-events/holdRepeat',\n  install,\n  listeners: ['move', 'up', 'cancel', 'endall'].reduce(\n    (acc, enderTypes) => {\n      acc[`pointerEvents:${enderTypes}`] = endHoldRepeat\n      return acc\n    },\n    {\n      'pointerEvents:new': onNew,\n      'pointerEvents:fired': onFired,\n    },\n  ),\n} as Interact.Plugin\n"
+	]
+}

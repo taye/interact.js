@@ -1,0 +1,28 @@
+{
+	"version": 3,
+	"sources": [
+		"index.ts"
+	],
+	"names": [
+		"base",
+		"restrictEdgesModule",
+		"restrictModule",
+		"restrictRectModule",
+		"restrictSizeModule",
+		"snapEdgesModule",
+		"snapModule",
+		"snapSizeModule",
+		"makeModifier",
+		"snap",
+		"snapSize",
+		"snapEdges",
+		"restrict",
+		"restrictRect",
+		"restrictEdges",
+		"restrictSize"
+	],
+	"mappings": "AAAA,OAAOA,IAAP;AACA,OAAOC,mBAAP;AACA,OAAOC,cAAP;AACA,OAAOC,kBAAP;AACA,OAAOC,kBAAP;AACA,OAAOC,eAAP;AACA,OAAOC,UAAP;AACA,OAAOC,cAAP;AAEA,MAAM;AAAEC,EAAAA;AAAF,IAAmBR,IAAzB;AAEA,OAAO,MAAMS,IAAI,GAAGD,YAAY,CAACF,UAAD,EAAa,MAAb,CAAzB;AACP,OAAO,MAAMI,QAAQ,GAAGF,YAAY,CAACD,cAAD,EAAiB,UAAjB,CAA7B;AACP,OAAO,MAAMI,SAAS,GAAGH,YAAY,CAACH,eAAD,EAAkB,WAAlB,CAA9B;AACP,OAAO,MAAMO,QAAQ,GAAGJ,YAAY,CAACN,cAAD,EAAiB,UAAjB,CAA7B;AACP,OAAO,MAAMW,YAAY,GAAGL,YAAY,CAACL,kBAAD,EAAqB,cAArB,CAAjC;AACP,OAAO,MAAMW,aAAa,GAAGN,YAAY,CAACP,mBAAD,EAAsB,eAAtB,CAAlC;AACP,OAAO,MAAMc,YAAY,GAAGP,YAAY,CAACJ,kBAAD,EAAqB,cAArB,CAAjC",
+	"sourcesContent": [
+		"import base from './base'\nimport restrictEdgesModule from './restrict/edges'\nimport restrictModule from './restrict/pointer'\nimport restrictRectModule from './restrict/rect'\nimport restrictSizeModule from './restrict/size'\nimport snapEdgesModule from './snap/edges'\nimport snapModule from './snap/pointer'\nimport snapSizeModule from './snap/size'\n\nconst { makeModifier } = base\n\nexport const snap = makeModifier(snapModule, 'snap')\nexport const snapSize = makeModifier(snapSizeModule, 'snapSize')\nexport const snapEdges = makeModifier(snapEdgesModule, 'snapEdges')\nexport const restrict = makeModifier(restrictModule, 'restrict')\nexport const restrictRect = makeModifier(restrictRectModule, 'restrictRect')\nexport const restrictEdges = makeModifier(restrictEdgesModule, 'restrictEdges')\nexport const restrictSize = makeModifier(restrictSizeModule, 'restrictSize')\n"
+	]
+}

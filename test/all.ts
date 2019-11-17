@@ -1,10 +1,14 @@
 // tslint:disable no-var-requires
-require('../packages/types/index')
+require('../@interactjs/types/index')
 
 const glob = require('glob')
 const path = require('path')
 
-const globOptions = { ignore: ['**/node_modules/**', '**/_*'] }
+const globOptions = {
+  ignore: ['**/node_modules/**', '**/_*'],
+  silent: true,
+  strict: false,
+}
 
 const [, , ...fileArgs] = process.argv
 
@@ -21,7 +25,7 @@ function getMatches (pattern) {
   })
 }
 
-(fileArgs.length ? Promise.resolve(fileArgs.filter((f) => f !== '--')) : getMatches('**/*.spec.ts')).then((tests) => {
+(fileArgs.length ? Promise.resolve(fileArgs.filter(f => f !== '--')) : getMatches('**/*.spec.ts')).then(tests => {
   for (const file of tests) {
     require(path.resolve(file))
   }

@@ -1,0 +1,25 @@
+{
+	"version": 3,
+	"sources": [
+		"index.ts"
+	],
+	"names": [
+		"interact",
+		"init",
+		"initInteract",
+		"modifiers",
+		"extend",
+		"snappers",
+		"window",
+		"win",
+		"use",
+		"id",
+		"install",
+		"createSnapGrid",
+		"grid"
+	],
+	"mappings": "AAAA,OAAOA,QAAP,IAAmBC,IAAI,IAAIC,YAA3B;AAEA,OAAO,KAAKC,SAAZ;AACA;AACA,OAAOC,MAAP;AACA,OAAO,KAAKC,QAAZ;;AAUA,IAAI,OAAOC,MAAP,KAAkB,QAAlB,IAA8B,CAAC,CAACA,MAApC,EAA4C;AAC1CL,EAAAA,IAAI,CAACK,MAAD,CAAJ;AACD;;AAED,OAAO,SAASL,IAAT,CAAeM,GAAf,EAA4B;AACjCL,EAAAA,YAAY,CAACK,GAAD,CAAZ;AAEA,SAAOP,QAAQ,CAACQ,GAAT,CAAa;AAClBC,IAAAA,EAAE,EAAE,YADc;;AAElBC,IAAAA,OAAO,GAAI;AACTV,MAAAA,QAAQ,CAACG,SAAT,GAAqBC,MAAM,CAAC,EAAD,EAAKD,SAAL,CAA3B;AACAH,MAAAA,QAAQ,CAACK,QAAT,GAAoBA,QAApB;AACAL,MAAAA,QAAQ,CAACW,cAAT,GAA0BX,QAAQ,CAACK,QAAT,CAAkBO,IAA5C;AACD;;AANiB,GAAb,CAAP;AAQD;AAED,eAAeZ,QAAf",
+	"sourcesContent": [
+		"import interact, { init as initInteract } from '../interact/index'\nimport { Modifier } from '../modifiers/base'\nimport * as modifiers from '../modifiers/index'\nimport '../types/index'\nimport extend from '../utils/extend'\nimport * as snappers from '../utils/snappers/index'\n\ndeclare module '@interactjs/interact/interact' {\n  interface InteractStatic {\n    modifiers?: typeof modifiers & { [key: string]: (options?) => Modifier }\n    snappers?: typeof snappers & { [key: string]: any }\n    createSnapGrid?: typeof snappers.grid\n  }\n}\n\nif (typeof window === 'object' && !!window) {\n  init(window)\n}\n\nexport function init (win: Window) {\n  initInteract(win)\n\n  return interact.use({\n    id: 'interactjs',\n    install () {\n      interact.modifiers = extend({}, modifiers)\n      interact.snappers = snappers\n      interact.createSnapGrid = interact.snappers.grid\n    },\n  })\n}\n\nexport default interact\n"
+	]
+}

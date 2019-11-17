@@ -1,0 +1,30 @@
+{
+	"version": 3,
+	"sources": [
+		"edges.ts"
+	],
+	"names": [
+		"clone",
+		"extend",
+		"snapSize",
+		"start",
+		"arg",
+		"edges",
+		"interaction",
+		"prepared",
+		"state",
+		"targetFields",
+		"left",
+		"top",
+		"set",
+		"snapEdges",
+		"defaults",
+		"offset",
+		"x",
+		"y"
+	],
+	"mappings": "AAAA;;;;;;;;;;;;;;;;;;;;;;;;;;;AA4BA,OAAOA,KAAP;AACA,OAAOC,MAAP;AAGA,OAAOC,QAAP;;AAEA,SAASC,KAAT,CAAgBC,GAAhB,EAA6C;AAC3C,QAAMC,KAAK,GAAGD,GAAG,CAACE,WAAJ,CAAgBC,QAAhB,CAAyBF,KAAvC;;AAEA,MAAI,CAACA,KAAL,EAAY;AAAE,WAAO,IAAP;AAAa;;AAE3BD,EAAAA,GAAG,CAACI,KAAJ,CAAUC,YAAV,GAAyBL,GAAG,CAACI,KAAJ,CAAUC,YAAV,IAA0B,CACjD,CAACJ,KAAK,CAACK,IAAN,GAAa,MAAb,GAAsB,OAAvB,EAAgCL,KAAK,CAACM,GAAN,GAAY,KAAZ,GAAoB,QAApD,CADiD,CAAnD;AAIA,SAAOT,QAAQ,CAACC,KAAT,CAAeC,GAAf,CAAP;AACD;;AAED,SAASQ,GAAT,CAAcR,GAAd,EAAmB;AACjB,SAAOF,QAAQ,CAACU,GAAT,CAAaR,GAAb,CAAP;AACD;;AAED,MAAMS,SAAS,GAAG;AAChBV,EAAAA,KADgB;AAEhBS,EAAAA,GAFgB;AAGhBE,EAAAA,QAAQ,EAAEb,MAAM,CAACD,KAAK,CAACE,QAAQ,CAACY,QAAV,CAAN,EAA8C;AAC5DC,IAAAA,MAAM,EAAE;AAAEC,MAAAA,CAAC,EAAE,CAAL;AAAQC,MAAAA,CAAC,EAAE;AAAX;AADoD,GAA9C;AAHA,CAAlB;AAQA,eAAeJ,SAAf",
+	"sourcesContent": [
+		"/**\n * @module modifiers/snapEdges\n *\n * @description\n * This module allows snapping of the edges of targets during resize\n * interactions.\n *\n * @example\n * interact(target).resizable({\n *   snapEdges: {\n *     targets: [interact.snappers.grid({ x: 100, y: 50 })],\n *   },\n * })\n *\n * interact(target).resizable({\n *   snapEdges: {\n *     targets: [\n *       interact.snappers.grid({\n *        top: 50,\n *        left: 50,\n *        bottom: 100,\n *        right: 100,\n *       }),\n *     ],\n *   },\n * })\n */\n\nimport clone from '../../utils/clone'\nimport extend from '../../utils/extend'\nimport { ModifierArg } from '../base'\nimport { SnapState } from './pointer'\nimport snapSize, { SnapSizeOptions } from './size'\n\nfunction start (arg: ModifierArg<SnapState>) {\n  const edges = arg.interaction.prepared.edges\n\n  if (!edges) { return null }\n\n  arg.state.targetFields = arg.state.targetFields || [\n    [edges.left ? 'left' : 'right', edges.top ? 'top' : 'bottom'],\n  ]\n\n  return snapSize.start(arg)\n}\n\nfunction set (arg) {\n  return snapSize.set(arg)\n}\n\nconst snapEdges = {\n  start,\n  set,\n  defaults: extend(clone(snapSize.defaults) as SnapSizeOptions, {\n    offset: { x: 0, y: 0 },\n  } as unknown),\n}\n\nexport default snapEdges\n"
+	]
+}

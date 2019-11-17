@@ -1,0 +1,47 @@
+{
+	"version": 3,
+	"sources": [
+		"size.ts"
+	],
+	"names": [
+		"extend",
+		"is",
+		"snap",
+		"start",
+		"arg",
+		"interaction",
+		"state",
+		"options",
+		"edges",
+		"prepared",
+		"targets",
+		"relativePoints",
+		"x",
+		"left",
+		"y",
+		"top",
+		"offset",
+		"origin",
+		"range",
+		"targetFields",
+		"offsets",
+		"set",
+		"coords",
+		"relative",
+		"snapTarget",
+		"target",
+		"func",
+		"xField",
+		"yField",
+		"push",
+		"defaults",
+		"Infinity",
+		"endOnly",
+		"enabled",
+		"snapSize"
+	],
+	"mappings": "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",
+	"sourcesContent": [
+		"// This module allows snapping of the size of targets during resize\n// interactions.\n\nimport extend from '../../utils/extend'\nimport * as is from '../../utils/is'\nimport { ModifierArg } from '../base'\nimport snap, { SnapOptions, SnapState } from './pointer'\n\nexport type SnapSizeOptions = Pick<\nSnapOptions,\n'targets' | 'offset' | 'endOnly' | 'range' | 'enabled'\n>\n\nfunction start (arg: ModifierArg<SnapState>) {\n  const { interaction, state } = arg\n  const { options } = state\n  const edges = interaction.prepared.edges\n\n  if (!edges) { return null }\n\n  arg.state = {\n    options: {\n      targets: null,\n      relativePoints: [{\n        x: edges.left ? 0 : 1,\n        y: edges.top ? 0 : 1,\n      }],\n      offset: options.offset || 'self',\n      origin: { x: 0, y: 0 },\n      range: options.range,\n    },\n  }\n\n  state.targetFields = state.targetFields || [\n    ['width', 'height'],\n    ['x', 'y'],\n  ]\n\n  snap.start(arg)\n  state.offsets = arg.state.offsets\n\n  arg.state = state\n}\n\nfunction set (arg) {\n  const { interaction, state, coords } = arg\n  const { options, offsets } = state\n  const relative = {\n    x: coords.x - offsets[0].x,\n    y: coords.y - offsets[0].y,\n  }\n\n  state.options = extend({}, options)\n  state.options.targets = []\n\n  for (const snapTarget of (options.targets || [])) {\n    let target\n\n    if (is.func(snapTarget)) {\n      target = snapTarget(relative.x, relative.y, interaction)\n    }\n    else {\n      target = snapTarget\n    }\n\n    if (!target) { continue }\n\n    for (const [xField, yField] of state.targetFields) {\n      if (xField in target || yField in target) {\n        target.x = target[xField]\n        target.y = target[yField]\n\n        break\n      }\n    }\n\n    state.options.targets.push(target)\n  }\n\n  snap.set(arg)\n\n  state.options = options\n}\n\nconst defaults: SnapSizeOptions = {\n  range: Infinity,\n  targets: null,\n  offset: null,\n  endOnly: false,\n  enabled: false,\n}\n\nconst snapSize = {\n  start,\n  set,\n  defaults,\n}\n\nexport default snapSize\n"
+	]
+}

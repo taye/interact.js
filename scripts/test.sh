@@ -1,5 +1,9 @@
 #!/bin/bash
 PKG_DIR=$(dirname $(dirname $(readlink -f $0)))
+if [ -z "$PKG_DIR" ]
+then
+    PKG_DIR=$(dirname $(dirname $0))
+fi
 
 export PATH=$PKG_DIR/node_modules/.bin:$PWD/node_modules/.bin:$PATH
 export NODE_ENV=test
@@ -23,13 +27,13 @@ EXEC_ARGS=${EXEC_ARGS:="--require $PKG_DIR/test/babel-register"}
 NODE_ENV=test $TEST_RUNNER $TEST_RUNNER_ARGS \
   $EXEC_COMMAND \
   $EXEC_ARGS \
-  --require $PKG_DIR/packages/types/index.ts \
+  --require $PKG_DIR/@interactjs/types/index.ts \
   $ENTRY_FILE $@ |
   tap-spec
 
 test_code=$?
 
-if [[ $report == 1 ]]; then
+if [[ "${test_code}${report}" == "01" ]]; then
   nyc report; nyc check-coverage
 fi
 

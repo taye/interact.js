@@ -1,0 +1,39 @@
+{
+	"version": 3,
+	"sources": [
+		"Eventable.ts"
+	],
+	"names": [
+		"arr",
+		"extend",
+		"normalize",
+		"fireUntilImmediateStopped",
+		"event",
+		"listeners",
+		"listener",
+		"immediatePropagationStopped",
+		"Eventable",
+		"constructor",
+		"options",
+		"fire",
+		"global",
+		"types",
+		"type",
+		"propagationStopped",
+		"on",
+		"merge",
+		"off",
+		"eventList",
+		"length",
+		"subListener",
+		"index",
+		"indexOf",
+		"splice",
+		"getRect",
+		"_element"
+	],
+	"mappings": ";;AAAA,OAAO,KAAKA,GAAZ;AACA,OAAOC,MAAP;AACA,OAAOC,SAAP;;AAIA,SAASC,yBAAT,CAGGC,KAHH,EAG+BC,SAH/B,EAG+D;AAC7D,OAAK,MAAMC,QAAX,IAAuBD,SAAvB,EAAkC;AAChC,QAAID,KAAK,CAACG,2BAAV,EAAuC;AAAE;AAAO;;AAEhDD,IAAAA,QAAQ,CAACF,KAAD,CAAR;AACD;AACF;;AAED,MAAMI,SAAN,CAAgB;AAOdC,EAAAA,WAAW,CAAEC,OAAF,EAAsC;AAAA;;AAAA,mCALpB,EAKoB;;AAAA,gDAJ5B,KAI4B;;AAAA,yDAHnB,KAGmB;;AAAA;;AAC/C,SAAKA,OAAL,GAAeT,MAAM,CAAC,EAAD,EAAKS,OAAO,IAAI,EAAhB,CAArB;AACD;;AAEDC,EAAAA,IAAI,CAAEP,KAAF,EAAc;AAChB,QAAIC,SAAJ;AACA,UAAMO,MAAM,GAAG,KAAKA,MAApB,CAFgB,CAIhB;AACA;;AACA,QAAKP,SAAS,GAAG,KAAKQ,KAAL,CAAWT,KAAK,CAACU,IAAjB,CAAjB,EAA0C;AACxCX,MAAAA,yBAAyB,CAACC,KAAD,EAAQC,SAAR,CAAzB;AACD,KARe,CAUhB;;;AACA,QAAI,CAACD,KAAK,CAACW,kBAAP,IAA6BH,MAA7B,KAAwCP,SAAS,GAAGO,MAAM,CAACR,KAAK,CAACU,IAAP,CAA1D,CAAJ,EAA8E;AAC5EX,MAAAA,yBAAyB,CAACC,KAAD,EAAQC,SAAR,CAAzB;AACD;AACF;;AAEDW,EAAAA,EAAE,CAAEF,IAAF,EAAgBR,QAAhB,EAAiD;AACjD,UAAMD,SAAS,GAAGH,SAAS,CAACY,IAAD,EAAOR,QAAP,CAA3B;;AAEA,SAAKQ,IAAL,IAAaT,SAAb,EAAwB;AACtB,WAAKQ,KAAL,CAAWC,IAAX,IAAmBd,GAAG,CAACiB,KAAJ,CAAU,KAAKJ,KAAL,CAAWC,IAAX,KAAoB,EAA9B,EAAkCT,SAAS,CAACS,IAAD,CAA3C,CAAnB;AACD;AACF;;AAEDI,EAAAA,GAAG,CAAEJ,IAAF,EAAgBR,QAAhB,EAAiD;AAClD,UAAMD,SAAS,GAAGH,SAAS,CAACY,IAAD,EAAOR,QAAP,CAA3B;;AAEA,SAAKQ,IAAL,IAAaT,SAAb,EAAwB;AACtB,YAAMc,SAAS,GAAG,KAAKN,KAAL,CAAWC,IAAX,CAAlB;;AAEA,UAAI,CAACK,SAAD,IAAc,CAACA,SAAS,CAACC,MAA7B,EAAqC;AAAE;AAAU;;AAEjD,WAAK,MAAMC,WAAX,IAA0BhB,SAAS,CAACS,IAAD,CAAnC,EAA2C;AACzC,cAAMQ,KAAK,GAAGH,SAAS,CAACI,OAAV,CAAkBF,WAAlB,CAAd;;AAEA,YAAIC,KAAK,KAAK,CAAC,CAAf,EAAkB;AAChBH,UAAAA,SAAS,CAACK,MAAV,CAAiBF,KAAjB,EAAwB,CAAxB;AACD;AACF;AACF;AACF;;AAEDG,EAAAA,OAAO,CAAEC,QAAF,EAA8B;AACnC,WAAO,IAAP;AACD;;AAvDa;;AA0DhB,eAAelB,SAAf",
+	"sourcesContent": [
+		"import * as arr from '../utils/arr'\nimport extend from '../utils/extend'\nimport normalize, { NormalizedListeners } from '../utils/normalizeListeners'\nimport { EventPhase, InteractEvent } from './InteractEvent'\nimport { ActionName } from './scope'\n\nfunction fireUntilImmediateStopped<\n  T extends ActionName,\n  P extends EventPhase,\n> (event: InteractEvent<T, P>, listeners: Interact.Listener[]) {\n  for (const listener of listeners) {\n    if (event.immediatePropagationStopped) { break }\n\n    listener(event)\n  }\n}\n\nclass Eventable {\n  options: any\n  types: NormalizedListeners = {}\n  propagationStopped = false\n  immediatePropagationStopped = false\n  global: any\n\n  constructor (options?: { [index: string]: any }) {\n    this.options = extend({}, options || {})\n  }\n\n  fire (event: any) {\n    let listeners\n    const global = this.global\n\n    // Interactable#on() listeners\n    // tslint:disable no-conditional-assignment\n    if ((listeners = this.types[event.type])) {\n      fireUntilImmediateStopped(event, listeners)\n    }\n\n    // interact.on() listeners\n    if (!event.propagationStopped && global && (listeners = global[event.type]))  {\n      fireUntilImmediateStopped(event, listeners)\n    }\n  }\n\n  on (type: string, listener: Interact.ListenersArg) {\n    const listeners = normalize(type, listener)\n\n    for (type in listeners) {\n      this.types[type] = arr.merge(this.types[type] || [], listeners[type])\n    }\n  }\n\n  off (type: string, listener: Interact.ListenersArg) {\n    const listeners = normalize(type, listener)\n\n    for (type in listeners) {\n      const eventList = this.types[type]\n\n      if (!eventList || !eventList.length) { continue }\n\n      for (const subListener of listeners[type]) {\n        const index = eventList.indexOf(subListener)\n\n        if (index !== -1) {\n          eventList.splice(index, 1)\n        }\n      }\n    }\n  }\n\n  getRect (_element: Interact.Element) {\n    return null\n  }\n}\n\nexport default Eventable\n"
+	]
+}

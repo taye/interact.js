@@ -29,11 +29,10 @@ const argv = require('yargs')
     required: true,
     coerce: path.resolve,
   })
-  .string('babelrc')
   .argv
 
 const dir = path.join(__dirname, '..')
-const extensions = ['.ts', '.js']
+const extensions = ['.ts', '.tsx', '.js', '.jsx']
 
 process.env.NODE_PATH = `${process.env.NODE_PATH || ''}:${dir}/node_modules`
 require('module')._initPaths()
@@ -60,7 +59,7 @@ const plugins = (() => {
 let babelrc
 
 try {
-  babelrc = require(path.resolve(argv.babelrc))
+  babelrc = require(path.join(process.cwd(), '.babelrc'))
 } catch (e) {
   babelrc = require('../.babelrc')
 }
@@ -73,17 +72,17 @@ const b = browserify(argv.entries, {
   standalone: argv.standalone,
 
   transform: [
-    [ require('babelify'), {
+    [require('babelify'), {
       babelrc: false,
       sourceType: 'module',
       global: true,
       extensions,
       ...babelrc,
-    } ],
-    [ require('envify'), {
+    }],
+    [require('envify'), {
       global: true,
       _: 'purge',
-    } ],
+    }],
   ],
 
   plugin: plugins,
@@ -104,7 +103,7 @@ else {
 
 function update (ids) {
   if (argv.docs) {
-    require('../docs')({
+    require('../jsdoc')({
       stdio: ['ignore', 'ignore', 'inherit'],
     })
   }
