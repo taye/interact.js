@@ -1,25 +1,18 @@
 import extend from "../utils/extend.js";
+import * as rectUtils from "../utils/rect.js";
 
 function start({
   interaction,
   phase
-}, pageCoords, prevCoords) {
+}, pageCoords, prevCoords, prevRect) {
   const {
     interactable,
-    element
+    element,
+    edges
   } = interaction;
   const modifierList = getModifierList(interaction);
   const states = prepareStates(modifierList);
   const rect = extend({}, interaction.rect);
-
-  if (!('width' in rect)) {
-    rect.width = rect.right - rect.left;
-  }
-
-  if (!('height' in rect)) {
-    rect.height = rect.bottom - rect.top;
-  }
-
   const startOffset = getRectOffset(rect, pageCoords);
   interaction.modifiers.startOffset = startOffset;
   interaction.modifiers.startDelta = {
@@ -33,11 +26,13 @@ function start({
     pageCoords,
     phase,
     rect,
+    edges,
     startOffset,
     states,
     preEnd: false,
     requireEndOnly: false,
-    prevCoords: prevCoords || (interaction.modifiers.result ? interaction.modifiers.result.coords : interaction.coords.prev.page)
+    prevCoords,
+    prevRect
   };
   interaction.modifiers.states = states;
   interaction.modifiers.result = null;
@@ -55,15 +50,18 @@ export function startAll(arg) {
       state.methods.start(arg);
     }
   }
+
+  arg.interaction.edges = arg.edges;
 }
 export function setAll(arg) {
   const {
     prevCoords,
+    prevRect,
     phase,
     preEnd,
     requireEndOnly,
-    rect,
-    states
+    states,
+    rect
   } = arg;
   arg.coords = extend({}, arg.pageCoords);
   arg.rect = extend({}, rect);
@@ -79,13 +77,21 @@ export function setAll(arg) {
       bottom: 0
     },
     coords: arg.coords,
+    rect: arg.rect,
     changed: true
+  };
+  const edges = arg.edges || {
+    left: true,
+    right: true,
+    top: true,
+    bottom: true
   };
 
   for (const state of states) {
     const {
       options
     } = state;
+    const lastModifierCoords = extend({}, arg.coords);
 
     if (!state.methods.set || !shouldDo(options, preEnd, requireEndOnly, phase)) {
       continue;
@@ -93,20 +99,19 @@ export function setAll(arg) {
 
     arg.state = state;
     state.methods.set(arg);
+    rectUtils.addEdges(edges, arg.rect, {
+      x: arg.coords.x - lastModifierCoords.x,
+      y: arg.coords.y - lastModifierCoords.y
+    });
   }
 
   result.delta.x = arg.coords.x - arg.pageCoords.x;
   result.delta.y = arg.coords.y - arg.pageCoords.y;
-  let rectChanged = false;
-
-  if (rect) {
-    result.rectDelta.left = arg.rect.left - rect.left;
-    result.rectDelta.right = arg.rect.right - rect.right;
-    result.rectDelta.top = arg.rect.top - rect.top;
-    result.rectDelta.bottom = arg.rect.bottom - rect.bottom;
-    rectChanged = result.rectDelta.left !== 0 || result.rectDelta.right !== 0 || result.rectDelta.top !== 0 || result.rectDelta.bottom !== 0;
-  }
-
+  result.rectDelta.left = arg.rect.left - rect.left;
+  result.rectDelta.right = arg.rect.right - rect.right;
+  result.rectDelta.top = arg.rect.top - rect.top;
+  result.rectDelta.bottom = arg.rect.bottom - rect.bottom;
+  const rectChanged = !prevRect || result.rect.left !== prevRect.left || result.rect.right !== prevRect.right || result.rect.top !== prevRect.top || result.rect.bottom !== prevRect.bottom;
   result.changed = !prevCoords || prevCoords.x !== result.coords.x || prevCoords.y !== result.coords.y || rectChanged;
   return result;
 }
@@ -123,7 +128,8 @@ function beforeMove(arg) {
     element
   } = interaction;
   const states = skipModifiers ? interaction.modifiers.states.slice(skipModifiers) : interaction.modifiers.states;
-  const prevCoords = arg.prevCoords || (interaction.modifiers.result ? interaction.modifiers.result.coords : interaction.coords.prev.page);
+  const prevCoords = arg.prevCoords || (interaction.modifiers.result ? interaction.modifiers.result.coords : null);
+  const prevRect = arg.prevRect || (interaction.modifiers.result ? interaction.modifiers.result.rect : null);
   const modifierResult = setAll({
     interaction,
     interactable,
@@ -133,6 +139,8 @@ function beforeMove(arg) {
     pageCoords: arg.modifiedCoords || interaction.coords.cur.page,
     prevCoords,
     rect: interaction.rect,
+    edges: interaction.edges,
+    prevRect,
     states,
     requireEndOnly: false
   });
@@ -392,7 +400,7 @@ export function makeModifier(module, name) {
 
   return modifier;
 }
-export default {
+const modifiersBase = {
   id: 'modifiers/base',
   install: scope => {
     scope.defaults.perAction.modifiers = [];
@@ -416,12 +424,16 @@ export default {
       };
     },
     'interactions:before-action-start': arg => {
-      start(arg, arg.interaction.coords.start.page, arg.interaction.coords.prev.page);
+      start(arg, arg.interaction.coords.start.page, null, null);
       setCoords(arg);
     },
     'interactions:action-resume': arg => {
+      const {
+        coords: prevCoords,
+        rect: prevRect
+      } = arg.interaction.modifiers.result;
       stop(arg);
-      start(arg, arg.interaction.coords.cur.page, arg.interaction.modifiers.result.coords);
+      start(arg, arg.interaction.coords.cur.page, prevCoords, prevRect);
       beforeMove(arg);
     },
     'interactions:after-action-move': restoreCoords,
@@ -443,4 +455,5 @@ export default {
   getRectOffset,
   makeModifier
 };
+export default modifiersBase;
 //# sourceMappingURL=base.js.map

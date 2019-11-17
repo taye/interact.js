@@ -53,11 +53,24 @@ export function tlbrToXywh(rect) {
 
   return rect;
 }
-export default {
-  getStringOptionResult,
-  resolveRectLike,
-  rectToXY,
-  xywhToTlbr,
-  tlbrToXywh
-};
+export function addEdges(edges, rect, delta) {
+  if (edges.left) {
+    rect.left += delta.x;
+  }
+
+  if (edges.right) {
+    rect.right += delta.x;
+  }
+
+  if (edges.top) {
+    rect.top += delta.y;
+  }
+
+  if (edges.bottom) {
+    rect.bottom += delta.y;
+  }
+
+  rect.width = rect.right - rect.left;
+  rect.height = rect.bottom - rect.top;
+}
 //# sourceMappingURL=rect.js.map

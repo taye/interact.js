@@ -9,7 +9,7 @@
 //   },
 // })
 import extend from "../../utils/extend.js";
-import rectUtils from "../../utils/rect.js";
+import * as rectUtils from "../../utils/rect.js";
 import { getRestrictionRect } from "./pointer.js";
 const noInner = {
   top: +Infinity,
@@ -26,12 +26,12 @@ const noOuter = {
 
 function start({
   interaction,
+  startOffset,
   state
 }) {
   const {
     options
   } = state;
-  const startOffset = interaction.modifiers.startOffset;
   let offset;
 
   if (options) {
@@ -53,6 +53,7 @@ function start({
 
 function set({
   coords,
+  edges,
   interaction,
   state
 }) {
@@ -60,7 +61,6 @@ function set({
     offset,
     options
   } = state;
-  const edges = interaction.prepared._linkedEdges || interaction.prepared.edges;
 
   if (!edges) {
     return;

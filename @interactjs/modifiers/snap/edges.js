@@ -30,7 +30,9 @@ import extend from "../../utils/extend.js";
 import snapSize from "./size.js";
 
 function start(arg) {
-  const edges = arg.interaction.prepared.edges;
+  const {
+    edges
+  } = arg.interaction.prepared;
 
   if (!edges) {
     return null;

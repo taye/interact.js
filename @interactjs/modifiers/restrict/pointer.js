@@ -1,6 +1,6 @@
 import extend from "../../utils/extend.js";
 import * as is from "../../utils/is.js";
-import rectUtils from "../../utils/rect.js";
+import * as rectUtils from "../../utils/rect.js";
 
 function start({
   rect,

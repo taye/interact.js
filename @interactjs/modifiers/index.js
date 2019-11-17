@@ -1,3 +1,4 @@
+import aspectRatioModule from "./aspectRatio.js";
 import base from "./base.js";
 import restrictEdgesModule from "./restrict/edges.js";
 import restrictModule from "./restrict/pointer.js";
@@ -16,4 +17,5 @@ export const restrict = makeModifier(restrictModule, 'restrict');
 export const restrictRect = makeModifier(restrictRectModule, 'restrictRect');
 export const restrictEdges = makeModifier(restrictEdgesModule, 'restrictEdges');
 export const restrictSize = makeModifier(restrictSizeModule, 'restrictSize');
+export const aspectRatio = makeModifier(aspectRatioModule, 'aspectRatio');
 //# sourceMappingURL=index.js.map

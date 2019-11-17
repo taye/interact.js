@@ -4,7 +4,7 @@ import { contains } from "./arr.js";
 import * as domUtils from "./domUtils.js";
 import * as is from "./is.js";
 import pExtend from "./pointerExtend.js";
-import pointerUtils from "./pointerUtils.js";
+import * as pointerUtils from "./pointerUtils.js";
 const elements = [];
 const targets = [];
 const delegatedEvents = {};

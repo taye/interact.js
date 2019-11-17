@@ -6,6 +6,7 @@ import { ActionName } from './scope';
 export interface ActionProps<T extends ActionName = any> {
     name: T;
     axis?: 'x' | 'y' | 'xy';
+    edges?: Interact.EdgeOptions;
 }
 export interface StartAction extends ActionProps {
     name: ActionName | string;
@@ -88,10 +89,14 @@ export declare type _InteractionProxy = Pick<Interaction, keyof typeof _ProxyVal
 export declare class Interaction<T extends ActionName = any> {
     interactable: Interactable;
     element: Interact.Element;
-    rect: Interact.Rect & Interact.Size;
-    edges: {
-        [P in keyof Interact.Rect]?: boolean;
+    rect: Interact.FullRect;
+    _rects?: {
+        start: Interact.FullRect;
+        corrected: Interact.FullRect;
+        previous: Interact.FullRect;
+        delta: Interact.FullRect;
     };
+    edges: Interact.EdgeOptions;
     _scopeFire: Interact.Scope['fire'];
     prepared: ActionProps<T>;
     pointerType: string;

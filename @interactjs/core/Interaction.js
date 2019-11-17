@@ -51,6 +51,8 @@ export class Interaction {
 
     _defineProperty(this, "rect", void 0);
 
+    _defineProperty(this, "_rects", void 0);
+
     _defineProperty(this, "edges", void 0);
 
     _defineProperty(this, "_scopeFire", void 0);
@@ -187,7 +189,7 @@ export class Interaction {
     this.interactable = interactable;
     this.element = element;
     this.rect = interactable.getRect(element);
-    this.edges = this.prepared.edges;
+    this.edges = utils.extend({}, this.prepared.edges);
     this._stopped = false;
     this._interacting = this._doPhase({
       interaction: this,
@@ -266,6 +268,10 @@ export class Interaction {
 
 
   move(signalArg) {
+    if (!signalArg || !signalArg.event) {
+      utils.pointer.setZeroCoords(this.coords.delta);
+    }
+
     signalArg = utils.extend({
       pointer: this._latestPointer.pointer,
       event: this._latestPointer.event,
@@ -480,6 +486,25 @@ export class Interaction {
       preEnd,
       type
     } = signalArg;
+    const {
+      rect,
+      coords: {
+        delta
+      }
+    } = this;
+
+    if (rect && phase === EventPhase.Move) {
+      // update the rect modifications
+      const edges = this.edges || this.prepared.edges || {
+        left: true,
+        right: true,
+        top: true,
+        bottom: true
+      };
+      utils.rect.addEdges(edges, rect, delta[this.interactable.options.deltaSource]);
+      rect.width = rect.right - rect.left;
+      rect.height = rect.bottom - rect.top;
+    }
 
     const beforeResult = this._scopeFire(`interactions:before-action-${phase}`, signalArg);
 
@@ -488,39 +513,6 @@ export class Interaction {
     }
 
     const iEvent = signalArg.iEvent = this._createPreparedEvent(event, phase, preEnd, type);
-
-    const {
-      rect
-    } = this;
-
-    if (rect) {
-      // update the rect modifications
-      const edges = this.edges || this.prepared.edges || {
-        left: true,
-        right: true,
-        top: true,
-        bottom: true
-      };
-
-      if (edges.top) {
-        rect.top += iEvent.delta.y;
-      }
-
-      if (edges.bottom) {
-        rect.bottom += iEvent.delta.y;
-      }
-
-      if (edges.left) {
-        rect.left += iEvent.delta.x;
-      }
-
-      if (edges.right) {
-        rect.right += iEvent.delta.x;
-      }
-
-      rect.width = rect.right - rect.left;
-      rect.height = rect.bottom - rect.top;
-    }
 
     this._scopeFire(`interactions:action-${phase}`, signalArg);
 

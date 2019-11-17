@@ -10,20 +10,7 @@ declare module '@interactjs/core/Interaction' {
             offsets: any;
             startOffset: any;
             startDelta: Interact.Point;
-            result?: {
-                delta: {
-                    x: number;
-                    y: number;
-                };
-                rectDelta: {
-                    left: number;
-                    right: number;
-                    top: number;
-                    bottom: number;
-                };
-                coords: Interact.Point;
-                changed: boolean;
-            };
+            result?: ModifiersResult;
             endPrevented: boolean;
         };
     }
@@ -55,12 +42,14 @@ export interface ModifierArg<State extends ModifierState = ModifierState> {
     interaction: Interact.Interaction;
     interactable: Interact.Interactable;
     phase: Interact.EventPhase;
-    rect: Interact.Rect;
+    rect: Interact.FullRect;
+    edges: Interact.EdgeOptions;
     states?: State[];
     state?: State;
     element: Interact.Element;
     pageCoords?: Interact.Point;
     prevCoords?: Interact.Point;
+    prevRect?: Interact.FullRect;
     coords?: Interact.Point;
     startOffset?: Interact.Rect;
     preEnd?: boolean;
@@ -75,10 +64,7 @@ export interface ModifierModule<Defaults extends {
     beforeEnd?(arg: ModifierArg<State>): boolean;
     stop?(arg: ModifierArg<State>): void;
 }
-declare function start({ interaction, phase }: {
-    interaction: Interact.Interaction;
-    phase: Interact.EventPhase;
-}, pageCoords: Interact.Point, prevCoords: Interact.Point): {
+export interface ModifiersResult {
     delta: {
         x: number;
         y: number;
@@ -89,9 +75,10 @@ declare function start({ interaction, phase }: {
         top: number;
         bottom: number;
     };
-    coords: import("../types/types").Point;
+    coords: Interact.Point;
+    rect: Interact.FullRect;
     changed: boolean;
-};
+}
 export declare function startAll(arg: ModifierArg<any>): void;
 export declare function setAll(arg: ModifierArg): {
     delta: {
@@ -105,25 +92,9 @@ export declare function setAll(arg: ModifierArg): {
         bottom: number;
     };
     coords: import("../types/types").Point;
+    rect: Required<import("../types/types").Rect>;
     changed: boolean;
 };
-declare function beforeMove(arg: Partial<Interact.DoPhaseArg> & {
-    interaction: Interact.Interaction;
-    phase: Interact.EventPhase;
-    preEnd?: boolean;
-    skipModifiers?: number;
-    prevCoords?: Interact.Point;
-    modifiedCoords?: Interact.Point;
-}): void | false;
-declare function beforeEnd(arg: Interact.DoPhaseArg & {
-    noPreEnd?: boolean;
-    state?: ModifierState;
-}): void | false;
-declare function stop(arg: {
-    interaction: Interact.Interaction;
-    phase: Interact.EventPhase;
-}): void;
-declare function getModifierList(interaction: any): any;
 export declare function prepareStates(modifierList: Modifier[]): {
     options: {};
     methods?: {
@@ -143,13 +114,6 @@ export declare function setCoords(arg: {
 export declare function restoreCoords({ interaction: { coords, rect, modifiers } }: {
     interaction: Interact.Interaction;
 }): void;
-declare function shouldDo(options: any, preEnd?: boolean, requireEndOnly?: boolean, phase?: string): any;
-declare function getRectOffset(rect: any, coords: any): {
-    left: number;
-    top: number;
-    right: number;
-    bottom: number;
-};
 export declare function makeModifier<Defaults extends {
     enabled?: boolean;
 }, State extends ModifierState, Name extends string>(module: ModifierModule<Defaults, State>, name?: Name): {
@@ -162,32 +126,5 @@ export declare function makeModifier<Defaults extends {
         stop: (arg: ModifierArg<State>) => void;
     };
 };
-declare const _default: {
-    id: string;
-    install: (scope: any) => void;
-    listeners: {
-        'interactions:new': ({ interaction }: {
-            interaction: any;
-        }) => void;
-        'interactions:before-action-start': (arg: any) => void;
-        'interactions:action-resume': (arg: any) => void;
-        'interactions:after-action-move': typeof restoreCoords;
-        'interactions:before-action-move': typeof beforeMove;
-        'interactions:after-action-start': typeof restoreCoords;
-        'interactions:before-action-end': typeof beforeEnd;
-        'interactions:stop': typeof stop;
-    };
-    before: string;
-    startAll: typeof startAll;
-    setAll: typeof setAll;
-    prepareStates: typeof prepareStates;
-    start: typeof start;
-    beforeMove: typeof beforeMove;
-    beforeEnd: typeof beforeEnd;
-    stop: typeof stop;
-    shouldDo: typeof shouldDo;
-    getModifierList: typeof getModifierList;
-    getRectOffset: typeof getRectOffset;
-    makeModifier: typeof makeModifier;
-};
-export default _default;
+declare const modifiersBase: Interact.Plugin;
+export default modifiersBase;

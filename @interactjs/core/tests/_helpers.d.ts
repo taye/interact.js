@@ -1,4 +1,4 @@
-import { MockCoords } from '../../utils/pointerUtils';
+import * as utils from '../../utils/index';
 export declare function unique(): number;
 export declare function uniqueProps(obj: any): void;
 export declare function newCoordsSet(n?: number): {
@@ -70,9 +70,9 @@ export declare function testEnv<T extends Interact.Target = HTMLElement>({ plugi
     interaction: import("@interactjs/core/Interaction").Interaction<any>;
     target: T;
     interactable: import("@interactjs/core/Interactable").Interactable;
-    coords: MockCoords;
+    coords: utils.pointer.MockCoords;
     event: ({
-        coords: MockCoords;
+        coords: utils.pointer.MockCoords;
         readonly page: any;
         readonly client: any;
         readonly timeStamp: any;
@@ -86,7 +86,7 @@ export declare function testEnv<T extends Interact.Target = HTMLElement>({ plugi
         readonly pointerType: any;
         readonly buttons: any;
     } & MouseEvent) | ({
-        coords: MockCoords;
+        coords: utils.pointer.MockCoords;
         readonly page: any;
         readonly client: any;
         readonly timeStamp: any;
@@ -100,7 +100,7 @@ export declare function testEnv<T extends Interact.Target = HTMLElement>({ plugi
         readonly pointerType: any;
         readonly buttons: any;
     } & MouseEvent & PointerEvent) | ({
-        coords: MockCoords;
+        coords: utils.pointer.MockCoords;
         readonly page: any;
         readonly client: any;
         readonly timeStamp: any;
@@ -114,7 +114,7 @@ export declare function testEnv<T extends Interact.Target = HTMLElement>({ plugi
         readonly pointerType: any;
         readonly buttons: any;
     } & MouseEvent & import("../../types/types").InteractEvent<any, any>) | ({
-        coords: MockCoords;
+        coords: utils.pointer.MockCoords;
         readonly page: any;
         readonly client: any;
         readonly timeStamp: any;
@@ -128,7 +128,7 @@ export declare function testEnv<T extends Interact.Target = HTMLElement>({ plugi
         readonly pointerType: any;
         readonly buttons: any;
     } & MouseEvent & TouchEvent) | ({
-        coords: MockCoords;
+        coords: utils.pointer.MockCoords;
         readonly page: any;
         readonly client: any;
         readonly timeStamp: any;
@@ -142,7 +142,7 @@ export declare function testEnv<T extends Interact.Target = HTMLElement>({ plugi
         readonly pointerType: any;
         readonly buttons: any;
     } & Touch & MouseEvent) | ({
-        coords: MockCoords;
+        coords: utils.pointer.MockCoords;
         readonly page: any;
         readonly client: any;
         readonly timeStamp: any;
@@ -156,7 +156,7 @@ export declare function testEnv<T extends Interact.Target = HTMLElement>({ plugi
         readonly pointerType: any;
         readonly buttons: any;
     } & Touch & PointerEvent) | ({
-        coords: MockCoords;
+        coords: utils.pointer.MockCoords;
         readonly page: any;
         readonly client: any;
         readonly timeStamp: any;
@@ -170,7 +170,7 @@ export declare function testEnv<T extends Interact.Target = HTMLElement>({ plugi
         readonly pointerType: any;
         readonly buttons: any;
     } & Touch & import("../../types/types").InteractEvent<any, any>) | ({
-        coords: MockCoords;
+        coords: utils.pointer.MockCoords;
         readonly page: any;
         readonly client: any;
         readonly timeStamp: any;
@@ -184,7 +184,7 @@ export declare function testEnv<T extends Interact.Target = HTMLElement>({ plugi
         readonly pointerType: any;
         readonly buttons: any;
     } & Touch & TouchEvent) | ({
-        coords: MockCoords;
+        coords: utils.pointer.MockCoords;
         readonly page: any;
         readonly client: any;
         readonly timeStamp: any;
@@ -198,7 +198,7 @@ export declare function testEnv<T extends Interact.Target = HTMLElement>({ plugi
         readonly pointerType: any;
         readonly buttons: any;
     } & PointerEvent & MouseEvent) | ({
-        coords: MockCoords;
+        coords: utils.pointer.MockCoords;
         readonly page: any;
         readonly client: any;
         readonly timeStamp: any;
@@ -212,7 +212,7 @@ export declare function testEnv<T extends Interact.Target = HTMLElement>({ plugi
         readonly pointerType: any;
         readonly buttons: any;
     } & PointerEvent) | ({
-        coords: MockCoords;
+        coords: utils.pointer.MockCoords;
         readonly page: any;
         readonly client: any;
         readonly timeStamp: any;
@@ -226,7 +226,7 @@ export declare function testEnv<T extends Interact.Target = HTMLElement>({ plugi
         readonly pointerType: any;
         readonly buttons: any;
     } & PointerEvent & import("../../types/types").InteractEvent<any, any>) | ({
-        coords: MockCoords;
+        coords: utils.pointer.MockCoords;
         readonly page: any;
         readonly client: any;
         readonly timeStamp: any;
@@ -240,7 +240,7 @@ export declare function testEnv<T extends Interact.Target = HTMLElement>({ plugi
         readonly pointerType: any;
         readonly buttons: any;
     } & PointerEvent & TouchEvent) | ({
-        coords: MockCoords;
+        coords: utils.pointer.MockCoords;
         readonly page: any;
         readonly client: any;
         readonly timeStamp: any;
@@ -254,7 +254,7 @@ export declare function testEnv<T extends Interact.Target = HTMLElement>({ plugi
         readonly pointerType: any;
         readonly buttons: any;
     } & import("../../types/types").InteractEvent<any, any> & MouseEvent) | ({
-        coords: MockCoords;
+        coords: utils.pointer.MockCoords;
         readonly page: any;
         readonly client: any;
         readonly timeStamp: any;
@@ -268,7 +268,7 @@ export declare function testEnv<T extends Interact.Target = HTMLElement>({ plugi
         readonly pointerType: any;
         readonly buttons: any;
     } & import("../../types/types").InteractEvent<any, any> & PointerEvent) | ({
-        coords: MockCoords;
+        coords: utils.pointer.MockCoords;
         readonly page: any;
         readonly client: any;
         readonly timeStamp: any;
@@ -282,7 +282,7 @@ export declare function testEnv<T extends Interact.Target = HTMLElement>({ plugi
         readonly pointerType: any;
         readonly buttons: any;
     } & import("../../types/types").InteractEvent<any, any>) | ({
-        coords: MockCoords;
+        coords: utils.pointer.MockCoords;
         readonly page: any;
         readonly client: any;
         readonly timeStamp: any;
@@ -298,3 +298,11 @@ export declare function testEnv<T extends Interact.Target = HTMLElement>({ plugi
     } & import("../../types/types").InteractEvent<any, any> & TouchEvent);
 };
 export declare function timeout(n: any): Promise<unknown>;
+export declare function ltrbwh(left: number, top: number, right: number, bottom: number, width: number, height: number): {
+    left: number;
+    top: number;
+    right: number;
+    bottom: number;
+    width: number;
+    height: number;
+};

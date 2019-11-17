@@ -44,7 +44,7 @@ export function init(window) {
   return interact;
 } // eslint-disable-next-line no-undef
 
-interact.version = "1.7.1";
+interact.version = "1.8.0-alpha.0";
 export default interact;
 export { interact, actions, autoScroll, interactablePreventDefault, inertia, modifiersBase as modifiers, pointerEvents, reflow };
 //# sourceMappingURL=index.js.map

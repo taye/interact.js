@@ -9,4 +9,4 @@ export declare const bool: (thing: any) => thing is boolean;
 export declare const string: (thing: any) => thing is string;
 export declare const element: (thing: any) => thing is import("../types/types").Element;
 export declare const plainObject: typeof object;
-export declare const array: (thing: any) => thing is any[];
+export declare const array: <T extends unknown>(thing: any) => thing is T[];

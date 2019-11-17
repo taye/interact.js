@@ -12,8 +12,8 @@ export declare type RestrictEdgesState = ModifierState<RestrictEdgesOptions, {
     outer: Interact.Rect;
     offset: RestrictEdgesOptions['offset'];
 }>;
-declare function start({ interaction, state }: ModifierArg<RestrictEdgesState>): void;
-declare function set({ coords, interaction, state }: ModifierArg<RestrictEdgesState>): void;
+declare function start({ interaction, startOffset, state }: ModifierArg<RestrictEdgesState>): void;
+declare function set({ coords, edges, interaction, state }: ModifierArg<RestrictEdgesState>): void;
 declare const restrictEdges: {
     noInner: {
         top: number;

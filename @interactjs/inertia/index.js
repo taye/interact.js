@@ -95,22 +95,22 @@ function release({
     interactable: interaction.interactable,
     element: interaction.element,
     rect: interaction.rect,
+    edges: interaction.edges,
     pageCoords: interaction.coords.cur.page,
-    states: inertiaPossible && interaction.modifiers.states.map(modifierStatus => utils.extend({}, modifierStatus)),
+    states: inertiaPossible && interaction.modifiers.states.map(modifierState => utils.extend({}, modifierState)),
     preEnd: true,
     prevCoords: null,
+    prevRect: null,
     requireEndOnly: null,
     phase: EventPhase.InertiaStart
   }; // smoothEnd
 
   if (inertiaPossible && !inertia) {
-    modifierArg.prevCoords = interaction.modifiers.result ? interaction.modifiers.result.coords : interaction.prevEvent.page;
+    modifierArg.prevCoords = interaction.modifiers.result.coords;
+    modifierArg.prevRect = interaction.modifiers.result.rect;
     modifierArg.requireEndOnly = false;
     modifierResult = modifiers.setAll(modifierArg);
-
-    if (modifierResult.changed) {
-      smoothEnd = true;
-    }
+    smoothEnd = modifierResult.changed;
   }
 
   if (!(inertia || smoothEnd)) {
@@ -137,6 +137,7 @@ function release({
     modifierArg.pageCoords.x += state.xe;
     modifierArg.pageCoords.y += state.ye;
     modifierArg.prevCoords = null;
+    modifierArg.prevRect = null;
     modifierArg.requireEndOnly = true;
     modifierResult = modifiers.setAll(modifierArg);
     state.modifiedXe += modifierResult.delta.x;
@@ -201,12 +202,16 @@ function inertiaTick(interaction) {
       state.sy = quadPoint.y;
     }
 
-    interaction.move();
+    interaction.move({
+      event: state.startEvent
+    });
     state.timeout = raf.request(() => inertiaTick(interaction));
   } else {
     state.sx = state.modifiedXe;
     state.sy = state.modifiedYe;
-    interaction.move();
+    interaction.move({
+      event: state.startEvent
+    });
     interaction.end(state.startEvent);
     state.active = false;
     interaction.simulation = null;
@@ -226,12 +231,16 @@ function smothEndTick(interaction) {
   if (t < duration) {
     state.sx = utils.easeOutQuad(t, 0, state.xe, duration);
     state.sy = utils.easeOutQuad(t, 0, state.ye, duration);
-    interaction.move();
+    interaction.move({
+      event: state.startEvent
+    });
     state.timeout = raf.request(() => smothEndTick(interaction));
   } else {
     state.sx = state.xe;
     state.sy = state.ye;
-    interaction.move();
+    interaction.move({
+      event: state.startEvent
+    });
     interaction.end(state.startEvent);
     state.smoothEnd = state.active = false;
     interaction.simulation = null;

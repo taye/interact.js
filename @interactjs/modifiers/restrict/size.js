@@ -1,5 +1,5 @@
 import extend from "../../utils/extend.js";
-import rectUtils from "../../utils/rect.js";
+import * as rectUtils from "../../utils/rect.js";
 import restrictEdges from "./edges.js";
 import { getRestrictionRect } from "./pointer.js";
 const noMin = {
@@ -18,18 +18,18 @@ function start(arg) {
 function set(arg) {
   const {
     interaction,
-    state
+    state,
+    rect,
+    edges
   } = arg;
   const {
     options
   } = state;
-  const edges = interaction.prepared._linkedEdges || interaction.prepared.edges;
 
   if (!edges) {
     return;
   }
 
-  const rect = rectUtils.xywhToTlbr(interaction.resizeRects.inverted);
   const minSize = rectUtils.tlbrToXywh(getRestrictionRect(options.min, interaction, arg.coords)) || noMin;
   const maxSize = rectUtils.tlbrToXywh(getRestrictionRect(options.max, interaction, arg.coords)) || noMax;
   state.options = {

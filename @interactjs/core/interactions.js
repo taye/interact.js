@@ -2,7 +2,7 @@ import browser from "../utils/browser.js";
 import domObjects from "../utils/domObjects.js";
 import { nodeContains } from "../utils/domUtils.js";
 import events from "../utils/events.js";
-import pointerUtils from "../utils/pointerUtils.js";
+import * as pointerUtils from "../utils/pointerUtils.js";
 import InteractionBase from "./Interaction.js";
 import finder from "./interactionFinder.js";
 import { Scope } from "./scope.js";
