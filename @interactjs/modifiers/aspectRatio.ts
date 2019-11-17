@@ -19,7 +19,7 @@
 
 import extend from '../utils/extend'
 import { addEdges } from '../utils/rect'
-import modifiersBase, { Modifier, ModifierModule, ModifiersResult, ModifierState, setAll, startAll } from './base'
+import modifiersBase, { Modifier, ModifierModule, ModifierState, setAll, startAll } from './base'
 
 export interface AspectRatioOptions {
   ratio?: number | 'preserve'
@@ -37,7 +37,6 @@ export type AspectRatioState = ModifierState<AspectRatioOptions, {
   xIsPrimaryAxis: boolean
   edgeSign: 1 | -1
   subStates: ModifierState[]
-  prevSubResult: ModifiersResult
 }>
 
 const aspectRatio: ModifierModule<AspectRatioOptions, AspectRatioState> = {
@@ -88,13 +87,6 @@ const aspectRatio: ModifierModule<AspectRatioOptions, AspectRatioState> = {
       ...arg,
       states: state.subStates,
     })
-
-    state.prevSubResult = setAll({
-      ...arg,
-      pageCoords: coords,
-      prevCoords: coords,
-      states: state.subStates,
-    })
   },
 
   set (arg) {
@@ -115,19 +107,19 @@ const aspectRatio: ModifierModule<AspectRatioOptions, AspectRatioState> = {
       rect: correctedRect,
       edges: state.linkedEdges,
       pageCoords: coords,
-      prevCoords: state.prevSubResult.coords,
-      prevRect: state.prevSubResult.rect,
       states: state.subStates,
+      prevCoords: coords,
+      prevRect: correctedRect,
     })
-
-    state.prevSubResult = result
-
-    if (!result.changed) { return }
 
     const { delta } = result
 
-    // do aspect modification again with critical edge as primary
-    aspectMethod(state, Math.abs(delta.x) > Math.abs(delta.y), result.coords, result.rect)
+    if (!result.changed) { return }
+
+    const xIsCriticalAxis = Math.abs(delta.x) > Math.abs(delta.y)
+
+    // do aspect modification again with critical edge axis as primary
+    aspectMethod(state, xIsCriticalAxis, result.coords, result.rect)
     extend(coords, result.coords)
   },
 
