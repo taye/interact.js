@@ -33,6 +33,7 @@ export type AspectRatioState = ModifierState<AspectRatioOptions, {
   originalEdges: Interact.EdgeOptions
   ratio: number
   equalDelta: boolean
+  xIsPrimaryAxis: boolean
   edgeSign: 1 | -1
 }>
 
@@ -58,17 +59,23 @@ const aspectRatio: ModifierModule<AspectRatioOptions, AspectRatioState> = {
       right : originalEdges.right  || (originalEdges.bottom && !originalEdges.left),
     }
 
-    state.edgeSign = (linkedEdges.left ? 1 : -1) * (linkedEdges.top ? 1 : -1) as 1 | -1
-  },
-
-  set ({ state, coords }) {
-    const xIsPrimaryAxis = !!(state.originalEdges.left || state.originalEdges.right)
+    state.xIsPrimaryAxis = !!(state.originalEdges.left || state.originalEdges.right)
 
     if (state.equalDelta) {
-      setEqualDelta(state, coords, xIsPrimaryAxis)
+      state.edgeSign = (linkedEdges.left ? 1 : -1) * (linkedEdges.top ? 1 : -1) as 1 | -1
     }
     else {
-      setRatio(state, coords, xIsPrimaryAxis)
+      const negativeSecondaryEdge = state.xIsPrimaryAxis ? linkedEdges.top : linkedEdges.left
+      state.edgeSign = negativeSecondaryEdge ? -1 : 1
+    }
+  },
+
+  set ({ state, rect, coords }) {
+    if (state.equalDelta) {
+      setEqualDelta(state, coords)
+    }
+    else {
+      setRatio(state, coords, rect)
     }
   },
 
@@ -79,25 +86,23 @@ const aspectRatio: ModifierModule<AspectRatioOptions, AspectRatioState> = {
   },
 }
 
-function setEqualDelta ({ startCoords, edgeSign }: AspectRatioState, coords: Interact.Point, xIsPrimaryAxis: boolean) {
+function setEqualDelta ({ startCoords, xIsPrimaryAxis, edgeSign }: AspectRatioState, coords: Interact.Point) {
   if (xIsPrimaryAxis) {
-    coords.y = startCoords.y + (coords.x - startCoords.x) / edgeSign
+    coords.y = startCoords.y + (coords.x - startCoords.x) * edgeSign
   }
   else {
     coords.x = startCoords.x + (coords.y - startCoords.y) * edgeSign
   }
 }
 
-function setRatio ({ startRect, startCoords, ratio, edgeSign }: AspectRatioState, coords: Interact.Point, xIsPrimaryAxis: boolean) {
+function setRatio ({ startRect, startCoords, ratio, xIsPrimaryAxis, edgeSign }: AspectRatioState, coords: Interact.Point, rect: Interact.Rect) {
   if (xIsPrimaryAxis) {
-    const newWidth = (startRect.width + (coords.x - startCoords.x) * edgeSign)
-    const newHeight = newWidth / ratio
+    const newHeight = rect.width / ratio
 
     coords.y = startCoords.y + (newHeight - startRect.height) * edgeSign
   }
   else {
-    const newHeight = (startRect.height + (coords.y - startCoords.y) * edgeSign)
-    const newWidth = newHeight * ratio
+    const newWidth = rect.height * ratio
 
     coords.x = startCoords.x + (newWidth - startRect.width) * edgeSign
   }
