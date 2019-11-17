@@ -1,3 +1,7 @@
+## v1.8.0-alpha.0
+
+ - added `aspectRatio` modifier (#638)
+
 ## v1.7.1
 
  - reorganized modules for esnext resolution
