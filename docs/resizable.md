@@ -98,6 +98,37 @@ to dimensions less than `0x0`. The possible values are:
  - `'reposition'` will keep the width/height positive by swapping the top and
  bottom edges and/or swapping the left and right edges
 
+Aspect ratio
+------------
+
+```js
+interact(target).resizable({
+  modifiers: [
+    interact.modifiers.aspectRatio({
+      // make sure the width is always double the height
+      ratio: 2,
+      // also restrict the size by nesting another modifier
+      modifiers: [
+        interact.modifiers.restrictSize({ max: 'parent' })
+      ]
+    })
+  ],
+})
+```
+
+interact.js comes with an `aspectRatio` modifier which can be used to force the
+resized rect to maintain a certain aspect ratio. The modifier has 3 options:
+
+| Prop         | Type                 | Description                                                                             |
+|--------------|----------------------|-----------------------------------------------------------------------------------------|
+| `ratio`      | number or 'preserve' | The aspect ratio to maintain or the value 'preserve' to maintain the starting ratio     |
+| `equalDelta` | boolean              | Increase edges by the same amount instead of maintaining the same ratio                 |
+| `modifiers`  | array of modifiers   | Modifiers to apply to the resize which will be made to respect the aspect ratio options |
+
+To guarantee that the aspect ratio options are respected by other modifiers,
+those modifiers must be in the `aspectRatio.modifiers` array option, **not** in the
+same `resize.modifiers` array as the `aspectRatio` one.
+
 [Demo on Codepen][resize-codepen]
 
 `cursorChecker`

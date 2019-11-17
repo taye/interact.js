@@ -2,6 +2,8 @@ import test from '@interactjs/_dev/test/test'
 import * as helpers from '../core/tests/_helpers'
 import resize from './resize'
 
+const { ltrbwh } = helpers
+
 test('resize', t => {
   const rect = Object.freeze({ left: 0, top: 0, right: 10, bottom: 10, width: 10, height: 10 })
   const {
@@ -75,19 +77,23 @@ test('resize', t => {
 
   coords.page.x = rect.right
   coords.page.y = rect.bottom
-  interaction.updatePointer(event, event, element, true)
+  interaction.pointerDown(event, event, element)
   interaction.start({ name: 'resize', edges: { bottom: true, right: true } }, interactable, element)
 
   t.deepEqual(
-    interaction.resizeRects,
+    interaction._rects,
     {
       start: rect,
-      current: helpers.getProps(rect, ['top', 'left', 'bottom', 'right']),
-      inverted: rect,
+      corrected: rect,
       previous: rect,
       delta: zeroRect,
     },
-    'sets starting interaction.resizeRect props',
+    'sets starting correct interaction._rects',
+  )
+  t.deepEqual(
+    interaction.rect,
+    rect,
+    'sets starting correct interaction.rect',
   )
   t.ok(hasResizeProps(resizeEvent), 'resizestart event has extra resize props')
 
@@ -97,15 +103,19 @@ test('resize', t => {
   interaction.pointerMove(event, event, element)
 
   t.deepEqual(
-    interaction.resizeRects,
+    interaction._rects,
     {
       start: rect,
-      current: { left: 0, top: 0, right: -100, bottom: -200 },
-      inverted: zeroRect,
+      corrected: zeroRect,
       previous: rect,
-      delta: { ...zeroRect, right: -rect.width, bottom: -rect.bottom, width: -rect.width, height: -rect.height },
+      delta: ltrbwh(0, 0, -rect.width, -rect.bottom, -rect.width, -rect.height),
     },
-    "invert: 'none'",
+    "`invert: 'none'` interaction._rects are correct",
+  )
+  t.deepEqual(
+    interaction.rect,
+    ltrbwh(0, 0, -100, -200, -100, -200),
+    "`invert: 'none'` interaction.rect is correct",
   )
   t.ok(hasResizeProps(resizeEvent), 'resizemove event has extra resize props')
 
@@ -113,32 +123,29 @@ test('resize', t => {
   interaction.move()
 
   t.deepEqual(
-    interaction.resizeRects,
+    interaction._rects,
     {
       start: rect,
-      current: { left: 0, top: 0, right: -100, bottom: -200 },
-      inverted: { ...zeroRect, left: -100, top: -200, width: 100, height: 200 },
-      previous: interaction.resizeRects.previous, // not testing previous
-      delta: { ...zeroRect, left: -100, top: -200, width: 100, height: 200 },
+      corrected: ltrbwh(-100, -200, 0, 0, 100, 200),
+      previous: interaction._rects.previous, // not testing previous
+      delta: ltrbwh(-100, -200, 0, 0, 100, 200),
     },
-    "invert: 'reposition'",
+    "`invert: 'reposition'` interaction._rects",
   )
 
-  interactable.options.resize.invert = 'none'
   interaction.move()
   interactable.options.resize.invert = 'negate'
   interaction.move()
 
   t.deepEqual(
-    interaction.resizeRects,
+    interaction._rects,
     {
       start: rect,
-      current: { left: 0, top: 0, right: -100, bottom: -200 },
-      inverted: { ...zeroRect, right: -100, bottom: -200, width: -100, height: -200 },
-      previous: interaction.resizeRects.previous, // not testing previous
-      delta: { ...zeroRect, right: -100, bottom: -200, width: -100, height: -200 },
+      corrected: ltrbwh(0, 0, -100, -200, -100, -200),
+      previous: interaction._rects.previous, // not testing previous
+      delta: ltrbwh(100, 200, -100, -200, -200, -400),
     },
-    "invert: 'negate'",
+    "invert: 'negate' interaction._rects",
   )
 
   resizeEvent = null

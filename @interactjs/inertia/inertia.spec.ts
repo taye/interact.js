@@ -53,7 +53,7 @@ test('inertia', t => {
       { x: modifierChange, y: modifierChange, type: 'dragmove' },
       { x: modifierChange, y: modifierChange, type: 'draginertiastart' },
     ],
-    '{ endOnly: false } && thrown: move, inertiastart, and end InteractEvents are modified'
+    '{ endOnly: false } && thrown: move, inertiastart, and end InteractEvents are modified',
   )
 
   // test inertia with { endOnly: true } modifier and with throw

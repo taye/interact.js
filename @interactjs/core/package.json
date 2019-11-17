@@ -1,14 +1,14 @@
 {
   "name": "@interactjs/core",
-  "version": "1.7.1",
+  "version": "1.8.0-alpha.0",
   "license": "MIT",
   "peerDependencies": {
-    "@interactjs/dev-tools": "1.7.1",
-    "@interactjs/utils": "1.7.1"
+    "@interactjs/dev-tools": "1.8.0-alpha.0",
+    "@interactjs/utils": "1.8.0-alpha.0"
   },
   "devDependencies": {
-    "@interactjs/actions": "1.7.1",
-    "@interactjs/auto-start": "1.7.1"
+    "@interactjs/actions": "1.8.0-alpha.0",
+    "@interactjs/auto-start": "1.8.0-alpha.0"
   },
   "publishConfig": {
     "access": "public"
