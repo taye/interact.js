@@ -7,6 +7,7 @@ import { ActionName } from './scope'
 export interface ActionProps<T extends ActionName = any> {
   name: T
   axis?: 'x' | 'y' | 'xy'
+  edges?: Interact.EdgeOptions
 }
 
 export interface StartAction extends ActionProps {
@@ -105,9 +106,6 @@ export class Interaction<T extends ActionName = any> {
     corrected: Interact.FullRect
     previous: Interact.FullRect
     delta: Interact.FullRect
-  }
-  edges: {
-    [P in keyof Interact.Rect]?: boolean
   }
 
   _scopeFire: Interact.Scope['fire']
@@ -261,7 +259,6 @@ export class Interaction<T extends ActionName = any> {
     this.interactable = interactable
     this.element      = element
     this.rect         = interactable.getRect(element)
-    this.edges        = this.prepared.edges
     this._stopped     = false
     this._interacting = this._doPhase({
       interaction: this,
@@ -572,7 +569,7 @@ export class Interaction<T extends ActionName = any> {
 
     if (rect && phase === EventPhase.Move) {
       // update the rect modifications
-      const edges = this.edges || this.prepared.edges || { left: true, right: true, top: true, bottom: true }
+      const edges = this.prepared.edges || { left: true, right: true, top: true, bottom: true }
       utils.rect.addEdges(edges, rect, delta[this.interactable.options.deltaSource])
 
       rect.width = rect.right - rect.left

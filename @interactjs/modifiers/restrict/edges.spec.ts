@@ -4,8 +4,9 @@ import restrictEdges from '../restrict/edges'
 
 test('restrictEdges', t => {
   const { interaction } = helpers.testEnv()
+  const edges = { top: true, bottom: true, left: true, right: true }
   interaction.prepared = {} as any
-  interaction.prepared.edges = { top: true, bottom: true, left: true, right: true }
+  interaction.prepared.edges = edges
   interaction._rects = {} as any
   interaction._rects.corrected = { x: 10, y: 20, width: 300, height: 200 } as any
   interaction._interacting = true
@@ -14,7 +15,7 @@ test('restrictEdges', t => {
   const coords = { x: 40, y: 40 }
   const offset = { top: 0, left: 0, bottom: 0, right: 0 }
   const state = { options, offset }
-  const arg = { interaction, state } as any
+  const arg = { interaction, edges, state } as any
 
   arg.coords = { ...coords }
 

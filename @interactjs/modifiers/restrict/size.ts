@@ -25,9 +25,8 @@ export type RestrictSizeState =
   }>
 
 function set (arg: ModifierArg<RestrictSizeState>) {
-  const { interaction, state, rect } = arg
+  const { interaction, state, rect, edges } = arg
   const { options } = state
-  const edges = interaction.prepared._linkedEdges || interaction.prepared.edges
 
   if (!edges) {
     return

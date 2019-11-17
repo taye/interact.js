@@ -17,12 +17,14 @@
  * });
  */
 
-import extend from '@interactjs/utils/extend'
-import { ModifierModule, ModifierState } from './base'
+import extend from '../utils/extend'
+import { addEdges } from '../utils/rect'
+import modifiersBase, { Modifier, ModifierModule, ModifiersResult, ModifierState, setAll, startAll } from './base'
 
 export interface AspectRatioOptions {
   ratio?: number | 'preserve'
   equalDelta?: boolean
+  modifiers?: Modifier[]
   enabled?: boolean
 }
 
@@ -30,36 +32,37 @@ export type AspectRatioState = ModifierState<AspectRatioOptions, {
   startCoords: Interact.Point
   startRect: Interact.Rect
   linkedEdges: Interact.EdgeOptions
-  originalEdges: Interact.EdgeOptions
   ratio: number
   equalDelta: boolean
   xIsPrimaryAxis: boolean
   edgeSign: 1 | -1
+  subStates: ModifierState[]
+  prevSubResult: ModifiersResult
 }>
 
 const aspectRatio: ModifierModule<AspectRatioOptions, AspectRatioState> = {
-  start ({ interaction, state, rect, pageCoords }) {
+  start (arg) {
+    const { state, rect, edges: originalEdges, pageCoords: coords } = arg
     let { ratio } = state.options
-    const { equalDelta } = state.options
+    const { equalDelta, modifiers } = state.options
 
     if (ratio === 'preserve') {
       ratio = rect.width / rect.height
     }
 
-    state.startCoords = extend({}, pageCoords)
+    state.startCoords = extend({}, coords)
     state.startRect = extend({}, rect)
     state.ratio = ratio
     state.equalDelta = equalDelta
-    const originalEdges = state.originalEdges = interaction.edges
 
-    const linkedEdges = state.linkedEdges = interaction.edges = {
+    const linkedEdges = state.linkedEdges = {
       top   : originalEdges.top    || (originalEdges.left   && !originalEdges.bottom),
       left  : originalEdges.left   || (originalEdges.top    && !originalEdges.right),
       bottom: originalEdges.bottom || (originalEdges.right  && !originalEdges.top),
       right : originalEdges.right  || (originalEdges.bottom && !originalEdges.left),
     }
 
-    state.xIsPrimaryAxis = !!(state.originalEdges.left || state.originalEdges.right)
+    state.xIsPrimaryAxis = !!(originalEdges.left || originalEdges.right)
 
     if (state.equalDelta) {
       state.edgeSign = (linkedEdges.left ? 1 : -1) * (linkedEdges.top ? 1 : -1) as 1 | -1
@@ -68,20 +71,70 @@ const aspectRatio: ModifierModule<AspectRatioOptions, AspectRatioState> = {
       const negativeSecondaryEdge = state.xIsPrimaryAxis ? linkedEdges.top : linkedEdges.left
       state.edgeSign = negativeSecondaryEdge ? -1 : 1
     }
+
+    extend(arg.edges, linkedEdges)
+
+    if (!modifiers || !modifiers.length) { return }
+
+    state.subStates = modifiersBase.prepareStates(modifiers).map(subState => {
+      subState.options = {
+        ...subState.options,
+      }
+
+      return subState
+    })
+
+    startAll({
+      ...arg,
+      states: state.subStates,
+    })
+
+    state.prevSubResult = setAll({
+      ...arg,
+      pageCoords: coords,
+      prevCoords: coords,
+      states: state.subStates,
+    })
   },
 
-  set ({ state, rect, coords }) {
-    if (state.equalDelta) {
-      setEqualDelta(state, coords)
-    }
-    else {
-      setRatio(state, coords, rect)
-    }
+  set (arg) {
+    const { state, rect, coords } = arg
+    const initialCoords = extend({}, coords)
+    const aspectMethod = state.equalDelta ? setEqualDelta : setRatio
+
+    aspectMethod(state, coords, rect)
+
+    if (!state.subStates) { return }
+
+    const correctedRect = extend({}, rect)
+
+    addEdges(state.linkedEdges, correctedRect, { x: coords.x - initialCoords.x, y: coords.y - initialCoords.y })
+
+    const result = setAll({
+      ...arg,
+      rect: correctedRect,
+      edges: state.linkedEdges,
+      pageCoords: coords,
+      prevCoords: state.prevSubResult.coords,
+      prevRect: state.prevSubResult.rect,
+      states: state.subStates,
+    })
+
+    state.prevSubResult = result
+
+    if (!result.changed) { return }
+
+    const { delta } = result
+
+    // do aspect modification again with critical edge as primary
+    aspectMethod({ ...state, xIsPrimaryAxis: Math.abs(delta.x) > Math.abs(delta.y) }, result.coords, result.rect)
+    extend(coords, result.coords)
   },
 
   defaults: {
     ratio: 'preserve',
     equalDelta: false,
+    modifiers: [],
     enabled: false,
   },
 }

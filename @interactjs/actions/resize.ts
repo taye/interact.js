@@ -20,11 +20,6 @@ declare module '@interactjs/core/Interaction' {
     resizeAxes: 'x' | 'y' | 'xy'
     resizeStartAspectRatio: number
   }
-
-  interface ActionProps {
-    edges?: { [edge in 'top' | 'left' | 'bottom' | 'right']?: boolean }
-    _linkedEdges?: { [edge in 'top' | 'left' | 'bottom' | 'right']?: boolean }
-  }
 }
 
 declare module '@interactjs/core/defaultOptions' {

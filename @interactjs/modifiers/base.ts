@@ -14,21 +14,7 @@ declare module '@interactjs/core/Interaction' {
       offsets: any
       startOffset: any
       startDelta: Interact.Point
-      result?: {
-        delta: {
-          x: number
-          y: number
-        }
-        rectDelta: {
-          left: number
-          right: number
-          top: number
-          bottom: number
-        }
-        coords: Interact.Point
-        rect: Interact.FullRect
-        changed: boolean
-      }
+      result?: ModifiersResult
       endPrevented: boolean
     }
   }
@@ -71,6 +57,7 @@ export interface ModifierArg<State extends ModifierState = ModifierState> {
   interactable: Interact.Interactable
   phase: Interact.EventPhase
   rect: Interact.FullRect
+  edges: Interact.EdgeOptions
   states?: State[]
   state?: State
   element: Interact.Element
@@ -94,13 +81,29 @@ export interface ModifierModule<
   stop? (arg: ModifierArg<State>): void
 }
 
+export interface ModifiersResult {
+  delta: {
+    x: number
+    y: number
+  }
+  rectDelta: {
+    left: number
+    right: number
+    top: number
+    bottom: number
+  }
+  coords: Interact.Point
+  rect: Interact.FullRect
+  changed: boolean
+}
+
 function start (
   { interaction, phase }: { interaction: Interact.Interaction, phase: Interact.EventPhase },
   pageCoords: Interact.Point,
   prevCoords: Interact.Point,
   prevRect: Interact.FullRect,
 ) {
-  const { interactable, element } = interaction
+  const { interactable, element, prepared: { edges } } = interaction
   const modifierList = getModifierList(interaction)
   const states = prepareStates(modifierList)
 
@@ -117,6 +120,7 @@ function start (
     pageCoords,
     phase,
     rect,
+    edges,
     startOffset,
     states,
     preEnd: false,
@@ -143,11 +147,12 @@ export function startAll (arg: ModifierArg<any>) {
       state.methods.start(arg)
     }
   }
+
+  arg.interaction.prepared.edges = arg.edges
 }
 
 export function setAll (arg: ModifierArg) {
   const {
-    interaction,
     prevCoords,
     prevRect,
     phase,
@@ -173,7 +178,7 @@ export function setAll (arg: ModifierArg) {
     changed: true,
   }
 
-  const edges = interaction.edges || interaction.prepared.edges || { left: true, right: true, top: true, bottom: true }
+  const edges = arg.edges || { left: true, right: true, top: true, bottom: true }
 
   for (const state of states) {
     const { options } = state
@@ -239,6 +244,7 @@ function beforeMove (arg: Partial<Interact.DoPhaseArg> & {
     pageCoords: arg.modifiedCoords || interaction.coords.cur.page,
     prevCoords,
     rect: interaction.rect,
+    edges: interaction.prepared.edges,
     prevRect,
     states,
     requireEndOnly: false,

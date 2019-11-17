@@ -58,9 +58,9 @@ test('modifiers/aspectRatio', t => {
   )
 
   // combine with restrictSize
-  interactable.options.resize.modifiers.push(resztrictSizeModifier({
+  options.modifiers = [resztrictSizeModifier({
     max: { width: 20, height: 20 },
-  }))
+  })]
   options.equalDelta = false
   options.ratio = 2
   downStartMoveUp({ x: 20, y: 0, edges: { right: true } })

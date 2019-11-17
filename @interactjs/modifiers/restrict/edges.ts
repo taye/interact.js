@@ -51,9 +51,8 @@ function start ({ interaction, startOffset, state }: ModifierArg<RestrictEdgesSt
   }
 }
 
-function set ({ coords, interaction, state }: ModifierArg<RestrictEdgesState>) {
+function set ({ coords, edges, interaction, state }: ModifierArg<RestrictEdgesState>) {
   const { offset, options } = state
-  const edges = interaction.prepared._linkedEdges || interaction.prepared.edges
 
   if (!edges) {
     return

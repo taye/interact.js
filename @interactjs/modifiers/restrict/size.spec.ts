@@ -34,6 +34,7 @@ test('restrictSize', t => {
   const arg: any = {
     interaction,
     rect,
+    edges,
     options,
     states: [state],
     coords: startCoords,
