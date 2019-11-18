@@ -1,27 +1,37 @@
 import test from '@interactjs/_dev/test/test'
+import extend from '@interactjs/utils/extend'
+import drag from '../../actions/drag'
 import * as helpers from '../../core/tests/_helpers'
+import modifiersBase, { makeModifier } from '../base'
 import snap from '../snap/pointer'
 
 test('modifiers/snap', t => {
+  const rect = helpers.ltrbwh(0, 0, 100, 100, 100, 100)
   const {
     interaction,
     interactable,
-  } = helpers.testEnv()
+    coords,
+    down,
+    move,
+    start,
+    stop,
+  } = helpers.testEnv({
+    plugins: [modifiersBase, drag],
+    rect,
+  })
+
+  coords.client = coords.page
+
+  const snapModifier = makeModifier(snap, 'snap')
   const origin = { x: 120, y: 120 }
-
-  ;(interactable.options as any).TEST = { origin }
-  interaction.interactable = interactable
-  interaction.prepared = { name: 'TEST' }
-  interaction._interacting = true
-
   let funcArgs = null
   const target0 = Object.freeze({ x:  50, y:  100 })
-  // eslint-disable-next-line no-restricted-syntax, no-shadow
   const targetFunc = (x, y, _interaction, offset, index, ...unexpected) => {
     funcArgs = { x, y, offset, index, unexpected }
     return target0
   }
   const relativePoint = { x: 0, y: 0 }
+
   const options = {
     offset: null,
     offsetWithOrigin: true,
@@ -33,41 +43,40 @@ test('modifiers/snap', t => {
     relativePoints: [relativePoint],
   }
 
-  const state = {
-    options,
-    realX: 0,
-    realY: 0,
-  }
-  const pageCoords = Object.freeze({ x: 200, y: 300 })
-  const arg = {
-    interaction,
-    interactable,
-    state,
-    pageCoords,
-    coords: { ...pageCoords },
-    rect: { top: 0, left: 0, bottom: 100, right: 100, width: 100, height: 100 },
-    startOffset: { top: 0, left: 0, bottom: 0, right: 0 },
-  } as any
+  let lastEventModifiers: any[] = null
+  interactable.draggable({
+    origin,
+    modifiers: [snapModifier(options)],
+  }).on('dragmove dragstart dragend', e => { lastEventModifiers = e.modifiers })
 
-  snap.start(arg)
-  snap.set(arg)
+  down()
+  start({ name: 'drag' })
+  extend(coords.page, { x: 50, y: 50 })
+  move()
 
   t.deepEqual(
-    arg.coords,
+    Object.keys(lastEventModifiers[0]).sort(),
+    ['delta', 'distance', 'inRange', 'range', 'target'],
+    'event.modifiers entry has expected props',
+  )
+
+  t.deepEqual(
+    helpers.getProps(lastEventModifiers[0].target, ['x', 'y']),
     { x: target0.x + origin.x, y: target0.y + origin.y },
     'snaps to target and adds origin which will be subtracted by InteractEvent',
   )
 
-  arg.coords = { ...pageCoords }
-  state.options.targets = [targetFunc]
-  snap.start(arg)
-  snap.set(arg)
+  options.targets = [targetFunc]
+  down()
+  start({ name: 'drag' })
+  move(true)
+  stop()
 
   t.deepEqual(
     funcArgs,
     {
-      x: pageCoords.x - origin.x,
-      y: pageCoords.y - origin.y,
+      x: coords.page.x - origin.x,
+      y: coords.page.y - origin.y,
       offset: {
         x: origin.x,
         y: origin.y,
@@ -80,21 +89,40 @@ test('modifiers/snap', t => {
     'x, y, interaction, offset, index are passed to target function; origin subtracted from x, y',
   )
 
-  arg.coords = { ...pageCoords }
   options.offset = { x: 300, y: 300 }
   options.offsetWithOrigin = false
-  snap.start(arg)
-  snap.set(arg)
+
+  down()
+  start({ name: 'drag' })
+  move(true)
+
+  const { startOffset } = interaction.modifiers
+  const relativeOffset = {
+    x: options.offset.x + startOffset.left,
+    y: options.offset.y + startOffset.top,
+  }
 
   t.deepEqual(
-    arg.coords,
-    { x: target0.x + 300, y: target0.y + 300 },
+    helpers.getProps(lastEventModifiers[0].target, ['source', 'range', 'offset']),
+    { source: targetFunc, range: Infinity, offset: { ...relativeOffset, index: 0, relativePoint } },
+    'event.modifiers entry has source element of options.targets array, range, and offset',
+  )
+
+  t.deepEqual(
+    helpers.getProps(lastEventModifiers[0].target, ['x', 'y']),
+    {
+      x: target0.x + relativeOffset.x,
+      y: target0.y + relativeOffset.y,
+    },
     'origin not added to target when !options.offsetWithOrigin',
   )
 
   t.deepEqual(
     { x: funcArgs.x, y: funcArgs.y },
-    { x: pageCoords.x - origin.x - 300, y: pageCoords.y - origin.y - 300 },
+    {
+      x: coords.page.x - origin.x - relativeOffset.x,
+      y: coords.page.y - origin.y - relativeOffset.y,
+    },
     'origin still subtracted from function target x, y args when !options.offsetWithOrigin',
   )
 

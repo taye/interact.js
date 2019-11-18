@@ -11,8 +11,7 @@ declare module '@interactjs/core/Interaction' {
   interface Interaction {
     modifiers?: {
       states: ModifierState[]
-      offsets: any
-      startOffset: any
+      startOffset: Interact.Rect
       startDelta: Interact.Point
       result?: ModifiersResult
       endPrevented: boolean
@@ -20,6 +19,14 @@ declare module '@interactjs/core/Interaction' {
   }
 }
 
+declare module '@interactjs/core/InteractEvent' {
+  interface InteractEvent {
+    modifiers?: Array<{
+      name: string
+      [key: string]: any
+    }>
+  }
+}
 declare module '@interactjs/core/defaultOptions' {
   interface PerActionDefaults {
     modifiers?: Modifier[]
@@ -50,6 +57,7 @@ export type ModifierState<
   methods?: Modifier<Defaults>['methods']
   index?: number
   name?: Name
+  result?: object
 } & StateProps
 
 export interface ModifierArg<State extends ModifierState = ModifierState> {
@@ -94,6 +102,7 @@ export interface ModifiersResult {
   }
   coords: Interact.Point
   rect: Interact.FullRect
+  eventProps: any[]
   changed: boolean
 }
 
@@ -151,7 +160,7 @@ export function startAll (arg: ModifierArg<any>) {
   arg.interaction.edges = arg.edges
 }
 
-export function setAll (arg: ModifierArg) {
+export function setAll (arg: ModifierArg): ModifiersResult {
   const {
     prevCoords,
     prevRect,
@@ -175,6 +184,7 @@ export function setAll (arg: ModifierArg) {
     },
     coords: arg.coords,
     rect: arg.rect,
+    eventProps: [],
     changed: true,
   }
 
@@ -183,14 +193,16 @@ export function setAll (arg: ModifierArg) {
   for (const state of states) {
     const { options } = state
     const lastModifierCoords = extend({}, arg.coords)
+    let returnValue = null
 
-    if (!state.methods.set ||
-      !shouldDo(options, preEnd, requireEndOnly, phase)) { continue }
+    if (state.methods.set && shouldDo(options, preEnd, requireEndOnly, phase)) {
+      arg.state = state
+      returnValue = state.methods.set(arg)
 
-    arg.state = state
-    state.methods.set(arg)
+      rectUtils.addEdges(edges, arg.rect, { x: arg.coords.x - lastModifierCoords.x, y: arg.coords.y - lastModifierCoords.y })
+    }
 
-    rectUtils.addEdges(edges, arg.rect, { x: arg.coords.x - lastModifierCoords.x, y: arg.coords.y - lastModifierCoords.y })
+    result.eventProps.push(returnValue)
   }
 
   result.delta.x = arg.coords.x - arg.pageCoords.x
@@ -490,6 +502,15 @@ export function makeModifier<
   return modifier
 }
 
+function addEventModifiers ({ iEvent, interaction: { modifiers: { result } } }: {
+  iEvent: Interact.InteractEvent
+  interaction: Interact.Interaction
+}) {
+  if (result) {
+    iEvent.modifiers = result.eventProps
+  }
+}
+
 const modifiersBase: Interact.Plugin = {
   id: 'modifiers/base',
   install: scope => {
@@ -499,7 +520,6 @@ const modifiersBase: Interact.Plugin = {
     'interactions:new': ({ interaction }) => {
       interaction.modifiers = {
         startOffset: { left: 0, right: 0, top: 0, bottom: 0 },
-        offsets: {},
         states: null,
         result: null,
         endPrevented: false,
@@ -511,6 +531,9 @@ const modifiersBase: Interact.Plugin = {
       start(arg, arg.interaction.coords.start.page, null, null)
       setCoords(arg)
     },
+    'interactions:after-action-start': restoreCoords,
+    'interactions:before-action-move': beforeMove,
+    'interactions:after-action-move': restoreCoords,
 
     'interactions:action-resume': arg => {
       const { coords: prevCoords, rect: prevRect } = arg.interaction.modifiers.result
@@ -520,12 +543,10 @@ const modifiersBase: Interact.Plugin = {
       beforeMove(arg)
     },
 
-    'interactions:after-action-move': restoreCoords,
-    'interactions:before-action-move': beforeMove,
-
-    'interactions:after-action-start': restoreCoords,
-
     'interactions:before-action-end': beforeEnd,
+    'interactions:action-start': addEventModifiers,
+    'interactions:action-move': addEventModifiers,
+    'interactions:action-end': addEventModifiers,
     'interactions:stop': stop,
   },
   before: 'ations',

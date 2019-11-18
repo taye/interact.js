@@ -1,17 +1,25 @@
 import * as utils from '../../utils/index'
 import { ModifierArg, ModifierState } from '../base'
 
+export interface Offset {
+  x: number
+  y: number
+  index: number
+  relativePoint?: Interact.Point
+}
+
 export interface SnapPosition {
   x: number
   y: number
   range?: number
+  offset?: Offset
 }
 
 export type SnapFunction = (
   x: number,
   y: number,
   interaction: Interact.Interaction,
-  offset: Interact.Point,
+  offset: Offset,
   index: number
 ) => SnapPosition
 export type SnapTarget = SnapPosition | SnapFunction
@@ -30,10 +38,7 @@ export interface SnapOptions {
 }
 
 export type SnapState = ModifierState<SnapOptions, {
-  offsets?: Interact.Point[]
-  realX?: number
-  realY?: number
-  range?: number
+  offsets?: Offset[]
   closest?: any
   targetFields?: string[][]
 }>
@@ -41,12 +46,11 @@ export type SnapState = ModifierState<SnapOptions, {
 function start (arg: ModifierArg<SnapState>) {
   const { interaction, interactable, element, rect, state, startOffset } = arg
   const { options } = state
-  const offsets = []
   const origin = options.offsetWithOrigin
     ? getOrigin(arg)
     : { x: 0, y: 0 }
 
-  let snapOffset
+  let snapOffset: Interact.Point
 
   if (options.offset === 'startCoords') {
     snapOffset = {
@@ -62,28 +66,19 @@ function start (arg: ModifierArg<SnapState>) {
     snapOffset.y += origin.y
   }
 
-  const relativePoints = options.relativePoints || []
+  const { relativePoints } = options
 
-  if (rect && options.relativePoints && options.relativePoints.length) {
-    for (let index = 0; index < relativePoints.length; index++) {
-      const relativePoint = relativePoints[index]
-
-      offsets.push({
-        index,
-        relativePoint,
-        x: startOffset.left - (rect.width  * relativePoint.x) + snapOffset.x,
-        y: startOffset.top  - (rect.height * relativePoint.y) + snapOffset.y,
-      })
-    }
-  }
-  else {
-    offsets.push(utils.extend({
+  state.offsets = rect && relativePoints && relativePoints.length
+    ?  relativePoints.map((relativePoint, index) => ({
+      index,
+      relativePoint,
+      x: startOffset.left - (rect.width  * relativePoint.x) + snapOffset.x,
+      y: startOffset.top  - (rect.height * relativePoint.y) + snapOffset.y,
+    }))
+    : [utils.extend({
       index: 0,
       relativePoint: null,
-    }, snapOffset))
-  }
-
-  state.offsets = offsets
+    }, snapOffset)]
 }
 
 function set (arg: ModifierArg<SnapState>) {
@@ -93,15 +88,11 @@ function set (arg: ModifierArg<SnapState>) {
   const origin = utils.getOriginXY(interaction.interactable, interaction.element, interaction.prepared.name)
   const page = utils.extend({}, coords)
   const targets = []
-  let target
 
   if (!options.offsetWithOrigin) {
     page.x -= origin.x
     page.y -= origin.y
   }
-
-  state.realX = page.x
-  state.realY = page.y
 
   for (const offset of offsets) {
     const relativeX = page.x - offset.x
@@ -109,6 +100,8 @@ function set (arg: ModifierArg<SnapState>) {
 
     for (let index = 0, len = options.targets.length; index < len; index++) {
       const snapTarget = options.targets[index]
+      let target
+
       if (utils.is.func(snapTarget)) {
         target = snapTarget(relativeX, relativeY, interaction, offset, index)
       }
@@ -123,6 +116,9 @@ function set (arg: ModifierArg<SnapState>) {
         y: (utils.is.number(target.y) ? target.y : relativeY) + offset.y,
 
         range: utils.is.number(target.range) ? target.range : options.range,
+        source: snapTarget,
+        index,
+        offset,
       })
     }
   }
@@ -132,13 +128,10 @@ function set (arg: ModifierArg<SnapState>) {
     inRange: false,
     distance: 0,
     range: 0,
-    dx: 0,
-    dy: 0,
+    delta: { x: 0, y: 0 },
   }
 
-  for (let i = 0, len = targets.length; i < len; i++) {
-    target = targets[i]
-
+  for (const target of targets) {
     const range = target.range
     const dx = target.x - page.x
     const dy = target.y - page.y
@@ -166,10 +159,8 @@ function set (arg: ModifierArg<SnapState>) {
       closest.distance = distance
       closest.range = range
       closest.inRange = inRange
-      closest.dx = dx
-      closest.dy = dy
-
-      state.range = range
+      closest.delta.x = dx
+      closest.delta.y = dy
     }
   }
 
@@ -179,6 +170,7 @@ function set (arg: ModifierArg<SnapState>) {
   }
 
   state.closest = closest
+  return closest
 }
 
 function getOrigin (arg: Partial<ModifierArg<SnapState>>) {
