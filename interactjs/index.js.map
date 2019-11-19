@@ -10,8 +10,8 @@
 		"exports",
 		"default"
 	],
-	"mappings": "AAAA,OAAOA,QAAP,IAAmBC,IAAnB;AACA;;AAEA,IAAI,OAAOC,MAAP,KAAkB,QAAlB,IAA8B,CAAC,CAACA,MAApC,EAA4C;AAC1CA,EAAAA,MAAM,CAACC,OAAP,GAAiBH,QAAjB;AACD;;AAEAA,QAAD,CAAkBI,OAAlB,GAA4BJ,QAA5B,CAAqC;AAArC;AACEA,QAAD,CAAkBC,IAAlB,GAAyBA,IAAzB,C,CAA8B",
+	"mappings": "AAAA,OAAOA,QAAP,IAAmBC,IAAnB;AACA;;AAEA,IAAI,OAAOC,MAAP,KAAkB,QAAlB,IAA8B,CAAC,CAACA,MAApC,EAA4C;AAC1CA,EAAAA,MAAM,CAACC,OAAP,GAAiBH,QAAjB;AACD;;AAEAA,QAAD,CAAkBI,OAAlB,GAA4BJ,QAA5B,CAAqC;AAArC;AACEA,QAAD,CAAkBC,IAAlB,GAAyBA,IAAzB,C,CAA8B;;AAE/B,eAAeD,QAAf",
 	"sourcesContent": [
-		"import interact, { init } from '../@interactjs/interactjs/index'\nexport * from '../@interactjs/interactjs/index'\n\nif (typeof module === 'object' && !!module) {\n  module.exports = interact\n}\n\n(interact as any).default = interact // tslint:disable-line no-string-literal\n;(interact as any).init = init // tslint:disable-line no-string-literal\n"
+		"import interact, { init } from '@interactjs/interactjs/index'\nexport * from '@interactjs/interactjs/index'\n\nif (typeof module === 'object' && !!module) {\n  module.exports = interact\n}\n\n(interact as any).default = interact // tslint:disable-line no-string-literal\n;(interact as any).init = init // tslint:disable-line no-string-literal\n\nexport default interact\n"
 	]
 }

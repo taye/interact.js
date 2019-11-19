@@ -1,6 +1,8 @@
 import * as arr from "./arr.js";
 import * as dom from "./domUtils.js";
 import * as is from "./is.js";
+import * as pointer from "./pointerUtils.js";
+import * as rect from "./rect.js";
 import win from "./window.js";
 export function warnOnce(method, message) {
   let warned = false; // eslint-disable-next-line no-shadow
@@ -43,8 +45,6 @@ export { default as extend } from "./extend.js";
 export { default as getOriginXY } from "./getOriginXY.js";
 export { default as hypot } from "./hypot.js";
 export { default as normalizeListeners } from "./normalizeListeners.js";
-export { default as pointer } from "./pointerUtils.js";
 export { default as raf } from "./raf.js";
-export { default as rect } from "./rect.js";
-export { win, arr, dom, is };
+export { win, arr, dom, is, pointer, rect };
 //# sourceMappingURL=index.js.map

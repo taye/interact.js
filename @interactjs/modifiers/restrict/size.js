@@ -1,5 +1,5 @@
 import extend from "../../utils/extend.js";
-import rectUtils from "../../utils/rect.js";
+import * as rectUtils from "../../utils/rect.js";
 import restrictEdges from "./edges.js";
 import { getRestrictionRect } from "./pointer.js";
 const noMin = {

@@ -1,5 +1,5 @@
 /**
- * interact.js 1.7.1
+ * interact.js 1.7.2
  *
  * Copyright (c) 2012-2019 Taye Adeyemi <dev@taye.me>
  * Released under the MIT License.
@@ -382,11 +382,15 @@ var _domObjects = _interopRequireDefault(_$domObjects_49);
 
 var _events = _interopRequireDefault(_$events_51);
 
-var _pointerUtils = _interopRequireDefault(_$pointerUtils_60);
+var pointerUtils = _interopRequireWildcard(_$pointerUtils_60);
 
 var _Interaction = _interopRequireDefault(_$Interaction_18({}));
 
 var _interactionFinder = _interopRequireDefault(_$interactionFinder_22);
+
+function _getRequireWildcardCache() { if (typeof WeakMap !== "function") return null; var cache = new WeakMap(); _getRequireWildcardCache = function _getRequireWildcardCache() { return cache; }; return cache; }
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } if (obj === null || _typeof(obj) !== "object" && typeof obj !== "function") { return { "default": obj }; } var cache = _getRequireWildcardCache(); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj["default"] = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
@@ -576,10 +580,9 @@ function install(scope) {
 function doOnInteractions(method, scope) {
   return function (event) {
     var interactions = scope.interactions.list;
+    var pointerType = pointerUtils.getPointerType(event);
 
-    var pointerType = _pointerUtils["default"].getPointerType(event);
-
-    var _pointerUtils$getEven = _pointerUtils["default"].getEventTargets(event),
+    var _pointerUtils$getEven = pointerUtils.getEventTargets(event),
         _pointerUtils$getEven2 = _slicedToArray(_pointerUtils$getEven, 2),
         eventTarget = _pointerUtils$getEven2[0],
         curEventTarget = _pointerUtils$getEven2[1];
@@ -595,9 +598,7 @@ function doOnInteractions(method, scope) {
         _ref6 = event.changedTouches[_i5];
         var changedTouch = _ref6;
         var pointer = changedTouch;
-
-        var pointerId = _pointerUtils["default"].getPointerId(pointer);
-
+        var pointerId = pointerUtils.getPointerId(pointer);
         var searchDetails = {
           pointer: pointer,
           pointerId: pointerId,
@@ -628,7 +629,7 @@ function doOnInteractions(method, scope) {
       if (!invalidPointer) {
         var _searchDetails = {
           pointer: event,
-          pointerId: _pointerUtils["default"].getPointerId(event),
+          pointerId: pointerUtils.getPointerId(event),
           pointerType: pointerType,
           eventType: event.type,
           curEventTarget: curEventTarget,
@@ -1940,41 +1941,19 @@ function trySelector(value) {
   return true;
 }
 
-var _$clone_48 = {};
+var _$hypot_54 = {};
 "use strict";
 
-function ___typeof_48(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { ___typeof_48 = function _typeof(obj) { return typeof obj; }; } else { ___typeof_48 = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return ___typeof_48(obj); }
-
-Object.defineProperty(_$clone_48, "__esModule", {
+Object.defineProperty(_$hypot_54, "__esModule", {
   value: true
 });
-_$clone_48["default"] = clone;
+_$hypot_54["default"] = void 0;
 
-var arr = ___interopRequireWildcard_48(_$arr_46);
+var ___default_54 = function _default(x, y) {
+  return Math.sqrt(x * x + y * y);
+};
 
-var __is_48 = ___interopRequireWildcard_48(_$is_56);
-
-function ___getRequireWildcardCache_48() { if (typeof WeakMap !== "function") return null; var cache = new WeakMap(); ___getRequireWildcardCache_48 = function _getRequireWildcardCache() { return cache; }; return cache; }
-
-function ___interopRequireWildcard_48(obj) { if (obj && obj.__esModule) { return obj; } if (obj === null || ___typeof_48(obj) !== "object" && typeof obj !== "function") { return { "default": obj }; } var cache = ___getRequireWildcardCache_48(); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj["default"] = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
-
-function clone(source) {
-  var dest = {};
-
-  for (var prop in source) {
-    var value = source[prop];
-
-    if (__is_48.plainObject(value)) {
-      dest[prop] = clone(value);
-    } else if (__is_48.array(value)) {
-      dest[prop] = arr.from(value);
-    } else {
-      dest[prop] = value;
-    }
-  }
-
-  return dest;
-}
+_$hypot_54["default"] = ___default_54;
 
 var _$pointerExtend_59 = {};
 "use strict";
@@ -2011,20 +1990,6 @@ pointerExtend.prefixedPropREs = {
 var ___default_59 = pointerExtend;
 _$pointerExtend_59["default"] = ___default_59;
 
-var _$hypot_54 = {};
-"use strict";
-
-Object.defineProperty(_$hypot_54, "__esModule", {
-  value: true
-});
-_$hypot_54["default"] = void 0;
-
-var ___default_54 = function _default(x, y) {
-  return Math.sqrt(x * x + y * y);
-};
-
-_$hypot_54["default"] = ___default_54;
-
 var _$pointerUtils_60 = {};
 "use strict";
 
@@ -2033,7 +1998,31 @@ function ___typeof_60(obj) { if (typeof Symbol === "function" && typeof Symbol.i
 Object.defineProperty(_$pointerUtils_60, "__esModule", {
   value: true
 });
-_$pointerUtils_60["default"] = void 0;
+_$pointerUtils_60.copyCoords = copyCoords;
+_$pointerUtils_60.setCoordDeltas = setCoordDeltas;
+_$pointerUtils_60.setCoordVelocity = setCoordVelocity;
+_$pointerUtils_60.setZeroCoords = setZeroCoords;
+_$pointerUtils_60.isNativePointer = isNativePointer;
+_$pointerUtils_60.getXY = getXY;
+_$pointerUtils_60.getPageXY = getPageXY;
+_$pointerUtils_60.getClientXY = getClientXY;
+_$pointerUtils_60.getPointerId = getPointerId;
+_$pointerUtils_60.setCoords = setCoords;
+_$pointerUtils_60.getTouchPair = getTouchPair;
+_$pointerUtils_60.pointerAverage = pointerAverage;
+_$pointerUtils_60.touchBBox = touchBBox;
+_$pointerUtils_60.touchDistance = touchDistance;
+_$pointerUtils_60.touchAngle = touchAngle;
+_$pointerUtils_60.getPointerType = getPointerType;
+_$pointerUtils_60.getEventTargets = getEventTargets;
+_$pointerUtils_60.newCoords = newCoords;
+_$pointerUtils_60.coordsToEvent = coordsToEvent;
+Object.defineProperty(_$pointerUtils_60, "pointerExtend", {
+  enumerable: true,
+  get: function get() {
+    return _pointerExtend["default"];
+  }
+});
 
 var ___browser_60 = ___interopRequireDefault_60(_$browser_47);
 
@@ -2053,255 +2042,418 @@ function ___interopRequireWildcard_60(obj) { if (obj && obj.__esModule) { return
 
 function ___interopRequireDefault_60(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
-var pointerUtils = {
-  copyCoords: function copyCoords(dest, src) {
-    dest.page = dest.page || {};
-    dest.page.x = src.page.x;
-    dest.page.y = src.page.y;
-    dest.client = dest.client || {};
-    dest.client.x = src.client.x;
-    dest.client.y = src.client.y;
-    dest.timeStamp = src.timeStamp;
-  },
-  setCoordDeltas: function setCoordDeltas(targetObj, prev, cur) {
-    targetObj.page.x = cur.page.x - prev.page.x;
-    targetObj.page.y = cur.page.y - prev.page.y;
-    targetObj.client.x = cur.client.x - prev.client.x;
-    targetObj.client.y = cur.client.y - prev.client.y;
-    targetObj.timeStamp = cur.timeStamp - prev.timeStamp;
-  },
-  setCoordVelocity: function setCoordVelocity(targetObj, delta) {
-    var dt = Math.max(delta.timeStamp / 1000, 0.001);
-    targetObj.page.x = delta.page.x / dt;
-    targetObj.page.y = delta.page.y / dt;
-    targetObj.client.x = delta.client.x / dt;
-    targetObj.client.y = delta.client.y / dt;
-    targetObj.timeStamp = dt;
-  },
-  isNativePointer: function isNativePointer(pointer) {
-    return pointer instanceof ___domObjects_60["default"].Event || pointer instanceof ___domObjects_60["default"].Touch;
-  },
-  // Get specified X/Y coords for mouse or event.touches[0]
-  getXY: function getXY(type, pointer, xy) {
-    xy = xy || {};
-    type = type || 'page';
-    xy.x = pointer[type + 'X'];
-    xy.y = pointer[type + 'Y'];
-    return xy;
-  },
-  getPageXY: function getPageXY(pointer, page) {
-    page = page || {
+function copyCoords(dest, src) {
+  dest.page = dest.page || {};
+  dest.page.x = src.page.x;
+  dest.page.y = src.page.y;
+  dest.client = dest.client || {};
+  dest.client.x = src.client.x;
+  dest.client.y = src.client.y;
+  dest.timeStamp = src.timeStamp;
+}
+
+function setCoordDeltas(targetObj, prev, cur) {
+  targetObj.page.x = cur.page.x - prev.page.x;
+  targetObj.page.y = cur.page.y - prev.page.y;
+  targetObj.client.x = cur.client.x - prev.client.x;
+  targetObj.client.y = cur.client.y - prev.client.y;
+  targetObj.timeStamp = cur.timeStamp - prev.timeStamp;
+}
+
+function setCoordVelocity(targetObj, delta) {
+  var dt = Math.max(delta.timeStamp / 1000, 0.001);
+  targetObj.page.x = delta.page.x / dt;
+  targetObj.page.y = delta.page.y / dt;
+  targetObj.client.x = delta.client.x / dt;
+  targetObj.client.y = delta.client.y / dt;
+  targetObj.timeStamp = dt;
+}
+
+function setZeroCoords(targetObj) {
+  targetObj.page.x = 0;
+  targetObj.page.y = 0;
+  targetObj.client.x = 0;
+  targetObj.client.y = 0;
+}
+
+function isNativePointer(pointer) {
+  return pointer instanceof ___domObjects_60["default"].Event || pointer instanceof ___domObjects_60["default"].Touch;
+} // Get specified X/Y coords for mouse or event.touches[0]
+
+
+function getXY(type, pointer, xy) {
+  xy = xy || {};
+  type = type || 'page';
+  xy.x = pointer[type + 'X'];
+  xy.y = pointer[type + 'Y'];
+  return xy;
+}
+
+function getPageXY(pointer, page) {
+  page = page || {
+    x: 0,
+    y: 0
+  }; // Opera Mobile handles the viewport and scrolling oddly
+
+  if (___browser_60["default"].isOperaMobile && isNativePointer(pointer)) {
+    getXY('screen', pointer, page);
+    page.x += window.scrollX;
+    page.y += window.scrollY;
+  } else {
+    getXY('page', pointer, page);
+  }
+
+  return page;
+}
+
+function getClientXY(pointer, client) {
+  client = client || {};
+
+  if (___browser_60["default"].isOperaMobile && isNativePointer(pointer)) {
+    // Opera Mobile handles the viewport and scrolling oddly
+    getXY('screen', pointer, client);
+  } else {
+    getXY('client', pointer, client);
+  }
+
+  return client;
+}
+
+function getPointerId(pointer) {
+  return __is_60.number(pointer.pointerId) ? pointer.pointerId : pointer.identifier;
+}
+
+function setCoords(targetObj, pointers, timeStamp) {
+  var pointer = pointers.length > 1 ? pointerAverage(pointers) : pointers[0];
+  var tmpXY = {};
+  getPageXY(pointer, tmpXY);
+  targetObj.page.x = tmpXY.x;
+  targetObj.page.y = tmpXY.y;
+  getClientXY(pointer, tmpXY);
+  targetObj.client.x = tmpXY.x;
+  targetObj.client.y = tmpXY.y;
+  targetObj.timeStamp = timeStamp;
+}
+
+function getTouchPair(event) {
+  var touches = []; // array of touches is supplied
+
+  if (__is_60.array(event)) {
+    touches[0] = event[0];
+    touches[1] = event[1];
+  } // an event
+  else {
+      if (event.type === 'touchend') {
+        if (event.touches.length === 1) {
+          touches[0] = event.touches[0];
+          touches[1] = event.changedTouches[0];
+        } else if (event.touches.length === 0) {
+          touches[0] = event.changedTouches[0];
+          touches[1] = event.changedTouches[1];
+        }
+      } else {
+        touches[0] = event.touches[0];
+        touches[1] = event.touches[1];
+      }
+    }
+
+  return touches;
+}
+
+function pointerAverage(pointers) {
+  var average = {
+    pageX: 0,
+    pageY: 0,
+    clientX: 0,
+    clientY: 0,
+    screenX: 0,
+    screenY: 0
+  };
+
+  for (var _i = 0; _i < pointers.length; _i++) {
+    var _ref;
+
+    _ref = pointers[_i];
+    var pointer = _ref;
+
+    for (var _prop in average) {
+      average[_prop] += pointer[_prop];
+    }
+  }
+
+  for (var prop in average) {
+    average[prop] /= pointers.length;
+  }
+
+  return average;
+}
+
+function touchBBox(event) {
+  if (!event.length && !(event.touches && event.touches.length > 1)) {
+    return null;
+  }
+
+  var touches = getTouchPair(event);
+  var minX = Math.min(touches[0].pageX, touches[1].pageX);
+  var minY = Math.min(touches[0].pageY, touches[1].pageY);
+  var maxX = Math.max(touches[0].pageX, touches[1].pageX);
+  var maxY = Math.max(touches[0].pageY, touches[1].pageY);
+  return {
+    x: minX,
+    y: minY,
+    left: minX,
+    top: minY,
+    right: maxX,
+    bottom: maxY,
+    width: maxX - minX,
+    height: maxY - minY
+  };
+}
+
+function touchDistance(event, deltaSource) {
+  var sourceX = deltaSource + 'X';
+  var sourceY = deltaSource + 'Y';
+  var touches = getTouchPair(event);
+  var dx = touches[0][sourceX] - touches[1][sourceX];
+  var dy = touches[0][sourceY] - touches[1][sourceY];
+  return (0, _hypot["default"])(dx, dy);
+}
+
+function touchAngle(event, deltaSource) {
+  var sourceX = deltaSource + 'X';
+  var sourceY = deltaSource + 'Y';
+  var touches = getTouchPair(event);
+  var dx = touches[1][sourceX] - touches[0][sourceX];
+  var dy = touches[1][sourceY] - touches[0][sourceY];
+  var angle = 180 * Math.atan2(dy, dx) / Math.PI;
+  return angle;
+}
+
+function getPointerType(pointer) {
+  return __is_60.string(pointer.pointerType) ? pointer.pointerType : __is_60.number(pointer.pointerType) ? [undefined, undefined, 'touch', 'pen', 'mouse'][pointer.pointerType] // if the PointerEvent API isn't available, then the "pointer" must
+  // be either a MouseEvent, TouchEvent, or Touch object
+  : /touch/.test(pointer.type) || pointer instanceof ___domObjects_60["default"].Touch ? 'touch' : 'mouse';
+} // [ event.target, event.currentTarget ]
+
+
+function getEventTargets(event) {
+  var path = __is_60.func(event.composedPath) ? event.composedPath() : event.path;
+  return [domUtils.getActualElement(path ? path[0] : event.target), domUtils.getActualElement(event.currentTarget)];
+}
+
+function newCoords() {
+  return {
+    page: {
       x: 0,
       y: 0
-    }; // Opera Mobile handles the viewport and scrolling oddly
+    },
+    client: {
+      x: 0,
+      y: 0
+    },
+    timeStamp: 0
+  };
+}
 
-    if (___browser_60["default"].isOperaMobile && pointerUtils.isNativePointer(pointer)) {
-      pointerUtils.getXY('screen', pointer, page);
-      page.x += window.scrollX;
-      page.y += window.scrollY;
-    } else {
-      pointerUtils.getXY('page', pointer, page);
+function coordsToEvent(coords) {
+  var event = {
+    coords: coords,
+
+    get page() {
+      return this.coords.page;
+    },
+
+    get client() {
+      return this.coords.client;
+    },
+
+    get timeStamp() {
+      return this.coords.timeStamp;
+    },
+
+    get pageX() {
+      return this.coords.page.x;
+    },
+
+    get pageY() {
+      return this.coords.page.y;
+    },
+
+    get clientX() {
+      return this.coords.client.x;
+    },
+
+    get clientY() {
+      return this.coords.client.y;
+    },
+
+    get pointerId() {
+      return this.coords.pointerId;
+    },
+
+    get target() {
+      return this.coords.target;
+    },
+
+    get type() {
+      return this.coords.type;
+    },
+
+    get pointerType() {
+      return this.coords.pointerType;
+    },
+
+    get buttons() {
+      return this.coords.buttons;
     }
 
-    return page;
-  },
-  getClientXY: function getClientXY(pointer, client) {
-    client = client || {};
+  };
+  return event;
+}
 
-    if (___browser_60["default"].isOperaMobile && pointerUtils.isNativePointer(pointer)) {
-      // Opera Mobile handles the viewport and scrolling oddly
-      pointerUtils.getXY('screen', pointer, client);
-    } else {
-      pointerUtils.getXY('client', pointer, client);
-    }
+var _$extend_52 = {};
+"use strict";
 
-    return client;
-  },
-  getPointerId: function getPointerId(pointer) {
-    return __is_60.number(pointer.pointerId) ? pointer.pointerId : pointer.identifier;
-  },
-  setCoords: function setCoords(targetObj, pointers, timeStamp) {
-    var pointer = pointers.length > 1 ? pointerUtils.pointerAverage(pointers) : pointers[0];
-    var tmpXY = {};
-    pointerUtils.getPageXY(pointer, tmpXY);
-    targetObj.page.x = tmpXY.x;
-    targetObj.page.y = tmpXY.y;
-    pointerUtils.getClientXY(pointer, tmpXY);
-    targetObj.client.x = tmpXY.x;
-    targetObj.client.y = tmpXY.y;
-    targetObj.timeStamp = timeStamp;
-  },
-  pointerExtend: _pointerExtend["default"],
-  getTouchPair: function getTouchPair(event) {
-    var touches = []; // array of touches is supplied
+Object.defineProperty(_$extend_52, "__esModule", {
+  value: true
+});
+_$extend_52["default"] = extend;
 
-    if (__is_60.array(event)) {
-      touches[0] = event[0];
-      touches[1] = event[1];
-    } // an event
-    else {
-        if (event.type === 'touchend') {
-          if (event.touches.length === 1) {
-            touches[0] = event.touches[0];
-            touches[1] = event.changedTouches[0];
-          } else if (event.touches.length === 0) {
-            touches[0] = event.changedTouches[0];
-            touches[1] = event.changedTouches[1];
-          }
-        } else {
-          touches[0] = event.touches[0];
-          touches[1] = event.touches[1];
-        }
-      }
-
-    return touches;
-  },
-  pointerAverage: function pointerAverage(pointers) {
-    var average = {
-      pageX: 0,
-      pageY: 0,
-      clientX: 0,
-      clientY: 0,
-      screenX: 0,
-      screenY: 0
-    };
-
-    for (var _i = 0; _i < pointers.length; _i++) {
-      var _ref;
-
-      _ref = pointers[_i];
-      var pointer = _ref;
-
-      for (var _prop in average) {
-        average[_prop] += pointer[_prop];
-      }
-    }
-
-    for (var prop in average) {
-      average[prop] /= pointers.length;
-    }
-
-    return average;
-  },
-  touchBBox: function touchBBox(event) {
-    if (!event.length && !(event.touches && event.touches.length > 1)) {
-      return null;
-    }
-
-    var touches = pointerUtils.getTouchPair(event);
-    var minX = Math.min(touches[0].pageX, touches[1].pageX);
-    var minY = Math.min(touches[0].pageY, touches[1].pageY);
-    var maxX = Math.max(touches[0].pageX, touches[1].pageX);
-    var maxY = Math.max(touches[0].pageY, touches[1].pageY);
-    return {
-      x: minX,
-      y: minY,
-      left: minX,
-      top: minY,
-      right: maxX,
-      bottom: maxY,
-      width: maxX - minX,
-      height: maxY - minY
-    };
-  },
-  touchDistance: function touchDistance(event, deltaSource) {
-    var sourceX = deltaSource + 'X';
-    var sourceY = deltaSource + 'Y';
-    var touches = pointerUtils.getTouchPair(event);
-    var dx = touches[0][sourceX] - touches[1][sourceX];
-    var dy = touches[0][sourceY] - touches[1][sourceY];
-    return (0, _hypot["default"])(dx, dy);
-  },
-  touchAngle: function touchAngle(event, deltaSource) {
-    var sourceX = deltaSource + 'X';
-    var sourceY = deltaSource + 'Y';
-    var touches = pointerUtils.getTouchPair(event);
-    var dx = touches[1][sourceX] - touches[0][sourceX];
-    var dy = touches[1][sourceY] - touches[0][sourceY];
-    var angle = 180 * Math.atan2(dy, dx) / Math.PI;
-    return angle;
-  },
-  getPointerType: function getPointerType(pointer) {
-    return __is_60.string(pointer.pointerType) ? pointer.pointerType : __is_60.number(pointer.pointerType) ? [undefined, undefined, 'touch', 'pen', 'mouse'][pointer.pointerType] // if the PointerEvent API isn't available, then the "pointer" must
-    // be either a MouseEvent, TouchEvent, or Touch object
-    : /touch/.test(pointer.type) || pointer instanceof ___domObjects_60["default"].Touch ? 'touch' : 'mouse';
-  },
-  // [ event.target, event.currentTarget ]
-  getEventTargets: function getEventTargets(event) {
-    var path = __is_60.func(event.composedPath) ? event.composedPath() : event.path;
-    return [domUtils.getActualElement(path ? path[0] : event.target), domUtils.getActualElement(event.currentTarget)];
-  },
-  newCoords: function newCoords() {
-    return {
-      page: {
-        x: 0,
-        y: 0
-      },
-      client: {
-        x: 0,
-        y: 0
-      },
-      timeStamp: 0
-    };
-  },
-  coordsToEvent: function coordsToEvent(coords) {
-    var event = {
-      coords: coords,
-
-      get page() {
-        return this.coords.page;
-      },
-
-      get client() {
-        return this.coords.client;
-      },
-
-      get timeStamp() {
-        return this.coords.timeStamp;
-      },
-
-      get pageX() {
-        return this.coords.page.x;
-      },
-
-      get pageY() {
-        return this.coords.page.y;
-      },
-
-      get clientX() {
-        return this.coords.client.x;
-      },
-
-      get clientY() {
-        return this.coords.client.y;
-      },
-
-      get pointerId() {
-        return this.coords.pointerId;
-      },
-
-      get target() {
-        return this.coords.target;
-      },
-
-      get type() {
-        return this.coords.type;
-      },
-
-      get pointerType() {
-        return this.coords.pointerType;
-      },
-
-      get buttons() {
-        return this.coords.buttons;
-      }
-
-    };
-    return event;
+function extend(dest, source) {
+  for (var prop in source) {
+    dest[prop] = source[prop];
   }
-};
-var ___default_60 = pointerUtils;
-_$pointerUtils_60["default"] = ___default_60;
+
+  var ret = dest;
+  return ret;
+}
+
+var _$rect_62 = {};
+"use strict";
+
+function ___typeof_62(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { ___typeof_62 = function _typeof(obj) { return typeof obj; }; } else { ___typeof_62 = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return ___typeof_62(obj); }
+
+Object.defineProperty(_$rect_62, "__esModule", {
+  value: true
+});
+_$rect_62.getStringOptionResult = getStringOptionResult;
+_$rect_62.resolveRectLike = resolveRectLike;
+_$rect_62.rectToXY = rectToXY;
+_$rect_62.xywhToTlbr = xywhToTlbr;
+_$rect_62.tlbrToXywh = tlbrToXywh;
+
+/* removed: var _$domUtils_50 = require("./domUtils.js"); */;
+
+var _extend = ___interopRequireDefault_62(_$extend_52);
+
+var __is_62 = ___interopRequireWildcard_62(_$is_56);
+
+function ___getRequireWildcardCache_62() { if (typeof WeakMap !== "function") return null; var cache = new WeakMap(); ___getRequireWildcardCache_62 = function _getRequireWildcardCache() { return cache; }; return cache; }
+
+function ___interopRequireWildcard_62(obj) { if (obj && obj.__esModule) { return obj; } if (obj === null || ___typeof_62(obj) !== "object" && typeof obj !== "function") { return { "default": obj }; } var cache = ___getRequireWildcardCache_62(); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj["default"] = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
+
+function ___interopRequireDefault_62(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+
+function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _nonIterableSpread(); }
+
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance"); }
+
+function _iterableToArray(iter) { if (Symbol.iterator in Object(iter) || Object.prototype.toString.call(iter) === "[object Arguments]") return Array.from(iter); }
+
+function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = new Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } }
+
+function getStringOptionResult(value, target, element) {
+  if (value === 'parent') {
+    return (0, _$domUtils_50.parentNode)(element);
+  }
+
+  if (value === 'self') {
+    return target.getRect(element);
+  }
+
+  return (0, _$domUtils_50.closest)(element, value);
+}
+
+function resolveRectLike(value, target, element, functionArgs) {
+  if (__is_62.string(value)) {
+    value = getStringOptionResult(value, target, element);
+  } else if (__is_62.func(value)) {
+    value = value.apply(void 0, _toConsumableArray(functionArgs));
+  }
+
+  if (__is_62.element(value)) {
+    value = (0, _$domUtils_50.getElementRect)(value);
+  }
+
+  return value;
+}
+
+function rectToXY(rect) {
+  return rect && {
+    x: 'x' in rect ? rect.x : rect.left,
+    y: 'y' in rect ? rect.y : rect.top
+  };
+}
+
+function xywhToTlbr(rect) {
+  if (rect && !('left' in rect && 'top' in rect)) {
+    rect = (0, _extend["default"])({}, rect);
+    rect.left = rect.x || 0;
+    rect.top = rect.y || 0;
+    rect.right = rect.right || rect.left + rect.width;
+    rect.bottom = rect.bottom || rect.top + rect.height;
+  }
+
+  return rect;
+}
+
+function tlbrToXywh(rect) {
+  if (rect && !('x' in rect && 'y' in rect)) {
+    rect = (0, _extend["default"])({}, rect);
+    rect.x = rect.left || 0;
+    rect.y = rect.top || 0;
+    rect.width = rect.width || rect.right - rect.x;
+    rect.height = rect.height || rect.bottom - rect.y;
+  }
+
+  return rect;
+}
+
+var _$clone_48 = {};
+"use strict";
+
+function ___typeof_48(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { ___typeof_48 = function _typeof(obj) { return typeof obj; }; } else { ___typeof_48 = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return ___typeof_48(obj); }
+
+Object.defineProperty(_$clone_48, "__esModule", {
+  value: true
+});
+_$clone_48["default"] = clone;
+
+var arr = ___interopRequireWildcard_48(_$arr_46);
+
+var __is_48 = ___interopRequireWildcard_48(_$is_56);
+
+function ___getRequireWildcardCache_48() { if (typeof WeakMap !== "function") return null; var cache = new WeakMap(); ___getRequireWildcardCache_48 = function _getRequireWildcardCache() { return cache; }; return cache; }
+
+function ___interopRequireWildcard_48(obj) { if (obj && obj.__esModule) { return obj; } if (obj === null || ___typeof_48(obj) !== "object" && typeof obj !== "function") { return { "default": obj }; } var cache = ___getRequireWildcardCache_48(); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj["default"] = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
+
+function clone(source) {
+  var dest = {};
+
+  for (var prop in source) {
+    var value = source[prop];
+
+    if (__is_48.plainObject(value)) {
+      dest[prop] = clone(value);
+    } else if (__is_48.array(value)) {
+      dest[prop] = arr.from(value);
+    } else {
+      dest[prop] = value;
+    }
+  }
+
+  return dest;
+}
 
 var _$events_51 = {};
 "use strict";
@@ -2321,7 +2473,7 @@ var __is_51 = ___interopRequireWildcard_51(_$is_56);
 
 var ___pointerExtend_51 = ___interopRequireDefault_51(_$pointerExtend_59);
 
-var _pointerUtils = ___interopRequireDefault_51(_$pointerUtils_60);
+var pointerUtils = ___interopRequireWildcard_51(_$pointerUtils_60);
 
 function ___interopRequireDefault_51(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
@@ -2539,7 +2691,7 @@ function delegateListener(event, optionalArg) {
   var fakeEvent = new FakeEvent(event);
   var delegated = delegatedEvents[event.type];
 
-  var _pointerUtils$getEven = _pointerUtils["default"].getEventTargets(event),
+  var _pointerUtils$getEven = pointerUtils.getEventTargets(event),
       _pointerUtils$getEven2 = _slicedToArray(_pointerUtils$getEven, 1),
       eventTarget = _pointerUtils$getEven2[0];
 
@@ -2649,124 +2801,6 @@ var events = {
 };
 var ___default_51 = events;
 _$events_51["default"] = ___default_51;
-
-var _$extend_52 = {};
-"use strict";
-
-Object.defineProperty(_$extend_52, "__esModule", {
-  value: true
-});
-_$extend_52["default"] = extend;
-
-function extend(dest, source) {
-  for (var prop in source) {
-    dest[prop] = source[prop];
-  }
-
-  var ret = dest;
-  return ret;
-}
-
-var _$rect_62 = {};
-"use strict";
-
-function ___typeof_62(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { ___typeof_62 = function _typeof(obj) { return typeof obj; }; } else { ___typeof_62 = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return ___typeof_62(obj); }
-
-Object.defineProperty(_$rect_62, "__esModule", {
-  value: true
-});
-_$rect_62.getStringOptionResult = getStringOptionResult;
-_$rect_62.resolveRectLike = resolveRectLike;
-_$rect_62.rectToXY = rectToXY;
-_$rect_62.xywhToTlbr = xywhToTlbr;
-_$rect_62.tlbrToXywh = tlbrToXywh;
-_$rect_62["default"] = void 0;
-
-/* removed: var _$domUtils_50 = require("./domUtils.js"); */;
-
-var _extend = ___interopRequireDefault_62(_$extend_52);
-
-var __is_62 = ___interopRequireWildcard_62(_$is_56);
-
-function ___getRequireWildcardCache_62() { if (typeof WeakMap !== "function") return null; var cache = new WeakMap(); ___getRequireWildcardCache_62 = function _getRequireWildcardCache() { return cache; }; return cache; }
-
-function ___interopRequireWildcard_62(obj) { if (obj && obj.__esModule) { return obj; } if (obj === null || ___typeof_62(obj) !== "object" && typeof obj !== "function") { return { "default": obj }; } var cache = ___getRequireWildcardCache_62(); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj["default"] = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
-
-function ___interopRequireDefault_62(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
-
-function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _nonIterableSpread(); }
-
-function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance"); }
-
-function _iterableToArray(iter) { if (Symbol.iterator in Object(iter) || Object.prototype.toString.call(iter) === "[object Arguments]") return Array.from(iter); }
-
-function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = new Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } }
-
-function getStringOptionResult(value, target, element) {
-  if (value === 'parent') {
-    return (0, _$domUtils_50.parentNode)(element);
-  }
-
-  if (value === 'self') {
-    return target.getRect(element);
-  }
-
-  return (0, _$domUtils_50.closest)(element, value);
-}
-
-function resolveRectLike(value, target, element, functionArgs) {
-  if (__is_62.string(value)) {
-    value = getStringOptionResult(value, target, element);
-  } else if (__is_62.func(value)) {
-    value = value.apply(void 0, _toConsumableArray(functionArgs));
-  }
-
-  if (__is_62.element(value)) {
-    value = (0, _$domUtils_50.getElementRect)(value);
-  }
-
-  return value;
-}
-
-function rectToXY(rect) {
-  return rect && {
-    x: 'x' in rect ? rect.x : rect.left,
-    y: 'y' in rect ? rect.y : rect.top
-  };
-}
-
-function xywhToTlbr(rect) {
-  if (rect && !('left' in rect && 'top' in rect)) {
-    rect = (0, _extend["default"])({}, rect);
-    rect.left = rect.x || 0;
-    rect.top = rect.y || 0;
-    rect.right = rect.right || rect.left + rect.width;
-    rect.bottom = rect.bottom || rect.top + rect.height;
-  }
-
-  return rect;
-}
-
-function tlbrToXywh(rect) {
-  if (rect && !('x' in rect && 'y' in rect)) {
-    rect = (0, _extend["default"])({}, rect);
-    rect.x = rect.left || 0;
-    rect.y = rect.top || 0;
-    rect.width = rect.width || rect.right - rect.x;
-    rect.height = rect.height || rect.bottom - rect.y;
-  }
-
-  return rect;
-}
-
-var ___default_62 = {
-  getStringOptionResult: getStringOptionResult,
-  resolveRectLike: resolveRectLike,
-  rectToXY: rectToXY,
-  xywhToTlbr: xywhToTlbr,
-  tlbrToXywh: tlbrToXywh
-};
-_$rect_62["default"] = ___default_62;
 
 var _$getOriginXY_53 = {};
 "use strict";
@@ -2972,25 +3006,13 @@ Object.defineProperty(_$utils_55, "normalizeListeners", {
     return _normalizeListeners["default"];
   }
 });
-Object.defineProperty(_$utils_55, "pointer", {
-  enumerable: true,
-  get: function get() {
-    return ___pointerUtils_55["default"];
-  }
-});
 Object.defineProperty(_$utils_55, "raf", {
   enumerable: true,
   get: function get() {
     return _raf["default"];
   }
 });
-Object.defineProperty(_$utils_55, "rect", {
-  enumerable: true,
-  get: function get() {
-    return ___rect_55["default"];
-  }
-});
-_$utils_55.is = _$utils_55.dom = _$utils_55.arr = void 0;
+_$utils_55.rect = _$utils_55.pointer = _$utils_55.is = _$utils_55.dom = _$utils_55.arr = void 0;
 
 var __arr_55 = ___interopRequireWildcard_55(_$arr_46);
 
@@ -3003,6 +3025,14 @@ _$utils_55.dom = dom;
 var __is_55 = ___interopRequireWildcard_55(_$is_56);
 
 _$utils_55.is = __is_55;
+
+var pointer = ___interopRequireWildcard_55(_$pointerUtils_60);
+
+_$utils_55.pointer = pointer;
+
+var rect = ___interopRequireWildcard_55(_$rect_62);
+
+_$utils_55.rect = rect;
 
 var ___window_55 = ___interopRequireDefault_55(_$window_65);
 
@@ -3020,11 +3050,7 @@ var ___hypot_55 = ___interopRequireDefault_55(_$hypot_54);
 
 var _normalizeListeners = ___interopRequireDefault_55(_$normalizeListeners_58);
 
-var ___pointerUtils_55 = ___interopRequireDefault_55(_$pointerUtils_60);
-
 var _raf = ___interopRequireDefault_55(_$raf_61);
-
-var ___rect_55 = ___interopRequireDefault_55(_$rect_62);
 
 function ___interopRequireDefault_55(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
@@ -7425,7 +7451,7 @@ Object.defineProperty(_$base_30, "__esModule", {
 _$base_30.startAll = startAll;
 _$base_30.setAll = setAll;
 _$base_30.prepareStates = prepareStates;
-_$base_30.setCoords = setCoords;
+_$base_30.setCoords = __setCoords_30;
 _$base_30.restoreCoords = restoreCoords;
 _$base_30.makeModifier = makeModifier;
 _$base_30["default"] = void 0;
@@ -7596,7 +7622,7 @@ function __beforeMove_30(arg) {
     modifierResult.delta.y += adjustment.y;
   }
 
-  setCoords(arg);
+  __setCoords_30(arg);
 }
 
 function beforeEnd(arg) {
@@ -7714,7 +7740,7 @@ function prepareStates(modifierList) {
   return states;
 }
 
-function setCoords(arg) {
+function __setCoords_30(arg) {
   var interaction = arg.interaction,
       phase = arg.phase;
   var curCoords = interaction.coords.cur;
@@ -7862,7 +7888,7 @@ var ___default_30 = {
     },
     'interactions:before-action-start': function interactionsBeforeActionStart(arg) {
       __start_30(arg, arg.interaction.coords.start.page, arg.interaction.coords.prev.page);
-      setCoords(arg);
+      __setCoords_30(arg);
     },
     'interactions:action-resume': function interactionsActionResume(arg) {
       stop(arg);
@@ -8221,7 +8247,7 @@ var ___extend_33 = ___interopRequireDefault_33(_$extend_52);
 
 var __is_33 = ___interopRequireWildcard_33(_$is_56);
 
-var ___rect_33 = ___interopRequireDefault_33(_$rect_62);
+var rectUtils = ___interopRequireWildcard_33(_$rect_62);
 
 function ___getRequireWildcardCache_33() { if (typeof WeakMap !== "function") return null; var cache = new WeakMap(); ___getRequireWildcardCache_33 = function _getRequireWildcardCache() { return cache; }; return cache; }
 
@@ -8283,17 +8309,16 @@ function set(_ref2) {
     return;
   }
 
-  var rect = ___rect_33["default"].xywhToTlbr(restriction);
-
+  var rect = rectUtils.xywhToTlbr(restriction);
   coords.x = Math.max(Math.min(rect.right - offset.right, coords.x), rect.left + offset.left);
   coords.y = Math.max(Math.min(rect.bottom - offset.bottom, coords.y), rect.top + offset.top);
 }
 
 function getRestrictionRect(value, interaction, coords) {
   if (__is_33.func(value)) {
-    return ___rect_33["default"].resolveRectLike(value, interaction.interactable, interaction.element, [coords.x, coords.y, interaction]);
+    return rectUtils.resolveRectLike(value, interaction.interactable, interaction.element, [coords.x, coords.y, interaction]);
   } else {
-    return ___rect_33["default"].resolveRectLike(value, interaction.interactable, interaction.element);
+    return rectUtils.resolveRectLike(value, interaction.interactable, interaction.element);
   }
 }
 
@@ -8315,6 +8340,8 @@ _$pointer_33["default"] = ___default_33;
 var _$edges_32 = {};
 "use strict";
 
+function ___typeof_32(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { ___typeof_32 = function _typeof(obj) { return typeof obj; }; } else { ___typeof_32 = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return ___typeof_32(obj); }
+
 Object.defineProperty(_$edges_32, "__esModule", {
   value: true
 });
@@ -8322,9 +8349,13 @@ _$edges_32["default"] = void 0;
 
 var ___extend_32 = ___interopRequireDefault_32(_$extend_52);
 
-var ___rect_32 = ___interopRequireDefault_32(_$rect_62);
+var __rectUtils_32 = ___interopRequireWildcard_32(_$rect_62);
 
 /* removed: var _$pointer_33 = require("./pointer.js"); */;
+
+function ___getRequireWildcardCache_32() { if (typeof WeakMap !== "function") return null; var cache = new WeakMap(); ___getRequireWildcardCache_32 = function _getRequireWildcardCache() { return cache; }; return cache; }
+
+function ___interopRequireWildcard_32(obj) { if (obj && obj.__esModule) { return obj; } if (obj === null || ___typeof_32(obj) !== "object" && typeof obj !== "function") { return { "default": obj }; } var cache = ___getRequireWildcardCache_32(); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj["default"] = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
 
 function ___interopRequireDefault_32(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
@@ -8360,7 +8391,7 @@ function __start_32(_ref) {
 
   if (options) {
     var offsetRect = (0, _$pointer_33.getRestrictionRect)(options.offset, interaction, interaction.coords.start.page);
-    offset = ___rect_32["default"].rectToXY(offsetRect);
+    offset = __rectUtils_32.rectToXY(offsetRect);
   }
 
   offset = offset || {
@@ -8475,6 +8506,8 @@ _$rect_34["default"] = ___default_34;
 var _$size_35 = {};
 "use strict";
 
+function ___typeof_35(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { ___typeof_35 = function _typeof(obj) { return typeof obj; }; } else { ___typeof_35 = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return ___typeof_35(obj); }
+
 Object.defineProperty(_$size_35, "__esModule", {
   value: true
 });
@@ -8482,11 +8515,15 @@ _$size_35["default"] = void 0;
 
 var ___extend_35 = ___interopRequireDefault_35(_$extend_52);
 
-var ___rect_35 = ___interopRequireDefault_35(_$rect_62);
+var __rectUtils_35 = ___interopRequireWildcard_35(_$rect_62);
 
 var _edges = ___interopRequireDefault_35(_$edges_32);
 
 /* removed: var _$pointer_33 = require("./pointer.js"); */;
+
+function ___getRequireWildcardCache_35() { if (typeof WeakMap !== "function") return null; var cache = new WeakMap(); ___getRequireWildcardCache_35 = function _getRequireWildcardCache() { return cache; }; return cache; }
+
+function ___interopRequireWildcard_35(obj) { if (obj && obj.__esModule) { return obj; } if (obj === null || ___typeof_35(obj) !== "object" && typeof obj !== "function") { return { "default": obj }; } var cache = ___getRequireWildcardCache_35(); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj["default"] = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
 
 function ___interopRequireDefault_35(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
@@ -8513,10 +8550,9 @@ function __set_35(arg) {
     return;
   }
 
-  var rect = ___rect_35["default"].xywhToTlbr(interaction.resizeRects.inverted);
-
-  var minSize = ___rect_35["default"].tlbrToXywh((0, _$pointer_33.getRestrictionRect)(options.min, interaction, arg.coords)) || noMin;
-  var maxSize = ___rect_35["default"].tlbrToXywh((0, _$pointer_33.getRestrictionRect)(options.max, interaction, arg.coords)) || noMax;
+  var rect = __rectUtils_35.xywhToTlbr(interaction.resizeRects.inverted);
+  var minSize = __rectUtils_35.tlbrToXywh((0, _$pointer_33.getRestrictionRect)(options.min, interaction, arg.coords)) || noMin;
+  var maxSize = __rectUtils_35.tlbrToXywh((0, _$pointer_33.getRestrictionRect)(options.max, interaction, arg.coords)) || noMax;
   state.options = {
     endOnly: options.endOnly,
     inner: (0, ___extend_35["default"])({}, _edges["default"].noInner),
@@ -9001,7 +9037,11 @@ _$PointerEvent_39["default"] = void 0;
 
 var ___BaseEvent2_39 = ___interopRequireDefault_39(_$BaseEvent_13);
 
-var ___pointerUtils_39 = ___interopRequireDefault_39(_$pointerUtils_60);
+var __pointerUtils_39 = ___interopRequireWildcard_39(_$pointerUtils_60);
+
+function ___getRequireWildcardCache_39() { if (typeof WeakMap !== "function") return null; var cache = new WeakMap(); ___getRequireWildcardCache_39 = function _getRequireWildcardCache() { return cache; }; return cache; }
+
+function ___interopRequireWildcard_39(obj) { if (obj && obj.__esModule) { return obj; } if (obj === null || ___typeof_39(obj) !== "object" && typeof obj !== "function") { return { "default": obj }; } var cache = ___getRequireWildcardCache_39(); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj["default"] = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
 
 function ___interopRequireDefault_39(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
@@ -9074,17 +9114,17 @@ function (_BaseEvent) {
 
     ___defineProperty_39(___assertThisInitialized_39(_this), "eventable", void 0);
 
-    ___pointerUtils_39["default"].pointerExtend(___assertThisInitialized_39(_this), event);
+    __pointerUtils_39.pointerExtend(___assertThisInitialized_39(_this), event);
 
     if (event !== pointer) {
-      ___pointerUtils_39["default"].pointerExtend(___assertThisInitialized_39(_this), pointer);
+      __pointerUtils_39.pointerExtend(___assertThisInitialized_39(_this), pointer);
     }
 
     _this.timeStamp = timeStamp;
     _this.originalEvent = event;
     _this.type = type;
-    _this.pointerId = ___pointerUtils_39["default"].getPointerId(pointer);
-    _this.pointerType = ___pointerUtils_39["default"].getPointerType(pointer);
+    _this.pointerId = __pointerUtils_39.getPointerId(pointer);
+    _this.pointerType = __pointerUtils_39.getPointerType(pointer);
     _this.target = eventTarget;
     _this.currentTarget = null;
 
@@ -9604,16 +9644,12 @@ _$interactableTargets_43["default"] = ___default_43;
 var _$pointerEvents_42 = {};
 "use strict";
 
+function ___typeof_42(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { ___typeof_42 = function _typeof(obj) { return typeof obj; }; } else { ___typeof_42 = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return ___typeof_42(obj); }
+
 Object.defineProperty(_$pointerEvents_42, "__esModule", {
   value: true
 });
 _$pointerEvents_42.install = __install_42;
-Object.defineProperty(_$pointerEvents_42, "pointerEvents", {
-  enumerable: true,
-  get: function get() {
-    return ___base_42["default"];
-  }
-});
 Object.defineProperty(_$pointerEvents_42, "holdRepeat", {
   enumerable: true,
   get: function get() {
@@ -9626,9 +9662,11 @@ Object.defineProperty(_$pointerEvents_42, "interactableTargets", {
     return _interactableTargets["default"];
   }
 });
-_$pointerEvents_42.id = void 0;
+_$pointerEvents_42.pointerEvents = _$pointerEvents_42.id = void 0;
 
-var ___base_42 = ___interopRequireDefault_42(_$base_40);
+var __pointerEvents_42 = ___interopRequireWildcard_42(_$base_40);
+
+_$pointerEvents_42.pointerEvents = __pointerEvents_42;
 
 var _holdRepeat = ___interopRequireDefault_42(_$holdRepeat_41);
 
@@ -9636,8 +9674,12 @@ var _interactableTargets = ___interopRequireDefault_42(_$interactableTargets_43)
 
 function ___interopRequireDefault_42(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
+function ___getRequireWildcardCache_42() { if (typeof WeakMap !== "function") return null; var cache = new WeakMap(); ___getRequireWildcardCache_42 = function _getRequireWildcardCache() { return cache; }; return cache; }
+
+function ___interopRequireWildcard_42(obj) { if (obj && obj.__esModule) { return obj; } if (obj === null || ___typeof_42(obj) !== "object" && typeof obj !== "function") { return { "default": obj }; } var cache = ___getRequireWildcardCache_42(); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj["default"] = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
+
 function __install_42(scope) {
-  scope.usePlugin(___base_42["default"]);
+  scope.usePlugin(__pointerEvents_42);
   scope.usePlugin(_holdRepeat["default"]);
   scope.usePlugin(_interactableTargets["default"]);
 }
@@ -10264,7 +10306,7 @@ function __init_27(window) {
 } // eslint-disable-next-line no-undef
 
 
-_interact["default"].version = "1.7.1";
+_interact["default"].version = "1.7.2";
 var ___default_27 = _interact["default"];
 _$interact_27["default"] = ___default_27;
 
@@ -10412,11 +10454,14 @@ var _$index_66 = { exports: {} };
 Object.defineProperty(_$index_66.exports, "__esModule", {
   value: true
 });
+var _exportNames = {};
+_$index_66.exports["default"] = void 0;
 
 var ___index_66 = ___interopRequireWildcard_66(_$interactjs_29);
 
 Object.keys(___index_66).forEach(function (key) {
   if (key === "default" || key === "__esModule") return;
+  if (Object.prototype.hasOwnProperty.call(_exportNames, key)) return;
   Object.defineProperty(_$index_66.exports, key, {
     enumerable: true,
     get: function get() {
@@ -10438,6 +10483,9 @@ if (("object" === "undefined" ? "undefined" : ___typeof_66(_$index_66)) === 'obj
 ___index_66["default"]["default"] = ___index_66["default"] // tslint:disable-line no-string-literal
 ;
 ___index_66["default"].init = ___index_66.init; // tslint:disable-line no-string-literal
+
+var ___default_66 = ___index_66["default"];
+_$index_66.exports["default"] = ___default_66;
 
 _$index_66 = _$index_66.exports
 return _$index_66;

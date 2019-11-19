@@ -1,4 +1,4 @@
-import pointerEvents from "./base.js";
+import * as pointerEvents from "./base.js";
 import holdRepeat from "./holdRepeat.js";
 import interactableTargets from "./interactableTargets.js";
 

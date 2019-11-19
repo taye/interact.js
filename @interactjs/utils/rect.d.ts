@@ -6,11 +6,3 @@ export declare function rectToXY(rect: any): {
 };
 export declare function xywhToTlbr(rect: any): any;
 export declare function tlbrToXywh(rect: any): any;
-declare const _default: {
-    getStringOptionResult: typeof getStringOptionResult;
-    resolveRectLike: typeof resolveRectLike;
-    rectToXY: typeof rectToXY;
-    xywhToTlbr: typeof xywhToTlbr;
-    tlbrToXywh: typeof tlbrToXywh;
-};
-export default _default;
