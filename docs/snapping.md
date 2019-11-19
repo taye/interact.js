@@ -251,3 +251,31 @@ optionally have its own range. The `range` of a snap target is the distance the
 pointer must be from the target's coordinates for a snap to be possible.
 
 i.e. `inRange = distance <= range`.
+
+Event snap info
+---------------
+
+```js
+interact(target).draggable({
+  modifiers: [
+    interact.modifiers.snap({ targets: [(x, y) => ({ x: x + 20 })] }),
+  ],
+  listeners: {
+    move (event) {
+      console.log(event.modifiers[0].target.source)
+    }
+  }
+})
+```
+
+`InteractEvent.modifiers` will be an array with info on the modifiers that have
+been set for the action. Snap modifiers provide an object with the closest
+target with the calculated offset.
+
+| Prop         | Type                      | Description                                                                             |
+|--------------|---------------------------|-----------------------------------------------------------------------------------------|
+| `x` and `y`  | number                    | The coords that were snapped to with origin, offset and relativePoint applied           |
+| `source`     | target object or function | The target object or function in the targets array option                               |
+| `index`      | number                    | The index of the source in the targets array                                            |
+| `range`      | number                    | The range of the target                                                                 |
+| `offset`     | object                    | The offset applied to the source                                                        |
