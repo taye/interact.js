@@ -76,9 +76,11 @@ function set (arg) {
     state.options.targets.push(target)
   }
 
-  snap.set(arg)
+  const returnValue = snap.set(arg)
 
   state.options = options
+
+  return returnValue
 }
 
 const defaults: SnapSizeOptions = {

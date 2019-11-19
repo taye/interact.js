@@ -84,7 +84,7 @@ export interface ModifierModule<
 > {
   defaults?: Defaults
   start? (arg: ModifierArg<State>): void
-  set? (arg: ModifierArg<State>): void
+  set? (arg: ModifierArg<State>): any
   beforeEnd? (arg: ModifierArg<State>): boolean
   stop? (arg: ModifierArg<State>): void
 }
