@@ -1,7 +1,7 @@
 import test from '@interactjs/_dev/test/test'
 import drag from '../actions/drag'
 import autoStart from '../auto-start/base'
-import pointerUtils from '../utils/pointerUtils'
+import * as pointerUtils from '../utils/pointerUtils'
 import InteractEvent from './InteractEvent'
 import Interaction from './Interaction'
 import * as helpers from './tests/_helpers'

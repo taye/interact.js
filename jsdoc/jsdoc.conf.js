@@ -1,9 +1,11 @@
-const packagesDir = `${__dirname}/../@interactjs`
+const path = require('path')
 const glob = require('glob')
-const ignore = ['**/node_modules/**', '**/*.spec.ts', '**/*.d.ts', '**/dist/**']
-const include = [...new Set([
-  ...glob.sync(`${packagesDir}/**/*.ts`, { ignore }),
-])]
+const { sourcesGlob, sourcesIgnoreGlobs } = require('../scripts/utils')
+
+const root = path.join(__dirname, '..')
+const include = glob
+  .sync(sourcesGlob, { cwd: root, ignore: sourcesIgnoreGlobs })
+  .map(source => path.join(root, source))
 
 module.exports = {
   source: {
@@ -13,7 +15,7 @@ module.exports = {
   },
 
   opts: {
-    destination: `${packagesDir}/interactjs/dist/api/`,
+    destination: `${root}/interactjs/dist/api/`,
     recurse: true,
   },
 

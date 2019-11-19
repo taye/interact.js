@@ -61,16 +61,16 @@ export function install (scope: Scope) {
 }
 
 function reflow (interactable: Interactable, action: ActionProps, scope: Scope): Promise<Interactable> {
-  const elements = is.string(interactable.target)
+  const elements = (is.string(interactable.target)
     ? arr.from(interactable._context.querySelectorAll(interactable.target))
-    : [interactable.target]
+    : [interactable.target]) as Interact.Element[]
 
   // tslint:disable-next-line variable-name
   const Promise = (win.window as any).Promise
   const promises: Array<Promise<null>> | null = Promise ? [] : null
 
   for (const element of elements) {
-    const rect = interactable.getRect(element)
+    const rect = interactable.getRect(element as HTMLElement | SVGElement)
 
     if (!rect) { break }
 
