@@ -26,15 +26,14 @@ test('modifiers/snap/edges', t => {
   const pageCoords = Object.freeze({ x: 0, y: 0 })
   const arg = {
     interaction,
+    // resize from top left
+    edges: { top: true, left: true } as Interact.EdgeOptions,
     interactable: interaction.interactable,
     state: null,
     pageCoords,
     coords: { ...pageCoords },
     offset: [{ x: 0, y: 0 }],
   }
-
-  // resize from top left
-  interaction.prepared.edges = { top: true, left: true }
 
   arg.state = { options }
   snapEdges.start(arg as any)
@@ -46,7 +45,7 @@ test('modifiers/snap/edges', t => {
     'modified coords are correct')
 
   // resize from bottom right
-  interaction.prepared.edges = { bottom: true, right: true }
+  arg.edges = { bottom: true, right: true }
 
   arg.state = { options }
   snapEdges.start(arg as any)

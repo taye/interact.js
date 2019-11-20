@@ -6,10 +6,6 @@ test('modifiers/snapSize', t => {
   const { interaction, interactable } = helpers.testEnv()
   interaction.interactable = interactable
   interactable.getRect = () => ({ top: 0, left: 0, bottom: 100, right: 100 } as any)
-  interaction.prepared = {
-    name: null,
-    edges: { top: true, left: true, bottom: false, right: false },
-  }
   interaction._interacting = true
 
   const target0 = Object.freeze({ x:  50, y:  100 })
@@ -28,6 +24,7 @@ test('modifiers/snapSize', t => {
   const arg = {
     interaction,
     interactable: interaction.interactable,
+    edges: { top: true, left: true },
     state,
     pageCoords,
     coords: { ...pageCoords },
