@@ -2,6 +2,10 @@
 
  - added `aspectRatio` modifier (#638)
 
+## v1.7.2
+
+ - fixed typescript definition files (#771)
+
 ## v1.7.1
 
  - reorganized modules for esnext resolution
