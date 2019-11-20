@@ -33,7 +33,7 @@ import { SnapState } from './pointer'
 import snapSize, { SnapSizeOptions } from './size'
 
 function start (arg: ModifierArg<SnapState>) {
-  const { edges } = arg.interaction.prepared
+  const { edges } = arg
 
   if (!edges) { return null }
 
