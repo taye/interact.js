@@ -39,7 +39,7 @@ test('restrict larger than restriction', t => {
   t.deepEqual(
     arg.coords,
     { x: 0, y: 0 },
-    'allows top and left edge values to be lower than the restriction'
+    'allows top and left edge values to be lower than the restriction',
   )
 
   arg.coords = { x: restriction.left + 10, y: restriction.top + 10 }
@@ -47,7 +47,7 @@ test('restrict larger than restriction', t => {
   t.deepEqual(
     arg.coords,
     { x: restriction.left - rect.left, y: restriction.top - rect.top },
-    'keeps the top left edge values lower than the restriction'
+    'keeps the top left edge values lower than the restriction',
   )
 
   arg.coords = { x: restriction.right - rect.right - 10, y: restriction.bottom - rect.right - 10 }
@@ -55,7 +55,7 @@ test('restrict larger than restriction', t => {
   t.deepEqual(
     arg.coords,
     { x: restriction.right - rect.right, y: restriction.bottom - rect.right },
-    'keeps the bottom right edge values higher than the restriction'
+    'keeps the bottom right edge values higher than the restriction',
   )
 
   t.end()

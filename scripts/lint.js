@@ -2,7 +2,7 @@
 
 const { existsSync } = require('fs')
 
-const { sourcesGlob, sourcesIgnoreGlobs } = require('./utils')
+const { sourcesGlob, lintIgnoreGlobs } = require('./utils')
 
 const jsExt = /\.js$/
 const dtsExt = /\.d\.ts$/
@@ -19,10 +19,8 @@ function isNotGenerated (source) {
 }
 
 const argv = require('yargs')
-  .defaults({
-    fix: false,
-    failOnError: false,
-  })
+  .boolean('fix')
+  .boolean('failOnError')
   .option('sources', {
     array: true,
     default: getSources,
@@ -33,7 +31,7 @@ function getSources () {
   const glob = require('glob')
 
   const sources = glob.sync(sourcesGlob, {
-    ignore: sourcesIgnoreGlobs,
+    ignore: lintIgnoreGlobs,
     silent: true,
   })
 

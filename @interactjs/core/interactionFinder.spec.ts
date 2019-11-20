@@ -33,7 +33,7 @@ test('modifiers/snap', t => {
   t.equal(
     list.indexOf(finder.search(details)),
     2,
-    '[pointerType: mouse] skips inactive mouse and touch interaction'
+    '[pointerType: mouse] skips inactive mouse and touch interaction',
   )
 
   list[2]._interacting = false
@@ -41,7 +41,7 @@ test('modifiers/snap', t => {
   t.equal(
     list.indexOf(finder.search(details)),
     0,
-    '[pointerType: mouse] returns first idle mouse interaction'
+    '[pointerType: mouse] returns first idle mouse interaction',
   )
 
   coords.pointerId = 4
@@ -51,7 +51,7 @@ test('modifiers/snap', t => {
   t.equal(
     list.indexOf(finder.search(details)),
     1,
-    '[pointerType: touch] gets interaction with pointerId'
+    '[pointerType: touch] gets interaction with pointerId',
   )
 
   coords.pointerId = 5
@@ -60,7 +60,7 @@ test('modifiers/snap', t => {
     list.indexOf(finder.search(details)),
     1,
     `[pointerType: touch] returns idle touch interaction without matching pointerId
-    and existing touch interaction has pointer and no target`
+    and existing touch interaction has pointer and no target`,
   )
 
   interactable.options.gesture = { enabled: false }
@@ -70,7 +70,7 @@ test('modifiers/snap', t => {
     list.indexOf(finder.search(details)),
     -1,
     `[pointerType: touch] no result without matching pointerId
-    and existing touch interaction has a pointer and target not gesturable`
+    and existing touch interaction has a pointer and target not gesturable`,
   )
 
   interactable.options.gesture = { enabled: true }
@@ -79,7 +79,7 @@ test('modifiers/snap', t => {
     list.indexOf(finder.search(details)),
     1,
     `[pointerType: touch] returns idle touch interaction with gesturable target
-    and existing pointer`
+    and existing pointer`,
   )
 
   t.end()

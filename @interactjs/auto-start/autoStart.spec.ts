@@ -25,13 +25,13 @@ test('autoStart', t => {
   t.deepEqual(
     interaction.prepared,
     { name: 'drag', axis: 'xy', edges: undefined },
-    'prepares action'
+    'prepares action',
   )
 
   t.deepEqual(
     interaction.rect,
     rect as any,
-    'set interaction.rect'
+    'set interaction.rect',
   )
 
   t.equal(element.style.cursor, 'move', 'sets drag cursor')
@@ -51,7 +51,7 @@ test('autoStart', t => {
   t.deepEqual(
     checkerArgs,
     [{ name: 'drag', axis: 'xy', edges: undefined }, interactable, element, false],
-    'calls cursorChecker with expected args'
+    'calls cursorChecker with expected args',
   )
 
   interaction.pointerDown(event, event, element)
@@ -65,7 +65,7 @@ test('autoStart', t => {
   t.deepEqual(
     checkerArgs,
     [{ name: 'drag', axis: 'xy', edges: undefined }, interactable, element, true],
-    'calls cursorChecker with true for interacting arg'
+    'calls cursorChecker with true for interacting arg',
   )
 
   t.end()

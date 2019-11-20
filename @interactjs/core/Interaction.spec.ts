@@ -219,7 +219,7 @@ test('Interaction.pointer{Down,Move,Up} updatePointer', t => {
       downTime: interaction.coords.cur.timeStamp,
       downTarget: eventTarget,
     },
-    'interaction.pointerDown updates pointer'
+    'interaction.pointerDown updates pointer',
   )
   t.equal(info.removed, undefined, 'interaction.pointerDown doesn\'t remove pointer')
   interaction.removePointer(pointer, null)
@@ -229,7 +229,7 @@ test('Interaction.pointer{Down,Move,Up} updatePointer', t => {
   t.deepEqual(
     info.updated,
     commonPointerInfo,
-    'interaction.pointerMove updates pointer'
+    'interaction.pointerMove updates pointer',
   )
   t.equal(info.removed, undefined, 'interaction.pointerMove doesn\'t remove pointer')
   info = {}
@@ -242,7 +242,7 @@ test('Interaction.pointer{Down,Move,Up} updatePointer', t => {
   t.deepEqual(
     info.updated,
     commonPointerInfo,
-    'interaction.pointerUp updates non existing pointer'
+    'interaction.pointerUp updates non existing pointer',
   )
   t.deepEqual(info.removed, commonPointerInfo, 'interaction.pointerUp also removes pointer')
   info = {}
@@ -290,7 +290,7 @@ test('Interaction.pointerDown', t => {
       downTime: null,
       downTarget: null,
     }],
-    'pointer is added'
+    'pointer is added',
   )
 
   t.deepEqual(interaction.downPointer, {} as any, 'downPointer is not updated')

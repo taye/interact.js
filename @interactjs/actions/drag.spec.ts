@@ -140,24 +140,24 @@ test('drag axis', t => {
           [opposite]: coords.start.page[opposite],
           [axis]: eventCoords.page[axis],
         },
-        `page.${opposite} is coords.start value`
+        `page.${opposite} is coords.start value`,
       )
 
       tt.equal(
         iEvent.page[axis],
         eventCoords.page[axis],
-        `page.${axis} is not modified`
+        `page.${axis} is not modified`,
       )
 
       tt.equal(
         iEvent.client[opposite],
         coords.start.client[opposite],
-        `client.${opposite} is coords.start value`
+        `client.${opposite} is coords.start value`,
       )
       tt.equal(
         iEvent.client[axis],
         eventCoords.client[axis],
-        `client.${axis} is not modified`
+        `client.${axis} is not modified`,
       )
 
       tt.end()

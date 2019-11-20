@@ -55,7 +55,7 @@ test('modifiers/snap', t => {
   t.deepEqual(
     arg.coords,
     { x: target0.x + origin.x, y: target0.y + origin.y },
-    'snaps to target and adds origin which will be subtracted by InteractEvent'
+    'snaps to target and adds origin which will be subtracted by InteractEvent',
   )
 
   arg.coords = { ...pageCoords }
@@ -77,7 +77,7 @@ test('modifiers/snap', t => {
       index: 0,
       unexpected: [],
     },
-    'x, y, interaction, offset, index are passed to target function; origin subtracted from x, y'
+    'x, y, interaction, offset, index are passed to target function; origin subtracted from x, y',
   )
 
   arg.coords = { ...pageCoords }
@@ -89,13 +89,13 @@ test('modifiers/snap', t => {
   t.deepEqual(
     arg.coords,
     { x: target0.x + 300, y: target0.y + 300 },
-    'origin not added to target when !options.offsetWithOrigin'
+    'origin not added to target when !options.offsetWithOrigin',
   )
 
   t.deepEqual(
     { x: funcArgs.x, y: funcArgs.y },
     { x: pageCoords.x - origin.x - 300, y: pageCoords.y - origin.y - 300 },
-    'origin still subtracted from function target x, y args when !options.offsetWithOrigin'
+    'origin still subtracted from function target x, y args when !options.offsetWithOrigin',
   )
 
   t.end()

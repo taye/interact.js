@@ -36,7 +36,7 @@ test('modifiers/snapSize', t => {
   t.deepEqual(
     arg.coords,
     target0,
-    'snapSize.set single target, zereo offset'
+    'snapSize.set single target, zereo offset',
   )
 
   t.end()

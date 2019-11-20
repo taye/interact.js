@@ -15,7 +15,7 @@ test('reflow', t => {
 
   t.ok(
     scope.Interactable.prototype.reflow instanceof Function,
-    'reflow method is added to Interactable.prototype'
+    'reflow method is added to Interactable.prototype',
   )
 
   const fired = []
@@ -52,7 +52,7 @@ test('reflow', t => {
       x: rect.left,
       y: rect.top,
     },
-    'uses element top left for event coords'
+    'uses element top left for event coords',
   )
 
   const reflowMove = fired[2]
@@ -60,23 +60,23 @@ test('reflow', t => {
   t.deepEqual(
     reflowMove.delta,
     { x: 100, y: -50 },
-    'move delta is correct with modified interaction coords'
+    'move delta is correct with modified interaction coords',
   )
 
   t.notOk(
     interaction.pointerIsDown,
-    'reflow pointer was lifted'
+    'reflow pointer was lifted',
   )
 
   t.equal(
     interaction.pointers.length,
     0,
-    'reflow pointer was removed from interaction'
+    'reflow pointer was removed from interaction',
   )
 
   t.notOk(
     scope.interactions.list.includes(interaction),
-    'interaction is removed from list'
+    'interaction is removed from list',
   )
 
   t.end()
