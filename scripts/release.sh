@@ -8,6 +8,7 @@ main() {
   ensure_clean_index &&
     check_version &&
     git_detach &&
+    clean &&
     run_build &&
     commit_and_tag &&
     push_and_publish
@@ -49,6 +50,10 @@ git_detach() {
 
   # detach HEAD
   git checkout --detach || exit $?
+}
+
+clean() {
+  npm run clean
 }
 
 run_build() {
