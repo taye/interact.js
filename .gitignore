@@ -3,8 +3,7 @@ coverage
 .nyc_output
 **/*.d.ts
 !@interactjs/types/types.d.ts
-@interactjs/**/*.js
-@interactjs/**/*.js.map
+*interactjs/**/*.js
+*interactjs/**/*.js.map
 **/node_modules
 **/lerna-debug.log
-@interactjs/*/.npmignore

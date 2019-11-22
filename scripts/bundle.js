@@ -9,14 +9,12 @@ const argv = require('yargs')
   .pkgConf('_dev')
   .default({
     watch: false,
-    docs: false,
     debug: true,
     headerFile: require.resolve('./header.js'),
     minHeaderFile: require.resolve('./minHeader.js'),
     name: 'index',
   })
   .boolean('watch')
-  .boolean('docs')
   .boolean('debug')
   .option('entries', {
     required: true,
@@ -102,12 +100,6 @@ else {
 }
 
 function update (ids) {
-  if (argv.docs) {
-    require('../jsdoc')({
-      stdio: ['ignore', 'ignore', 'inherit'],
-    })
-  }
-
   if (argv.watch) {
     console.log('Bundling...')
   }

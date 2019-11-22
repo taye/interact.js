@@ -9,7 +9,7 @@
     "./interactjs"
   ],
   "bin": {
-    "@build": "scripts/build.js",
+    "@bundle": "scripts/bundle.js",
     "@esnext": "scripts/esnext.js",
     "@docs": "jsdoc/index.js",
     "@clean": "scripts/clean.js",
@@ -19,9 +19,10 @@
   },
   "scripts": {
     "bootstrap": "npx yarn install",
-    "start": "cd interactjs; NODE_ENV=development ../scripts/build.js --watch",
-    "build": "cd interactjs; NODE_ENV=production ../scripts/build.js --docs",
+    "start": "cd interactjs; NODE_ENV=development ../scripts/bundle.js --watch",
+    "bundle": "cd interactjs; NODE_ENV=production ../scripts/bundle.js",
     "esnext": "scripts/esnext.js",
+    "build": "npm run clean && npm run docs && npm run bundle && npm run esnext",
     "docs": "node jsdoc/index.js",
     "clean": "scripts/clean.js",
     "lint": "scripts/lint.js --fail-on-error",

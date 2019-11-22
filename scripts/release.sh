@@ -1,25 +1,18 @@
 #!/usr/bin/bash
 PATH=$PATH:$PWD/node_modules/.bin
 
-RELEASE_BRANCH=$1
-NEW_VERSION=$2
-
 ROOT=$(dirname $(readlink -f $0))/..
 INITIAL_BRANCH=$(git rev-parse --abbrev-ref HEAD)
 
 main() {
   ensure_clean_index &&
-    check_args &&
     check_version &&
-    merge_to_release &&
+    checkout_clean_head &&
+    bootstrap &&
     run_tests &&
     run_build &&
-    bootstrap &&
     commit_and_tag &&
-    push_and_publish &&
-
-  # leave the release branch
-  quit
+    publish_and_push
 }
 
 ensure_clean_index() {
@@ -33,14 +26,6 @@ ensure_clean_index() {
   fi
 }
 
-check_args() {
-  echo_funcname
-
-  if [[ -z $RELEASE_BRANCH ]]; then
-    quit "Missing release branch arg" 1
-  fi
-}
-
 check_version() {
   echo_funcname
 
@@ -48,7 +33,7 @@ check_version() {
   NEW_TAG="v$(semver clean $NEW_VERSION)"
 
   if [[ $NEW_TAG == v ]]; then
-    quit "failed parse version from '$NEW_VERSION'" 1
+    quit "failed parsing version from '$NEW_VERSION'" 1
   fi
 
   # if the version tag already exists
@@ -57,20 +42,14 @@ check_version() {
   fi
 }
 
-merge_to_release() {
+checkout_clean_head() {
   echo_funcname
 
-  echo "checking out the '$RELEASE_BRANCH' branch"
-  git checkout $RELEASE_BRANCH || exit $?
-  git pull --ff-only
+  # detach HEAD
+  git switch -d || exit $?
 
   # clean repo
-  npm run clean
   git clean -fdX
-
-
-  git merge --no-ff --no-edit $INITIAL_BRANCH || quit "failed to merge branches" $?
-  npm run bootstrap || quit "bootstrapping failed" $?
 }
 
 run_tests() {
@@ -99,12 +78,12 @@ run_build() {
   ## generate esnext .js modules
   npm run esnext &&
 
-  # build interactjs bundle
+  # bundle interactjs, generate docs, transpile modules
   npm run build || exit $?
 }
 
 bootstrap() {
-  npm run bootstrap
+  npm run bootstrap || quit "bootstrapping failed" $?
 }
 
 commit_and_tag() {
@@ -112,23 +91,23 @@ commit_and_tag() {
 
   # commit and add new version tag
   git add --all &&
+    git add --force *interactjs/**/*.{ts,js,js.map} interactjs/dist &&
     git commit -m $NEW_TAG &&
     git tag $NEW_TAG
 }
 
-push_and_publish() {
+publish_and_push() {
   echo_funcname
 
-  if [[ $RELEASE_BRANCH == "next" ]]; then
-    # publish to npm with "next" tag
-    npx lerna exec --no-private -- npm publish --tag next
-  else
-    # publish with default tag
-    npx lerna exec --no-private -- npm publish
+  if [[ -n $NPM_TAG ]]; then
+    tag_arg="--tag $NPM_TAG"
   fi
 
+  # publish to npm with release tag if provided
+  npx lerna exec --no-private -- npm publish $tag_arg || quit "failed to publish to npm" $?
+
   # push branch and tags to git origin
-  git push --no-verify && git push --no-verify origin $NEW_TAG
+  git push --no-verify origin $NEW_TAG || quit "failed to push git tag $NEW_TAG to origin" $?
 }
 
 echo_funcname() {
@@ -144,7 +123,6 @@ quit() {
     fi
   fi
 
-  git checkout -q $INITIAL_BRANCH > /dev/null
   exit $2
 }
 
