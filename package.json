@@ -54,6 +54,7 @@
     "babelify": "latest",
     "browser-pack-flat": "latest",
     "browserify": "latest",
+    "codeclimate-test-reporter": "^0.5.1",
     "combine-source-map": "latest",
     "common-shakeify": "latest",
     "domator": "latest",

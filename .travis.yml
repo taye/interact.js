@@ -10,12 +10,16 @@ script: npm run tsc_lint_test
 after_success:
   - npx codeclimate-test-reporter < ./coverage/lcov.info
 before_deploy:
+  - pushd $HOME
   - openssl aes-256-cbc -K $encrypted_e8f45655cff8_key -iv $encrypted_e8f45655cff8_iv
-    -in .travis/id_rsa.enc -out .travis/id_rsa -d
+    -in $TRAVIS_BUILD_DIR/.travis/secrets.tar.enc -out secrets.tar -d
+  - tar -xvf secrets.tar
+  - popd
 deploy:
   - provider: script
-    script: NPM_TAG=$NPM_TAG bash .travis/deploy.sh
-    api_key:
+    script: bash .travis/deploy.sh
+    skip_cleanup: true
+    env:
       secure: JDw06YX4/egO+WjuWVHsEcPS/04syh6fEpY1RbQgEypFNDt8UVvHXPcSP6nNp2YDvfbAWF1TBKojBJk02EQDB1KlQgnO/csvq3tBOSlQU0Cku6zKcUX6LzywLuBPfc3gYKTeXsiNly31vmMxTh2hwHnx2iYxHdMN7CojQpf1JdI=
     on:
       branch: [latest, next]

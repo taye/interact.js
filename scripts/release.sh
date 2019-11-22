@@ -1,4 +1,4 @@
-#!/usr/bin/bash
+#!/bin/bash
 PATH=$PATH:$PWD/node_modules/.bin
 
 ROOT=$(dirname $(readlink -f $0))/..
@@ -7,12 +7,10 @@ INITIAL_BRANCH=$(git rev-parse --abbrev-ref HEAD)
 main() {
   ensure_clean_index &&
     check_version &&
-    checkout_clean_head &&
-    bootstrap &&
-    run_tests &&
+    git_detach &&
     run_build &&
     commit_and_tag &&
-    publish_and_push
+    push_and_publish
 }
 
 ensure_clean_index() {
@@ -30,7 +28,7 @@ check_version() {
   echo_funcname
 
   NEW_VERSION=$(node $ROOT/scripts/version.js)
-  NEW_TAG="v$(semver clean $NEW_VERSION)"
+  NEW_TAG="v$(npx semver clean $NEW_VERSION)"
 
   if [[ $NEW_TAG == v ]]; then
     quit "failed parsing version from '$NEW_VERSION'" 1
@@ -40,22 +38,17 @@ check_version() {
   if [[ $(git tag -l $NEW_TAG) == $NEW_TAG ]]; then
     quit "$NEW_TAG tag already exists" 1
   fi
+
+  if [[ -n $NPM_TAG ]]; then
+    echo "will publish to npm with '$NPM_TAG' tag"
+  fi
 }
 
-checkout_clean_head() {
+git_detach() {
   echo_funcname
 
   # detach HEAD
-  git checkout -d || exit $?
-
-  # clean repo
-  git clean -fdX
-}
-
-run_tests() {
-  echo_funcname
-
-  npm run tsc_lint_test || quit "tests have failed" $?
+  git checkout --detach || exit $?
 }
 
 run_build() {
@@ -82,10 +75,6 @@ run_build() {
   npm run build || exit $?
 }
 
-bootstrap() {
-  npm run bootstrap || quit "bootstrapping failed" $?
-}
-
 commit_and_tag() {
   echo_funcname
 
@@ -96,18 +85,18 @@ commit_and_tag() {
     git tag $NEW_TAG
 }
 
-publish_and_push() {
+push_and_publish() {
   echo_funcname
 
   if [[ -n $NPM_TAG ]]; then
     tag_arg="--tag $NPM_TAG"
   fi
 
-  # publish to npm with release tag if provided
-  npx lerna exec --no-private -- npm publish $tag_arg || quit "failed to publish to npm" $?
-
   # push branch and tags to git origin
   git push --no-verify origin $NEW_TAG || quit "failed to push git tag $NEW_TAG to origin" $?
+
+  # publish to npm with release tag if provided
+  npx lerna exec --no-private -- npm publish $tag_arg || quit "failed to publish to npm" $?
 }
 
 echo_funcname() {
