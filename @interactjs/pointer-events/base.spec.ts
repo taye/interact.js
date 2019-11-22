@@ -115,7 +115,7 @@ test('pointerEvents Interaction update-pointer signal', t => {
   scope.usePlugin(pointerEvents)
 
   const interaction = scope.interactions.new({})
-  const initialHold = { duration: Infinity, timeout: 0 }
+  const initialHold = { duration: Infinity, timeout: null as number }
   const event = {} as Interact.PointerEventType
 
   interaction.updatePointer(helpers.newPointer(0), event, null, false)
