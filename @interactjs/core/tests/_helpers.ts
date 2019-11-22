@@ -119,6 +119,11 @@ export function testEnv<T extends Interact.Target = HTMLElement> ({
     interactable,
     coords,
     event,
+    start: (action: Interact.ActionProps) => interaction.start(action, interactable, target as HTMLElement),
+    stop: () => interaction.stop(),
+    down: () => interaction.pointerDown(event, event, target as HTMLElement),
+    move: (force?: boolean) => force ? interaction.move() : interaction.pointerMove(event, event, target as HTMLElement),
+    up: () => interaction.pointerMove(event, event, target as HTMLElement),
   }
 }
 

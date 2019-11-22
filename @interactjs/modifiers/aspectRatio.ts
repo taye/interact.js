@@ -83,7 +83,7 @@ const aspectRatio: ModifierModule<AspectRatioOptions, AspectRatioState> = {
       return subState
     })
 
-    startAll({
+    return startAll({
       ...arg,
       states: state.subStates,
     })
@@ -96,7 +96,7 @@ const aspectRatio: ModifierModule<AspectRatioOptions, AspectRatioState> = {
 
     aspectMethod(state, state.xIsPrimaryAxis, coords, rect)
 
-    if (!state.subStates) { return }
+    if (!state.subStates) { return null }
 
     const correctedRect = extend({}, rect)
 
@@ -114,13 +114,15 @@ const aspectRatio: ModifierModule<AspectRatioOptions, AspectRatioState> = {
 
     const { delta } = result
 
-    if (!result.changed) { return }
+    if (result.changed) {
+      const xIsCriticalAxis = Math.abs(delta.x) > Math.abs(delta.y)
 
-    const xIsCriticalAxis = Math.abs(delta.x) > Math.abs(delta.y)
+      // do aspect modification again with critical edge axis as primary
+      aspectMethod(state, xIsCriticalAxis, result.coords, result.rect)
+      extend(coords, result.coords)
+    }
 
-    // do aspect modification again with critical edge axis as primary
-    aspectMethod(state, xIsCriticalAxis, result.coords, result.rect)
-    extend(coords, result.coords)
+    return result.eventProps
   },
 
   defaults: {

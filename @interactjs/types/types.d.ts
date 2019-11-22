@@ -13,6 +13,7 @@ import * as iEvent from '@interactjs/core/InteractEvent'
 import * as interaction from '@interactjs/core/Interaction'
 import * as scope from '@interactjs/core/scope'
 import interact from '@interactjs/interact/interact'
+import * as snap from '@interactjs/modifiers/snap/pointer'
 
 declare namespace Interact {
   type OrBoolean<T> = {
@@ -47,7 +48,6 @@ declare namespace Interact {
   export interface Point {
     x: number
     y: number
-    [index: string]: number
   }
 
   export interface Size {
@@ -178,6 +178,8 @@ declare namespace Interact {
   ) => ActionProps
 
   export type OriginFunction = (target: Element) => Rect
+  export type SnapFunction = snap.SnapFunction
+  export type SnapTarget = snap.SnapTarget
 
   export interface PointerEventsOptions {
     holdDuration?: number

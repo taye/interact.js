@@ -6,7 +6,10 @@ function createGrid (grid: (Interact.Rect | Interact.Point) & { range?: number, 
     ['width', 'height'],
   ].filter(([xField, yField]) => xField in grid || yField in grid)
 
-  const gridFunc = function snapGrid (x, y) {
+  const gridFunc: Interact.SnapFunction & {
+    grid: typeof grid
+    coordFields: typeof coordFields
+  } = (x, y) => {
     const {
       range,
       limits = {
@@ -18,7 +21,9 @@ function createGrid (grid: (Interact.Rect | Interact.Point) & { range?: number, 
       offset = { x: 0, y: 0 },
     } = grid
 
-    const result = { range }
+    const result: Interact.SnapTarget & {
+      grid: typeof grid
+    } = { range, grid, x: null as number, y: null as number }
 
     for (const [xField, yField] of coordFields) {
       const gridx = Math.round((x - offset.x) / grid[xField])
@@ -31,7 +36,6 @@ function createGrid (grid: (Interact.Rect | Interact.Point) & { range?: number, 
     return result
   }
 
-  gridFunc._isSnapGrid = true
   gridFunc.grid = grid
   gridFunc.coordFields = coordFields
 
