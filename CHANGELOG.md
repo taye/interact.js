@@ -1,3 +1,7 @@
+## v1.8.0-alpha.1
+
+ - added `event.modifiers` array (#772)
+
 ## v1.8.0-alpha.0
 
  - added `aspectRatio` modifier (#638)
