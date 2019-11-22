@@ -1,7 +1,11 @@
 import { rectToXY, resolveRectLike } from './rect'
 
-export default function (target: Interact.HasGetRect & { options: Interact.PerActionDefaults }, element, action?) {
-  const actionOptions = target.options[action]
+export default function (
+  target: Interact.HasGetRect & { options: Interact.PerActionDefaults },
+  element: Node,
+  actionName?: Interact.ActionName,
+) {
+  const actionOptions = (target.options as any)[actionName]
   const actionOrigin = actionOptions && actionOptions.origin
   const origin = actionOrigin || target.options.origin
 

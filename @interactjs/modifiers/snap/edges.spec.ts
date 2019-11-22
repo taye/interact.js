@@ -29,7 +29,7 @@ test('modifiers/snap/edges', t => {
     // resize from top left
     edges: { top: true, left: true } as Interact.EdgeOptions,
     interactable: interaction.interactable,
-    state: null,
+    state: null as any,
     pageCoords,
     coords: { ...pageCoords },
     offset: [{ x: 0, y: 0 }],
@@ -37,7 +37,7 @@ test('modifiers/snap/edges', t => {
 
   arg.state = { options }
   snapEdges.start(arg as any)
-  snapEdges.set(arg)
+  snapEdges.set(arg as any)
 
   t.deepEqual(
     arg.coords,
@@ -49,7 +49,7 @@ test('modifiers/snap/edges', t => {
 
   arg.state = { options }
   snapEdges.start(arg as any)
-  snapEdges.set(arg)
+  snapEdges.set(arg as any)
 
   t.deepEqual(
     arg.coords,

@@ -55,7 +55,7 @@ export default class PointerEvent<T extends string> extends BaseEvent {
     }
   }
 
-  _subtractOrigin ({ x: originX, y: originY }) {
+  _subtractOrigin ({ x: originX, y: originY }: Interact.Point) {
     this.pageX   -= originX
     this.pageY   -= originY
     this.clientX -= originX
@@ -64,7 +64,7 @@ export default class PointerEvent<T extends string> extends BaseEvent {
     return this
   }
 
-  _addOrigin ({ x: originX, y: originY }) {
+  _addOrigin ({ x: originX, y: originY }: Interact.Point) {
     this.pageX   += originX
     this.pageY   += originY
     this.clientX += originX
@@ -80,3 +80,5 @@ export default class PointerEvent<T extends string> extends BaseEvent {
     this.originalEvent.preventDefault()
   }
 }
+
+export { PointerEvent }

@@ -7,7 +7,7 @@ const win = {
   init,
 }
 
-export function init (window: Window & { wrap?: (...args) => any }) {
+export function init (window: Window & { wrap?: (...args: any) => any }) {
   // get wrapped window if using Shadow DOM polyfill
 
   win.realWindow = window
@@ -34,7 +34,7 @@ else {
   init(window)
 }
 
-export function getWindow (node) {
+export function getWindow (node: any) {
   if (isWindow(node)) {
     return node
   }

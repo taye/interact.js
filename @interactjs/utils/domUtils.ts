@@ -15,7 +15,7 @@ export function nodeContains (parent: Node | Interact.EventTarget, child: Node |
   return false
 }
 
-export function closest (element, selector) {
+export function closest (element: Node, selector: string) {
   while (is.element(element)) {
     if (matchesSelector(element, selector)) { return element }
 
@@ -25,7 +25,7 @@ export function closest (element, selector) {
   return null
 }
 
-export function parentNode (node) {
+export function parentNode (node: Node | Document) {
   let parent = node.parentNode
 
   if (is.docFrag(parent)) {
@@ -41,7 +41,7 @@ export function parentNode (node) {
   return parent
 }
 
-export function matchesSelector (element, selector) {
+export function matchesSelector (element: Interact.Element, selector: string) {
   // remove /deep/ from selectors if shadowDOM polyfill is used
   if (win.window !== win.realWindow) {
     selector = selector.replace(/\/deep\//g, ' ')
@@ -174,7 +174,7 @@ export function matchesUpTo (element: Interact.Element, selector: string, limit:
       return true
     }
 
-    element = parentNode(element)
+    element = parentNode(element) as Interact.Element
 
     if (element === limit) {
       return matchesSelector(element, selector)
@@ -184,9 +184,9 @@ export function matchesUpTo (element: Interact.Element, selector: string, limit:
   return false
 }
 
-export function getActualElement (element) {
+export function getActualElement (element: Interact.Element) {
   return (element instanceof domObjects.SVGElementInstance
-    ? element.correspondingUseElement
+    ? (element as SVGElement).correspondingUseElement
     : element)
 }
 
@@ -198,7 +198,7 @@ export function getScrollXY (relevantWindow) {
   }
 }
 
-export function getElementClientRect (element) {
+export function getElementClientRect (element: Interact.Element) {
   const clientRect = (element instanceof domObjects.SVGElement
     ? element.getBoundingClientRect()
     : element.getClientRects()[0])
@@ -213,7 +213,7 @@ export function getElementClientRect (element) {
   }
 }
 
-export function getElementRect (element) {
+export function getElementRect (element: Interact.Element) {
   const clientRect = getElementClientRect(element)
 
   if (!browser.isIOS7 && clientRect) {
@@ -228,7 +228,7 @@ export function getElementRect (element) {
   return clientRect
 }
 
-export function getPath (node) {
+export function getPath (node: Node | Document) {
   const path = []
 
   while (node) {

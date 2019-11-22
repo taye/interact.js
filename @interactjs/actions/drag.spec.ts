@@ -94,6 +94,7 @@ test('drag axis', t => {
     page: { x: -1, y: -2 },
     client: { x: -3, y: -4 },
     delta: { x: -5, y: -6 },
+    timeStamp: 0,
   }
   const coords = helpers.newCoordsSet()
 

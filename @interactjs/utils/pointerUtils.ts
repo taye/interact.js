@@ -5,19 +5,19 @@ import hypot from './hypot'
 import * as is from './is'
 import pointerExtend from './pointerExtend'
 
-export function copyCoords (dest, src) {
-  dest.page = dest.page || {}
+export function copyCoords (dest: Interact.CoordsSetMember, src: Interact.CoordsSetMember) {
+  dest.page = dest.page || {} as any
   dest.page.x = src.page.x
   dest.page.y = src.page.y
 
-  dest.client = dest.client || {}
+  dest.client = dest.client || {} as any
   dest.client.x = src.client.x
   dest.client.y = src.client.y
 
   dest.timeStamp = src.timeStamp
 }
 
-export function setCoordDeltas (targetObj, prev, cur) {
+export function setCoordDeltas (targetObj: Interact.CoordsSetMember, prev: Interact.CoordsSetMember, cur: Interact.CoordsSetMember) {
   targetObj.page.x    = cur.page.x    - prev.page.x
   targetObj.page.y    = cur.page.y    - prev.page.y
   targetObj.client.x  = cur.client.x  - prev.client.x
@@ -25,7 +25,7 @@ export function setCoordDeltas (targetObj, prev, cur) {
   targetObj.timeStamp = cur.timeStamp - prev.timeStamp
 }
 
-export function setCoordVelocity (targetObj, delta) {
+export function setCoordVelocity (targetObj: Interact.CoordsSetMember, delta: Interact.CoordsSetMember) {
   const dt = Math.max(delta.timeStamp / 1000, 0.001)
 
   targetObj.page.x   = delta.page.x / dt
@@ -35,14 +35,14 @@ export function setCoordVelocity (targetObj, delta) {
   targetObj.timeStamp = dt
 }
 
-export function setZeroCoords (targetObj: ReturnType<typeof newCoords>) {
+export function setZeroCoords (targetObj: Interact.CoordsSetMember) {
   targetObj.page.x = 0
   targetObj.page.y = 0
   targetObj.client.x = 0
   targetObj.client.y = 0
 }
 
-export function isNativePointer  (pointer) {
+export function isNativePointer  (pointer: any) {
   return (pointer instanceof dom.Event || pointer instanceof dom.Touch)
 }
 
@@ -230,7 +230,7 @@ export function getEventTargets (event) {
   ]
 }
 
-export function newCoords () {
+export function newCoords (): Interact.CoordsSetMember {
   return {
     page     : { x: 0, y: 0 },
     client   : { x: 0, y: 0 },

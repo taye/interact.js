@@ -13,17 +13,16 @@ const domObjects: {
 } =
 {
   init,
-  document: null as any,
-  DocumentFragment: null as any,
-  SVGElement: null as any,
-  SVGSVGElement: null as any,
-  // eslint-disable-next-line no-undef
-  SVGElementInstance: null as any,
-  Element: null as any,
-  HTMLElement: null as any,
-  Event: null as any,
-  Touch: null as any,
-  PointerEvent: null as any,
+  document: null,
+  DocumentFragment: null,
+  SVGElement: null,
+  SVGSVGElement: null,
+  SVGElementInstance: null,
+  Element: null,
+  HTMLElement: null,
+  Event: null,
+  Touch: null,
+  PointerEvent: null,
 }
 
 function blank () {}

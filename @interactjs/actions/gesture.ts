@@ -90,8 +90,8 @@ function install (scope: Scope) {
   Interactable.prototype.gesturable = function (this: Interact.Interactable, options: Interact.GesturableOptions | boolean) {
     if (utils.is.object(options)) {
       this.options.gesture.enabled = options.enabled !== false
-      this.setPerAction('gesture', options)
-      this.setOnEvents('gesture', options)
+      this.setPerAction(ActionName.Gesture, options)
+      this.setOnEvents(ActionName.Gesture, options)
 
       return this
     }
@@ -117,7 +117,7 @@ function install (scope: Scope) {
   defaults.actions.gesture = gesture.defaults
 }
 
-const gesture = {
+const gesture: Interact.Plugin = {
   id: 'actions/gesture',
   install,
   listeners: {
@@ -139,7 +139,13 @@ const gesture = {
   defaults: {
   },
 
-  checker (_pointer, _event, _interactable, _element, interaction: { pointers: { length: number } }) {
+  checker (
+    _pointer: Interact.PointerType,
+    _event: Interact.PointerEventType,
+    _interactable: Interact.Interactable,
+    _element: Interact.Element,
+    interaction: { pointers: { length: number } },
+  ) {
     if (interaction.pointers.length >= 2) {
       return { name: 'gesture' }
     }

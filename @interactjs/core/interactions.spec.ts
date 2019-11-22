@@ -66,7 +66,7 @@ test('interactions removes pointers on targeting removed elements', t => {
     scope,
   } = helpers.testEnv()
 
-  const { TouchEvent, Touch = function (_t) { return _t } } = scope.window as any
+  const { TouchEvent, Touch = function (_t: any) { return _t } } = scope.window as any
   const div1 = scope.document.body.appendChild(scope.document.createElement('div'))
   const div2 = scope.document.body.appendChild(scope.document.createElement('div'))
 

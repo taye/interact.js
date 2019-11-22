@@ -28,9 +28,9 @@
 
 import clone from '../../utils/clone'
 import extend from '../../utils/extend'
-import { ModifierArg } from '../base'
-import { SnapState } from './pointer'
-import snapSize, { SnapSizeOptions } from './size'
+import { ModifierArg, ModifierModule } from '../base'
+import { SnapOptions, SnapState } from './pointer'
+import snapSize from './size'
 
 function start (arg: ModifierArg<SnapState>) {
   const { edges } = arg
@@ -44,16 +44,15 @@ function start (arg: ModifierArg<SnapState>) {
   return snapSize.start(arg)
 }
 
-function set (arg) {
-  return snapSize.set(arg)
-}
-
-const snapEdges = {
+const snapEdges: ModifierModule<SnapOptions, SnapState> = {
   start,
-  set,
-  defaults: extend(clone(snapSize.defaults) as SnapSizeOptions, {
-    offset: { x: 0, y: 0 },
-  } as unknown),
+  set: snapSize.set,
+  defaults: extend(
+    clone(snapSize.defaults),
+    {
+      offset: { x: 0, y: 0 },
+    } as SnapOptions,
+  ),
 }
 
 export default snapEdges

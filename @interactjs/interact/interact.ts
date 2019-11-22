@@ -119,7 +119,7 @@ function isSet (target: Interact.Element, options?: any) {
  * @return {object} interact
  */
 interact.on = on
-function on (type: string | Interact.EventTypes, listener: Interact.ListenersArg, options?) {
+function on (type: string | Interact.EventTypes, listener: Interact.ListenersArg, options?: object) {
   if (utils.is.string(type) && type.search(' ') !== -1) {
     type = type.trim().split(/ +/)
   }
@@ -134,7 +134,7 @@ function on (type: string | Interact.EventTypes, listener: Interact.ListenersArg
 
   if (utils.is.object(type)) {
     for (const prop in type) {
-      interact.on(prop, (type as Interact.EventTypes)[prop], listener)
+      interact.on(prop, (type as any)[prop], listener)
     }
 
     return interact
@@ -171,7 +171,7 @@ function on (type: string | Interact.EventTypes, listener: Interact.ListenersArg
  * @return {object} interact
  */
 interact.off = off
-function off (type, listener, options) {
+function off (type: Interact.EventTypes, listener: any, options?: object) {
   if (utils.is.string(type) && type.search(' ') !== -1) {
     type = type.trim().split(/ +/)
   }
@@ -269,7 +269,7 @@ function stop () {
  * @return {interact | number}
  */
 interact.pointerMoveTolerance = pointerMoveTolerance
-function pointerMoveTolerance (newValue) {
+function pointerMoveTolerance (newValue?: number) {
   if (utils.is.number(newValue)) {
     scope.interactions.pointerMoveTolerance = newValue
 

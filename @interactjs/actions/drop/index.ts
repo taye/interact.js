@@ -1,6 +1,6 @@
 import Interactable from '../../core/Interactable'
 import InteractEvent from '../../core/InteractEvent'
-import { Scope } from '../../core/scope'
+import { Scope, ActionName } from '../../core/scope'
 import * as utils from '../../utils/index'
 import drag from '../drag'
 import DropEvent from './DropEvent'
@@ -438,7 +438,7 @@ function dropCheckMethod (
   const dropOverlap = interactable.options.drop.overlap
 
   if (dropOverlap === 'pointer') {
-    const origin = utils.getOriginXY(draggable, draggableElement, 'drag')
+    const origin = utils.getOriginXY(draggable, draggableElement, ActionName.Drag)
     const page = utils.pointer.getPageXY(dragEvent)
 
     page.x += origin.x

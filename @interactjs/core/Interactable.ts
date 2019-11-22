@@ -42,7 +42,7 @@ export class Interactable implements Partial<Eventable> {
     this.set(options)
   }
 
-  setOnEvents (actionName: string, phases: NonNullable<any>) {
+  setOnEvents (actionName: Interact.ActionName, phases: NonNullable<any>) {
     if (is.func(phases.onstart)) { this.on(`${actionName}start`, phases.onstart) }
     if (is.func(phases.onmove)) { this.on(`${actionName}move`, phases.onmove) }
     if (is.func(phases.onend)) { this.on(`${actionName}end`, phases.onend) }
@@ -51,7 +51,7 @@ export class Interactable implements Partial<Eventable> {
     return this
   }
 
-  updatePerActionListeners (actionName, prev, cur) {
+  updatePerActionListeners (actionName: Interact.ActionName, prev: Interact.Listeners, cur: Interact.Listeners) {
     if (is.array(prev) || is.object(prev)) {
       this.off(actionName, prev)
     }
@@ -61,43 +61,43 @@ export class Interactable implements Partial<Eventable> {
     }
   }
 
-  setPerAction (actionName, options: Interact.OrBoolean<Options>) {
+  setPerAction (actionName: Interact.ActionName, options: Interact.OrBoolean<Options>) {
     const defaults = this._defaults
 
     // for all the default per-action options
-    for (const optionName in options) {
+    for (const optionName_ in options) {
+      const optionName = optionName_ as keyof Interact.PerActionDefaults
       const actionOptions = this.options[actionName]
-      const optionValue = options[optionName]
-      const isArray = is.array(optionValue)
+      const optionValue: any = options[optionName]
 
       // remove old event listeners and add new ones
       if (optionName === 'listeners') {
-        this.updatePerActionListeners(actionName, actionOptions.listeners, optionValue)
+        this.updatePerActionListeners(actionName, actionOptions.listeners, optionValue as Interact.Listeners)
       }
 
       // if the option value is an array
-      if (isArray) {
-        actionOptions[optionName] = arr.from(optionValue)
+      if (is.array<any>(optionValue)) {
+        (actionOptions[optionName] as any) = arr.from(optionValue)
       }
       // if the option value is an object
-      else if (!isArray && is.plainObject(optionValue)) {
+      else if (is.plainObject(optionValue)) {
         // copy the object
-        actionOptions[optionName] = extend(
-          actionOptions[optionName] || {},
+        (actionOptions[optionName] as any) = extend(
+          actionOptions[optionName] || {} as any,
           clone(optionValue))
 
         // set anabled field to true if it exists in the defaults
-        if (is.object(defaults.perAction[optionName]) && 'enabled' in defaults.perAction[optionName]) {
-          actionOptions[optionName].enabled = optionValue.enabled !== false
+        if (is.object(defaults.perAction[optionName]) && 'enabled' in (defaults.perAction[optionName] as any)) {
+          (actionOptions[optionName] as any).enabled = optionValue.enabled !== false
         }
       }
       // if the option value is a boolean and the default is an object
       else if (is.bool(optionValue) && is.object(defaults.perAction[optionName])) {
-        actionOptions[optionName].enabled = optionValue
+        (actionOptions[optionName] as any).enabled = optionValue
       }
       // if it's anything else, do a plain assignment
       else {
-        actionOptions[optionName] = optionValue
+        (actionOptions[optionName] as any) = optionValue
       }
     }
   }
@@ -145,12 +145,12 @@ export class Interactable implements Partial<Eventable> {
     return this.getRect
   }
 
-  _backCompatOption (optionName, newValue) {
+  _backCompatOption (optionName: keyof Interact.Options, newValue: any) {
     if (trySelector(newValue) || is.object(newValue)) {
-      this.options[optionName] = newValue
+      (this.options[optionName] as any) = newValue
 
       for (const action of this._actions.names) {
-        this.options[action][optionName] = newValue
+        (this.options[action][optionName] as any) = newValue
       }
 
       return this
@@ -169,7 +169,7 @@ export class Interactable implements Partial<Eventable> {
    *
    * @return {object} The current origin or this Interactable
    */
-  origin (newValue) {
+  origin (newValue: any) {
     return this._backCompatOption('origin', newValue)
   }
 
@@ -181,7 +181,7 @@ export class Interactable implements Partial<Eventable> {
    * interacting; Use 'page' if you want autoScroll to work
    * @return {string | object} The current deltaSource or this Interactable
    */
-  deltaSource (newValue) {
+  deltaSource (newValue?: string) {
     if (newValue === 'page' || newValue === 'client') {
       this.options.deltaSource = newValue
 
@@ -201,14 +201,14 @@ export class Interactable implements Partial<Eventable> {
     return this._context
   }
 
-  inContext (element) {
+  inContext (element: Document | Node) {
     return (this._context === element.ownerDocument ||
             nodeContains(this._context, element))
   }
 
   testIgnoreAllow (
     this: Interactable,
-    options: { ignoreFrom: IgnoreValue, allowFrom: IgnoreValue },
+    options: { ignoreFrom?: IgnoreValue, allowFrom?: IgnoreValue },
     targetNode: Node,
     eventTarget: Interact.EventTarget,
   ) {
@@ -262,7 +262,7 @@ export class Interactable implements Partial<Eventable> {
    * Interactable
    * @return {Interactable} this Interactable
    */
-  fire (iEvent) {
+  fire (iEvent: object) {
     this.events.fire(iEvent)
 
     return this
@@ -287,7 +287,7 @@ export class Interactable implements Partial<Eventable> {
         }
         // delegated event
         else if (is.string(this.target)) {
-          events[`${addRemove}Delegate`](this.target, this._context, type, listener, options)
+          events[`${addRemove}Delegate` as 'addDelegate' | 'removeDelegate'](this.target, this._context, type, listener, options)
         }
         // remove listener from this Interactable's element
         else {
@@ -342,8 +342,9 @@ export class Interactable implements Partial<Eventable> {
 
     (this.options as Required<Options>) = clone(defaults.base) as Required<Options>
 
-    for (const actionName in this._actions.methodDict) {
-      const methodName = this._actions.methodDict[actionName]
+    for (const actionName_ in this._actions.methodDict) {
+      const actionName = actionName_ as Interact.ActionName
+      const methodName: any = this._actions.methodDict[actionName]
 
       this.options[actionName] = {}
       this.setPerAction(actionName, extend(extend({}, defaults.perAction), defaults.actions[actionName]))
@@ -379,11 +380,6 @@ export class Interactable implements Partial<Eventable> {
           delegated.selectors.splice(0, 1)
           delegated.contexts.splice(0, 1)
           delegated.listeners.splice(0, 1)
-
-          // remove the arrays if they are empty
-          if (!delegated.selectors.length) {
-            delegated[type] = null
-          }
         }
 
         events.remove(this._context, type, events.delegateListener)

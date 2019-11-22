@@ -68,7 +68,7 @@ class Eventable {
     }
   }
 
-  getRect (_element: Interact.Element) {
+  getRect (_element: Interact.Element): Interact.Rect {
     return null
   }
 }

@@ -1,5 +1,4 @@
 import interact, { init as initInteract } from '../interact/index'
-import { Modifier } from '../modifiers/base'
 import * as modifiers from '../modifiers/index'
 import '../types/index'
 import extend from '../utils/extend'
@@ -7,8 +6,8 @@ import * as snappers from '../utils/snappers/index'
 
 declare module '@interactjs/interact/interact' {
   interface InteractStatic {
-    modifiers?: typeof modifiers & { [key: string]: (options?) => Modifier }
-    snappers?: typeof snappers & { [key: string]: any }
+    modifiers?: typeof modifiers
+    snappers?: typeof snappers
     createSnapGrid?: typeof snappers.grid
   }
 }

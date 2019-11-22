@@ -13,21 +13,22 @@ export function getStringOptionResult (value: any, target: Interact.HasGetRect, 
 export function resolveRectLike<T extends any[]> (
   value: Interact.RectResolvable<T>,
   target?: Interact.HasGetRect,
-  element?: Interact.Element,
+  element?: Node,
   functionArgs?: T,
 ) {
-  if (is.string(value)) {
-    value = getStringOptionResult(value, target, element)
+  let returnValue: any = value
+  if (is.string(returnValue)) {
+    returnValue = getStringOptionResult(returnValue, target, element)
   }
-  else if (is.func(value)) {
-    value = value(...functionArgs)
-  }
-
-  if (is.element(value)) {
-    value = getElementRect(value)
+  else if (is.func(returnValue)) {
+    returnValue = returnValue(...functionArgs)
   }
 
-  return value as Interact.Rect
+  if (is.element(returnValue)) {
+    returnValue = getElementRect(returnValue)
+  }
+
+  return returnValue as Interact.Rect
 }
 
 export function rectToXY (rect) {

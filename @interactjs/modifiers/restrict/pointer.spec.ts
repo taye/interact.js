@@ -12,10 +12,10 @@ test('restrict larger than restriction', t => {
   const restriction = { left: 100, top: 50, right: 150, bottom: 150 }
   const options = {
     ...restrict.defaults,
-    restriction: null,
+    restriction: null as any,
     elementRect: { left: 0, top: 0, right: 1, bottom: 1 },
   }
-  const state = { options, offset: null }
+  const state = { options, offset: null as any }
   const arg: any = {
     interaction,
     state,
@@ -25,7 +25,7 @@ test('restrict larger than restriction', t => {
     pageCoords: { x: 0, y: 0 },
   }
 
-  options.restriction = () => null
+  options.restriction = () => null as any
   t.doesNotThrow(() => {
     restrict.start(arg as any)
     restrict.set(arg as any)

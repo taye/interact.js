@@ -14,21 +14,26 @@ declare module '@interactjs/core/scope' {
   }
 }
 
+interface InteractableScopeProp {
+  context: Document | Interact.Element
+  interactable: Interact.Interactable
+}
+
 export default class InteractableSet {
   // all set interactables
   list: Interact.Interactable[] = []
 
   selectorMap: {
-    [selector: string]: Array<{ context: Document | Interact.Element, interactable: Interact.Interactable }>
+    [selector: string]: InteractableScopeProp[]
   } = {}
 
   constructor (protected scope: Interact.Scope) {
     scope.addListeners({
       'interactable:unset': ({ interactable }) => {
         const { target, _context: context } = interactable
-        const targetMappings = is.string(target)
+        const targetMappings: InteractableScopeProp[] = is.string(target)
           ? this.selectorMap[target]
-          : target[this.scope.id]
+          : (target as any)[this.scope.id]
 
         const targetIndex = targetMappings.findIndex(m => m.context === context)
         if (targetMappings[targetIndex]) {
@@ -55,14 +60,14 @@ export default class InteractableSet {
       if (!this.selectorMap[target]) { this.selectorMap[target] = [] }
       this.selectorMap[target].push(mappingInfo)
     } else {
-      if (!interactable.target[this.scope.id]) {
+      if (!((interactable.target as any)[this.scope.id])) {
         Object.defineProperty(target, this.scope.id, {
           value: [],
           configurable: true,
         })
       }
 
-      target[this.scope.id].push(mappingInfo)
+      (target as any)[this.scope.id].push(mappingInfo)
     }
 
     this.scope.fire('interactable:new', {
@@ -75,19 +80,19 @@ export default class InteractableSet {
     return interactable
   }
 
-  get (target: Interact.Target, options) {
+  get (target: Interact.Target, options?: Interact.Options) {
     const context = (options && options.context) || this.scope.document
     const isSelector = is.string(target)
-    const targetMappings = isSelector
+    const targetMappings: InteractableScopeProp[] = isSelector
       ? this.selectorMap[target as string]
-      : target[this.scope.id]
+      : (target as any)[this.scope.id]
 
     if (!targetMappings) { return null }
 
     const found = arr.find(
       targetMappings,
       m => m.context === context &&
-        (isSelector || m.interactable.inContext(target)))
+        (isSelector || m.interactable.inContext(target as any)))
 
     return found && found.interactable
   }

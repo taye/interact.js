@@ -17,7 +17,7 @@ export interface SignalArgs {
 
 export type ListenerName = keyof SignalArgs
 
-type ListenerMap = {
+export type ListenerMap = {
   [P in ListenerName]?: (arg: SignalArgs[P], scope: Scope, signalName: P) => void | boolean
 }
 

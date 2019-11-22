@@ -110,5 +110,5 @@ export default {
   listeners: ['down', 'move', 'up', 'cancel'].reduce((acc, eventType) => {
     acc[`interactions:${eventType}`] = onInteractionEvent
     return acc
-  }, {}),
+  }, {} as any),
 }

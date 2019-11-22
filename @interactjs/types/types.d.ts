@@ -72,6 +72,20 @@ declare namespace Interact {
 
   export type Dimensions = Point & Size
 
+  export interface CoordsSetMember {
+    page: Interact.Point
+    client: Interact.Point
+    timeStamp: number
+  }
+
+  export interface CoordsSet {
+    cur: CoordsSetMember
+    prev: CoordsSetMember
+    start: CoordsSetMember
+    delta: CoordsSetMember
+    velocity: CoordsSetMember
+  }
+
   export interface HasGetRect {
     getRect (element: Interact.Element): Interact.Rect
   }

@@ -96,7 +96,7 @@ function resume (
 
   // Check if the down event hits the current inertia target
   if (state.active) {
-    let element = eventTarget
+    let element = eventTarget as Node
 
     // climb up the DOM tree from the event target
     while (utils.is.element(element)) {

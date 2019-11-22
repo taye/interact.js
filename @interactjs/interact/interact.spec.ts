@@ -72,7 +72,7 @@ test('interact export', t => {
   scope.interactables.list.forEach(i => i.unset())
 
   const plugin1 = { id: 'test-1', install () { plugin1.count++ }, count: 0 }
-  const plugin2 = { id: undefined, install () { plugin2.count++ }, count: 0 }
+  const plugin2 = { id: '', install () { plugin2.count++ }, count: 0 }
 
   interact.use(plugin1)
   interact.use(plugin2)

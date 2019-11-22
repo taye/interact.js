@@ -18,9 +18,9 @@ test('reflow', t => {
     'reflow method is added to Interactable.prototype',
   )
 
-  const fired = []
+  const fired: any[] = []
 
-  interactable.fire = (iEvent => { fired.push(iEvent) }) as any
+  interactable.fire = ((iEvent: any) => { fired.push(iEvent) }) as any
   (interactable.target as any) = {}
   ;(interactable.options as any).TEST = { enabled: true }
   interactable.rectChecker(() => ({ ...rect }))
@@ -87,13 +87,13 @@ test('async reflow', async t => {
 
   Object.assign(scope.actions, { TEST: {}, names: ['TEST'] })
 
-  let reflowEvent
+  let reflowEvent: any
   let promise
 
   const interactable = scope.interactables.new(scope.window)
   const rect = Object.freeze({ top: 100, left: 200, bottom: 300, right: 400 })
   interactable.rectChecker(() => ({ ...rect }))
-  interactable.fire = (iEvent => { reflowEvent = iEvent }) as any
+  interactable.fire = ((iEvent: any) => { reflowEvent = iEvent }) as any
   (interactable.options as any).TEST = { enabled: true }
 
   // test with Promise implementation
@@ -105,7 +105,7 @@ test('async reflow', async t => {
 
   t.equal(await promise, interactable, 'returned Promise resolves to interactable')
 
-  let stoppedFromTimeout
+  let stoppedFromTimeout: boolean
   // block the end of the reflow interaction and stop it after a timeout
   scope.addListeners({
     'interactions:before-action-end': ({ interaction }) => {

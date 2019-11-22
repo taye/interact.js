@@ -2,7 +2,7 @@ import * as pointerEvents from './base'
 import holdRepeat from './holdRepeat'
 import interactableTargets from './interactableTargets'
 
-function install (scope) {
+function install (scope: Interact.Scope) {
   scope.usePlugin(pointerEvents)
   scope.usePlugin(holdRepeat)
   scope.usePlugin(interactableTargets)

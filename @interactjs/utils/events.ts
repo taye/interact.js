@@ -135,7 +135,13 @@ function addDelegate (selector: string, context: Node, type: string, listener: L
   delegated.listeners[index].push([listener, !!options.capture, options.passive])
 }
 
-function removeDelegate (selector, context, type, listener?, optionalArg?: any) {
+function removeDelegate (
+  selector: string,
+  context: Document | Interact.Element,
+  type: string,
+  listener?: Listener,
+  optionalArg?: any,
+) {
   const options = getOptions(optionalArg)
   const delegated = delegatedEvents[type]
   let matchFound = false
@@ -194,7 +200,7 @@ function delegateListener (event: Event, optionalArg?: any) {
   const fakeEvent = new FakeEvent(event)
   const delegated = delegatedEvents[event.type]
   const [eventTarget] = (pointerUtils.getEventTargets(event))
-  let element = eventTarget
+  let element: Node = eventTarget
 
   // climb up document tree looking for selector matches
   while (is.element(element)) {
@@ -225,14 +231,14 @@ function delegateUseCapture (event: Event) {
   return delegateListener.call(this, event, true)
 }
 
-function getOptions (param) {
+function getOptions (param: object) {
   return is.object(param) ? param : { capture: param }
 }
 
 export class FakeEvent implements Partial<Event> {
   currentTarget: EventTarget
 
-  constructor (public originalEvent) {
+  constructor (public originalEvent: Event) {
     // duplicate the event so that currentTarget can be changed
     pExtend(this, originalEvent)
   }

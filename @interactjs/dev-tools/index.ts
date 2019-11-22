@@ -35,16 +35,16 @@ export interface Logger {
 }
 
 export interface Check {
-  name: string
+  name: CheckName
   text: string
   perform: (interaction: Interact.Interaction) => boolean
   getInfo: (interaction: Interact.Interaction) => any[]
 }
 
 enum CheckName {
-  touchAction = '',
-  boxSizing = '',
-  noListeners = '',
+  touchAction = 'touchAction',
+  boxSizing = 'boxSizing',
+  noListeners = 'noListeners',
 }
 
 const prefix  = '[interact.js] '
@@ -68,7 +68,7 @@ function install (scope: Interact.Scope, { logger }: { logger?: Logger } = {}) {
     ignore: {},
   }
 
-  Interactable.prototype.devTools = function (options?) {
+  Interactable.prototype.devTools = function (options?: object) {
     if (options) {
       extend(this.options.devTools, options)
       return this
@@ -80,7 +80,7 @@ function install (scope: Interact.Scope, { logger }: { logger?: Logger } = {}) {
 
 const checks: Check[] = [
   {
-    name: 'touchAction',
+    name: CheckName.touchAction,
     perform ({ element }) {
       return !parentHasStyle(element, 'touchAction', /pan-|pinch|none/)
     },
@@ -94,7 +94,7 @@ const checks: Check[] = [
   },
 
   {
-    name: 'boxSizing',
+    name: CheckName.boxSizing,
     perform (interaction) {
       const { element } = interaction
 
@@ -112,7 +112,7 @@ const checks: Check[] = [
   },
 
   {
-    name: 'noListeners',
+    name: CheckName.noListeners,
     perform (interaction) {
       const actionName = interaction.prepared.name
       const moveListeners = interaction.interactable.events.types[`${actionName}move`] || []
@@ -141,14 +141,14 @@ function parentHasStyle (element: Interact.Element, prop: keyof CSSStyleDeclarat
       return true
     }
 
-    parent = parentNode(parent)
+    parent = parentNode(parent) as HTMLElement
   }
 
   return false
 }
 
 const id = 'dev-tools'
-const defaultExport = isProduction
+const defaultExport: Interact.Plugin = isProduction
   ? { id, install: () => {} }
   : {
     id,
@@ -156,7 +156,8 @@ const defaultExport = isProduction
     listeners: {
       'interactions:action-start': ({ interaction }, scope) => {
         for (const check of checks) {
-          const options = interaction.interactable && interaction.interactable.options[interaction.prepared.name]
+          const actionName: Interact.ActionName = interaction.prepared.name
+          const options = interaction.interactable && interaction.interactable.options[actionName]
 
           if (
             !(options && options.devTools && options.devTools.ignore[check.name]) &&

@@ -14,15 +14,15 @@ test('devTools', t => {
   const scope: Interact.Scope = helpers.mockScope()
   const logs: Array<{ args: any[], type: keyof Logger }> = []
 
-  function log (args, type) {
+  function log (args: any, type: any) {
     logs.push({ args, type })
   }
 
   scope.usePlugin(devTools, {
     logger: {
-      warn (...args) { log(args, 'warn') },
-      log (...args) { log(args, 'log') },
-      error (...args) { log(args, 'error') },
+      warn (...args: any[]) { log(args, 'warn') },
+      log (...args: any[]) { log(args, 'log') },
+      error (...args: any[]) { log(args, 'error') },
     },
   })
 

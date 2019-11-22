@@ -14,84 +14,83 @@ test('utils/domUtils/indexOfDeepestElement', t => {
 
   const ownerDocument = {
     name: 'Owner Document',
-    lastChild: null,
+    lastChild: null as any,
   }
   const html = {
     name: 'html',
-    lastChild: null,
+    lastChild: null as any,
     ownerDocument,
     parentNode: ownerDocument,
   }
 
-  const body = {
+  const body: any = {
     name: 'body',
     lastChild: null,
     ownerDocument,
     parentNode: html,
-
   }
 
   const wrapper = {
     name: 'wrapper',
     ownerDocument,
     parentNode: body,
-    lastChild: null,
+    lastChild: null as any,
   }
 
   const a = {
     name: 'a',
     ownerDocument,
     parentNode: wrapper,
-    lastChild: null,
+    lastChild: null as any,
   }
 
   const b1 = {
     name: 'b1',
     ownerDocument,
     parentNode: a,
-    lastChild: null,
+    lastChild: null as any,
   }
 
   const b2 = {
     name: 'b2',
     ownerDocument,
     parentNode: a,
-    lastChild: null,
+    lastChild: null as any,
   }
 
   const c1 = {
     name: 'c1',
     ownerDocument,
     parentNode: b1,
-    lastChild: null,
+    lastChild: null as any,
   }
 
   const c2 = {
     name: 'c2',
     ownerDocument,
     parentNode: b1,
-    lastChild: null,
+    lastChild: null as any,
   }
 
   const d1 = {
     name: 'd1',
     ownerDocument,
     parentNode: c1,
-    lastChild: null,
+    lastChild: null as any,
   }
 
   const d1Comp = {
     name: 'd1_comp',
     ownerDocument,
     parentNode: d1,
-    lastChild: null,
+    lastChild: null as any,
   }
 
   const d2Shadow = {
     name: 'd2_shadow',
     ownerDocument,
-    parentNode: null,
-    lastChild: null,
+    parentNode: null as any,
+    lastChild: null as any,
     host: d1Comp,
   }
 

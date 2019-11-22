@@ -23,9 +23,9 @@ function beforeStart ({ interaction, eventTarget, dx, dy }: Interact.SignalArgs[
     interaction.prepared.name = null
 
     // then try to get a drag from another ineractable
-    let element = eventTarget
+    let element = eventTarget as Interact.Element
 
-    const getDraggable = function (interactable) {
+    const getDraggable = function (interactable: Interact.Interactable): Interact.Interactable | void {
       if (interactable === interaction.interactable) { return }
 
       const options = interaction.interactable.options.drag
@@ -55,12 +55,12 @@ function beforeStart ({ interaction, eventTarget, dx, dy }: Interact.SignalArgs[
         break
       }
 
-      element = parentNode(element)
+      element = parentNode(element) as Interact.Element
     }
   }
 }
 
-function checkStartAxis (startAxis, interactable) {
+function checkStartAxis (startAxis: string, interactable: Interact.Interactable) {
   if (!interactable) { return false }
 
   const thisAxis = interactable.options[ActionName.Drag].startAxis

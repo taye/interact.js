@@ -68,7 +68,11 @@ function set ({ coords, interaction, state }: ModifierArg<RestrictState>) {
   coords.y = Math.max(Math.min(rect.bottom - offset.bottom, coords.y), rect.top  + offset.top)
 }
 
-export function getRestrictionRect (value, interaction, coords?: Interact.Point) {
+export function getRestrictionRect (
+  value: Interact.RectResolvable<[number, number, Interact.Interaction]>,
+  interaction: Interact.Interaction,
+  coords?: Interact.Point,
+) {
   if (is.func(value)) {
     return rectUtils.resolveRectLike(value, interaction.interactable, interaction.element, [coords.x, coords.y, interaction])
   } else {

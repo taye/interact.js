@@ -32,10 +32,10 @@ export function init (window: Window) {
 
   // for backwrads compatibility
   for (const type in modifiers) {
-    const { _defaults, _methods } = modifiers[type]
+    const { _defaults, _methods } = modifiers[type as keyof typeof modifiers]
 
     _defaults._methods = _methods
-    scope.defaults.perAction[type] = _defaults
+    ;(scope.defaults.perAction as any)[type] = _defaults
   }
 
   // autoScroll
@@ -56,13 +56,3 @@ export function init (window: Window) {
 interact.version = process.env.npm_package_version
 
 export default interact
-export {
-  interact,
-  actions,
-  autoScroll,
-  interactablePreventDefault,
-  inertia,
-  modifiersBase as modifiers,
-  pointerEvents,
-  reflow,
-}

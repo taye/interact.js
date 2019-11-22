@@ -68,13 +68,11 @@ test('restrictSize', t => {
   let minFuncArgs
   let maxFuncArgs
 
-  options.min = (...args) => {
+  options.min = (...args: any) => {
     minFuncArgs = args
-    return null
   }
-  options.max = (...args) => {
+  options.max = (...args: any) => {
     maxFuncArgs = args
-    return null
   }
 
   restrictSize.set(arg as any)

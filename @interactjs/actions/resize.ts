@@ -178,7 +178,12 @@ const resize: Interact.Plugin = {
 
     if (options.resize.enabled) {
       const resizeOptions = options.resize
-      const resizeEdges: { [edge: string]: boolean } = { left: false, right: false, top: false, bottom: false }
+      const resizeEdges = {
+        left: false,
+        right: false,
+        top: false,
+        bottom: false,
+      }
 
       // if using resize.edges
       if (is.object(resizeOptions.edges)) {
@@ -248,8 +253,8 @@ const resize: Interact.Plugin = {
 function resizable (interactable: Interact.Interactable, options: Interact.OrBoolean<Interact.ResizableOptions> | boolean, scope: Scope) {
   if (is.object(options)) {
     interactable.options.resize.enabled = options.enabled !== false
-    interactable.setPerAction('resize', options)
-    interactable.setOnEvents('resize', options)
+    interactable.setPerAction(ActionName.Resize, options)
+    interactable.setOnEvents(ActionName.Resize, options)
 
     if (is.string(options.axis) && /^x$|^y$|^xy$/.test(options.axis)) {
       interactable.options.resize.axis = options.axis

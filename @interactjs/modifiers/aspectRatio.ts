@@ -133,7 +133,7 @@ const aspectRatio: ModifierModule<AspectRatioOptions, AspectRatioState> = {
   },
 }
 
-function setEqualDelta ({ startCoords, edgeSign }: AspectRatioState, xIsPrimaryAxis, coords: Interact.Point) {
+function setEqualDelta ({ startCoords, edgeSign }: AspectRatioState, xIsPrimaryAxis: boolean, coords: Interact.Point) {
   if (xIsPrimaryAxis) {
     coords.y = startCoords.y + (coords.x - startCoords.x) * edgeSign
   }
@@ -142,7 +142,7 @@ function setEqualDelta ({ startCoords, edgeSign }: AspectRatioState, xIsPrimaryA
   }
 }
 
-function setRatio ({ startRect, startCoords, ratio, edgeSign }: AspectRatioState, xIsPrimaryAxis, coords: Interact.Point, rect: Interact.Rect) {
+function setRatio ({ startRect, startCoords, ratio, edgeSign }: AspectRatioState, xIsPrimaryAxis: boolean, coords: Interact.Point, rect: Interact.Rect) {
   if (xIsPrimaryAxis) {
     const newHeight = rect.width / ratio
 

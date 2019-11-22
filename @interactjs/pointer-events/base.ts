@@ -212,7 +212,7 @@ function collectEventTargets<T extends string> ({ interaction, pointer, event, e
     return []
   }
 
-  const path = utils.dom.getPath(eventTarget)
+  const path = utils.dom.getPath(eventTarget as Interact.Element | Document)
   const signalArg = {
     interaction,
     pointer,
@@ -280,7 +280,7 @@ function moveAndClearHold (
 
 function downAndStartHold ({ interaction, pointer, event, eventTarget, pointerIndex }: Interact.SignalArgs['interactions:down'], scope: Interact.Scope) {
   const timer = interaction.pointers[pointerIndex].hold
-  const path = utils.dom.getPath(eventTarget)
+  const path = utils.dom.getPath(eventTarget as Interact.Element | Document)
   const signalArg = {
     interaction,
     pointer,

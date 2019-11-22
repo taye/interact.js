@@ -163,7 +163,7 @@ export class Interaction<T extends ActionName = any> {
     },
     'The interaction.doMove() method has been renamed to interaction.move()')
 
-  coords = {
+  coords: Interact.CoordsSet = {
     // Starting InteractEvent pointer coordinates
     start: utils.pointer.newCoords(),
     // Previous native pointer move event coordinates

@@ -8,7 +8,7 @@ test('Interactable copies and extends defaults', t => {
 
   scope.actions.methodDict = { test: 'testize' }
 
-  scope.Interactable.prototype.testize = function (options) {
+  scope.Interactable.prototype.testize = function (options: any) {
     this.setPerAction('test', options)
   }
 
@@ -64,7 +64,7 @@ test('Interactable copies and extends per action defaults', t => {
 
   scope.actions.methodDict = { test: 'testize' }
 
-  ;(scope.Interactable.prototype as any).testize = function (options) {
+  ;(scope.Interactable.prototype as any).testize = function (options: any) {
     this.setPerAction('test', options)
   }
 
@@ -106,12 +106,12 @@ test('Interactable copies and extends per action defaults', t => {
 test('Interactable.updatePerActionListeners', t => {
   const scope = helpers.mockScope()
 
-  let fired = []
-  function addToFired (event) { fired.push(event) }
+  let fired: any[] = []
+  function addToFired (event: any) { fired.push(event) }
 
   scope.actions.eventTypes.push('teststart', 'testmove', 'testend')
   scope.actions.methodDict = { test: 'testize' }
-  ;(scope.Interactable.prototype as any).testize = function (options) {
+  ;(scope.Interactable.prototype as any).testize = function (options: any) {
     this.setPerAction('test', options)
   }
 
@@ -119,7 +119,7 @@ test('Interactable.updatePerActionListeners', t => {
 
   const interactable = scope.interactables.new('target')
 
-  interactable.setPerAction('test', {
+  interactable.setPerAction('test' as any, {
     listeners: [{
       start: addToFired,
       move: addToFired,
@@ -140,7 +140,7 @@ test('Interactable.updatePerActionListeners', t => {
   t.deepEqual(fired.map(e => e.type), ['teststart', 'testmove', 'testend'])
 
   fired = []
-  interactable.setPerAction('test', {
+  interactable.setPerAction('test' as any, {
     listeners: [{ start: addToFired }],
   })
 
@@ -150,7 +150,7 @@ test('Interactable.updatePerActionListeners', t => {
   t.deepEqual(fired.map(e => e.type), ['teststart'])
 
   fired = []
-  interactable.setPerAction('test', {
+  interactable.setPerAction('test' as any, {
     listeners: null,
   })
 

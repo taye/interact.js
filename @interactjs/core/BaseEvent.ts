@@ -1,5 +1,4 @@
 import Interactable from './Interactable'
-import Interaction from './Interaction'
 import { ActionName } from './scope'
 
 export enum EventPhase {
@@ -14,7 +13,7 @@ export class BaseEvent<T extends ActionName = any> {
   target: EventTarget
   currentTarget: EventTarget
   interactable: Interactable
-  _interaction: Interaction<T>
+  _interaction: Interact.Interaction<T>
   timeStamp: any
   immediatePropagationStopped = false
   propagationStopped = false
@@ -23,7 +22,7 @@ export class BaseEvent<T extends ActionName = any> {
     return this._interaction._proxy
   }
 
-  constructor (interaction) {
+  constructor (interaction: Interact.Interaction) {
     this._interaction = interaction
   }
 

@@ -32,8 +32,8 @@ function set (arg: ModifierArg<RestrictSizeState>) {
     return
   }
 
-  const minSize = rectUtils.tlbrToXywh(getRestrictionRect(options.min, interaction, arg.coords)) || noMin
-  const maxSize = rectUtils.tlbrToXywh(getRestrictionRect(options.max, interaction, arg.coords)) || noMax
+  const minSize = rectUtils.tlbrToXywh(getRestrictionRect(options.min as any, interaction, arg.coords)) || noMin
+  const maxSize = rectUtils.tlbrToXywh(getRestrictionRect(options.max as any, interaction, arg.coords)) || noMax
 
   state.options = {
     endOnly: options.endOnly,

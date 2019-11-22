@@ -139,8 +139,8 @@ function move ({ iEvent, interaction }) {
 const draggable: DraggableMethod = function draggable (this: Interact.Interactable, options?: Interact.DraggableOptions | boolean): any {
   if (is.object(options)) {
     this.options.drag.enabled = options.enabled !== false
-    this.setPerAction('drag', options)
-    this.setOnEvents('drag', options)
+    this.setPerAction(ActionName.Drag, options)
+    this.setOnEvents(ActionName.Drag, options)
 
     if (/^(xy|x|y|start)$/.test(options.lockAxis)) {
       this.options.drag.lockAxis = options.lockAxis

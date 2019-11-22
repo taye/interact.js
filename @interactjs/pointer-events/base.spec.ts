@@ -28,7 +28,7 @@ test('pointerEvents.fire', t => {
   const element = {}
   const eventTarget = {}
   const TEST_PROP = ['TEST_PROP']
-  let firedEvent
+  let firedEvent: any
   const targets: EventTargetList = [{
     eventable,
     node: element as Node,
@@ -115,7 +115,7 @@ test('pointerEvents Interaction update-pointer signal', t => {
   scope.usePlugin(pointerEvents)
 
   const interaction = scope.interactions.new({})
-  const initialHold = { duration: Infinity, timeout: null }
+  const initialHold = { duration: Infinity, timeout: 0 }
   const event = {} as Interact.PointerEventType
 
   interaction.updatePointer(helpers.newPointer(0), event, null, false)

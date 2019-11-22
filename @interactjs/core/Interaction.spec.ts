@@ -28,7 +28,7 @@ test('Interaction constructor', t => {
     'interaction.downPointer is an object')
 
   for (const coordField in interaction.coords) {
-    t.deepEqual(interaction.coords[coordField], zeroCoords,
+    t.deepEqual(interaction.coords[coordField as keyof typeof interaction.coords], zeroCoords,
       `interaction.coords.${coordField} set to zero`)
   }
 
@@ -42,9 +42,11 @@ test('Interaction constructor', t => {
     'interaction.pointers is initially an empty array')
 
   // false properties
-  for (const prop of 'pointerIsDown pointerWasMoved _interacting mouse'.split(' ')) {
-    t.notOk(interaction[prop], `interaction.${prop} is false`)
+  for (const prop of ['pointerIsDown', 'pointerWasMoved', '_interacting'] as const) {
+    t.false(interaction[prop], `interaction.${prop} is false`)
   }
+
+  t.notEqual(interaction.pointerType, 'mouse')
 
   t.end()
 })
@@ -203,7 +205,7 @@ test('Interaction.pointer{Down,Move,Up} updatePointer', t => {
   })
 
   interaction.coords.cur.timeStamp = 0
-  const commonPointerInfo = {
+  const commonPointerInfo: any = {
     id: 0,
     pointer,
     event: pointer,
@@ -259,9 +261,9 @@ test('Interaction.pointerDown', t => {
     target: eventTarget,
   }
   const pointer: any = helpers.newPointer()
-  let signalArg
+  let signalArg: any
 
-  const signalListener = arg => {
+  const signalListener = (arg: any) => {
     signalArg = arg
   }
 
@@ -273,7 +275,7 @@ test('Interaction.pointerDown', t => {
   pointerUtils.setCoords(pointerCoords, [pointer], event.timeStamp)
 
   for (const prop in coords) {
-    pointerUtils.copyCoords(interaction.coords[prop], coords[prop])
+    pointerUtils.copyCoords(interaction.coords[prop as keyof typeof coords], coords[prop as keyof typeof coords])
   }
 
   // test while interacting
@@ -349,7 +351,7 @@ test('Interaction.pointerDown', t => {
 
 test('Interaction.start', t => {
   const { interaction, interactable, scope } = helpers.testEnv()
-  const action = { name: 'TEST' }
+  const action: Interact.ActionProps<Interact.ActionName> = { name: 'TEST' as any }
   const element: any = {}
   const pointer = helpers.newPointer()
   const event: any = {}
@@ -375,9 +377,10 @@ test('Interaction.start', t => {
   t.equal(interaction.prepared.name, null, 'do nothing if action is not enabled')
   interactable.options[action.name] = { enabled: true }
 
-  let signalArg
+  let signalArg: any
+
   // let interactingInStartListener
-  const signalListener = arg => {
+  const signalListener = (arg: any) => {
     signalArg = arg
     // interactingInStartListener = arg.interaction.interacting()
   }

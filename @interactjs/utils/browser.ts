@@ -22,7 +22,7 @@ const browser = {
   wheelEvent: null as string,
 }
 
-function init (window) {
+function init (window: any) {
   const Element = domObjects.Element
   const navigator  = win.window.navigator
 

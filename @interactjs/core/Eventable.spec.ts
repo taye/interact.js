@@ -10,7 +10,7 @@ test('Eventable', t => {
     immediatePropagationStopped: false,
   }
   let firedEvent
-  const listener = event => { firedEvent = event }
+  const listener = (event: any) => { firedEvent = event }
 
   eventable.on(type, listener)
   eventable.fire(testEvent)

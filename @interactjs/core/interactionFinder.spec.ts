@@ -15,9 +15,9 @@ test('modifiers/snap', t => {
   const { list } = scope.interactions
   const details = {
     pointer: event,
-    get pointerId () { return details.pointer.pointerId },
-    get pointerType () { return details.pointer.pointerType },
-    eventType: null,
+    get pointerId (): number { return details.pointer.pointerId },
+    get pointerType (): string { return details.pointer.pointerType },
+    eventType: null as string,
     eventTarget: body,
     curEventTarget: scope.document,
     scope,

@@ -11,9 +11,9 @@ export interface SearchDetails {
 }
 
 const finder = {
-  methodOrder: ['simulationResume', 'mouseOrPen', 'hasPointer', 'idle'],
+  methodOrder: ['simulationResume', 'mouseOrPen', 'hasPointer', 'idle'] as const,
 
-  search (details) {
+  search (details: SearchDetails) {
     for (const method of finder.methodOrder) {
       const interaction = finder[method](details)
 
@@ -21,6 +21,8 @@ const finder = {
         return interaction
       }
     }
+
+    return null
   },
 
   // try to resume simulation with a new pointer
@@ -30,7 +32,7 @@ const finder = {
     }
 
     for (const interaction of scope.interactions.list) {
-      let element = eventTarget
+      let element = eventTarget as Node
 
       if (interaction.simulation && interaction.simulation.allowResume &&
           (interaction.pointerType === pointerType)) {

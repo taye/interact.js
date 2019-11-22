@@ -18,7 +18,7 @@ test('inertia', t => {
   const testModifier = {
     options: { endOnly: false },
     methods: {
-      set ({ coords: modifierCoords, phase }) {
+      set ({ coords: modifierCoords, phase }: any) {
         modifierCoords.x = modifierChange
         modifierCoords.y = modifierChange
         modifierCallPhases.push(phase)
@@ -26,8 +26,8 @@ test('inertia', t => {
     },
   }
 
-  let fired = []
-  let modifierCallPhases = []
+  let fired: any[] = []
+  let modifierCallPhases: any[] = []
 
   coords.client = coords.page
   scope.now = () => coords.timeStamp
@@ -85,7 +85,7 @@ test('inertia', t => {
   interaction.stop()
   t.end()
 
-  function downStartMoveUp ({ x, y, dt }) {
+  function downStartMoveUp ({ x, y, dt }: any) {
     fired = []
     modifierCallPhases = []
     coords.timeStamp = 0

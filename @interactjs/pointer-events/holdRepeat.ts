@@ -1,8 +1,16 @@
+import { ListenerMap } from '@interactjs/core/scope'
 import basePlugin from './base'
+import PointerEvent from './PointerEvent'
 
 declare module '@interactjs/core/Interaction' {
   interface Interaction {
     holdIntervalHandle?: any
+  }
+}
+
+declare module '@interactjs/pointer-events/PointerEvent' {
+  interface PointerEvent<T> {
+    count?: number
   }
 }
 
@@ -24,7 +32,7 @@ function install (scope: Interact.Scope) {
   pointerEvents.types.push('holdrepeat')
 }
 
-function onNew ({ pointerEvent }) {
+function onNew ({ pointerEvent }: { pointerEvent: PointerEvent<any> }) {
   if (pointerEvent.type !== 'hold') { return }
 
   pointerEvent.count = (pointerEvent.count || 0) + 1
@@ -54,7 +62,7 @@ function onFired (
   }, interval)
 }
 
-function endHoldRepeat ({ interaction }) {
+function endHoldRepeat ({ interaction }: { interaction: Interact.Interaction }) {
   // set the interaction's holdStopTime property
   // to stop further holdRepeat events
   if (interaction.holdIntervalHandle) {
@@ -63,17 +71,19 @@ function endHoldRepeat ({ interaction }) {
   }
 }
 
-export default {
+const holdRepeat: Interact.Plugin = {
   id: 'pointer-events/holdRepeat',
   install,
   listeners: ['move', 'up', 'cancel', 'endall'].reduce(
     (acc, enderTypes) => {
-      acc[`pointerEvents:${enderTypes}`] = endHoldRepeat
+      (acc as any)[`pointerEvents:${enderTypes}`] = endHoldRepeat
       return acc
     },
     {
       'pointerEvents:new': onNew,
       'pointerEvents:fired': onFired,
-    },
+    } as ListenerMap,
   ),
-} as Interact.Plugin
+}
+
+export default holdRepeat

@@ -1,9 +1,6 @@
+import { Actions } from '@interactjs/core/scope'
 import { warnOnce } from '../utils/index'
 import * as is from '../utils/is'
-
-// TODO: there seems to be a @babel/preset-typescript bug causing regular import
-// syntax to remain in js output
-type Actions = import ('@interactjs/core/scope').Actions
 
 declare module '@interactjs/core/Interactable' {
   interface Interactable {
@@ -137,13 +134,13 @@ function install (scope: Interact.Scope) {
   }
 }
 
-function getAction (
+function getAction<T extends Interact.ActionName> (
   this: Interact.Interactable,
   pointer: Interact.PointerType,
   event: Interact.PointerEventType,
   interaction: Interact.Interaction,
   element: Interact.Element,
-): Interact.ActionProps {
+): Interact.ActionProps<T> {
   const action = this.defaultActionChecker(pointer, event, interaction, element)
 
   if (this.options.actionChecker) {
@@ -178,7 +175,7 @@ function defaultActionChecker (
       continue
     }
 
-    action = (actions[actionName as keyof Actions] as any).checker(pointer, event, interactable, element, interaction, rect)
+    action = actions[actionName].checker(pointer, event, interactable, element, interaction, rect)
 
     if (action) {
       return action

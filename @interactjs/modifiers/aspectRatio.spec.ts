@@ -78,7 +78,7 @@ test('modifiers/aspectRatio', t => {
   )
   t.end()
 
-  function downStartMoveUp ({ x, y, edges }) {
+  function downStartMoveUp ({ x, y, edges }: { x: number, y: number, edges: Interact.EdgeOptions }) {
     coords.timeStamp = 0
     interaction.stop()
     lastRect = null

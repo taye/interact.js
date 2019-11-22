@@ -16,8 +16,9 @@ declare module '@interactjs/core/scope' {
 
 declare module '@interactjs/core/defaultOptions' {
   interface BaseDefaults {
-    actionChecker?
-    styleCursor?
+    actionChecker?: any
+    cursorChecker?: any
+    styleCursor?: any
   }
 
   interface PerActionDefaults {
@@ -120,10 +121,11 @@ function startOnMove (arg: Interact.SignalArgs['interactions:move'], scope: Inte
   scope.fire('autoStart:before-start', arg)
 
   const { interactable } = interaction
+  const actionName: Interact.ActionName = interaction.prepared.name
 
-  if (interaction.prepared.name && interactable) {
+  if (actionName && interactable) {
     // check manualStart and interaction limit
-    if (interactable.options[interaction.prepared.name].manualStart ||
+    if (interactable.options[actionName].manualStart ||
         !withinInteractionLimit(interactable, interaction.element, interaction.prepared, scope)) {
       interaction.stop()
     }
@@ -144,8 +146,8 @@ function clearCursorOnStop ({ interaction }: { interaction: Interact.Interaction
 
 // Check if the current interactable supports the action.
 // If so, return the validated action. Otherwise, return null
-function validateAction (
-  action: Interact.ActionProps,
+function validateAction<T extends Interact.ActionName> (
+  action: Interact.ActionProps<T>,
   interactable: Interact.Interactable,
   element: Interact.Element,
   eventTarget: Interact.EventTarget,
@@ -160,10 +162,10 @@ function validateAction (
   return null
 }
 
-function validateMatches (
+function validateMatches<T extends Interact.ActionName> (
   interaction: Interact.Interaction,
-  pointer,
-  event,
+  pointer: Interact.PointerType,
+  event: Interact.PointerEventType,
   matches: Interact.Interactable[],
   matchElements: Interact.Element[],
   eventTarget: Interact.EventTarget,
@@ -172,7 +174,7 @@ function validateMatches (
   for (let i = 0, len = matches.length; i < len; i++) {
     const match = matches[i]
     const matchElement = matchElements[i]
-    const matchAction = match.getAction(pointer, event, interaction, matchElement)
+    const matchAction = match.getAction<T>(pointer, event, interaction, matchElement)
 
     if (!matchAction) { continue }
 
@@ -202,12 +204,12 @@ function getActionInfo (
   eventTarget: Interact.EventTarget,
   scope: Interact.Scope,
 ) {
-  let matches = []
-  let matchElements = []
+  let matches: Interact.Interactable[] = []
+  let matchElements: Interact.Element[] = []
 
-  let element = eventTarget
+  let element = eventTarget as Interact.Element
 
-  function pushMatches (interactable) {
+  function pushMatches (interactable: Interact.Interactable) {
     matches.push(interactable)
     matchElements.push(element)
   }
@@ -225,7 +227,7 @@ function getActionInfo (
       return actionInfo
     }
 
-    element = utils.dom.parentNode(element)
+    element = utils.dom.parentNode(element) as Interact.Element
   }
 
   return { action: null, interactable: null, element: null }
@@ -260,7 +262,12 @@ function prepare (
   scope.fire('autoStart:prepared', { interaction })
 }
 
-function withinInteractionLimit (interactable: Interact.Interactable, element: Interact.Element, action, scope: Interact.Scope) {
+function withinInteractionLimit<T extends Interact.ActionName> (
+  interactable: Interact.Interactable,
+  element: Interact.Element,
+  action: Interact.ActionProps<T>,
+  scope: Interact.Scope,
+) {
   const options = interactable.options
   const maxActions = options[action.name].max
   const maxPerElement = options[action.name].maxPerElement
@@ -303,7 +310,7 @@ function withinInteractionLimit (interactable: Interact.Interactable, element: I
   return autoStartMax > 0
 }
 
-function maxInteractions (newValue, scope: Interact.Scope) {
+function maxInteractions (newValue: any, scope: Interact.Scope) {
   if (utils.is.number(newValue)) {
     scope.autoStart.maxInteractions = newValue
 
@@ -313,7 +320,7 @@ function maxInteractions (newValue, scope: Interact.Scope) {
   return scope.autoStart.maxInteractions
 }
 
-function setCursor (element: Interact.Element, cursor, scope: Interact.Scope) {
+function setCursor (element: Interact.Element, cursor: string, scope: Interact.Scope) {
   if (scope.autoStart.cursorElement) {
     scope.autoStart.cursorElement.style.cursor = ''
   }
@@ -323,7 +330,7 @@ function setCursor (element: Interact.Element, cursor, scope: Interact.Scope) {
   scope.autoStart.cursorElement = cursor ? element : null
 }
 
-function setInteractionCursor (interaction: Interact.Interaction, scope: Interact.Scope) {
+function setInteractionCursor<T extends Interact.ActionName> (interaction: Interact.Interaction<T>, scope: Interact.Scope) {
   const { interactable, element, prepared } = interaction
 
   if (!(interaction.pointerType === 'mouse' && interactable && interactable.options.styleCursor)) {
