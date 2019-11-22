@@ -46,7 +46,7 @@ checkout_clean_head() {
   echo_funcname
 
   # detach HEAD
-  git switch -d || exit $?
+  git checkout -d || exit $?
 
   # clean repo
   git clean -fdX
