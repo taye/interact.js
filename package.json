@@ -10,7 +10,7 @@
   ],
   "bin": {
     "@bundle": "scripts/bundle.js",
-    "@esnext": "scripts/esnext.js",
+    "@esnext": "scripts/esnext-bin.js",
     "@docs": "jsdoc/index.js",
     "@clean": "scripts/clean.js",
     "@lint": "scripts/lint.js",
@@ -21,7 +21,7 @@
     "bootstrap": "npx yarn install",
     "start": "cd interactjs; NODE_ENV=development ../scripts/bundle.js --watch",
     "bundle": "cd interactjs; NODE_ENV=production ../scripts/bundle.js",
-    "esnext": "scripts/esnext.js",
+    "esnext": "scripts/esnext-bin.js",
     "build": "npm run clean && npm run docs && npm run bundle && npm run esnext",
     "docs": "node jsdoc/index.js",
     "clean": "scripts/clean.js",

@@ -1,4 +1,3 @@
-#!/usr/bin/env node
 const path = require('path')
 const os = require('os')
 const fs = require('fs')
@@ -33,7 +32,11 @@ const babelOptions = {
 
 const queue = new PQueue({ concurrency: os.cpus().length })
 
-getSources().then(async sources => {
+module.exports = async sources => {
+  sources = sources || await getSources()
+
+  queue.clear()
+
   // touch the .js files so they can be resolved successfully
   await Promise.all(sources.map(sourceFile => {
     const jsName = getJsName(sourceFile)
@@ -58,7 +61,7 @@ getSources().then(async sources => {
       new Promise(resolve => mapStream.on('close', resolve)),
     ])
   }))
-})
+}
 
 function getJsName (tsName) {
   return tsName.replace(/\.[jt]sx?$/, '.js')

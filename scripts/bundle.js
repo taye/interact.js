@@ -30,7 +30,6 @@ const argv = require('yargs')
   .argv
 
 const dir = path.join(__dirname, '..')
-const extensions = ['.ts', '.tsx', '.js', '.jsx']
 
 process.env.NODE_PATH = `${process.env.NODE_PATH || ''}:${dir}/node_modules`
 require('module')._initPaths()
@@ -63,7 +62,7 @@ try {
 }
 
 const b = browserify(argv.entries, {
-  extensions,
+  extensions: ['.ts', '.tsx'],
 
   debug: argv.debug,
 
@@ -74,7 +73,6 @@ const b = browserify(argv.entries, {
       babelrc: false,
       sourceType: 'module',
       global: true,
-      extensions,
       ...babelrc,
     }],
     [require('envify'), {
@@ -90,8 +88,19 @@ const b = browserify(argv.entries, {
 }).exclude('jsdom')
 
 if (argv.watch) {
-  b.on('update', update)
+  const doEsnext = require('./esnext')
+
+  b.on('update', ids => {
+    ids = ids.filter(filename => !/\.js$/.test(filename))
+
+    if (!ids.length) { return }
+
+    update(ids)
+    doEsnext(ids.map(id => path.resolve(id)))
+  })
   b.on('log', msg => console.log(msg))
+
+  doEsnext()
 }
 else {
   process.on('beforeExit', () => {
