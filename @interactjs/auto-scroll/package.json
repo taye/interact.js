@@ -5,6 +5,9 @@
   "peerDependencies": {
     "@interactjs/utils": "1.8.0-alpha.3"
   },
+  "devDependencies": {
+    "@interactjs/_dev": "1.8.0-alpha.3"
+  },
   "publishConfig": {
     "access": "public"
   }
