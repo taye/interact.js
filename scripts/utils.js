@@ -12,7 +12,7 @@ const getSources = ({ cwd = process.cwd() } = {}) => glob(
   {
     cwd,
     ignore: sourcesIgnoreGlobs,
-    silent: true,
+    strict: false,
     nodir: true,
   },
 )
@@ -22,7 +22,7 @@ const getBuiltJsFiles = ({ cwd = process.cwd() } = {}) => glob(
   {
     cwd,
     ignore: builtFilesIgnoreGlobs,
-    silent: true,
+    strict: false,
     nodir: true,
   })
 

@@ -21,6 +21,7 @@ const babelOptions = {
   presets: [
     [require('@babel/preset-typescript'), {
       allExtensions: true,
+      isTSX: true,
     }],
   ],
   plugins: [
@@ -62,6 +63,8 @@ module.exports = async sources => {
     ])
   }))
 }
+
+module.exports.babelOptions = babelOptions
 
 function getJsName (tsName) {
   return tsName.replace(/\.[jt]sx?$/, '.js')

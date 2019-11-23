@@ -5,6 +5,7 @@ module.exports = {
       : [require('@babel/preset-env').default],
     [require('@babel/preset-typescript').default, {
       allExtensions: true,
+      isTSX: true,
     }],
   ],
 
