@@ -1,3 +1,7 @@
+## v1.7.3
+
+ - fixed interactjs package main and browser fields (#774)
+
 ## v1.7.2
 
  - fixed typescript definition files (#771)

@@ -1,10 +1,10 @@
 {
   "name": "@interactjs/actions",
-  "version": "1.7.2",
+  "version": "1.7.3",
   "license": "MIT",
   "peerDependencies": {
-    "@interactjs/core": "1.7.2",
-    "@interactjs/utils": "1.7.2"
+    "@interactjs/core": "1.7.3",
+    "@interactjs/utils": "1.7.3"
   },
   "publishConfig": {
     "access": "public"
