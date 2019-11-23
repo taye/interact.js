@@ -1,13 +1,13 @@
 {
   "name": "@interactjs/auto-start",
-  "version": "1.8.0-alpha.2",
+  "version": "1.8.0-alpha.3",
   "license": "MIT",
   "peerDependencies": {
-    "@interactjs/core": "1.8.0-alpha.2",
-    "@interactjs/utils": "1.8.0-alpha.2"
+    "@interactjs/core": "1.8.0-alpha.3",
+    "@interactjs/utils": "1.8.0-alpha.3"
   },
   "devDependencies": {
-    "@interactjs/actions": "1.8.0-alpha.2"
+    "@interactjs/actions": "1.8.0-alpha.3"
   },
   "publishConfig": {
     "access": "public"

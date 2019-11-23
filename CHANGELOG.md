@@ -1,3 +1,7 @@
+## v1.8.0-alpha.3
+
+ - added missing typescript declaration files
+
 ## v1.8.0-alpha.2
 
  - used non relative imports in .ts files with correct config for
