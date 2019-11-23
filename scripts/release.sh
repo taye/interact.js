@@ -17,9 +17,12 @@ main() {
 ensure_clean_index() {
   echo_funcname
 
+  # ignore filemode changes
+  git config core.fileMode false
+
   # make sure the repo is clean
   if ! git diff-index HEAD --stat --exit-code; then
-    exit_code = $?
+    exit_code=$?
     echo
     quit "working directory must be clean" $exit_code
   fi
