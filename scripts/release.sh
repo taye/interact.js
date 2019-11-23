@@ -18,10 +18,10 @@ ensure_clean_index() {
   echo_funcname
 
   # make sure the repo is clean
-  git clean -fx **/dist/*
   if ! git diff-index HEAD --stat --exit-code; then
+    exit_code = $?
     echo
-    quit "working directory must be clean" $?
+    quit "working directory must be clean" $exit_code
   fi
 }
 
