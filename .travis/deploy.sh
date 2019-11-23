@@ -5,4 +5,6 @@ ssh-add $HOME/deploy_key # Add the private key to SSH
 
 git remote set-url origin ssh://git@github.com/taye/interact.js.git
 
-$TRAVIS_BUILD_DIR/scripts/release.sh $@
+# undo permission changes to bin files
+git checkout -- $TRAVIS_BUILD_DIR/{jsdoc,scripts}
+bash $TRAVIS_BUILD_DIR/scripts/release.sh $@
