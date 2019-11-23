@@ -1,4 +1,4 @@
-import { Scope } from '../core/scope'
+import { Scope } from '@interactjs/core/scope'
 import drag from './drag'
 import drop from './drop/index'
 import gesture from './gesture'

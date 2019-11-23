@@ -1,6 +1,6 @@
 import test from '@interactjs/_dev/test/test'
-import * as helpers from '../../core/tests/_helpers'
-import * as pointerUtils from '../../utils/pointerUtils'
+import * as helpers from '@interactjs/core/tests/_helpers'
+import * as pointerUtils from '@interactjs/utils/pointerUtils'
 import drag from '../drag'
 import drop from '../drop/index'
 

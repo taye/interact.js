@@ -1,6 +1,6 @@
 import test from '@interactjs/_dev/test/test'
-import drag from '../actions/drag'
-import { autoStart } from '../auto-start/index'
+import drag from '@interactjs/actions/drag'
+import { autoStart } from '@interactjs/auto-start/index'
 import interactablePreventDefault from './interactablePreventDefault'
 import * as helpers from './tests/_helpers'
 

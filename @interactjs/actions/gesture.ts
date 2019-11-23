@@ -1,6 +1,6 @@
-import InteractEvent from '../core/InteractEvent'
-import { ActionName, Scope } from '../core/scope'
-import * as utils from '../utils/index'
+import InteractEvent from '@interactjs/core/InteractEvent'
+import { ActionName, Scope } from '@interactjs/core/scope'
+import * as utils from '@interactjs/utils/index'
 
 export type GesturableMethod = Interact.ActionMethod<Interact.GesturableOptions>
 

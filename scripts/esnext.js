@@ -27,7 +27,9 @@ const babelOptions = {
   plugins: [
     require('@babel/plugin-proposal-class-properties'),
     require('babel-plugin-transform-inline-environment-variables'),
-    require('babel-plugin-bare-import-rewrite'),
+    [require('babel-plugin-bare-import-rewrite'), {
+      resolveDirectories: ['.'],
+    }],
   ],
 }
 

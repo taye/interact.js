@@ -1,4 +1,4 @@
-import * as dom from '../utils/domUtils'
+import * as dom from '@interactjs/utils/domUtils'
 
 export interface SearchDetails {
   pointer: Interact.PointerType

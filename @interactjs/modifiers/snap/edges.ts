@@ -26,8 +26,8 @@
  * })
  */
 
-import clone from '../../utils/clone'
-import extend from '../../utils/extend'
+import clone from '@interactjs/utils/clone'
+import extend from '@interactjs/utils/extend'
 import { ModifierArg, ModifierModule } from '../base'
 import { SnapOptions, SnapState } from './pointer'
 import snapSize from './size'

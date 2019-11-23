@@ -1,13 +1,13 @@
-import browser from '../utils/browser'
-import domObjects from '../utils/domObjects'
-import { nodeContains } from '../utils/domUtils'
-import events from '../utils/events'
-import * as pointerUtils from '../utils/pointerUtils'
+import browser from '@interactjs/utils/browser'
+import domObjects from '@interactjs/utils/domObjects'
+import { nodeContains } from '@interactjs/utils/domUtils'
+import events from '@interactjs/utils/events'
+import * as pointerUtils from '@interactjs/utils/pointerUtils'
 import InteractionBase from './Interaction'
 import finder, { SearchDetails } from './interactionFinder'
 import { Scope } from './scope'
 
-declare module '../core/scope' {
+declare module '@interactjs/core/scope' {
   interface Scope {
     Interaction: typeof InteractionBase
     interactions: {

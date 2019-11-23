@@ -1,11 +1,11 @@
 /** @module interact */
 
-import { Options } from '../core/defaultOptions'
-import Interactable from '../core/Interactable'
-import { Scope } from '../core/scope'
-import browser from '../utils/browser'
-import events from '../utils/events'
-import * as utils from '../utils/index'
+import { Options } from '@interactjs/core/defaultOptions'
+import Interactable from '@interactjs/core/Interactable'
+import { Scope } from '@interactjs/core/scope'
+import browser from '@interactjs/utils/browser'
+import events from '@interactjs/utils/events'
+import * as utils from '@interactjs/utils/index'
 
 declare module '@interactjs/core/scope' {
   interface Scope {

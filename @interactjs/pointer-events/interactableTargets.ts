@@ -1,6 +1,6 @@
-import { Scope } from '../core/scope'
-import { merge } from '../utils/arr'
-import extend from '../utils/extend'
+import { Scope } from '@interactjs/core/scope'
+import { merge } from '@interactjs/utils/arr'
+import extend from '@interactjs/utils/extend'
 
 type Interactable = import ('@interactjs/core/Interactable').default
 

@@ -1,5 +1,5 @@
-import extend from '../utils/extend'
-import * as rectUtils from '../utils/rect'
+import extend from '@interactjs/utils/extend'
+import * as rectUtils from '@interactjs/utils/rect'
 
 declare module '@interactjs/core/scope' {
   interface Scope {

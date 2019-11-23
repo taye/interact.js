@@ -1,7 +1,7 @@
 import test from '@interactjs/_dev/test/test'
-import { ActionName } from '../core/scope'
-import * as helpers from '../core/tests/_helpers'
-import * as utils from '../utils/index'
+import { ActionName } from '@interactjs/core/scope'
+import * as helpers from '@interactjs/core/tests/_helpers'
+import * as utils from '@interactjs/utils/index'
 import gesture from './gesture'
 
 function getGestureProps (event: Interact.GestureEvent) {

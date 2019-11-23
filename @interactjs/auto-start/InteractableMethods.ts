@@ -1,6 +1,6 @@
 import { Actions } from '@interactjs/core/scope'
-import { warnOnce } from '../utils/index'
-import * as is from '../utils/is'
+import { warnOnce } from '@interactjs/utils/index'
+import * as is from '@interactjs/utils/is'
 
 declare module '@interactjs/core/Interactable' {
   interface Interactable {

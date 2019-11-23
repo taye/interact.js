@@ -1,6 +1,6 @@
 import test from '@interactjs/_dev/test/test'
 import PromisePolyfill from 'promise-polyfill'
-import * as helpers from '../core/tests/_helpers'
+import * as helpers from '@interactjs/core/tests/_helpers'
 import reflow from './index'
 
 test('reflow', t => {

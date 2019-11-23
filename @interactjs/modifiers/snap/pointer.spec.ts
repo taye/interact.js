@@ -1,7 +1,7 @@
 import test from '@interactjs/_dev/test/test'
 import extend from '@interactjs/utils/extend'
-import drag from '../../actions/drag'
-import * as helpers from '../../core/tests/_helpers'
+import drag from '@interactjs/actions/drag'
+import * as helpers from '@interactjs/core/tests/_helpers'
 import modifiersBase, { makeModifier } from '../base'
 import snap from '../snap/pointer'
 

@@ -1,7 +1,7 @@
 import test from '@interactjs/_dev/test/test'
-import { drag, resize } from '../actions/index'
-import * as helpers from '../core/tests/_helpers'
-import * as utils from '../utils/index'
+import { drag, resize } from '@interactjs/actions/index'
+import * as helpers from '@interactjs/core/tests/_helpers'
+import * as utils from '@interactjs/utils/index'
 import devTools, { Check, Logger } from './index'
 
 const { checks, links, prefix } = devTools

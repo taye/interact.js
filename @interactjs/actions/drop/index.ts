@@ -1,7 +1,7 @@
-import Interactable from '../../core/Interactable'
-import InteractEvent from '../../core/InteractEvent'
-import { Scope, ActionName } from '../../core/scope'
-import * as utils from '../../utils/index'
+import Interactable from '@interactjs/core/Interactable'
+import InteractEvent from '@interactjs/core/InteractEvent'
+import { Scope, ActionName } from '@interactjs/core/scope'
+import * as utils from '@interactjs/utils/index'
 import drag from '../drag'
 import DropEvent from './DropEvent'
 

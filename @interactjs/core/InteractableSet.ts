@@ -1,7 +1,7 @@
-import * as arr from '../utils/arr'
-import * as domUtils from '../utils/domUtils'
-import extend from '../utils/extend'
-import * as is from '../utils/is'
+import * as arr from '@interactjs/utils/arr'
+import * as domUtils from '@interactjs/utils/domUtils'
+import extend from '@interactjs/utils/extend'
+import * as is from '@interactjs/utils/is'
 
 declare module '@interactjs/core/scope' {
   interface SignalArgs {

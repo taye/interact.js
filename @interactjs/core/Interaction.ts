@@ -1,4 +1,4 @@
-import * as utils from '../utils/index'
+import * as utils from '@interactjs/utils/index'
 import Interactable from './Interactable'
 import InteractEvent, { EventPhase } from './InteractEvent'
 import PointerInfo from './PointerInfo'

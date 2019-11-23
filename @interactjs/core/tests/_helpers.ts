@@ -1,7 +1,7 @@
 /* eslint-disable no-restricted-syntax */
 import { doc } from '@interactjs/_dev/test/domator'
-import * as utils from '../../utils/index'
-import { MockCoords } from '../../utils/pointerUtils'
+import * as utils from '@interactjs/utils/index'
+import { MockCoords } from '@interactjs/utils/pointerUtils'
 import { createScope } from '../scope'
 
 let counter = 0

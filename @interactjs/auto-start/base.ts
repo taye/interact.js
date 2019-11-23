@@ -1,4 +1,4 @@
-import * as utils from '../utils/index'
+import * as utils from '@interactjs/utils/index'
 import InteractableMethods from './InteractableMethods'
 
 declare module '@interactjs/interact/interact' {
