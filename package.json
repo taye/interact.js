@@ -22,7 +22,7 @@
     "start": "cd interactjs; NODE_ENV=development ../scripts/bundle.js --watch",
     "bundle": "cd interactjs; NODE_ENV=production ../scripts/bundle.js",
     "esnext": "scripts/esnext-bin.js",
-    "build": "npm run clean && npm run docs && npm run bundle && npm run esnext",
+    "build": "npm run clean && npm run docs && npm run bundle && tsc -b -f && npm run esnext",
     "docs": "node jsdoc/index.js",
     "clean": "scripts/clean.js",
     "lint": "scripts/lint.js --fail-on-error",

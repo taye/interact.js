@@ -69,9 +69,6 @@ run_build() {
   npx lerna exec --no-private -- cp -v $ROOT/LICENSE . ||
     quit "failed to copy LICENSE"
 
-  # generate .d.ts files
-  npx tsc -b -f &&
-
   # copy .npmignore to all packages
   npx lerna exec --no-private -- "echo '# copied from [root]/.npmignore' > .npmignore
     cat $ROOT/.npmignore >> .npmignore" &&
@@ -79,7 +76,7 @@ run_build() {
   ## generate esnext .js modules
   npm run esnext &&
 
-  # bundle interactjs, generate docs, transpile modules
+  # bundle interactjs, generate docs, transpile modules, generate declaration files
   npm run build || exit $?
 }
 
