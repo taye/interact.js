@@ -1,3 +1,8 @@
+## v1.8.0-alpha.2
+
+ - used non relative imports in .ts files with correct config for
+   babel-plugin-bare-import-rewrite
+
 ## v1.8.0-alpha.1
 
  - added `event.modifiers` array (#772)

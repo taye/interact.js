@@ -1,6 +1,6 @@
 {
   "name": "@interactjs/utils",
-  "version": "1.8.0-alpha.1",
+  "version": "1.8.0-alpha.2",
   "license": "MIT",
   "publishConfig": {
     "access": "public"
