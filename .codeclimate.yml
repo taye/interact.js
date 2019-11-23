@@ -1,7 +1,10 @@
 plugins:
   eslint:
-    enabled: true
+    enabled: false
     channel: eslint-6
+    extensions:
+      - .ts
+      - .js
   duplication:
     enabled: false
     config:
