@@ -1,15 +1,15 @@
 {
   "name": "@interactjs/core",
-  "version": "1.8.0-alpha.4",
+  "version": "1.8.0-alpha.5",
   "license": "MIT",
   "peerDependencies": {
-    "@interactjs/dev-tools": "1.8.0-alpha.4",
-    "@interactjs/utils": "1.8.0-alpha.4"
+    "@interactjs/dev-tools": "1.8.0-alpha.5",
+    "@interactjs/utils": "1.8.0-alpha.5"
   },
   "devDependencies": {
-    "@interactjs/_dev": "1.8.0-alpha.4",
-    "@interactjs/actions": "1.8.0-alpha.4",
-    "@interactjs/auto-start": "1.8.0-alpha.4"
+    "@interactjs/_dev": "1.8.0-alpha.5",
+    "@interactjs/actions": "1.8.0-alpha.5",
+    "@interactjs/auto-start": "1.8.0-alpha.5"
   },
   "publishConfig": {
     "access": "public"
