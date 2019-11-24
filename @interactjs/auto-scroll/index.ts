@@ -215,7 +215,7 @@ export function getScrollSize (container: any) {
 }
 
 export function getScrollSizeDelta<T extends Interact.ActionName> ({ interaction, element }: {
-  interaction: Interact.Interaction<T>
+  interaction: Partial<Interact.Interaction<T>>
   element: Interact.Element
 }, func: any) {
   const scrollOptions = interaction && interaction.interactable.options[interaction.prepared.name].autoScroll
