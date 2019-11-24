@@ -1,3 +1,9 @@
+## v1.8.0-alpha.4
+
+ - added `main` field to interactjs package.json (#774)
+ - removed baseUrl from project tsconfig to avoid relative imports in generated
+   declarations
+
 ## v1.8.0-alpha.3
 
  - added missing typescript declaration files
