@@ -34,6 +34,7 @@ export interface InteractStatic {
   closest: typeof utils.dom.closest
   addDocument: typeof scope.addDocument
   removeDocument: typeof scope.removeDocument
+  dynamicDrop: (newValue?: boolean) => boolean | Interact.interact
   version: string
 }
 

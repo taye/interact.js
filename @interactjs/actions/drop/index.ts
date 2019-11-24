@@ -58,12 +58,6 @@ declare module '@interactjs/core/scope' {
   }
 }
 
-declare module '@interactjs/interact/interact' {
-  interface InteractStatic {
-    dynamicDrop: (newValue?: boolean) => boolean | Interact.interact
-  }
-}
-
 function install (scope: Scope) {
   const {
     actions,
