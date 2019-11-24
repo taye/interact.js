@@ -74,7 +74,7 @@ export function mockScope (options = {} as any) {
   return scope
 }
 
-export function getProps<T extends object, K extends keyof T> (src: T, props: K[]) {
+export function getProps<T extends { [key: string]: any }, K extends keyof T> (src: T, props: readonly K[]) {
   return props.reduce((acc, prop) => {
     if (prop in src) {
       acc[prop] = src[prop]
