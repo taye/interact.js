@@ -30,6 +30,8 @@
     "test": "scripts/test.sh",
     "test:debug": "TEST_RUNNER=nodemon TEST_RUNNER_ARGS='-x node --inspect' npm run test",
     "tsc_lint_test": "tsc -b -f && tsc -b --clean && npm run lint -- --fail-on-error && npm test",
+    "dev-link": "yarn link; for p in @interactjs/*; do cd $p; yarn link; cd ../..; done",
+    "dev-unlink": "yarn unlink; for p in @interactjs/*; do cd $p; yarn unlink; cd ../..; done",
     "release": "sh ./scripts/release.sh",
     "version": "scripts/version.js"
   },
