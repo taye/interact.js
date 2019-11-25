@@ -14,6 +14,7 @@
     "@docs": "jsdoc/index.js",
     "@clean": "scripts/clean.js",
     "@lint": "scripts/lint.js",
+    "@release": "scripts/release.sh",
     "@run_test": "scripts/test.sh",
     "@version": "scripts/version.js"
   },
