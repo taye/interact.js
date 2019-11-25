@@ -1,3 +1,7 @@
+## v1.8.0-alpha.6
+
+ - fixed dev scripts
+
 ## v1.8.0-alpha.5
 
  - moved `interact.dynamicDrop` definition in order to avoid compilation errors
