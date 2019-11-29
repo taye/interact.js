@@ -1,39 +1,43 @@
+import interact from '../../interactjs/index.js'
+
 let transformProp;
+const dragPositions = [1, 2, 3, 4].reduce((acc, n) => {
+  acc[`drag${n}`] = { x: 0, y: 0 }
+  return acc
+}, {})
 
 interact.maxInteractions(Infinity);
 
 // setup draggable elements.
 interact('.js-drag')
   .draggable({
-    max: Infinity,
-    snap: {
-      targets: [interact.createSnapGrid({ x: 100, y: 100 })],
-      relativePoints: [{ x: 0.5, y: 0.5 }],
-    },
-  })
-  .on('dragstart', function (event) {
-    const interaction = event._interaction
-    interaction.x = parseInt(event.target.getAttribute('data-x'), 10) || 0;
-    interaction.y = parseInt(event.target.getAttribute('data-y'), 10) || 0;
-  })
-  .on('dragmove', function (event) {
-    const interaction = event._interaction
-    interaction.x += event.dx;
-    interaction.y += event.dy;
+    listeners: {
+      start (event) {
+        const position = dragPositions[event.target.id]
+        position.x = parseInt(event.target.getAttribute('data-x'), 10) || 0;
+        position.y = parseInt(event.target.getAttribute('data-y'), 10) || 0;
+      },
+      move (event) {
+        const position = dragPositions[event.target.id]
+        position.x += event.dx;
+        position.y += event.dy;
 
-    if (transformProp) {
-      event.target.style[transformProp] =
-        'translate(' + interaction.x + 'px, ' + interaction.y + 'px)';
-    }
-    else {
-      event.target.style.left = interaction.x + 'px';
-      event.target.style.top  = interaction.y + 'px';
+        if (transformProp) {
+          event.target.style[transformProp] =
+            'translate(' + position.x + 'px, ' + position.y + 'px)';
+        }
+        else {
+          event.target.style.left = position.x + 'px';
+          event.target.style.top  = position.y + 'px';
+        }
+      },
+      end (event) {
+        const position = dragPositions[event.target.id]
+        event.target.setAttribute('data-x', position.x);
+        event.target.setAttribute('data-y', position.y);
+      },
     }
   })
-  .on('dragend', function (event) {
-    event.target.setAttribute('data-x', interaction.x);
-    event.target.setAttribute('data-y', interaction.y);
-  });
 
 // setup drop areas.
 // dropzone #1 accepts draggable #1
@@ -46,12 +50,11 @@ setupDropzone('.js-drop', '#drag3');
 /**
  * Setup a given element as a dropzone.
  *
- * @param {HTMLElement|String} el
+ * @param {HTMLElement|String} target
  * @param {String} accept
  */
-function setupDropzone (el, accept) {
-  interact(el)
-    .on('dropactivate', e => { console.log(e.type); e.reject(); })
+function setupDropzone (target, accept) {
+  interact(target)
     .dropzone({
       accept: accept,
       ondropactivate: function (event) {

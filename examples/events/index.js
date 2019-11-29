@@ -1,3 +1,5 @@
+import interact from '../../interactjs/index.js'
+
 const dirs = ['up', 'down', 'left', 'right'];
 
 interact('#swipe')

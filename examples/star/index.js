@@ -1,6 +1,4 @@
 document.addEventListener('DOMContentLoaded', function () {
-
-
   let sns='http://www.w3.org/2000/svg',
     xns='http://www.w3.org/1999/xlink',
     root = document.getElementById('svg-edit-demo'),

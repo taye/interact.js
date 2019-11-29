@@ -1,3 +1,5 @@
+import interact from '../../interactjs/index.js'
+
 let canvas,
   context,
   guidesCanvas,
