@@ -1,11 +1,12 @@
 {
   "name": "interactjs",
-  "version": "1.7.2",
+  "version": "1.7.3",
   "repository": {
     "type": "git",
     "url": "https://github.com/taye/interact.js.git"
   },
-  "browser": "dist/interact.js",
+  "browser": "dist/interact.min.js",
+  "main": "dist/interact.min.js",
   "description": "Drag and drop, resizing and multi-touch gestures with inertia and snapping for modern browsers (and also IE9+)",
   "homepage": "https://interactjs.io",
   "authors": [
@@ -35,8 +36,8 @@
   ],
   "license": "MIT",
   "dependencies": {
-    "@interactjs/interactjs": "1.7.2",
-    "@interactjs/types": "1.7.2"
+    "@interactjs/interactjs": "1.7.3",
+    "@interactjs/types": "1.7.3"
   },
   "_dev": {
     "entries": "./index.ts",
