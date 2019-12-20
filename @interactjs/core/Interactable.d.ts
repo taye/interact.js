@@ -4,7 +4,7 @@ import { Actions } from './scope';
 declare type IgnoreValue = string | Interact.Element | boolean;
 /** */
 export declare class Interactable implements Partial<Eventable> {
-    protected get _defaults(): Defaults;
+    protected readonly _defaults: Defaults;
     readonly options: Required<Options>;
     readonly _actions: Actions;
     readonly target: Interact.Target;

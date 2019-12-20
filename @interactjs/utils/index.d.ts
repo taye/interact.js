@@ -11,7 +11,7 @@ export declare function getQuadraticCurvePoint(startX: number, startY: number, c
     y: number;
 };
 export declare function easeOutQuad(t: number, b: number, c: number, d: number): number;
-export declare function copyAction(dest: Interact.ActionProps, src: Interact.ActionProps): import("../types/types").ActionProps<any>;
+export declare function copyAction(dest: Interact.ActionProps, src: Interact.ActionProps): import("@interactjs/core/Interaction").ActionProps<any>;
 export { default as browser } from './browser';
 export { default as clone } from './clone';
 export { default as events } from './events';

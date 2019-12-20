@@ -32,7 +32,7 @@ declare const autoScroll: {
     prevTime: number;
     margin: number;
     speed: number;
-    start(interaction: import("../types/types").Interaction<any>): void;
+    start(interaction: import("@interactjs/core/Interaction").Interaction<any>): void;
     stop(): void;
     scroll(): void;
     check(interactable: any, actionName: any): any;

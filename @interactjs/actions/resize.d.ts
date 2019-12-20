@@ -82,7 +82,7 @@ declare const resize: {
         topright: string;
         bottomleft: string;
     };
-    getCursor({ edges, axis, name }: import("../types/types").ActionProps<any>): string;
+    getCursor({ edges, axis, name }: import("@interactjs/core/Interaction").ActionProps<any>): string;
     defaultMargin: number;
 };
 declare function end({ iEvent, interaction }: {

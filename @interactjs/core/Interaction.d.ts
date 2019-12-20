@@ -111,7 +111,7 @@ export declare class Interaction<T extends ActionName = any> {
     _stopped: boolean;
     _proxy: _InteractionProxy;
     simulation: any;
-    get pointerMoveTolerance(): number;
+    readonly pointerMoveTolerance: number;
     /**
      * @alias Interaction.prototype.move
      */

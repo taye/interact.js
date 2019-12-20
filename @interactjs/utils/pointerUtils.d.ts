@@ -85,7 +85,7 @@ export declare function coordsToEvent(coords: MockCoords): ({
     readonly type: any;
     readonly pointerType: any;
     readonly buttons: any;
-} & MouseEvent & import("../types/types").InteractEvent<any, any>) | ({
+} & MouseEvent & import("@interactjs/core/InteractEvent").InteractEvent<any, any>) | ({
     coords: MockCoords;
     readonly page: any;
     readonly client: any;
@@ -141,7 +141,7 @@ export declare function coordsToEvent(coords: MockCoords): ({
     readonly type: any;
     readonly pointerType: any;
     readonly buttons: any;
-} & Touch & import("../types/types").InteractEvent<any, any>) | ({
+} & Touch & import("@interactjs/core/InteractEvent").InteractEvent<any, any>) | ({
     coords: MockCoords;
     readonly page: any;
     readonly client: any;
@@ -197,7 +197,7 @@ export declare function coordsToEvent(coords: MockCoords): ({
     readonly type: any;
     readonly pointerType: any;
     readonly buttons: any;
-} & PointerEvent & import("../types/types").InteractEvent<any, any>) | ({
+} & PointerEvent & import("@interactjs/core/InteractEvent").InteractEvent<any, any>) | ({
     coords: MockCoords;
     readonly page: any;
     readonly client: any;
@@ -225,7 +225,7 @@ export declare function coordsToEvent(coords: MockCoords): ({
     readonly type: any;
     readonly pointerType: any;
     readonly buttons: any;
-} & import("../types/types").InteractEvent<any, any> & MouseEvent) | ({
+} & import("@interactjs/core/InteractEvent").InteractEvent<any, any> & MouseEvent) | ({
     coords: MockCoords;
     readonly page: any;
     readonly client: any;
@@ -239,7 +239,7 @@ export declare function coordsToEvent(coords: MockCoords): ({
     readonly type: any;
     readonly pointerType: any;
     readonly buttons: any;
-} & import("../types/types").InteractEvent<any, any> & PointerEvent) | ({
+} & import("@interactjs/core/InteractEvent").InteractEvent<any, any> & PointerEvent) | ({
     coords: MockCoords;
     readonly page: any;
     readonly client: any;
@@ -253,7 +253,7 @@ export declare function coordsToEvent(coords: MockCoords): ({
     readonly type: any;
     readonly pointerType: any;
     readonly buttons: any;
-} & import("../types/types").InteractEvent<any, any>) | ({
+} & import("@interactjs/core/InteractEvent").InteractEvent<any, any>) | ({
     coords: MockCoords;
     readonly page: any;
     readonly client: any;
@@ -267,7 +267,7 @@ export declare function coordsToEvent(coords: MockCoords): ({
     readonly type: any;
     readonly pointerType: any;
     readonly buttons: any;
-} & import("../types/types").InteractEvent<any, any> & TouchEvent);
+} & import("@interactjs/core/InteractEvent").InteractEvent<any, any> & TouchEvent);
 export interface MockCoords {
     page: Interact.Point;
     client: Interact.Point;

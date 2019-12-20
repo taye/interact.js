@@ -98,7 +98,13 @@ declare function collectEventTargets<T extends string>({ interaction, pointer, e
     event: Interact.PointerEventType | PointerEvent<any>;
     eventTarget: Interact.EventTarget;
     type: T;
-}, scope: Interact.Scope): EventTargetList;
+}, scope: Interact.Scope): {
+    node: Node;
+    eventable: Eventable;
+    props: {
+        [key: string]: any;
+    };
+}[];
 declare function addInteractionProps({ interaction }: {
     interaction: any;
 }): void;
