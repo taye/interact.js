@@ -1,6 +1,42 @@
+## v1.8.0-alpha.7
+
+ - reverted to typescript@3.6 to avoid backwards compatibility issues (#775)
+
+## v1.8.0-alpha.6
+
+ - fixed dev scripts
+
+## v1.8.0-alpha.5
+
+ - moved `interact.dynamicDrop` definition in order to avoid compilation errors
+
+## v1.8.0-alpha.4
+
+ - added `main` field to interactjs package.json (#774)
+ - removed baseUrl from project tsconfig to avoid relative imports in generated
+   declarations
+
+## v1.8.0-alpha.3
+
+ - added missing typescript declaration files
+
+## v1.8.0-alpha.2
+
+ - used non relative imports in .ts files with correct config for
+   babel-plugin-bare-import-rewrite
+
+## v1.8.0-alpha.1
+
+ - added `event.modifiers` array (#772)
+
+## v1.8.0-alpha.0
+
+ - added `aspectRatio` modifier (#638)
+
 ## v1.7.3
 
  - fixed interactjs package main and browser fields (#774)
+ - reverted to typescript@3.6 to avoid backwards compatibility issues (#775)
 
 ## v1.7.2
 
