@@ -83,7 +83,7 @@
     "tape": "latest",
     "ts-node": "latest",
     "tslint": "latest",
-    "typescript": "latest",
+    "typescript": "3.6",
     "uglify-js": "latest",
     "watchify": "latest",
     "yargs": "latest",
