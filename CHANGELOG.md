@@ -33,8 +33,9 @@
 
  - added `aspectRatio` modifier (#638)
 
-## v1.7.2
+## v1.7.3
 
+ - fixed interactjs package main and browser fields (#774)
  - reverted to typescript@3.6 to avoid backwards compatibility issues (#775)
 
 ## v1.7.2
