@@ -19,7 +19,7 @@
     "@version": "scripts/version.js"
   },
   "scripts": {
-    "bootstrap": "npx yarn install",
+    "bootstrap": "npx yarn install --pure-lockfile",
     "start": "cd interactjs; NODE_ENV=development ../scripts/bundle.js --watch",
     "bundle": "cd interactjs; NODE_ENV=production ../scripts/bundle.js",
     "esnext": "scripts/esnext-bin.js",
