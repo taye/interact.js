@@ -1,19 +1,19 @@
 {
   "name": "@interactjs/interactjs",
-  "version": "1.8.0-alpha.6",
+  "version": "1.8.0-alpha.7",
   "repository": {
     "type": "git",
     "url": "https://github.com/taye/interact.js.git"
   },
   "license": "MIT",
   "dependencies": {
-    "@interactjs/types": "1.8.0-alpha.6"
+    "@interactjs/types": "1.8.0-alpha.7"
   },
   "devDependencies": {
-    "@interactjs/_dev": "1.8.0-alpha.6",
-    "@interactjs/interact": "1.8.0-alpha.6",
-    "@interactjs/modifiers": "1.8.0-alpha.6",
-    "@interactjs/utils": "1.8.0-alpha.6"
+    "@interactjs/_dev": "1.8.0-alpha.7",
+    "@interactjs/interact": "1.8.0-alpha.7",
+    "@interactjs/modifiers": "1.8.0-alpha.7",
+    "@interactjs/utils": "1.8.0-alpha.7"
   },
   "publishConfig": {
     "access": "public"

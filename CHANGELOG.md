@@ -1,3 +1,7 @@
+## v1.8.0-alpha.7
+
+ - reverted to typescript@3.6 to avoid backwards compatibility issues (#775)
+
 ## v1.8.0-alpha.6
 
  - fixed dev scripts
@@ -28,6 +32,10 @@
 ## v1.8.0-alpha.0
 
  - added `aspectRatio` modifier (#638)
+
+## v1.7.2
+
+ - reverted to typescript@3.6 to avoid backwards compatibility issues (#775)
 
 ## v1.7.2
 

@@ -1,20 +1,20 @@
 {
   "name": "@interactjs/interact",
-  "version": "1.8.0-alpha.6",
+  "version": "1.8.0-alpha.7",
   "peerDependencies": {
-    "@interactjs/actions": "1.8.0-alpha.6",
-    "@interactjs/auto-scroll": "1.8.0-alpha.6",
-    "@interactjs/auto-start": "1.8.0-alpha.6",
-    "@interactjs/core": "1.8.0-alpha.6",
-    "@interactjs/dev-tools": "1.8.0-alpha.6",
-    "@interactjs/inertia": "1.8.0-alpha.6",
-    "@interactjs/modifiers": "1.8.0-alpha.6",
-    "@interactjs/pointer-events": "1.8.0-alpha.6",
-    "@interactjs/reflow": "1.8.0-alpha.6",
-    "@interactjs/utils": "1.8.0-alpha.6"
+    "@interactjs/actions": "1.8.0-alpha.7",
+    "@interactjs/auto-scroll": "1.8.0-alpha.7",
+    "@interactjs/auto-start": "1.8.0-alpha.7",
+    "@interactjs/core": "1.8.0-alpha.7",
+    "@interactjs/dev-tools": "1.8.0-alpha.7",
+    "@interactjs/inertia": "1.8.0-alpha.7",
+    "@interactjs/modifiers": "1.8.0-alpha.7",
+    "@interactjs/pointer-events": "1.8.0-alpha.7",
+    "@interactjs/reflow": "1.8.0-alpha.7",
+    "@interactjs/utils": "1.8.0-alpha.7"
   },
   "devDependencies": {
-    "@interactjs/_dev": "1.8.0-alpha.6"
+    "@interactjs/_dev": "1.8.0-alpha.7"
   },
   "publishConfig": {
     "access": "public"
