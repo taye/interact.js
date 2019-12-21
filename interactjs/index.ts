@@ -2,7 +2,8 @@ import interact, { init } from '@interactjs/interactjs/index'
 export * from '@interactjs/interactjs/index'
 
 if (typeof module === 'object' && !!module) {
-  module.exports = interact
+  try { module.exports = interact }
+  catch {}
 }
 
 (interact as any).default = interact // tslint:disable-line no-string-literal
