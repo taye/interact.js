@@ -57,8 +57,8 @@ export function tlbrToXywh (rect) {
 
     rect.x      = rect.left || 0
     rect.y      = rect.top  || 0
-    rect.width  = rect.width  || (rect.right  - rect.x)
-    rect.height = rect.height || (rect.bottom - rect.y)
+    rect.width  = rect.width  || (rect.right || 0  - rect.x)
+    rect.height = rect.height || (rect.bottom || 0 - rect.y)
   }
 
   return rect
