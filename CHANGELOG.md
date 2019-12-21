@@ -1,3 +1,8 @@
+## v1.8.0-rc.0
+
+ - fixed `modifiers.restrictSize` (#779)
+ - fixed option types in typescript and fixed devTools options (#776)
+
 ## v1.8.0-alpha.7
 
  - reverted to typescript@3.6 to avoid backwards compatibility issues (#775)
