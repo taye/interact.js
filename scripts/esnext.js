@@ -46,7 +46,7 @@ module.exports = async sources => {
     return fs.promises.writeFile(jsName, '')
   }))
 
-  await sources.map(sourceFile => queue.add(async () => {
+  await Promise.all(sources.map(sourceFile => queue.add(async () => {
     const jsName = getJsName(sourceFile)
     const mapName = `${jsName}.map`
 
@@ -63,7 +63,7 @@ module.exports = async sources => {
       new Promise(resolve => jsStream.on('close', resolve)),
       new Promise(resolve => mapStream.on('close', resolve)),
     ])
-  }))
+  })))
 }
 
 module.exports.babelOptions = babelOptions
