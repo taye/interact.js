@@ -123,19 +123,18 @@ declare namespace Interact {
   }
 
   export type PerActionDefaults = defaults.PerActionDefaults
-  export interface OptionsArg extends defaults.BaseDefaults, Interact.OrBoolean<defaults.PerActionDefaults> {}
+  export type OptionsArg = defaults.OptionsArg
 
-  export interface DraggableOptions extends Options {
+  export interface DraggableOptions extends PerActionDefaults {
     startAxis?: 'x' | 'y' | 'xy'
     lockAxis?: 'x' | 'y' | 'xy' | 'start'
-    cursorChecker?: Interact.CursorChecker
     oninertiastart?: ListenersArg
     onstart?: Interact.ListenersArg
     onmove?: Interact.ListenersArg
     onend?: Interact.ListenersArg
   }
 
-  export interface DropzoneOptions extends Options {
+  export interface DropzoneOptions extends PerActionDefaults {
     accept?: string | Element | (({ dropzone, draggableElement }: {
       dropzone: Interact.Interactable
       draggableElement: Element
@@ -162,7 +161,7 @@ declare namespace Interact {
     draggableElement: Element, // dragged element
   ) => boolean
 
-  export interface ResizableOptions extends Options {
+  export interface ResizableOptions extends PerActionDefaults {
     square?: boolean
     preserveAspectRatio?: boolean
     edges?: EdgeOptions | null
@@ -170,14 +169,13 @@ declare namespace Interact {
     invert?: 'none' | 'negate' | 'reposition'
     margin?: number
     squareResize?: boolean
-    cursorChecker?: Interact.CursorChecker
     oninertiastart?: ListenersArg
     onstart?: Interact.ListenersArg
     onmove?: Interact.ListenersArg
     onend?: Interact.ListenersArg
   }
 
-  export interface GesturableOptions extends Options {
+  export interface GesturableOptions extends PerActionDefaults {
     onstart?: Interact.ListenersArg
     onmove?: Interact.ListenersArg
     onend?: Interact.ListenersArg

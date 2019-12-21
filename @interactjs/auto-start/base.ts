@@ -27,6 +27,7 @@ declare module '@interactjs/core/defaultOptions' {
     maxPerElement?: number
     allowFrom?: string | Interact.Element
     ignoreFrom?: string | Interact.Element
+    cursorChecker?: Interact.CursorChecker
 
     // only allow left button by default
     // see https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/buttons#Return_value

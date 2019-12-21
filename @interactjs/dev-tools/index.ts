@@ -156,8 +156,7 @@ const defaultExport: Interact.Plugin = isProduction
     listeners: {
       'interactions:action-start': ({ interaction }, scope) => {
         for (const check of checks) {
-          const actionName: Interact.ActionName = interaction.prepared.name
-          const options = interaction.interactable && interaction.interactable.options[actionName]
+          const options = interaction.interactable && interaction.interactable.options
 
           if (
             !(options && options.devTools && options.devTools.ignore[check.name]) &&

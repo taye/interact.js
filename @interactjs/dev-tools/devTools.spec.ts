@@ -1,7 +1,6 @@
 import test from '@interactjs/_dev/test/test'
 import { drag, resize } from '@interactjs/actions/index'
 import * as helpers from '@interactjs/core/tests/_helpers'
-import * as utils from '@interactjs/utils/index'
 import devTools, { Check, Logger } from './index'
 
 const { checks, links, prefix } = devTools
@@ -11,33 +10,42 @@ const checkMap = checks.reduce((acc, check) => {
 }, {} as { [name: string]: Check})
 
 test('devTools', t => {
-  const scope: Interact.Scope = helpers.mockScope()
+  const devToolsWithLogger = {
+    install: s => s.usePlugin(devTools, {
+      logger: {
+        warn (...args: any[]) { log(args, 'warn') },
+        log (...args: any[]) { log(args, 'log') },
+        error (...args: any[]) { log(args, 'error') },
+      },
+    }),
+  }
+
+  const {
+    scope,
+    interaction,
+    interactable,
+    target: element,
+    down,
+    start,
+    move,
+    stop,
+  } = helpers.testEnv({ plugins: [devToolsWithLogger, drag, resize ] })
+
   const logs: Array<{ args: any[], type: keyof Logger }> = []
 
   function log (args: any, type: any) {
     logs.push({ args, type })
   }
 
-  scope.usePlugin(devTools, {
-    logger: {
-      warn (...args: any[]) { log(args, 'warn') },
-      log (...args: any[]) { log(args, 'log') },
-      error (...args: any[]) { log(args, 'error') },
-    },
-  })
-
   scope.usePlugin(drag)
   scope.usePlugin(resize)
 
-  const element = scope.document.body.appendChild(scope.document.createElement('div'))
-  const event = utils.pointer.coordsToEvent(utils.pointer.newCoords())
-  const interactable = scope.interactables.new(element)
+  interactable
     .draggable(true)
     .resizable({ onmove: () => {} })
-  const interaction = scope.interactions.new({})
 
-  interaction.pointerDown(event, event, element)
-  interaction.start({ name: 'drag' }, interactable, element)
+  down()
+  start({ name: 'drag' })
   t.deepEqual(
     logs[0],
     { args: [prefix + checkMap.touchAction.text, element, links.touchAction], type: 'warn' },
@@ -48,7 +56,7 @@ test('devTools', t => {
     { args: [prefix + checkMap.noListeners.text, 'drag', interactable], type: 'warn' },
     'warning about missing move listeners')
 
-  interaction.stop()
+  stop()
 
   // resolve touchAction
   element.style.touchAction = 'none'
@@ -56,45 +64,49 @@ test('devTools', t => {
   interactable.on('dragmove', () => {})
 
   interaction.start({ name: 'resize' }, interactable, element)
-  interaction.pointerMove(event, event, element)
-  interaction.end()
+  move()
+  stop()
 
   t.deepEqual(
     logs[2],
     { args: [prefix + checkMap.boxSizing.text, element, links.boxSizing], type: 'warn' },
     'warning about resizing without "box-sizing: none"')
 
-  // resolve boxSizing
-  element.style.boxSizing = 'border-box'
+  logs.splice(0)
 
   interaction.start({ name: 'resize' }, interactable, element)
-  interaction.move({ event, pointer: event })
-  interaction.end()
-
-  interaction.start({ name: 'drag' }, interactable, element)
-  interaction.pointerMove(event, event, element)
-  interaction.end()
-
-  t.equal(
-    logs.length,
-    3,
-    'no warnings when issues are resolved')
-
-  // re-introduce boxSizing issue
-  element.style.boxSizing = ''
-
-  interaction.start({ name: 'drag' }, interactable, element)
-  interaction.end()
+  move()
+  stop()
 
   interactable.options.devTools.ignore = { boxSizing: true }
 
-  interaction.start({ name: 'drag' }, interactable, element)
-  interaction.end()
+  interaction.start({ name: 'resize' }, interactable, element)
+  move()
+  stop()
 
   t.equal(
     logs.length,
-    3,
-    'no warning with options.devTools.ignore')
+    1,
+    'warning removed with options.devTools.ignore')
+
+  logs.splice(0)
+
+  // resolve boxSizing
+  interactable.options.devTools.ignore = {}
+  element.style.boxSizing = 'border-box'
+
+  interaction.start({ name: 'resize' }, interactable, element)
+  move(true)
+  stop()
+
+  interaction.start({ name: 'drag' }, interactable, element)
+  move()
+  stop()
+
+  t.equal(
+    logs.length,
+    0,
+    'no warnings when issues are resolved')
 
   t.end()
 })

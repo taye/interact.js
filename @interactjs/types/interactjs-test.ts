@@ -8,6 +8,7 @@ interact(window)
 
 interact('.drag-and-resize')
   .draggable({
+    inertia: true,
     modifiers: [
       interact.modifiers.snap({
         targets: [
@@ -204,6 +205,11 @@ interact(target).draggable({
 })
 
 interact.on(['dragmove', 'resizestart'], listener)
+
+// devTools options
+interact(target).devTools({
+  ignore: { boxSizing: true, touchAction: true },
+})
 
 const dropTarget = 'div'
 // Drop Events

@@ -30,7 +30,7 @@ export type Options = Partial<BaseDefaults> & Partial<PerActionDefaults> & {
 
 // export interface Options extends BaseDefaults, PerActionDefaults {}
 
-export interface OptionsArg extends BaseDefaults, Interact.OrBoolean<PerActionDefaults> {}
+export interface OptionsArg extends BaseDefaults, Interact.OrBoolean<Partial<ActionDefaults>> {}
 
 export const defaults: Defaults = {
   base: {
