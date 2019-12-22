@@ -1,4 +1,4 @@
-function createGrid (grid: (Interact.Rect | Interact.Point) & { range?: number, limits: Interact.Rect, offset: Interact.Point }) {
+function createGrid (grid: (Partial<Interact.Rect> | Interact.Point) & { range?: number, limits?: Interact.Rect, offset?: Interact.Point }) {
   const coordFields = ([
     ['x', 'y'],
     ['left', 'top'],

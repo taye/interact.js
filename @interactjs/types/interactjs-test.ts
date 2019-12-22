@@ -14,6 +14,7 @@ interact('.drag-and-resize')
         targets: [
           { x: 100, y: 200 },
           (x: number, y: number) => ({ x: x % 20, y }),
+          interact.snappers.grid({ x: 20, y: 0 }),
         ],
         offset: 'startCoords',
         relativePoints: [{ x: 0, y: 1 }],
@@ -23,6 +24,7 @@ interact('.drag-and-resize')
         targets: [
           { x: 100, y: 200 },
           (x: number, y: number) => ({ x: x % 20, y }),
+          interact.snappers.grid({ width: 100, height: 500 }),
         ],
         endOnly: true,
       }),
