@@ -1,3 +1,9 @@
+## v1.8.0-rc.1
+
+ - fixed `interact.snappers.grid` arg typings
+   (https://twitter.com/ksumarine/status/1204457347856424960)
+ - removed "?" from definitions for interact.{modifiers,snappers,createSnapGrid}
+
 ## v1.8.0-rc.0
 
  - fixed `modifiers.restrictSize` (#779)
@@ -37,6 +43,12 @@
 ## v1.8.0-alpha.0
 
  - added `aspectRatio` modifier (#638)
+
+## v1.7.4
+
+ - fixed `interact.snappers.grid` arg typings
+   (https://twitter.com/ksumarine/status/1204457347856424960)
+ - removed "?" from definitions for interact.{modifiers,snappers,createSnapGrid}
 
 ## v1.7.3
 

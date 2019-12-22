@@ -1,9 +1,9 @@
 {
   "name": "@interactjs/utils",
-  "version": "1.8.0-rc.0",
+  "version": "1.8.0-rc.1",
   "license": "MIT",
   "devDependencies": {
-    "@interactjs/_dev": "1.8.0-rc.0"
+    "@interactjs/_dev": "1.8.0-rc.1"
   },
   "publishConfig": {
     "access": "public"
