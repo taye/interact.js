@@ -9,14 +9,14 @@
     "./interactjs"
   ],
   "bin": {
-    "@bundle": "scripts/bundle.js",
-    "@esnext": "scripts/esnext-bin.js",
-    "@docs": "jsdoc/index.js",
-    "@clean": "scripts/clean.js",
-    "@lint": "scripts/lint.js",
-    "@release": "scripts/release.sh",
-    "@run_test": "scripts/test.sh",
-    "@version": "scripts/version.js"
+    "_bundle": "scripts/bundle.js",
+    "_esnext": "scripts/esnext-bin.js",
+    "_docs": "jsdoc/index.js",
+    "_clean": "scripts/clean.js",
+    "_lint": "scripts/lint.js",
+    "_release": "scripts/release.sh",
+    "_run_test": "scripts/test.sh",
+    "_version": "scripts/version.js"
   },
   "scripts": {
     "bootstrap": "npx yarn install --pure-lockfile",
