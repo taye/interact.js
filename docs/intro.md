@@ -148,19 +148,19 @@ inertia configuration.
 | `speed`                 | The speed of the pointer                          |
 | `timeStamp`             | The time of creation of the event object          |
 
-<h2 class="title is-3"><router-link to="draggable">Draggable</router-link></h2>
+<h2 class="title is-3"><router-link to="/docs/draggable">Draggable</router-link></h2>
 
 <!-- TODO -->
  - for watching the pointer go down, move, then go back up
  - combined with dropzones
 
-<h2 class="title is-3"><router-link to="dropzone">Dropzone</router-link></h2>
+<h2 class="title is-3"><router-link to="/docs/dropzone">Dropzone</router-link></h2>
 
 <!-- TODO -->
  - use this to define elements that other draggable elements can be moved into
  - doesn't actually re-parent the draggable elements; that's up to you
 
-<h2 class="title is-3"><router-link to="resizable">Resizable</router-link></h2>
+<h2 class="title is-3"><router-link to="/docs/resizable">Resizable</router-link></h2>
 
 <!-- TODO -->
  - for watching the size and position of an element while the pointer is used to
@@ -169,7 +169,7 @@ inertia configuration.
  - there are some modifiers that are specifically for resizing which change the
    way the element's edges and size are updated in response to the pointer
 
-<h2 class="title is-3"><router-link to="gesturable">Gesturable</router-link></h2>
+<h2 class="title is-3"><router-link to="/docs/gesturable">Gesturable</router-link></h2>
 
 <!-- TODO -->
  - for 2-finger gestures
