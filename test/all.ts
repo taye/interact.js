@@ -5,7 +5,7 @@ const glob = require('glob')
 const path = require('path')
 
 const globOptions = {
-  ignore: ['**/node_modules/**', '**/_*'],
+  ignore: ['**/node_modules/**', '**/_*', '**/_*/**'],
   silent: true,
   strict: false,
 }
@@ -20,7 +20,7 @@ function getMatches (pattern) {
       (error, files) => {
         if (error) { reject(error) }
         else { resolve(files) }
-      }
+      },
     )
   })
 }
