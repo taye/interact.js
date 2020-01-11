@@ -238,7 +238,7 @@ interact(element).draggable({
     interact.modifiers.snap({
       targets: [
         { x: 20, y: 450, range: 50 }
-        { x: 10, y: 0 /* use default range below */}
+        { x: 10, y: 0 /* use default range below */ }
       ],
       range: 300 // for targets that don't specify a range
     })

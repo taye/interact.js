@@ -35,7 +35,7 @@ Dropzone events are plain objects with the following properties:
 | `dropzone`              | The dropzone Interactable                         |
 | `relatedTarget`         | The element that's being dragged                  |
 | `draggable`             | The Interactable that's being dragged             |
-| `dragEvent`             | The related drag event – drag{start,move,end}     |
+| `dragEvent`             | The related drag event – `drag{start,move,end}`   |
 | `timeStamp`             | Time of the event                                 |
 | `type`                  | The event type                                    |
 
