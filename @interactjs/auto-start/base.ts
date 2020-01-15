@@ -365,7 +365,7 @@ export default {
     },
     'interactions:stop': clearCursorOnStop,
   },
-  before: 'ations',
+  before: ['ations'],
   maxInteractions,
   withinInteractionLimit,
   validateAction,

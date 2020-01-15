@@ -54,7 +54,7 @@ export interface Plugin {
   [key: string]: any
   id?: string
   listeners?: ListenerMap
-  before?: string
+  before?: string[]
   install? (scope: Scope, options?: any): void
 }
 
@@ -174,11 +174,16 @@ export class Scope {
 
     if (plugin.listeners && plugin.before) {
       let index = 0
+      const len = this.listenerMaps.length
+      const before = plugin.before.reduce((acc, id) => {
+        acc[id] = true
+        return acc
+      }, {})
 
-      for (; index < this.listenerMaps.length; index++) {
+      for (; index < len; index++) {
         const otherId = this.listenerMaps[index].id
 
-        if (otherId === plugin.before) { break }
+        if (before[otherId]) { break }
       }
 
       this.listenerMaps.splice(index, 0, { id: plugin.id, map: plugin.listeners })

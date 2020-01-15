@@ -549,7 +549,7 @@ const modifiersBase: Interact.Plugin = {
     'interactions:action-end': addEventModifiers,
     'interactions:stop': stop,
   },
-  before: 'ations',
+  before: ['ations'],
   startAll,
   setAll,
   prepareStates,

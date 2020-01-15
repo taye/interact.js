@@ -378,7 +378,7 @@ function getOptions ({ interactable, prepared }: Interact.Interaction) {
     interactable.options[prepared.name].inertia
 }
 
-export default {
+const inertia: Interact.Plugin = {
   id: 'inertia',
   install,
   listeners: {
@@ -396,9 +396,11 @@ export default {
     'interactions:down': resume,
     'interactions:stop': stop,
   },
-  before: 'modifiers/base',
+  before: ['modifiers/base'],
   calcInertia,
   inertiaTick,
   smothEndTick,
   updateInertiaCoords,
 }
+
+export default inertia

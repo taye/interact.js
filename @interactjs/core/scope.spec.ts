@@ -24,15 +24,17 @@ test('scope', t => {
 
   const plugin1 = { id: '1', listeners: {} }
   const plugin2 = { id: '2', listeners: {} }
-  const plugin3 = { id: '3', listeners: {}, before: '2' }
+  const plugin3 = { id: '3', listeners: {}, before: ['2'] }
+  const plugin4 = { id: '4', listeners: {}, before: ['2', '3'] }
 
   const initialListeners = scope.listenerMaps.map(l => l.id)
 
   scope.usePlugin(plugin1)
   scope.usePlugin(plugin2)
   scope.usePlugin(plugin3)
+  scope.usePlugin(plugin4)
 
-  t.deepEqual(scope.listenerMaps.map(l => l.id), [...initialListeners, '1', '3', '2'])
+  t.deepEqual(scope.listenerMaps.map(l => l.id), [...initialListeners, '1', '4', '3', '2'])
 
   t.end()
 })
