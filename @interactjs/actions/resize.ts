@@ -123,132 +123,66 @@ function install (scope: Scope) {
   defaults.actions.resize = resize.defaults
 }
 
-const resize: Interact.Plugin = {
-  id: 'actions/resize',
-  before: ['actions/drag'],
-  install,
-  listeners: {
-    'interactions:new': ({ interaction }) => {
-      interaction.resizeAxes = 'xy'
-    },
+function resizeChecker (arg) {
+  const { interaction, interactable, element, rect, buttons } = arg
 
-    'interactions:action-start': arg => {
-      start(arg)
-      updateEventAxes(arg)
-    },
-    'interactions:action-move': arg => {
-      move(arg)
-      updateEventAxes(arg)
-    },
-    'interactions:action-end': end,
-  },
+  if (!rect) { return undefined }
 
-  defaults: {
-    square: false,
-    preserveAspectRatio: false,
-    axis: 'xy',
+  const page = extend({}, interaction.coords.cur.page)
+  const resizeOptions = interactable.options.resize
 
-    // use default margin
-    margin: NaN,
-
-    // object with props left, right, top, bottom which are
-    // true/false values to resize when the pointer is over that edge,
-    // CSS selectors to match the handles for each direction
-    // or the Elements for each handle
-    edges: null,
-
-    // a value of 'none' will limit the resize rect to a minimum of 0x0
-    // 'negate' will alow the rect to have negative width/height
-    // 'reposition' will keep the width/height positive by swapping
-    // the top and bottom edges and/or swapping the left and right edges
-    invert: 'none',
-  } as Interact.ResizableOptions,
-
-  checker (
-    _pointer: Interact.PointerType,
-    _event: Interact.PointerEventType,
-    interactable: Interact.Interactable,
-    element: Interact.Element,
-    interaction: Interaction,
-    rect: Interact.Rect,
+  if (
+    !(resizeOptions && resizeOptions.enabled) ||
+    // check mouseButton setting if the pointer is down
+    (interaction.pointerIsDown &&
+     /mouse|pointer/.test(interaction.pointerType) &&
+   (buttons & resizeOptions.mouseButtons) === 0)
   ) {
-    if (!rect) { return null }
+    return undefined
+  }
 
-    const page = extend({}, interaction.coords.cur.page)
-    const options = interactable.options
-
-    if (options.resize.enabled) {
-      const resizeOptions = options.resize
-      const resizeEdges = {
-        left: false,
-        right: false,
-        top: false,
-        bottom: false,
-      }
-
-      // if using resize.edges
-      if (is.object(resizeOptions.edges)) {
-        for (const edge in resizeEdges) {
-          resizeEdges[edge] = checkResizeEdge(edge,
-            resizeOptions.edges[edge],
-            page,
-            interaction._latestPointer.eventTarget,
-            element,
-            rect,
-            resizeOptions.margin || this.defaultMargin)
-        }
-
-        resizeEdges.left = resizeEdges.left && !resizeEdges.right
-        resizeEdges.top  = resizeEdges.top  && !resizeEdges.bottom
-
-        if (resizeEdges.left || resizeEdges.right || resizeEdges.top || resizeEdges.bottom) {
-          return {
-            name: 'resize',
-            edges: resizeEdges,
-          }
-        }
-      }
-      else {
-        const right  = options.resize.axis !== 'y' && page.x > (rect.right  - this.defaultMargin)
-        const bottom = options.resize.axis !== 'x' && page.y > (rect.bottom - this.defaultMargin)
-
-        if (right || bottom) {
-          return {
-            name: 'resize',
-            axes: (right ? 'x' : '') + (bottom ? 'y' : ''),
-          }
-        }
-      }
+  // if using resize.edges
+  if (is.object(resizeOptions.edges)) {
+    const resizeEdges = {
+      left: false,
+      right: false,
+      top: false,
+      bottom: false,
     }
 
-    return null
-  },
-
-  cursors: null as ReturnType<typeof initCursors>,
-
-  getCursor ({ edges, axis, name }: Interact.ActionProps) {
-    const cursors = resize.cursors
-    let result: string = null
-
-    if (axis) {
-      result = cursors[name + axis]
+    for (const edge in resizeEdges) {
+      resizeEdges[edge] = checkResizeEdge(edge,
+        resizeOptions.edges[edge],
+        page,
+        interaction._latestPointer.eventTarget,
+        element,
+        rect,
+        resizeOptions.margin || resize.defaultMargin)
     }
-    else if (edges) {
-      let cursorKey = ''
 
-      for (const edge of ['top', 'bottom', 'left', 'right']) {
-        if (edges[edge]) {
-          cursorKey += edge
-        }
+    resizeEdges.left = resizeEdges.left && !resizeEdges.right
+    resizeEdges.top  = resizeEdges.top  && !resizeEdges.bottom
+
+    if (resizeEdges.left || resizeEdges.right || resizeEdges.top || resizeEdges.bottom) {
+      arg.action = {
+        name: ActionName.Resize,
+        edges: resizeEdges,
       }
-
-      result = cursors[cursorKey]
     }
+  }
+  else {
+    const right  = resizeOptions.axis !== 'y' && page.x > (rect.right  - resize.defaultMargin)
+    const bottom = resizeOptions.axis !== 'x' && page.y > (rect.bottom - resize.defaultMargin)
 
-    return result
-  },
+    if (right || bottom) {
+      arg.action = {
+        name: 'resize',
+        axes: (right ? 'x' : '') + (bottom ? 'y' : ''),
+      }
+    }
+  }
 
-  defaultMargin: null as number,
+  return arg.action ? false : undefined
 }
 
 function resizable (interactable: Interact.Interactable, options: Interact.OrBoolean<Interact.ResizableOptions> | boolean, scope: Scope) {
@@ -469,6 +403,75 @@ function updateEventAxes ({ iEvent, interaction }: { iEvent: ResizeEvent, intera
       iEvent.delta.x = 0
     }
   }
+}
+
+const resize: Interact.Plugin = {
+  id: 'actions/resize',
+  before: ['actions/drag'],
+  install,
+  listeners: {
+    'interactions:new': ({ interaction }) => {
+      interaction.resizeAxes = 'xy'
+    },
+
+    'interactions:action-start': arg => {
+      start(arg)
+      updateEventAxes(arg)
+    },
+    'interactions:action-move': arg => {
+      move(arg)
+      updateEventAxes(arg)
+    },
+    'interactions:action-end': end,
+    'auto-start:check': resizeChecker,
+  },
+
+  defaults: {
+    square: false,
+    preserveAspectRatio: false,
+    axis: 'xy',
+
+    // use default margin
+    margin: NaN,
+
+    // object with props left, right, top, bottom which are
+    // true/false values to resize when the pointer is over that edge,
+    // CSS selectors to match the handles for each direction
+    // or the Elements for each handle
+    edges: null,
+
+    // a value of 'none' will limit the resize rect to a minimum of 0x0
+    // 'negate' will alow the rect to have negative width/height
+    // 'reposition' will keep the width/height positive by swapping
+    // the top and bottom edges and/or swapping the left and right edges
+    invert: 'none',
+  } as Interact.ResizableOptions,
+
+  cursors: null as ReturnType<typeof initCursors>,
+
+  getCursor ({ edges, axis, name }: Interact.ActionProps) {
+    const cursors = resize.cursors
+    let result: string = null
+
+    if (axis) {
+      result = cursors[name + axis]
+    }
+    else if (edges) {
+      let cursorKey = ''
+
+      for (const edge of ['top', 'bottom', 'left', 'right']) {
+        if (edges[edge]) {
+          cursorKey += edge
+        }
+      }
+
+      result = cursors[cursorKey]
+    }
+
+    return result
+  },
+
+  defaultMargin: null as number,
 }
 
 export default resize

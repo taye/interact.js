@@ -38,14 +38,6 @@ function install (scope: Scope) {
     defaults,
   } = scope
 
-  scope.addListeners({
-    'interactions:before-action-move': beforeMove,
-    'interactions:action-resume': beforeMove,
-
-    // dragmove
-    'interactions:action-move': move,
-  })
-
   Interactable.prototype.draggable = drag.draggable
 
   actions[ActionName.Drag] = drag
@@ -164,6 +156,36 @@ const draggable: DraggableMethod = function draggable (this: Interact.Interactab
 const drag: Interact.Plugin = {
   id: 'actions/drag',
   install,
+  listeners: {
+    'interactions:before-action-move': beforeMove,
+    'interactions:action-resume': beforeMove,
+
+    // dragmove
+    'interactions:action-move': move,
+    'auto-start:check': arg => {
+      const { interaction, interactable, buttons } = arg
+      const dragOptions = interactable.options.drag
+
+      if (
+        !(dragOptions && dragOptions.enabled) ||
+        // check mouseButton setting if the pointer is down
+        (interaction.pointerIsDown &&
+         /mouse|pointer/.test(interaction.pointerType) &&
+       (buttons & interactable.options.drag.mouseButtons) === 0)
+      ) {
+        return undefined
+      }
+
+      arg.action = {
+        name: ActionName.Drag,
+        axis: (dragOptions.lockAxis === 'start'
+          ? dragOptions.startAxis
+          : dragOptions.lockAxis),
+      }
+
+      return false
+    },
+  },
   draggable,
   beforeMove,
   move,
@@ -171,19 +193,6 @@ const drag: Interact.Plugin = {
     startAxis : 'xy',
     lockAxis  : 'xy',
   } as Interact.DropzoneOptions,
-
-  checker (_pointer, _event, interactable) {
-    const dragOptions = interactable.options.drag
-
-    return dragOptions.enabled
-      ? {
-        name: 'drag',
-        axis: (dragOptions.lockAxis === 'start'
-          ? dragOptions.startAxis
-          : dragOptions.lockAxis),
-      }
-      : null
-  },
 
   getCursor () {
     return 'move'

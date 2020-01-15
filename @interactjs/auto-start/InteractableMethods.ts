@@ -1,11 +1,15 @@
-import { Actions } from '@interactjs/core/scope'
 import { warnOnce } from '@interactjs/utils/index'
 import * as is from '@interactjs/utils/is'
 
 declare module '@interactjs/core/Interactable' {
   interface Interactable {
-    getAction: typeof getAction
-    defaultActionChecker: (pointer: any, event: any, interaction: any, element: any) => any
+    getAction: (
+      this: Interact.Interactable,
+      pointer: Interact.PointerType,
+      event: Interact.PointerEventType,
+      interaction: Interact.Interaction,
+      element: Interact.Element,
+    ) => Interact.ActionProps | null
     styleCursor: typeof styleCursor
     actionChecker: typeof actionChecker
     ignoreFrom: (...args: any) => boolean
@@ -23,10 +27,23 @@ function install (scope: Interact.Scope) {
   const {
     /** @lends Interactable */
     Interactable, // tslint:disable-line no-shadowed-variable
-    actions,
   } = scope
 
-  Interactable.prototype.getAction = getAction
+  Interactable.prototype.getAction = function getAction (
+    this: Interact.Interactable,
+    pointer: Interact.PointerType,
+    event: Interact.PointerEventType,
+    interaction: Interact.Interaction,
+    element: Interact.Element,
+  ): Interact.ActionProps {
+    const action = defaultActionChecker(this, event, interaction, element, scope)
+
+    if (this.options.actionChecker) {
+      return this.options.actionChecker(pointer, event, action, this, element, interaction)
+    }
+
+    return action
+  }
 
   /**
    * ```js
@@ -128,35 +145,14 @@ function install (scope: Interact.Scope) {
    * @return {boolean | Interactable} The current setting or this Interactable
    */
   Interactable.prototype.styleCursor = styleCursor
-
-  Interactable.prototype.defaultActionChecker = function (this: Interact.Interactable, pointer, event, interaction, element) {
-    return defaultActionChecker(this, pointer, event, interaction, element, actions)
-  }
-}
-
-function getAction<T extends Interact.ActionName> (
-  this: Interact.Interactable,
-  pointer: Interact.PointerType,
-  event: Interact.PointerEventType,
-  interaction: Interact.Interaction,
-  element: Interact.Element,
-): Interact.ActionProps<T> {
-  const action = this.defaultActionChecker(pointer, event, interaction, element)
-
-  if (this.options.actionChecker) {
-    return this.options.actionChecker(pointer, event, action, this, element, interaction)
-  }
-
-  return action
 }
 
 function defaultActionChecker (
   interactable: Interact.Interactable,
-  pointer: Interact.PointerType,
   event: Interact.PointerEventType,
   interaction: Interact.Interaction,
   element: Interact.Element,
-  actions: Actions,
+  scope: Interact.Scope,
 ) {
   const rect = interactable.getRect(element)
   const buttons = (event as MouseEvent).buttons || ({
@@ -165,22 +161,18 @@ function defaultActionChecker (
     3: 8,
     4: 16,
   })[(event as MouseEvent).button as 0 | 1 | 3 | 4]
-  let action = null
-
-  for (const actionName of actions.names) {
-    // check mouseButton setting if the pointer is down
-    if (interaction.pointerIsDown &&
-        /mouse|pointer/.test(interaction.pointerType) &&
-      (buttons & interactable.options[actionName].mouseButtons) === 0) {
-      continue
-    }
-
-    action = actions[actionName].checker(pointer, event, interactable, element, interaction, rect)
-
-    if (action) {
-      return action
-    }
+  const arg = {
+    action: null,
+    interactable,
+    interaction,
+    element,
+    rect,
+    buttons,
   }
+
+  scope.fire('auto-start:check', arg)
+
+  return arg.action
 }
 
 function styleCursor (this: Interact.Interactable, newValue?: boolean) {

@@ -2,6 +2,7 @@ import test from '@interactjs/_dev/test/test'
 import { ActionName } from '@interactjs/core/scope'
 import * as helpers from '@interactjs/core/tests/_helpers'
 import * as utils from '@interactjs/utils/index'
+import { coordsToEvent, newCoords } from '@interactjs/utils/pointerUtils'
 import gesture from './gesture'
 
 function getGestureProps (event: Interact.GestureEvent) {
@@ -21,49 +22,53 @@ test('gesture action init', t => {
 })
 
 test('Interactable.gesturable method', t => {
-  const scope: Interact.Scope = helpers.mockScope()
+  const rect = Object.freeze({ top: 100, left: 200, bottom: 300, right: 400 })
+  const {
+    scope,
+    interaction,
+    interactable,
+    target: element,
+    coords,
+    down,
+    start,
+    move,
+  } = helpers.testEnv({ plugins: [gesture], rect })
+  const events: Interact.GestureEvent[] = []
+  const event2 = coordsToEvent(newCoords())
+  event2.coords.pointerId = 2
 
   scope.usePlugin(gesture)
 
-  const interaction = scope.interactions.new({})
-  const element = scope.document.body
-  const interactable = scope.interactables.new(element).gesturable(true)
-  const rect = Object.freeze({ top: 100, left: 200, bottom: 300, right: 400 })
-  const touches = [
-    utils.pointer.coordsToEvent(utils.pointer.newCoords()),
-    utils.pointer.coordsToEvent(utils.pointer.newCoords()),
-  ].map(
-    (touch, index) => Object.assign(touch.coords, {
-      pointerId: index,
-      client: touch.page,
-    }) && touch,
-  )
-  const events: Interact.GestureEvent[] = []
-
   interactable.rectChecker(() => ({ ...rect }))
+  interactable.gesturable(true)
   interactable.on('gesturestart gesturemove gestureend', (event: Interact.GestureEvent) => {
     events.push(event)
   })
+  interaction.pointerType = 'touch'
 
   // 0 --> 1
-  utils.extend(touches[0].page, { x: 0, y: 0 })
-  utils.extend(touches[1].page, { x: 100, y: 0 })
+  utils.extend(coords.page, { x: 0, y: 0 })
+  utils.extend(event2.coords.page, { x: 100, y: 0 })
 
-  interaction.pointerDown(touches[0], touches[0], element)
+  const checkArg = {
+    action: null,
+    interactable,
+    interaction,
+    element,
+    rect,
+    buttons: 0,
+  }
 
-  t.notOk(
-    gesture.checker(touches[0], touches[0], interactable, element, interaction),
-    'not allowed with 1 pointer',
-  )
+  down()
 
-  interaction.pointerDown(touches[1], touches[1], element)
+  scope.fire('auto-start:check', checkArg)
+  t.notOk(checkArg.action, 'not allowed with 1 pointer')
 
-  t.ok(
-    gesture.checker(touches[1], touches[1], interactable, element, interaction),
-    'allowed with 2 pointers',
-  )
+  interaction.pointerDown(event2, event2, element)
+  scope.fire('auto-start:check', checkArg)
+  t.ok(checkArg.action, 'allowed with 2 pointers')
 
-  interaction.start({ name: ActionName.Gesture }, interactable, element)
+  start({ name: ActionName.Gesture })
 
   t.deepEqual(
     interaction.gesture,
@@ -92,9 +97,8 @@ test('Interactable.gesturable method', t => {
   // |
   // v
   // 1
-  utils.extend(touches[1].page, { x: 0, y: 50 })
-
-  interaction.pointerMove(touches[1], touches[1], element)
+  utils.extend(event2.coords.page, { x: 0, y: 50 })
+  interaction.pointerMove(event2, event2, element)
 
   t.deepEqual(
     interaction.gesture,
@@ -120,8 +124,8 @@ test('Interactable.gesturable method', t => {
     'move event properties are correct')
 
   // 1 <-- 0
-  utils.extend(touches[0].page, { x: 50, y: 50 })
-  interaction.pointerMove(touches[0], touches[0], element)
+  utils.extend(coords.page, { x: 50, y: 50 })
+  move()
 
   t.deepEqual(
     interaction.gesture,
@@ -146,7 +150,7 @@ test('Interactable.gesturable method', t => {
     },
     'move event properties are correct')
 
-  interaction.pointerUp(touches[1], touches[1], element, element)
+  interaction.pointerUp(event2, event2, element, element)
 
   t.deepEqual(
     interaction.gesture,
@@ -175,12 +179,14 @@ test('Interactable.gesturable method', t => {
   // |
   // v
   // 1
-  interaction.pointerDown(touches[1], touches[1], element)
-  utils.extend(touches[0].page, { x: 0, y: -150 })
-  interaction.pointerMove(touches[1], touches[1], element)
+  interaction.pointerDown(event2, event2, element)
+  utils.extend(coords.page, { x: 0, y: -150 })
+  checkArg.action = null
+  scope.fire('auto-start:check', checkArg)
+  interaction.pointerMove(event2, event2, element)
 
   t.ok(
-    gesture.checker(touches[0], touches[0], interactable, element, interaction),
+    checkArg.action,
     'not allowed with re-added second pointers',
   )
 

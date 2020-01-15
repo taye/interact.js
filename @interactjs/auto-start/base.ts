@@ -12,6 +12,12 @@ declare module '@interactjs/core/scope' {
     autoStart: AutoStart
     maxInteractions: (...args: any) => any
   }
+
+  interface SignalArgs {
+    'autoStart:before-start': Interact.SignalArgs['interactions:move']
+    'autoStart:prepared': { interaction: Interact.Interaction }
+    'auto-start:check': CheckSignalArg
+  }
 }
 
 declare module '@interactjs/core/defaultOptions' {
@@ -35,11 +41,12 @@ declare module '@interactjs/core/defaultOptions' {
   }
 }
 
-declare module '@interactjs/core/scope' {
-  interface SignalArgs {
-    'autoStart:before-start': Interact.SignalArgs['interactions:move']
-    'autoStart:prepared': { interaction: Interact.Interaction }
-  }
+interface CheckSignalArg {
+  interactable: Interact.Interactable
+  interaction: Interact.Interaction
+  element: Interact.Element
+  action: Interact.ActionProps
+  buttons: number
 }
 
 export interface AutoStart {
@@ -163,7 +170,7 @@ function validateAction<T extends Interact.ActionName> (
   return null
 }
 
-function validateMatches<T extends Interact.ActionName> (
+function validateMatches (
   interaction: Interact.Interaction,
   pointer: Interact.PointerType,
   event: Interact.PointerEventType,
@@ -175,7 +182,7 @@ function validateMatches<T extends Interact.ActionName> (
   for (let i = 0, len = matches.length; i < len; i++) {
     const match = matches[i]
     const matchElement = matchElements[i]
-    const matchAction = match.getAction<T>(pointer, event, interaction, matchElement)
+    const matchAction = match.getAction(pointer, event, interaction, matchElement)
 
     if (!matchAction) { continue }
 

@@ -10,15 +10,25 @@ test('resize', t => {
     scope,
     interactable,
     interaction,
-    event,
     coords,
     target,
+    down,
+    start,
+    move,
   } = helpers.testEnv({
     plugins: [resize],
     rect,
   })
 
   const element = target as HTMLElement
+  const checkArg = {
+    action: null,
+    interactable,
+    interaction,
+    element,
+    rect,
+    buttons: 0,
+  }
 
   t.ok(scope.actions.names.includes('resize' as any), '"resize" in actions.names')
   t.equal(scope.actions.methodDict.resize, 'resizable')
@@ -31,10 +41,10 @@ test('resize', t => {
   })
 
   // resize top left
-  interaction.updatePointer(event, event, element, true)
-
+  down()
+  scope.fire('auto-start:check', checkArg)
   t.deepEqual(
-    resize.checker(event, event, interactable, element, interaction, rect),
+    checkArg.action,
     {
       name: 'resize',
       edges: { left: true, top: true, right: false, bottom: false },
@@ -44,10 +54,11 @@ test('resize', t => {
 
   // resize top right
   coords.page.x = 10
-  interaction.updatePointer(event, event, element, true)
+  move()
 
+  scope.fire('auto-start:check', checkArg)
   t.deepEqual(
-    resize.checker(event, event, interactable, element, interaction, rect),
+    checkArg.action,
     {
       name: 'resize',
       edges: { left: false, top: true, right: true, bottom: false },
@@ -57,10 +68,11 @@ test('resize', t => {
 
   // resize bottom right
   coords.page.y = 10
-  interaction.updatePointer(event, event, element, true)
+  move()
 
+  scope.fire('auto-start:check', checkArg)
   t.deepEqual(
-    resize.checker(event, event, interactable, element, interaction, rect),
+    checkArg.action,
     {
       name: 'resize',
       edges: { left: false, top: false, right: true, bottom: true },
@@ -77,8 +89,8 @@ test('resize', t => {
 
   coords.page.x = rect.right
   coords.page.y = rect.bottom
-  interaction.pointerDown(event, event, element)
-  interaction.start({ name: 'resize', edges: { bottom: true, right: true } }, interactable, element)
+  down()
+  start({ name: 'resize', edges: { bottom: true, right: true } })
 
   t.deepEqual(
     interaction._rects,
@@ -100,7 +112,7 @@ test('resize', t => {
   coords.page.x = -100
   coords.page.y = -200
   resizeEvent = null
-  interaction.pointerMove(event, event, element)
+  move()
 
   t.deepEqual(
     interaction._rects,

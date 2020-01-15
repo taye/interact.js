@@ -117,48 +117,6 @@ function install (scope: Scope) {
   defaults.actions.gesture = gesture.defaults
 }
 
-const gesture: Interact.Plugin = {
-  id: 'actions/gesture',
-  before: ['actions/drag', 'actions/resize'],
-  install,
-  listeners: {
-    'interactions:action-start': updateGestureProps,
-    'interactions:action-move': updateGestureProps,
-    'interactions:action-end': updateGestureProps,
-
-    'interactions:new': ({ interaction }) => {
-      interaction.gesture = {
-        angle: 0,
-        distance: 0,
-        scale: 1,
-        startAngle: 0,
-        startDistance: 0,
-      }
-    },
-  },
-
-  defaults: {
-  },
-
-  checker (
-    _pointer: Interact.PointerType,
-    _event: Interact.PointerEventType,
-    _interactable: Interact.Interactable,
-    _element: Interact.Element,
-    interaction: { pointers: { length: number } },
-  ) {
-    if (interaction.pointers.length >= 2) {
-      return { name: 'gesture' }
-    }
-
-    return null
-  },
-
-  getCursor () {
-    return ''
-  },
-}
-
 function updateGestureProps ({ interaction, iEvent, event, phase }: GestureSignalArg) {
   if (interaction.prepared.name !== 'gesture') { return }
 
@@ -208,6 +166,50 @@ function updateGestureProps ({ interaction, iEvent, event, phase }: GestureSigna
       !isNaN(iEvent.scale)) {
     interaction.gesture.scale = iEvent.scale
   }
+}
+
+const gesture: Interact.Plugin = {
+  id: 'actions/gesture',
+  before: ['actions/drag', 'actions/resize'],
+  install,
+  listeners: {
+    'interactions:action-start': updateGestureProps,
+    'interactions:action-move': updateGestureProps,
+    'interactions:action-end': updateGestureProps,
+
+    'interactions:new': ({ interaction }) => {
+      interaction.gesture = {
+        angle: 0,
+        distance: 0,
+        scale: 1,
+        startAngle: 0,
+        startDistance: 0,
+      }
+    },
+
+    'auto-start:check': arg => {
+      if (arg.interaction.pointers.length < 2) {
+        return undefined
+      }
+
+      const gestureOptions = arg.interactable.options.gesture
+
+      if (!(gestureOptions && gestureOptions.enabled)) {
+        return undefined
+      }
+
+      arg.action = { name: ActionName.Gesture }
+
+      return false
+    },
+  },
+
+  defaults: {
+  },
+
+  getCursor () {
+    return ''
+  },
 }
 
 export default gesture
