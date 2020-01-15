@@ -125,6 +125,7 @@ function install (scope: Scope) {
 
 const resize: Interact.Plugin = {
   id: 'actions/resize',
+  before: ['actions/drag'],
   install,
   listeners: {
     'interactions:new': ({ interaction }) => {

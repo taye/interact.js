@@ -354,8 +354,9 @@ function setInteractionCursor<T extends Interact.ActionName> (interaction: Inter
   setCursor(interaction.element, cursor || '', scope)
 }
 
-export default {
+const autoStart: Interact.Plugin = {
   id: 'auto-start/base',
+  before: ['actions', 'action/drag', 'actions/resize', 'actions/gesture'],
   install,
   listeners: {
     'interactions:down': prepareOnDown,
@@ -365,8 +366,9 @@ export default {
     },
     'interactions:stop': clearCursorOnStop,
   },
-  before: ['ations'],
   maxInteractions,
   withinInteractionLimit,
   validateAction,
 } as Interact.Plugin
+
+export default autoStart

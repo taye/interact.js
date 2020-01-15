@@ -119,6 +119,7 @@ function install (scope: Scope) {
 
 const gesture: Interact.Plugin = {
   id: 'actions/gesture',
+  before: ['actions/drag', 'actions/resize'],
   install,
   listeners: {
     'interactions:action-start': updateGestureProps,
