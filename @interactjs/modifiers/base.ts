@@ -14,7 +14,7 @@ declare module '@interactjs/core/Interaction' {
       startOffset: Interact.Rect
       startDelta: Interact.Point
       result?: ModifiersResult
-      endPrevented: boolean
+      endResult: Interact.Point | void
     }
   }
 }
@@ -42,7 +42,7 @@ export interface Modifier<
   methods: {
     start?: (arg: ModifierArg<State>) => void
     set: (arg: ModifierArg<State>) => void
-    beforeEnd?: (arg: ModifierArg<State>) => boolean
+    beforeEnd?: (arg: ModifierArg<State>) => Interact.Point | void
     stop?: (arg: ModifierArg<State>) => void
   }
   name?: Name
@@ -85,7 +85,7 @@ export interface ModifierModule<
   defaults?: Defaults
   start? (arg: ModifierArg<State>): void
   set? (arg: ModifierArg<State>): any
-  beforeEnd? (arg: ModifierArg<State>): boolean
+  beforeEnd? (arg: ModifierArg<State>): Interact.Point | void
   stop? (arg: ModifierArg<State>): void
 }
 
@@ -299,10 +299,10 @@ function beforeEnd (arg: Interact.DoPhaseArg & { noPreEnd?: boolean, state?: Mod
     arg.state = state
     const { options, methods } = state
 
-    const endResult = methods.beforeEnd && methods.beforeEnd(arg as unknown as ModifierArg)
+    const endPosition = methods.beforeEnd && methods.beforeEnd(arg as unknown as ModifierArg)
 
-    if (endResult === false) {
-      interaction.modifiers.endPrevented = true
+    if (endPosition) {
+      interaction.modifiers.endResult = endPosition
       return false
     }
 
@@ -337,7 +337,7 @@ function stop (arg: { interaction: Interact.Interaction, phase: Interact.EventPh
   }
 
   arg.interaction.modifiers.states = null
-  arg.interaction.modifiers.endPrevented = null
+  arg.interaction.modifiers.endResult = null
 }
 
 function getModifierList (interaction) {
@@ -522,7 +522,7 @@ const modifiersBase: Interact.Plugin = {
         startOffset: { left: 0, right: 0, top: 0, bottom: 0 },
         states: null,
         result: null,
-        endPrevented: false,
+        endResult: null,
         startDelta: null,
       }
     },
