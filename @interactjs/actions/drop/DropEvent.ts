@@ -66,10 +66,7 @@ class DropEvent extends BaseEvent {
       const index = arr.findIndex(activeDrops, ({ dropzone, element }) =>
         dropzone === this.dropzone && element === this.target)
 
-      dropState.activeDrops = [
-        ...activeDrops.slice(0, index),
-        ...activeDrops.slice(index + 1),
-      ]
+      dropState.activeDrops.splice(index, 1)
 
       const deactivateEvent = new DropEvent(dropState, this.dragEvent, 'dropdeactivate')
 

@@ -1,14 +1,11 @@
 import test from '@interactjs/_dev/test/test'
 import * as helpers from '@interactjs/core/tests/_helpers'
-import * as pointerUtils from '@interactjs/utils/pointerUtils'
-import drag from '../drag'
 import drop from '../drop/index'
 
 test('actions/drop options', t => {
-  const scope = helpers.mockScope()
-  scope.usePlugin(drop)
-
-  const interactable = scope.interactables.new({ pointerType: 'test' } as any)
+  const {
+    interactable,
+  } = helpers.testEnv({ plugins: [drop] })
 
   const funcs = Object.freeze({
     drop () {},
@@ -34,34 +31,81 @@ test('actions/drop options', t => {
 })
 
 test('actions/drop start', t => {
-  const scope: Interact.Scope = helpers.mockScope()
-  scope.interact = {} as any
-  scope.usePlugin(drag)
-  scope.usePlugin(drop)
+  const {
+    scope,
+    interactable,
+    down,
+    start,
+    move,
+    interaction,
+  } = helpers.testEnv({ plugins: [drop] })
 
-  let interaction
-  const draggable = scope.interactables.new(scope.document.body).draggable({})
-
-  const event = pointerUtils.coordsToEvent(pointerUtils.newCoords())
+  interactable.draggable({})
+  const dropzone = scope.interactables.new('[data-drop]').dropzone({})
 
   t.doesNotThrow(() => {
     scope.interact.dynamicDrop(false)
 
-    interaction = scope.interactions.new({})
-    interaction.pointerDown(event, event, scope.document.body)
-    interaction.start({ name: 'drag' }, draggable, scope.document.documentElement)
-    interaction.move()
+    down()
+    start({ name: 'drag' })
+    move()
     interaction.end()
   }, 'no error with dynamicDrop === false')
 
   t.doesNotThrow(() => {
-    interaction = scope.interactions.new({})
     scope.interact.dynamicDrop(true)
-    interaction.pointerDown(event, event, scope.document.body)
-    interaction.start({ name: 'drag' }, draggable, scope.document.documentElement)
-    interaction.move()
+    down()
+    start({ name: 'drag' })
+    move()
     interaction.end()
   }, 'no error with dynamicDrop === true')
+
+  for (const i of [0, 1, 2]) {
+    const dropEl = scope.document.createElement('div')
+
+    dropEl.dataset.drop = `${i}`
+    scope.document.body.appendChild(dropEl)
+  }
+
+  dropzone.on('dropactivate', event => {
+    if (event.target.dataset.drop === '0') {
+      event.reject()
+    }
+  })
+
+  let activated = []
+  const deactivated = []
+
+  scope.addListeners({
+    'actions/drop:start' ({ interaction: { dropState } }) {
+      activated = dropState.activeDrops.map(d => d.element.dataset.drop)
+    },
+  })
+
+  dropzone.on('dropdeactivate', event => {
+    deactivated.push(event.target)
+  })
+
+  down()
+  start({ name: 'drag' })
+  move()
+
+  t.deepEqual(
+    interaction.dropState.activeDrops.map(d => d.element.dataset.drop),
+    ['1', '2'],
+    'rejected dropzones are removed from activeDrops')
+
+  t.deepEqual(
+    activated,
+    ['1', '2'],
+    'actions/drop:start is fired with activeDrops')
+
+  t.deepEqual(
+    deactivated.map(d => d.dataset.drop),
+    ['0'],
+    'rejected dropzones are deactivated')
+
+  interaction.end()
 
   t.end()
 })

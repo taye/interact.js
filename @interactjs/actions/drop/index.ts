@@ -1,6 +1,6 @@
 import Interactable from '@interactjs/core/Interactable'
 import InteractEvent from '@interactjs/core/InteractEvent'
-import { Scope, ActionName } from '@interactjs/core/scope'
+import { ActionName, Scope } from '@interactjs/core/scope'
 import * as utils from '@interactjs/utils/index'
 import drag from '../drag'
 import DropEvent from './DropEvent'
@@ -52,9 +52,20 @@ declare module '@interactjs/core/defaultOptions' {
   }
 }
 
+interface DropSignalArg {
+  interaction: Interact.Interaction
+  dragEvent: Interact.DragEvent
+}
+
 declare module '@interactjs/core/scope' {
   interface Scope {
     dynamicDrop?: boolean
+  }
+
+  interface SignalArgs {
+    'actions/drop:start': DropSignalArg
+    'actions/drop:move': DropSignalArg
+    'actions/drop:end': DropSignalArg
   }
 }
 
@@ -206,7 +217,7 @@ function collectDrops ({ interactables }, draggableElement) {
 
 function fireActivationEvents (activeDrops, event) {
   // loop through all active dropzones and trigger event
-  for (const { dropzone, element } of activeDrops) {
+  for (const { dropzone, element } of activeDrops.slice()) {
     event.dropzone = dropzone
 
     // set current element as event target
@@ -469,7 +480,7 @@ function dropCheckMethod (
   return dropped
 }
 
-const drop = {
+const drop: Interact.Plugin = {
   id: 'actions/drop',
   install,
   listeners: {
@@ -504,6 +515,7 @@ const drop = {
 
       if (dropState.events.activate) {
         fireActivationEvents(dropState.activeDrops, dropState.events.activate)
+        scope.fire('actions/drop:start', { interaction, dragEvent })
       }
     },
 
@@ -511,17 +523,20 @@ const drop = {
     'interactions:action-move': onEventCreated,
     'interactions:action-end': onEventCreated,
 
-    'interactions:after-action-move': function fireDropAfterMove ({ interaction }) {
+    'interactions:after-action-move': function fireDropAfterMove ({ interaction, iEvent: dragEvent }, scope) {
       if (interaction.prepared.name !== 'drag') { return }
 
       fireDropEvents(interaction, interaction.dropState.events)
+
+      scope.fire('actions/drop:move', { interaction, dragEvent })
       interaction.dropState.events = {}
     },
 
-    'interactions:after-action-end': ({ interaction }) => {
+    'interactions:after-action-end': ({ interaction, iEvent: dragEvent }, scope) => {
       if (interaction.prepared.name !== 'drag') { return }
 
       fireDropEvents(interaction, interaction.dropState.events)
+      scope.fire('actions/drop:end', { interaction, dragEvent })
     },
 
     'interactions:stop': ({ interaction }) => {
