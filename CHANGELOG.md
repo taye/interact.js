@@ -1,3 +1,7 @@
+## v1.8.0-rc.2
+
+ - refactoring
+
 ## v1.8.0-rc.1
 
  - fixed `interact.snappers.grid` arg typings
