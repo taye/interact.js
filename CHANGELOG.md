@@ -1,3 +1,7 @@
+## v1.8.0-rc.3
+
+ - fixed incorrect publish
+
 ## v1.8.0-rc.2
 
  - refactoring
