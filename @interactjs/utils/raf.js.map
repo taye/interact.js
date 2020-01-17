@@ -1,0 +1,31 @@
+{
+	"version": 3,
+	"sources": [
+		"raf.ts"
+	],
+	"names": [
+		"lastTime",
+		"request",
+		"cancel",
+		"init",
+		"window",
+		"requestAnimationFrame",
+		"cancelAnimationFrame",
+		"vendors",
+		"vendor",
+		"callback",
+		"currTime",
+		"Date",
+		"now",
+		"timeToCall",
+		"Math",
+		"max",
+		"token",
+		"setTimeout",
+		"clearTimeout"
+	],
+	"mappings": "AAAA,IAAIA,QAAQ,GAAG,CAAf;AACA,IAAIC,OAAJ;AACA,IAAIC,MAAJ;;AAEA,SAASC,IAAT,CAAeC,MAAf,EAAuB;AACrBH,EAAAA,OAAO,GAAGG,MAAM,CAACC,qBAAjB;AACAH,EAAAA,MAAM,GAAGE,MAAM,CAACE,oBAAhB;;AAEA,MAAI,CAACL,OAAL,EAAc;AACZ,UAAMM,OAAO,GAAG,CAAC,IAAD,EAAO,KAAP,EAAc,QAAd,EAAwB,GAAxB,CAAhB;;AAEA,SAAK,MAAMC,MAAX,IAAqBD,OAArB,EAA8B;AAC5BN,MAAAA,OAAO,GAAGG,MAAM,CAAE,GAAEI,MAAO,uBAAX,CAAhB;AACAN,MAAAA,MAAM,GAAGE,MAAM,CAAE,GAAEI,MAAO,sBAAX,CAAN,IAA2CJ,MAAM,CAAE,GAAEI,MAAO,6BAAX,CAA1D;AACD;AACF;;AAED,MAAI,CAACP,OAAL,EAAc;AACZA,IAAAA,OAAO,GAAGQ,QAAQ,IAAI;AACpB,YAAMC,QAAQ,GAAGC,IAAI,CAACC,GAAL,EAAjB;AACA,YAAMC,UAAU,GAAGC,IAAI,CAACC,GAAL,CAAS,CAAT,EAAY,MAAML,QAAQ,GAAGV,QAAjB,CAAZ,CAAnB,CAFoB,CAGpB;;AACA,YAAMgB,KAAK,GAAGC,UAAU,CAAC,MAAM;AAAER,QAAAA,QAAQ,CAACC,QAAQ,GAAGG,UAAZ,CAAR;AAAiC,OAA1C,EACtBA,UADsB,CAAxB;AAGAb,MAAAA,QAAQ,GAAGU,QAAQ,GAAGG,UAAtB;AACA,aAAOG,KAAP;AACD,KATD;;AAWAd,IAAAA,MAAM,GAAGc,KAAK,IAAIE,YAAY,CAACF,KAAD,CAA9B;AACD;AACF;;AAED,eAAe;AACbf,EAAAA,OAAO,EAAEQ,QAAQ,IAAIR,OAAO,CAACQ,QAAD,CADf;AAEbP,EAAAA,MAAM,EAAEc,KAAK,IAAId,MAAM,CAACc,KAAD,CAFV;AAGbb,EAAAA;AAHa,CAAf",
+	"sourcesContent": [
+		"let lastTime = 0\nlet request\nlet cancel\n\nfunction init (window) {\n  request = window.requestAnimationFrame\n  cancel = window.cancelAnimationFrame\n\n  if (!request) {\n    const vendors = ['ms', 'moz', 'webkit', 'o']\n\n    for (const vendor of vendors) {\n      request = window[`${vendor}RequestAnimationFrame`]\n      cancel = window[`${vendor}CancelAnimationFrame`] || window[`${vendor}CancelRequestAnimationFrame`]\n    }\n  }\n\n  if (!request) {\n    request = callback => {\n      const currTime = Date.now()\n      const timeToCall = Math.max(0, 16 - (currTime - lastTime))\n      // eslint-disable-next-line standard/no-callback-literal\n      const token = setTimeout(() => { callback(currTime + timeToCall) },\n        timeToCall)\n\n      lastTime = currTime + timeToCall\n      return token\n    }\n\n    cancel = token => clearTimeout(token)\n  }\n}\n\nexport default {\n  request: callback => request(callback),\n  cancel: token => cancel(token),\n  init,\n}\n"
+	]
+}
