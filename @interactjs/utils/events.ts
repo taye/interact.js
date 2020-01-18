@@ -41,7 +41,7 @@ function add (element: EventTarget, type: string, listener: Listener, optionalAr
     target.typeCount++
   }
 
-  if (!contains(target.events[type], listener)) {
+  if (element.removeEventListener && !contains(target.events[type], listener)) {
     element.addEventListener(type, listener as any, events.supportsOptions ? options : !!options.capture)
     target.events[type].push(listener)
   }
@@ -76,7 +76,7 @@ function remove (element: EventTarget, type: string, listener?: 'all' | Listener
     }
     else {
       for (let i = 0; i < len; i++) {
-        if (target.events[type][i] === listener) {
+        if (element.removeEventListener && target.events[type][i] === listener) {
           element.removeEventListener(type, listener as any, events.supportsOptions ? options : !!options.capture)
           target.events[type].splice(i, 1)
 

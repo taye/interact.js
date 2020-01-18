@@ -14,6 +14,7 @@ import * as interaction from '@interactjs/core/Interaction'
 import * as scope from '@interactjs/core/scope'
 import interact from '@interactjs/interact/interact'
 import * as snap from '@interactjs/modifiers/snap/pointer'
+import _PointerEvent from '@interactjs/pointer-events/PointerEvent'
 
 declare namespace Interact {
   type OrBoolean<T> = {
@@ -44,6 +45,7 @@ declare namespace Interact {
   export type DragEvent = InteractEvent<scope.ActionName.Drag>
   export type ResizeEvent = resize.ResizeEvent
   export type GestureEvent = gesture.GestureEvent
+  export type PointerEvent<T extends string> = _PointerEvent<T>
 
   export interface Point {
     x: number

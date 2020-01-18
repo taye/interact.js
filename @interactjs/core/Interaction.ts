@@ -94,6 +94,8 @@ Interaction,
 keyof typeof _ProxyValues | keyof typeof _ProxyMethods
 >
 
+let idCounter = 0
+
 export class Interaction<T extends ActionName = any> {
   // current interactable being interacted with
   interactable: Interactable = null
@@ -175,6 +177,8 @@ export class Interaction<T extends ActionName = any> {
     // pointer velocity
     velocity: utils.pointer.newCoords(),
   }
+
+  readonly _id: number = idCounter++
 
   /** */
   constructor ({ pointerType, scopeFire }: {
