@@ -9,7 +9,7 @@ declare module '@interactjs/core/Interaction' {
 }
 
 declare module '@interactjs/pointer-events/PointerEvent' {
-  interface PointerEvent<T> {
+  interface PointerEvent<T extends string = any> {
     count?: number
   }
 }

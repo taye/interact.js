@@ -14,7 +14,13 @@ import * as interaction from '@interactjs/core/Interaction'
 import * as scope from '@interactjs/core/scope'
 import interact from '@interactjs/interact/interact'
 import * as snap from '@interactjs/modifiers/snap/pointer'
-import _PointerEvent from '@interactjs/pointer-events/PointerEvent'
+import { PointerEvent as _PointerEvent } from '@interactjs/pointer-events/PointerEvent'
+import _NativePointerEventType from './NativePointerEventType'
+
+// import module augmentations
+import '@interactjs/auto-scroll'
+import '@interactjs/auto-start'
+import '@interactjs/inertia'
 
 declare namespace Interact {
   type OrBoolean<T> = {
@@ -45,7 +51,7 @@ declare namespace Interact {
   export type DragEvent = InteractEvent<scope.ActionName.Drag>
   export type ResizeEvent = resize.ResizeEvent
   export type GestureEvent = gesture.GestureEvent
-  export type PointerEvent<T extends string> = _PointerEvent<T>
+  export type PointerEvent<T extends string = any> = _PointerEvent<T>
 
   export interface Point {
     x: number
@@ -204,8 +210,9 @@ declare namespace Interact {
 
   export type RectChecker = (element: Element)  => Rect
 
-  export type PointerEventType = MouseEvent | TouchEvent | PointerEvent | InteractEvent
-  export type PointerType = MouseEvent | Touch | PointerEvent | InteractEvent
+  export type NativePointerEventType = _NativePointerEventType
+  export type PointerEventType = MouseEvent | TouchEvent | _NativePointerEventType | PointerEvent | InteractEvent
+  export type PointerType = MouseEvent | Touch | _NativePointerEventType | PointerEvent | InteractEvent
 
   export type EventTypes = string | ListenerMap | Array<(string | ListenerMap)>
 

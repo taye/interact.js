@@ -1,10 +1,9 @@
 import BaseEvent from '../core/BaseEvent'
 import * as pointerUtils from '../utils/pointerUtils'
 
-/** */
-export default class PointerEvent<T extends string> extends BaseEvent {
+export default class PointerEvent<T extends string = any> extends BaseEvent {
   type: T
-  originalEvent: Interact.PointerEventType | PointerEvent<any>
+  originalEvent: Interact.PointerEventType
   pointerId: number
   pointerType: string
   double: boolean
@@ -14,12 +13,13 @@ export default class PointerEvent<T extends string> extends BaseEvent {
   clientY: number
   dt: number
   eventable: any
+  [key: string]: any
 
   /** */
   constructor (
     type: T,
     pointer: Interact.PointerType | PointerEvent<any>,
-    event: Interact.PointerEventType | PointerEvent<any>,
+    event: Interact.PointerEventType,
     eventTarget: Interact.EventTarget,
     interaction: Interact.Interaction,
     timeStamp: number,
