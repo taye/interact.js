@@ -73,6 +73,9 @@ run_build() {
   npx lerna exec --no-private -- "echo '# copied from [root]/.npmignore' > .npmignore
     cat $ROOT/.npmignore >> .npmignore" &&
 
+  # add gitHead to package.json files
+  node $ROOT/scripts/setGitHead.js
+
   ## generate esnext .js modules
   npm run esnext &&
 

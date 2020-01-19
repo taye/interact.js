@@ -5,10 +5,10 @@
 </h2>
 
 <div align="center">
-<a href="https://gitter.im/taye/interact.js"><img src="https://badges.gitter.im/Join%20Chat.svg" alt="Gitter"></a>
+<a href="https://gitter.im/taye/interact.js"><img src="https://badges.gitter.im/taye/interact.js.svg" alt="Gitter"></a>
 <a href="https://www.jsdelivr.com/package/npm/interactjs"><img src="https://data.jsdelivr.com/v1/package/npm/interactjs/badge" alt="jsDelivr"></a>
 <a href="https://travis-ci.org/taye/interact.js"><img src="https://travis-ci.org/taye/interact.js.svg?branch=master" alt="Build Status"></a>
-<a href="https://codeclimate.com/github/taye/interact.js/test_coverage"><img src="https://api.codeclimate.com/v1/badges/0168aeaeed781a949088/test_coverage" /></a>
+<a href="https://codeclimate.com/github/taye/interact.js/test_coverage"><img src="https://api.codeclimate.com/v1/badges/0168aeaeed781a949088/test_coverage"/></a>
 </div>
 <br>
 

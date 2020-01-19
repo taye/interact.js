@@ -34,6 +34,9 @@
     "SVG",
     "interact"
   ],
+  "scripts": {
+    "test": "cd ../; npm test"
+  },
   "license": "MIT",
   "dependencies": {
     "@interactjs/interactjs": "1.8.0-rc.3",
