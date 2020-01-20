@@ -1,0 +1,19 @@
+{
+	"version": 3,
+	"sources": [
+		"index.ts"
+	],
+	"names": [
+		"autoStart",
+		"dragAxis",
+		"hold",
+		"install",
+		"scope",
+		"usePlugin",
+		"id"
+	],
+	"mappings": "AAAA,OAAOA,SAAP;AACA,OAAOC,QAAP;AACA,OAAOC,IAAP;;AAEA,SAASC,OAAT,CAAkBC,KAAlB,EAAyB;AACvBA,EAAAA,KAAK,CAACC,SAAN,CAAgBL,SAAhB;AACAI,EAAAA,KAAK,CAACC,SAAN,CAAgBH,IAAhB;AACAE,EAAAA,KAAK,CAACC,SAAN,CAAgBJ,QAAhB;AACD;;AAED,MAAMK,EAAE,GAAG,YAAX;AAEA,SACEA,EADF,EAEEH,OAFF,EAGEH,SAHF,EAIEE,IAJF,EAKED,QALF",
+	"sourcesContent": [
+		"import autoStart from './base'\nimport dragAxis from './dragAxis'\nimport hold from './hold'\n\nfunction install (scope) {\n  scope.usePlugin(autoStart)\n  scope.usePlugin(hold)\n  scope.usePlugin(dragAxis)\n}\n\nconst id = 'auto-start'\n\nexport {\n  id,\n  install,\n  autoStart,\n  hold,\n  dragAxis,\n}\n"
+	]
+}
