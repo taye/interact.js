@@ -73,9 +73,6 @@ run_build() {
   npx lerna exec --no-private -- "echo '# copied from [root]/.npmignore' > .npmignore
     cat $ROOT/.npmignore >> .npmignore" &&
 
-  # add gitHead to package.json files
-  node $ROOT/scripts/setGitHead.js
-
   ## generate esnext .js modules
   npm run esnext &&
 
@@ -103,8 +100,13 @@ push_and_publish() {
   # push branch and tags to git origin
   git push --no-verify origin $NEW_TAG || quit "failed to push git tag $NEW_TAG to origin" $?
 
+  # add gitHead to package.json files
+  node $ROOT/scripts/setGitHead.js
+
   # publish to npm with release tag if provided
   npx lerna exec --no-private -- npm publish $tag_arg || quit "failed to publish to npm" $?
+
+  git checkout $(git ls-files '**package.json')
 }
 
 echo_funcname() {
