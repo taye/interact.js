@@ -1,3 +1,7 @@
+## v1.8.1
+
+ - fixed an issue causing flickering a cursor on Firefox for Windows (#781)
+
 ## v1.8.0
 
 Changes from prerelease versions listed below. See
