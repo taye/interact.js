@@ -1,3 +1,9 @@
+## v1.8.0
+
+Changes from prerelease versions listed below. See
+https://github.com/taye/interact.js/projects/4#column-7093512 for a list of
+issues and pull requests.
+
 ## v1.8.0-rc.3
 
  - fixed incorrect publish
