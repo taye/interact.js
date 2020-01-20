@@ -252,11 +252,6 @@ function prepare (
 ) {
   action = action || { name: null }
 
-  // clear previous target element cursor
-  if (interaction.interactable && interaction.interactable.options.styleCursor) {
-    setCursor(interaction.element, '', scope)
-  }
-
   interaction.interactable = interactable
   interaction.element = element
   utils.copyAction(interaction.prepared, action)
@@ -329,8 +324,10 @@ function maxInteractions (newValue: any, scope: Interact.Scope) {
 }
 
 function setCursor (element: Interact.Element, cursor: string, scope: Interact.Scope) {
-  if (scope.autoStart.cursorElement) {
-    scope.autoStart.cursorElement.style.cursor = ''
+  const { cursorElement: prevCursorElement } = scope.autoStart
+
+  if (prevCursorElement && prevCursorElement !== element) {
+    prevCursorElement.style.cursor = ''
   }
 
   element.ownerDocument.documentElement.style.cursor = cursor
@@ -342,6 +339,11 @@ function setInteractionCursor<T extends Interact.ActionName> (interaction: Inter
   const { interactable, element, prepared } = interaction
 
   if (!(interaction.pointerType === 'mouse' && interactable && interactable.options.styleCursor)) {
+    // clear previous target element cursor
+    if (scope.autoStart.cursorElement) {
+      setCursor(scope.autoStart.cursorElement, '', scope)
+    }
+
     return
   }
 
