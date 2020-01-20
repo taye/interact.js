@@ -98,5 +98,6 @@
       "pre-commit": "npm run lint -- --fail-on-error",
       "pre-push": "npm run tsc_lint_test"
     }
-  }
+  },
+  "gitHead": "96b50f75"
 }

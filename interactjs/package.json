@@ -47,5 +47,6 @@
     "standalone": "interact",
     "destDir": "./dist",
     "name": "interact"
-  }
+  },
+  "gitHead": "96b50f75"
 }
