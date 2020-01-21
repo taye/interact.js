@@ -5,7 +5,8 @@ title: Snapping
 Snapping
 ========
 
-interact.js has 3 snap modifiers:
+interact.js has 3 snap modifiers available through the `interact.modifiers`
+object:
 
  - pointer coordinate-based `snap` which is best suited to drag actions,
  - `snapSize` which works only on resize actions and let's you set targets for

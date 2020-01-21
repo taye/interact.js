@@ -5,7 +5,8 @@ title: Restrict
 Restrict
 ========
 
-interact.js has 3 restriction modifiers:
+interact.js has 3 restriction modifiers available through the
+`interact.modifiers` object:
 
   - pointer coordinate-based `restrict`
   - element rect-based restriction `restrictRect`

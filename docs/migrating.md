@@ -1,33 +1,62 @@
 ---
-title: Migrating from `v1.2` to `v1.3`
+title: Migrating from `v1.2`
 ---
 
-`v1.3` fixes several bugs, allows setting more options on a per-action basis,
-adds configuration options to `pointerEvents` and adds several new methods and
-options. The [changelog][changelog-v1.3.0] lists all the major changes.
+# Migrating from `v1.2`
 
-Removed Methods
----------------
+The latest versions fix several bugs, allows setting more options on a
+per-action basis, add configuration options to `pointerEvents` and add several
+new methods and options. The [changelog][changelog] lists all the major changes.
 
-The methods in the table below were removed and replaced with action method options:
-
-| Method                                                      | Replaced with                                                    |
-| ----------------------------------------------------------- | ---------------------------------------------------------------- |
-| `interactable .squareResize(bool)`                          | `interactable .resizable({ square: bool })`                      |
-| `interactable .snap({ actions: ['drag'], ...snapOptions })` | `interactable .draggable({ snap: snapOptions })`                 |
-| `interactable .restrict({ restriction: 'self' })`           | `interactable .draggable({ restrict: { restriction: 'self' } })` |
-| `interactable .inertia(true)`                               | `interactable .draggable({ inertia: true })`                     |
-| `interactable .accept('.can-be-dropped')`                   | `interactable .dropzone({ accept: '.can-be-dropped' })`          |
-| `interact .margin(50)`                                      | `interactable .resizable({ margin: 60 })`                        |
-
-Improved resize snap and restrict
+Per-action modifiers array
 --------------------------
 
-There's 1 new snap modifier and 2 new resize modifiers for resize actions:
+Modifiers are now created with `interact.modifiers[modifierName](options)`
+methods. The return values returned by these methods go into the
+`actionOptions.modifiers` array. The lets you more easily reuse modifier
+configurations and specify their execution order.
 
- - `snapSize: { min: rectLike, max: rectLink }`
- - `restrictSize: { min: rectLike, max: rectLink }`
- - `restrictEdges: { outer: rectLike, inner: rectLink }`
+```js
+// create a restrict modifier to prevent dragging an element out of its parent
+const restrictToParent = interact.modifiers.restrict({
+  restriction: 'parent',
+  elementRect: { left: 0, right: 0, top: 1, bottom: 1 },
+})
+
+// create a snap modifier which changes the event coordinates to the closest
+// corner of a grid
+const snap100x100 = interact.modifiers.snap({
+  targets: [interact.snappers.grid({ x: 100, y: 100 })],
+  relativePoints: [{ x: 0.5, y: 0.5 }],
+}),
+
+interact(target)
+  .draggable({
+    // apply the restrict and then the snap modifiers to drag events
+    modifiers: [restrictToParent, snap100x100],
+  })
+  .on('dragmove', event => console.log(event.pageX, event.pageY))
+```
+
+Improved resize snap and restrict
+---------------------------------
+
+There are a few new snap and restrict modifiers for resize actions:
+
+<router-link to="/docs/restriction">Restrictions</router-link>:
+
+  - pointer coordinate-based `restrict`
+  - element rect-based restriction `restrictRect`
+  - element size-based `restrictSize` (resize only)
+  - and element edge-based `restrictEdges` (resize only)
+
+<router-link to="/docs/snapping">Snapping</router-link>:
+
+ - pointer coordinate-based `snap` which is best suited to drag actions,
+ - `snapSize` which works only on resize actions and let's you set targets for
+   the size of the target element,
+ - and `snapEdges` which is similar to `snapSize`, but let's you set the target
+   positions of the edges of the target element.
 
 ```js
 interact(target).resize({
@@ -36,22 +65,68 @@ interact(target).resize({
   // sizes at fixed grid points
   snapSize: {
     targets: [
-      interact.createSnapGrid({ x: 25, y: 25, range: Infinity }),
-    ],
+      interact.createSnapGrid({ x: 25, y: 25, range: Infinity })
+    ]
   },
 
   // minimum size
   restrictSize: {
-    min: { width: 100, height: 50 },
-  },
+    min: { width: 100, height: 50 }
+  }
 
   // keep the edges inside the parent
   restrictEdges: {
     outer: 'parent',
-    endOnly: true,
-  },
+    endOnly: true
+  }
 });
 ```
+
+Resize `aspectRatio` modifier
+-----------------------------
+
+The resize `preserveAspectRatio` and `square` options have been replaced by an
+`aspectRatio` modifier which can cooperate with other modifiers.
+
+```js
+interact(target).resizable({
+  edges: { left: true, bottom: true },
+  modifiers: [
+    interact.modifiers.aspectRatio({
+       // ratio may be the string 'preserve' to maintain the starting aspect ratio,
+      // or any number to force a width/height ratio
+      ratio: 'preserve',
+      // To add other modifiers that respect the aspect ratio,
+      // put them in the aspectRatio.modifiers array
+      modifiers: [interact.modifiers.restrictSize({ max: 'parent' })]
+    }),
+  ],
+});
+```
+
+```js
+interact(target).resizable({
+  modifiers: [interact.modifiers.aspectRatio({
+    // The equalDelta option replaces the old resize.square option
+    equalDelta: true,
+  })]
+})
+```
+
+Removed Methods
+---------------
+
+The methods in the table below were removed and replaced with action method
+options and modifier methods for the new modifiers array API:
+
+| Method                                                     | Replaced with                                                   |
+| ---------------------------------------------------------- | --------------------------------------------------------------- |
+| `interactable.squareResize(bool)`                          | `interact.modifiers.aspectRatio({ equalDelta: true })`          |
+| `interactable.snap({ actions: ['drag'], ...snapOptions })` | `interact.modifiers.snap(snapOptions)`                          |
+| `interactable.restrict(restrictOptions)`                   | `interact.modifiers.restrict(restrictOptions)`                  |
+| `interactable.inertia(true)`                               | `interactable.draggable({ inertia: true })`                     |
+| `interactable.accept('.can-be-dropped')`                   | `interactable.dropzone({ accept: '.can-be-dropped' })`          |
+| `interact.margin(50)`                                      | `interactable.resizable({ margin: 50 })`                        |
 
 Action end event dx/dy
 ----------------------
@@ -83,4 +158,4 @@ Mouse buttons
 By default, only the left mouse button can start actions. The `mouseButtons`
 action option can be used to change this.
 
-[changelog-v1.3.0]: https://github.com/taye/interact.js/blob/master/CHANGELOG.md#v130
+[changelog]: https://github.com/taye/interact.js/blob/master/CHANGELOG.md
