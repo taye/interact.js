@@ -2,6 +2,7 @@ dist
 coverage
 .nyc_output
 **/*.d.ts
+**/*.d.ts.map
 !@interactjs/types/types.d.ts
 *interactjs/**/*.js
 *interactjs/**/*.js.map

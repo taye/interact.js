@@ -8,6 +8,7 @@
     ],
     "allowJs": false,                         /* Allow javascript files to be compiled. */
     "declaration": true,                      /* Generates corresponding '.d.ts' file. */
+    "declarationMap": true,                   /* Generates a sourcemap for each corresponding '.d.ts' file. */
     "emitDeclarationOnly": true,
     "esModuleInterop": true,
 
