@@ -1,3 +1,8 @@
+## v1.8.2
+
+ - enabled `.d.ts.map` files output
+ - added license field to @interactjs/interact package.json
+
 ## v1.8.1
 
  - fixed an issue causing flickering a cursor on Firefox for Windows (#781)
