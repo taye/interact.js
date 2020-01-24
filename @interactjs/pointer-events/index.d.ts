@@ -1,0 +1,7 @@
+import * as pointerEvents from './base';
+import holdRepeat from './holdRepeat';
+import interactableTargets from './interactableTargets';
+declare function install(scope: Interact.Scope): void;
+declare const id = "pointer-events";
+export { id, pointerEvents, holdRepeat, interactableTargets, install };
+//# sourceMappingURL=index.d.ts.map
