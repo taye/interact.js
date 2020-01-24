@@ -1,6 +1,7 @@
 {
   "name": "@interactjs/interact",
   "version": "1.8.1",
+  "license": "MIT",
   "peerDependencies": {
     "@interactjs/actions": "1.8.1",
     "@interactjs/auto-scroll": "1.8.1",
