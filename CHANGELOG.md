@@ -1,3 +1,12 @@
+## v1.8.3
+
+ - fixed bug when calling interaction.move() from start event (#791)
+ - fixed invalid non-array argument spread types (#789)
+ - fixed missing typescript definition of some interactable methods (#788)
+ - disabled `.d.ts.map` files output since the `.ts` source files are not
+   published
+ - fixed typings for modifiers
+
 ## v1.8.2
 
  - enabled `.d.ts.map` files output
