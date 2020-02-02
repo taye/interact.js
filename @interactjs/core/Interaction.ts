@@ -561,7 +561,7 @@ export class Interaction<T extends ActionName = any> {
     return new InteractEvent(this, event, actionName, phase, this.element, null, preEnd, type)
   }
 
-  _fireEvent (iEvent) {
+  _fireEvent (iEvent: InteractEvent) {
     this.interactable.fire(iEvent)
 
     if (!this.prevEvent || iEvent.timeStamp >= this.prevEvent.timeStamp) {
@@ -591,6 +591,8 @@ export class Interaction<T extends ActionName = any> {
     const iEvent = signalArg.iEvent = this._createPreparedEvent(event, phase, preEnd, type)
 
     this._scopeFire(`interactions:action-${phase}` as any, signalArg)
+
+    if (phase === 'start') { this.prevEvent = iEvent }
 
     this._fireEvent(iEvent)
 

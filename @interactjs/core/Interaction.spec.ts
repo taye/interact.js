@@ -350,11 +350,16 @@ test('Interaction.pointerDown', t => {
 })
 
 test('Interaction.start', t => {
-  const { interaction, interactable, scope } = helpers.testEnv()
-  const action: Interact.ActionProps<Interact.ActionName> = { name: 'TEST' as any }
-  const element: any = {}
-  const pointer = helpers.newPointer()
-  const event: any = {}
+  const {
+    interaction,
+    interactable,
+    scope,
+    event,
+    target: element,
+    down,
+    stop,
+  } = helpers.testEnv({ plugins: [drag] })
+  const action = { name: 'drag' }
 
   interaction.start(action, interactable, element)
   t.equal(interaction.prepared.name, null, 'do nothing if !pointerIsDown')
@@ -364,7 +369,7 @@ test('Interaction.start', t => {
   interaction.start(action, interactable, element)
   t.equal(interaction.prepared.name, null, 'do nothing if too few pointers are down')
 
-  interaction.pointerDown(pointer, event, null)
+  down()
 
   interaction._interacting = true
   interaction.start(action, interactable, element)
@@ -399,32 +404,43 @@ test('Interaction.start', t => {
   t.equal(signalArg.interaction, interaction, 'interaction in signal arg')
   t.equal(signalArg.event, event, 'event (interaction.downEvent) in signal arg')
 
-  interaction._interacting = false
-
-  // interaction.start(action, target, element)
-  // t.deepEqual(scope.interactions.list, [interaction], 'interaction is added back to scope')
+  stop()
 
   t.end()
 })
 
-test('stop interaction from start event', t => {
+test('interaction move() and stop() from start event', t => {
   const {
     interaction,
     interactable,
     target,
+    down,
   } = helpers.testEnv({ plugins: [drag, autoStart] })
 
   let stoppedBeforeStartFired
 
-  interactable.on('dragstart', event => {
-    stoppedBeforeStartFired = interaction._stopped
+  interactable.draggable({
+    listeners: {
+      start (event) {
+        stoppedBeforeStartFired = interaction._stopped
 
-    event.interaction.stop()
+        t.doesNotThrow(
+          () => event.interaction.move(),
+          "interaction.move() doesn't throw from start event",
+        )
+
+        t.doesNotThrow(
+          () => event.interaction.stop(),
+          "interaction.stop() doesn't throw from start event",
+        )
+      },
+    },
   })
 
+  down()
   interaction.start({ name: 'drag' }, interactable, target as HTMLElement)
 
-  t.notOk(stoppedBeforeStartFired, '!interaction._stopped in start listener')
+  t.equal(stoppedBeforeStartFired, false, '!interaction._stopped in start listener')
   t.notOk(interaction.interacting(), 'interaction can be stopped from start event listener')
   t.ok(interaction._stopped, 'interaction._stopped after stop() in start listener')
 
