@@ -1,0 +1,13 @@
+{
+	"version": 3,
+	"sources": [
+		"NativePointerEventType.ts"
+	],
+	"names": [
+		"PointerEvent"
+	],
+	"mappings": "AAAA,eAAeA,YAAf",
+	"sourcesContent": [
+		"export default PointerEvent\n"
+	]
+}

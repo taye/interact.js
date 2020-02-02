@@ -1,0 +1,7 @@
+# copied from [root]/.npmignore
+*.ts
+!*.d.ts
+*.spec.ts
+*.spec.js
+dist/docs
+guide
