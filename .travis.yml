@@ -1,15 +1,22 @@
+# ignore release tags
 if: tag IS blank
+
+env:
+  global:
+    - CC_TEST_REPORTER_ID=9c6558805c8a00ef83371f4dcd82bfc765d2eac147a7442164f8cc1b401d43de
+
 language: node_js
 node_js:
   - "node"
-addons:
-  code_climate:
-    repo_token: 9c6558805c8a00ef83371f4dcd82bfc765d2eac147a7442164f8cc1b401d43de
 install:
   - npm run bootstrap
+before_script:
+  - curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
+  - chmod +x ./cc-test-reporter
+  - ./cc-test-reporter before-build
 script: npm run tsc_lint_test
 after_success:
-  - npx codeclimate-test-reporter < ./coverage/lcov.info
+  - ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT
 before_deploy:
   - pushd $HOME
   - openssl aes-256-cbc -K $encrypted_e8f45655cff8_key -iv $encrypted_e8f45655cff8_iv

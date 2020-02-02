@@ -1,5 +1,6 @@
 dist
 coverage
+cc-test-reporter
 .nyc_output
 **/*.d.ts
 **/*.d.ts.map
