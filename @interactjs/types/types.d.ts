@@ -18,9 +18,13 @@ import { PointerEvent as _PointerEvent } from '@interactjs/pointer-events/Pointe
 import _NativePointerEventType from './NativePointerEventType'
 
 // import module augmentations
+import '@interactjs/actions/drop'
 import '@interactjs/auto-scroll'
 import '@interactjs/auto-start'
+import '@interactjs/auto-start/InteractableMethods'
 import '@interactjs/inertia'
+import '@interactjs/pointer-events/interactableTargets'
+import '@interactjs/reflow'
 
 declare namespace Interact {
   type OrBoolean<T> = {
