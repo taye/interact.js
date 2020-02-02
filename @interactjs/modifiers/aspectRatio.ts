@@ -19,7 +19,7 @@
 
 import extend from '@interactjs/utils/extend'
 import { addEdges } from '@interactjs/utils/rect'
-import modifiersBase, { Modifier, ModifierModule, ModifierState, setAll, startAll } from './base'
+import { Modifier, ModifierModule, ModifierState, prepareStates, setAll, startAll } from './base'
 
 export interface AspectRatioOptions {
   ratio?: number | 'preserve'
@@ -75,7 +75,7 @@ const aspectRatio: ModifierModule<AspectRatioOptions, AspectRatioState> = {
 
     if (!modifiers || !modifiers.length) { return }
 
-    state.subStates = modifiersBase.prepareStates(modifiers).map(subState => {
+    state.subStates = prepareStates(modifiers).map(subState => {
       subState.options = {
         ...subState.options,
       }

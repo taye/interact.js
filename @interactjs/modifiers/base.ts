@@ -435,7 +435,7 @@ export function restoreCoords ({ interaction: { coords, rect, modifiers } }: { i
   rect.bottom -= rectDelta.bottom
 }
 
-function shouldDo (options, preEnd?: boolean, requireEndOnly?: boolean, phase?: string) {
+export function shouldDo (options, preEnd?: boolean, requireEndOnly?: boolean, phase?: string) {
   return options
     ? options.enabled !== false &&
       (preEnd || !options.endOnly) &&
@@ -444,7 +444,7 @@ function shouldDo (options, preEnd?: boolean, requireEndOnly?: boolean, phase?: 
     : !requireEndOnly
 }
 
-function getRectOffset (rect, coords) {
+export function getRectOffset (rect, coords) {
   return rect
     ? {
       left  : coords.x - rect.left,
@@ -550,17 +550,6 @@ const modifiersBase: Interact.Plugin = {
     'interactions:stop': stop,
   },
   before: ['actions', 'action/drag', 'actions/resize', 'actions/gesture'],
-  startAll,
-  setAll,
-  prepareStates,
-  start,
-  beforeMove,
-  beforeEnd,
-  stop,
-  shouldDo,
-  getModifierList,
-  getRectOffset,
-  makeModifier,
 }
 
 export default modifiersBase

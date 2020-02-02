@@ -1,5 +1,5 @@
 import { EventPhase } from '@interactjs/core/InteractEvent'
-import modifiers, { ModifierArg, restoreCoords, setCoords } from '@interactjs/modifiers/base'
+import * as modifiers from '@interactjs/modifiers/base'
 import * as utils from '@interactjs/utils/index'
 import raf from '@interactjs/utils/raf'
 
@@ -76,7 +76,7 @@ function install (scope: Interact.Scope) {
     defaults,
   } = scope
 
-  scope.usePlugin(modifiers)
+  scope.usePlugin(modifiers.default)
 
   defaults.perAction.inertia = {
     enabled          : false,
@@ -169,7 +169,7 @@ function release<T extends Interact.ActionName> (
     pointerSpeed > options.minSpeed &&
     pointerSpeed > options.endSpeed)
 
-  const modifierArg: ModifierArg = {
+  const modifierArg: modifiers.ModifierArg = {
     interaction,
     interactable: interaction.interactable,
     element: interaction.element,
@@ -200,7 +200,7 @@ function release<T extends Interact.ActionName> (
 
   utils.pointer.copyCoords(state.upCoords, interaction.coords.cur)
 
-  setCoords(modifierArg)
+  modifiers.setCoords(modifierArg)
   interaction.pointers[0].pointer = state.startEvent = new scope.InteractEvent(
     interaction,
     event,
@@ -209,7 +209,7 @@ function release<T extends Interact.ActionName> (
     EventPhase.InertiaStart,
     interaction.element,
   )
-  restoreCoords(modifierArg)
+  modifiers.restoreCoords(modifierArg)
 
   state.t0 = now
 

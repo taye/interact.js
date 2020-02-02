@@ -34,7 +34,7 @@ export function init (window: Window) {
   for (const type in modifiers) {
     const { _defaults, _methods } = modifiers[type as keyof typeof modifiers]
 
-    _defaults._methods = _methods
+    ;(_defaults as any)._methods = _methods
     ;(scope.defaults.perAction as any)[type] = _defaults
   }
 

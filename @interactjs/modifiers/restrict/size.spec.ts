@@ -2,7 +2,7 @@ import test from '@interactjs/_dev/test/test'
 import extend from '@interactjs/utils/extend'
 import * as helpers from '../../core/tests/_helpers'
 import * as rectUtils from '../../utils/rect'
-import base from './../base'
+import { getRectOffset, startAll } from './../base'
 import restrictSize from './../restrict/size'
 
 test('restrictSize', t => {
@@ -40,10 +40,10 @@ test('restrictSize', t => {
     coords: startCoords,
     pageCoords: startCoords,
     state: null,
-    startOffset: base.getRectOffset(rect, startCoords),
+    startOffset: getRectOffset(rect, startCoords),
   }
 
-  base.startAll(arg)
+  startAll(arg)
   arg.state = state
 
   const move1 = Object.freeze({ x: -50, y: -40 })
