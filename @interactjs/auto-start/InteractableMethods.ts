@@ -12,8 +12,8 @@ declare module '@interactjs/core/Interactable' {
     ) => Interact.ActionProps | null
     styleCursor: typeof styleCursor
     actionChecker: typeof actionChecker
-    ignoreFrom: (...args: any) => boolean
-    allowFrom: (...args: any) => boolean
+    ignoreFrom: (...args: any[]) => boolean
+    allowFrom: (...args: any[]) => boolean
   }
 }
 

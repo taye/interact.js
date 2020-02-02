@@ -10,7 +10,7 @@ declare module '@interactjs/interact/interact' {
 declare module '@interactjs/core/scope' {
   interface Scope {
     autoStart: AutoStart
-    maxInteractions: (...args: any) => any
+    maxInteractions: (...args: any[]) => any
   }
 
   interface SignalArgs {

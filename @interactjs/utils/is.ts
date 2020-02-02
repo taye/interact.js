@@ -12,7 +12,7 @@ export const docFrag = (thing: any): thing is DocumentFragment =>
 export const object = (thing: any): thing is { [index: string]: any } =>
   !!thing && (typeof thing === 'object')
 
-export const func = (thing: any): thing is (...args: any) => any =>
+export const func = (thing: any): thing is (...args: any[]) => any =>
   typeof thing === 'function'
 
 export const number = (thing: any): thing is number =>

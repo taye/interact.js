@@ -216,7 +216,7 @@ declare namespace Interact {
 
   export type EventTypes = string | ListenerMap | Array<(string | ListenerMap)>
 
-  export type Listener = (...args: any) => any
+  export type Listener = (...args: any[]) => any
   export type Listeners = ListenerMap | ListenerMap[]
   export type ListenersArg = Listener | ListenerMap | Array<(Listener | ListenerMap)>
   export interface ListenerMap {

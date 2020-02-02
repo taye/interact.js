@@ -5,7 +5,7 @@ import * as pointer from './pointerUtils'
 import * as rect from './rect'
 import win from './window'
 
-export function warnOnce<T> (this: T, method: (...args: any) => any, message: string) {
+export function warnOnce<T> (this: T, method: (...args: any[]) => any, message: string) {
   let warned = false
 
   // eslint-disable-next-line no-shadow
