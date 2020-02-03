@@ -1,3 +1,7 @@
+## v1.8.4
+
+ - fixed bug when calling interaction.move() from start event (#791)
+
 ## v1.8.3
 
  - fixed bug when calling interaction.move() from start event (#791)

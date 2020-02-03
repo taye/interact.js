@@ -1,14 +1,14 @@
 {
   "name": "@interactjs/dev-tools",
-  "version": "1.8.3",
+  "version": "1.8.4",
   "license": "MIT",
   "dependencies": {
-    "@interactjs/utils": "1.8.3"
+    "@interactjs/utils": "1.8.4"
   },
   "devDependencies": {
-    "@interactjs/_dev": "1.8.3",
-    "@interactjs/actions": "1.8.3",
-    "@interactjs/core": "1.8.3"
+    "@interactjs/_dev": "1.8.4",
+    "@interactjs/actions": "1.8.4",
+    "@interactjs/core": "1.8.4"
   },
   "publishConfig": {
     "access": "public"
