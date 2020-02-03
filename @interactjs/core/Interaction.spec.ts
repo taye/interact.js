@@ -1,5 +1,6 @@
 import test from '@interactjs/_dev/test/test'
 import drag from '@interactjs/actions/drag'
+import drop from '@interactjs/actions/drop'
 import autoStart from '@interactjs/auto-start/base'
 import * as pointerUtils from '@interactjs/utils/pointerUtils'
 import InteractEvent from './InteractEvent'
@@ -415,7 +416,7 @@ test('interaction move() and stop() from start event', t => {
     interactable,
     target,
     down,
-  } = helpers.testEnv({ plugins: [drag, autoStart] })
+  } = helpers.testEnv({ plugins: [drag, drop, autoStart] })
 
   let stoppedBeforeStartFired
 

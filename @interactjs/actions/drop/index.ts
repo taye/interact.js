@@ -498,7 +498,7 @@ const drop: Interact.Plugin = {
         },
         rejected: null,
         events: null,
-        activeDrops: null,
+        activeDrops: [],
       }
     },
 
