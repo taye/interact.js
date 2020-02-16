@@ -264,7 +264,9 @@ export class Interaction<T extends ActionName = any> {
     this.interactable = interactable
     this.element      = element
     this.rect         = interactable.getRect(element)
-    this.edges        = utils.extend({}, this.prepared.edges)
+    this.edges        = this.prepared.edges
+      ? utils.extend({}, this.prepared.edges)
+      : { left: true, right: true, top: true, bottom: true }
     this._stopped     = false
     this._interacting = this._doPhase({
       interaction: this,
@@ -276,7 +278,7 @@ export class Interaction<T extends ActionName = any> {
   }
 
   pointerMove (pointer: Interact.PointerType, event: Interact.PointerEventType, eventTarget: Interact.EventTarget) {
-    if (!this.simulation && !(this.modifiers && this.modifiers.endResult)) {
+    if (!this.simulation && !(this.modification && this.modification.endResult)) {
       this.updatePointer(pointer, event, eventTarget, false)
       utils.pointer.setCoords(this.coords.cur, this.pointers.map(p => p.pointer), this._now())
     }
@@ -575,7 +577,7 @@ export class Interaction<T extends ActionName = any> {
 
     if (rect && phase === EventPhase.Move) {
       // update the rect modifications
-      const edges = this.edges || this.prepared.edges || { left: true, right: true, top: true, bottom: true }
+      const edges = this.edges || this.prepared.edges
       utils.rect.addEdges(edges, rect, delta[this.interactable.options.deltaSource])
 
       rect.width = rect.right - rect.left

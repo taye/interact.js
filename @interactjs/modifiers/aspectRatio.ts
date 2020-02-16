@@ -19,7 +19,8 @@
 
 import extend from '@interactjs/utils/extend'
 import { addEdges } from '@interactjs/utils/rect'
-import { Modifier, ModifierModule, ModifierState, prepareStates, setAll, startAll } from './base'
+import { Modifier, ModifierModule, ModifierState } from './base'
+import Modification from './Modification'
 
 export interface AspectRatioOptions {
   ratio?: number | 'preserve'
@@ -36,7 +37,7 @@ export type AspectRatioState = ModifierState<AspectRatioOptions, {
   equalDelta: boolean
   xIsPrimaryAxis: boolean
   edgeSign: 1 | -1
-  subStates: ModifierState[]
+  subModification: Modification
 }>
 
 const aspectRatio: ModifierModule<AspectRatioOptions, AspectRatioState> = {
@@ -75,18 +76,17 @@ const aspectRatio: ModifierModule<AspectRatioOptions, AspectRatioState> = {
 
     if (!modifiers || !modifiers.length) { return }
 
-    state.subStates = prepareStates(modifiers).map(subState => {
+    const subModiification = new Modification(arg.interaction)
+    subModiification.prepareStates(modifiers)
+
+    for (const subState of subModiification.states) {
       subState.options = {
         ...subState.options,
       }
+    }
 
-      return subState
-    })
-
-    return startAll({
-      ...arg,
-      states: state.subStates,
-    })
+    state.subModification = subModiification
+    subModiification.startAll({ ...arg })
   },
 
   set (arg) {
@@ -96,18 +96,17 @@ const aspectRatio: ModifierModule<AspectRatioOptions, AspectRatioState> = {
 
     aspectMethod(state, state.xIsPrimaryAxis, coords, rect)
 
-    if (!state.subStates) { return null }
+    if (!state.subModification) { return null }
 
     const correctedRect = extend({}, rect)
 
     addEdges(state.linkedEdges, correctedRect, { x: coords.x - initialCoords.x, y: coords.y - initialCoords.y })
 
-    const result = setAll({
+    const result = state.subModification.setAll({
       ...arg,
       rect: correctedRect,
       edges: state.linkedEdges,
       pageCoords: coords,
-      states: state.subStates,
       prevCoords: coords,
       prevRect: correctedRect,
     })

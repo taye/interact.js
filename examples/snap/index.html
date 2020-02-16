@@ -16,29 +16,29 @@
     <div id="controls">
     <section id="sliders">
         <h3> grid spacing </h3>
-        <input id="grid-x" type="range" value="500" min="20" max="500" title="x-axis">
-        <input id="grid-y" type="range" value="500" min="20" max="500" title="x-axis">
+        <input id="grid-x" type="range" value="300" min="20" max="500" title="x-axis">
+        <input id="grid-y" type="range" value="300" min="20" max="500" title="x-axis">
         <br>
         <h3> grid offset </h3>
-        <input id="offset-x" type="range" value="240" min="0" max="500" title="x-axis">
-        <input id="offset-y" type="range" value="240" min="0" max="500" title="x-axis">
+        <input id="offset-x" type="range" value="100" min="0" max="500" title="x-axis">
+        <input id="offset-y" type="range" value="100" min="0" max="500" title="x-axis">
         <br>
         <h3> snap range </h3>
-        <input id="snap-range" type="range" min="-1" value="-1" min="10" max="150" title="snap range">
+        <input id="snap-range" type="range" min="-1" value="100" min="10" max="150" title="snap range">
     </section>
         <br>
         <section id="modes">
         <h3> snap mode </h3>
             <label for="off-mode" class="snap-mode">
                 Off
-                <input id="off-mode" type="radio" name="snap-mode" checked="true"> 
+                <input id="off-mode" type="radio" name="snap-mode">
             </label> <br>
             <label for="grid-mode" class="snap-mode">
-                Grid Mode 
-                <input id="grid-mode" type="radio" name="snap-mode" checked="true"> 
+                Grid Mode
+                <input id="grid-mode" type="radio" name="snap-mode" checked="true">
             </label> <br>
             <label for="anchor-mode" class="snap-mode">
-                Anchor Mode 
+                Anchor Mode
                 <input id="anchor-mode" type="radio" name="snap-mode">
             </label>
             <br>
@@ -46,7 +46,7 @@
 
             <label for="end-only">
                 Snap at end only
-                <input id="end-only" type="checkbox" checked>
+                <input id="end-only" type="checkbox">
             </label>
 
             <label for="inertia">

@@ -16,7 +16,7 @@ test('modifiers/base', t => {
 
   scope.actions.eventTypes.push('TESTstart', 'TESTmove', 'TESTend')
 
-  t.ok(utils.is.object(interaction.modifiers), 'modifiers prop is added new Interaction')
+  t.ok(utils.is.object(interaction.modification), 'modifiers prop is added new Interaction')
 
   coords.client = coords.page
 

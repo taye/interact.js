@@ -2,6 +2,7 @@ import { EventPhase } from '@interactjs/core/InteractEvent'
 import * as modifiers from '@interactjs/modifiers/base'
 import * as utils from '@interactjs/utils/index'
 import raf from '@interactjs/utils/raf'
+import Modification, { ModificationResult } from '@interactjs/modifiers/Modification'
 
 declare module '@interactjs/core/InteractEvent' {
   // eslint-disable-next-line no-shadow
@@ -24,6 +25,8 @@ declare module '@interactjs/core/Interaction' {
         client: Interact.Point
         timeStamp: number
       }
+
+      modification: Modification
 
       xe?: number
       ye?: number
@@ -95,46 +98,46 @@ function resume (
   const state = interaction.inertia
 
   // Check if the down event hits the current inertia target
-  if (state.active) {
-    let element = eventTarget as Node
+  if (!state.active) { return }
 
-    // climb up the DOM tree from the event target
-    while (utils.is.element(element)) {
-      // if interaction element is the current inertia target element
-      if (element === interaction.element) {
-        // stop inertia
-        raf.cancel(state.timeout)
-        state.active = false
-        interaction.simulation = null
+  let element = eventTarget as Node
 
-        // update pointers to the down event's coordinates
-        interaction.updatePointer(pointer as Interact.PointerType, event as Interact.PointerEventType, eventTarget, true)
-        utils.pointer.setCoords(
-          interaction.coords.cur,
-          interaction.pointers.map(p => p.pointer),
-          interaction._now(),
-        )
+  // climb up the DOM tree from the event target
+  while (utils.is.element(element)) {
+    // if interaction element is the current inertia target element
+    if (element === interaction.element) {
+      // stop inertia
+      raf.cancel(state.timeout)
+      state.active = false
+      interaction.simulation = null
 
-        // fire appropriate signals
-        const signalArg = {
-          interaction,
-          phase: EventPhase.Resume as const,
-        }
+      // update pointers to the down event's coordinates
+      interaction.updatePointer(pointer as Interact.PointerType, event as Interact.PointerEventType, eventTarget, true)
+      utils.pointer.setCoords(
+        interaction.coords.cur,
+        interaction.pointers.map(p => p.pointer),
+        interaction._now(),
+      )
 
-        scope.fire('interactions:action-resume', signalArg)
-
-        // fire a reume event
-        const resumeEvent = new scope.InteractEvent(
-          interaction, event as Interact.PointerEventType, interaction.prepared.name, EventPhase.Resume, interaction.element)
-
-        interaction._fireEvent(resumeEvent)
-
-        utils.pointer.copyCoords(interaction.coords.prev, interaction.coords.cur)
-        break
+      // fire appropriate signals
+      const signalArg = {
+        interaction,
+        phase: EventPhase.Resume as const,
       }
 
-      element = utils.dom.parentNode(element)
+      scope.fire('interactions:action-resume', signalArg)
+
+      // fire a reume event
+      const resumeEvent = new scope.InteractEvent(
+        interaction, event as Interact.PointerEventType, interaction.prepared.name, EventPhase.Resume, interaction.element)
+
+      interaction._fireEvent(resumeEvent)
+
+      utils.pointer.copyCoords(interaction.coords.prev, interaction.coords.cur)
+      break
     }
+
+    element = utils.dom.parentNode(element)
   }
 }
 
@@ -151,13 +154,12 @@ function release<T extends Interact.ActionName> (
   }
 
   const options = getOptions(interaction)
-
   const now = interaction._now()
   const { client: velocityClient } = interaction.coords.velocity
   const pointerSpeed = utils.hypot(velocityClient.x, velocityClient.y)
 
   let smoothEnd = false
-  let modifierResult: ReturnType<typeof modifiers.setAll>
+  let modifierResult: ModificationResult
 
   // check if inertia should be started
   const inertiaPossible = (options && options.enabled &&
@@ -169,6 +171,15 @@ function release<T extends Interact.ActionName> (
     pointerSpeed > options.minSpeed &&
     pointerSpeed > options.endSpeed)
 
+  const modification = state.modification || (state.modification = new Modification(interaction))
+
+  utils.extend(modification, interaction.modification)
+  modification.states = inertiaPossible
+    ? interaction.modification.states.map(
+      modifierState => utils.extend({}, modifierState),
+    )
+    : []
+
   const modifierArg: modifiers.ModifierArg = {
     interaction,
     interactable: interaction.interactable,
@@ -176,9 +187,6 @@ function release<T extends Interact.ActionName> (
     rect: interaction.rect,
     edges: interaction.edges,
     pageCoords: interaction.coords.cur.page,
-    states: inertiaPossible && interaction.modifiers.states.map(
-      modifierState => utils.extend({}, modifierState),
-    ),
     preEnd: true,
     prevCoords: null,
     prevRect: null,
@@ -188,10 +196,10 @@ function release<T extends Interact.ActionName> (
 
   // smoothEnd
   if (inertiaPossible && !inertia) {
-    modifierArg.prevCoords = interaction.modifiers.result.coords
-    modifierArg.prevRect = interaction.modifiers.result.rect
+    modifierArg.prevCoords = interaction.modification.result.coords
+    modifierArg.prevRect = interaction.modification.result.rect
     modifierArg.requireEndOnly = false
-    modifierResult = modifiers.setAll(modifierArg)
+    modifierResult = modification.setAll(modifierArg)
 
     smoothEnd = modifierResult.changed
   }
@@ -200,16 +208,15 @@ function release<T extends Interact.ActionName> (
 
   utils.pointer.copyCoords(state.upCoords, interaction.coords.cur)
 
-  modifiers.setCoords(modifierArg)
+  modification.setCoords(modifierArg)
   interaction.pointers[0].pointer = state.startEvent = new scope.InteractEvent(
     interaction,
     event,
-    // FIXME add proper typing Action.name
     interaction.prepared.name as T,
     EventPhase.InertiaStart,
     interaction.element,
   )
-  modifiers.restoreCoords(modifierArg)
+  modification.restoreCoords(modifierArg)
 
   state.t0 = now
 
@@ -234,7 +241,7 @@ function release<T extends Interact.ActionName> (
     modifierArg.prevRect = null
     modifierArg.requireEndOnly = true
 
-    modifierResult = modifiers.setAll(modifierArg)
+    modifierResult = modification.setAll(modifierArg)
 
     state.modifiedXe += modifierResult.delta.x
     state.modifiedYe += modifierResult.delta.y
@@ -348,8 +355,7 @@ function smothEndTick (interaction: Interact.Interaction) {
     interaction.move({ event: state.startEvent })
     interaction.end(state.startEvent)
 
-    state.smoothEnd =
-      state.active = false
+    state.smoothEnd = state.active = false
     interaction.simulation = null
   }
 }
@@ -384,11 +390,12 @@ const inertia: Interact.Plugin = {
   listeners: {
     'interactions:new': ({ interaction }) => {
       interaction.inertia = {
-        active     : false,
-        smoothEnd  : false,
+        active: false,
+        smoothEnd: false,
         allowResume: false,
-        upCoords   : {} as any,
-        timeout    : null,
+        upCoords: {} as any,
+        timeout: null,
+        modification: null,
       }
     },
 

@@ -2,7 +2,7 @@ import test from '@interactjs/_dev/test/test'
 import extend from '@interactjs/utils/extend'
 import * as helpers from '../../core/tests/_helpers'
 import * as rectUtils from '../../utils/rect'
-import { getRectOffset, startAll } from './../base'
+import Modification, { getRectOffset } from './../Modification'
 import restrictSize from './../restrict/size'
 
 test('restrictSize', t => {
@@ -11,13 +11,14 @@ test('restrictSize', t => {
   } = helpers.testEnv()
   const edges = { left: true, top: true }
   const rect = rectUtils.xywhToTlbr({ left: 0, top: 0, right: 200, bottom: 300 })
+  const modification = new Modification(interaction)
 
   interaction.prepared = { name: null }
   interaction.prepared.edges = edges
   interaction._rects = {
     corrected: extend({} as any, rect),
   } as any
-  interaction.modifiers = {} as any
+  interaction.modification = {} as any
   interaction._interacting = true
 
   const options = {
@@ -43,7 +44,7 @@ test('restrictSize', t => {
     startOffset: getRectOffset(rect, startCoords),
   }
 
-  startAll(arg)
+  modification.startAll(arg)
   arg.state = state
 
   const move1 = Object.freeze({ x: -50, y: -40 })

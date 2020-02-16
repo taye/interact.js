@@ -3,19 +3,21 @@ import drag from '@interactjs/actions/drag'
 import { EventPhase } from '@interactjs/core/InteractEvent'
 import * as helpers from '@interactjs/core/tests/_helpers'
 import inertia from './index'
+import extend from '@interactjs/utils/extend'
 
 test('inertia', t => {
   const {
     scope,
     interaction,
-    target,
+    down,
+    start,
+    move,
+    up,
     interactable,
     coords,
-    event,
-  } = helpers.testEnv({ plugins: [inertia, drag] })
-  const element = target as HTMLElement
+  } = helpers.testEnv({ plugins: [inertia, drag], rect: { left: 0, top: 0, bottom: 100, right: 100 } })
   const modifierChange = 5
-  const testModifier = {
+  const changeModifier = {
     options: { endOnly: false },
     methods: {
       set ({ coords: modifierCoords, phase }: any) {
@@ -41,7 +43,7 @@ test('inertia', t => {
   downStartMoveUp({ x: 100, y: 0, dt: 10 })
   t.ok(interaction.inertia.active, 'thrown: inertia is activated')
 
-  interactable.draggable({ modifiers: [testModifier as any] })
+  interactable.draggable({ modifiers: [changeModifier as any] })
 
   // test inertia with { endOnly: false } modifier and with throw
   downStartMoveUp({ x: 100, y: 0, dt: 10 })
@@ -57,12 +59,11 @@ test('inertia', t => {
   )
 
   // test inertia with { endOnly: true } modifier and with throw
-  testModifier.options.endOnly = true
+  changeModifier.options.endOnly = true
   downStartMoveUp({ x: 100, y: 0, dt: 10 })
   t.deepEqual(modifierCallPhases, [EventPhase.InertiaStart], '{ endOnly: true } && thrown: modifier is called from pointerUp')
-  const modified = helpers.getProps(interaction.inertia, ['modifiedXe', 'modifiedYe'])
   t.deepEqual(
-    modified,
+    helpers.getProps(interaction.inertia, ['modifiedXe', 'modifiedYe'] as const),
     {
       // modified target minus move coords
       modifiedXe: modifierChange - 100,
@@ -71,13 +72,13 @@ test('inertia', t => {
     '{ endOnly: true } && thrown: inertia target coords are correct')
 
   // test smoothEnd with { endOnly: false } modifier
-  testModifier.options.endOnly = false
+  changeModifier.options.endOnly = false
   downStartMoveUp({ x: 1, y: 0, dt: 1000 })
   t.notOk(interaction.inertia.active, '{ endOnly: false } && !thrown: inertia smoothEnd is not activated')
   t.deepEqual(modifierCallPhases, [EventPhase.Move, EventPhase.InertiaStart], '{ endOnly: false } && !thrown: modifier is called from pointerUp')
 
   // test smoothEnd with { endOnly: true } modifier
-  testModifier.options.endOnly = true
+  changeModifier.options.endOnly = true
   downStartMoveUp({ x: 1, y: 0, dt: 1000 })
   t.ok(interaction.inertia.active, '{ endOnly: true } && !thrown: inertia smoothEnd is activated')
   t.deepEqual(modifierCallPhases, [EventPhase.InertiaStart], '{ endOnly: true } && !thrown: modifier is called from pointerUp')
@@ -92,13 +93,13 @@ test('inertia', t => {
     interaction.stop()
 
     Object.assign(coords.page, { x: 0, y: 0 })
-    interaction.pointerDown(event, event, element)
+    down()
 
-    interaction.start({ name: 'drag' }, interactable, element)
+    start({ name: 'drag' })
 
     Object.assign(coords.page, { x, y })
     coords.timeStamp = dt
-    interaction.pointerMove(event, event, element)
-    interaction.pointerUp(event, event, element, element)
+    move()
+    up()
   }
 })
