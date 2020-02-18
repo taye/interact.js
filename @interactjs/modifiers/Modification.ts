@@ -1,18 +1,11 @@
+import clone from '@interactjs/utils/clone'
 import extend from '@interactjs/utils/extend'
 import * as rectUtils from '@interactjs/utils/rect'
 import { Modifier, ModifierArg, ModifierState } from './base'
 
 export interface ModificationResult {
-  delta: {
-    x: number
-    y: number
-  }
-  rectDelta: {
-    left: number
-    right: number
-    top: number
-    bottom: number
-  }
+  delta: Interact.Point
+  rectDelta: Interact.Rect
   coords: Interact.Point
   rect: Interact.FullRect
   eventProps: any[]
@@ -23,11 +16,8 @@ interface MethodArg {
   phase: Interact.EventPhase
   pageCoords?: Interact.Point
   rect?: Interact.FullRect
-  prevCoords?: Interact.Point
-  prevRect?: Interact.FullRect
   coords?: Interact.Point
   preEnd?: boolean
-  requireEndOnly?: boolean
   skipModifiers?: number
 }
 
@@ -37,16 +27,13 @@ export default class Modification {
   startDelta: Interact.Point = null
   result?: ModificationResult = null
   endResult?: Interact.Point = null
-  phase: Interact.EventPhase
   edges: Interact.EdgeOptions
 
-  constructor (private readonly interaction: Readonly<Interact.Interaction>) {}
+  constructor (readonly interaction: Readonly<Interact.Interaction>) {}
 
   start (
     { phase }: MethodArg,
     pageCoords: Interact.Point,
-    prevCoords: Interact.Point,
-    prevRect: Interact.FullRect,
   ) {
     const { interaction } = this
     const modifierList = getModifierList(interaction)
@@ -60,12 +47,9 @@ export default class Modification {
       phase,
       pageCoords,
       preEnd: false,
-      requireEndOnly: false,
-      prevCoords,
-      prevRect,
     }
 
-    this.result = null
+    this.result = createResult()
     this.startAll(arg)
 
     const result = this.result = this.setAll(arg)
@@ -75,6 +59,7 @@ export default class Modification {
 
   fillArg (arg: Partial<ModifierArg>) {
     const { interaction } = this
+
     arg.interaction = interaction
     arg.interactable = interaction.interactable
     arg.element = interaction.element
@@ -98,42 +83,27 @@ export default class Modification {
     this.fillArg(arg)
 
     const {
-      prevCoords,
-      prevRect,
       phase,
       preEnd,
-      requireEndOnly,
       skipModifiers,
-      rect,
+      rect: unmodifiedRect,
     } = arg
 
     arg.coords = extend({}, arg.pageCoords)
-    arg.rect = extend({}, rect)
+    arg.rect = extend({}, unmodifiedRect)
 
     const states = skipModifiers
       ? this.states.slice(skipModifiers)
       : this.states
 
-    const result = {
-      rect,
-      delta: { x: 0, y: 0 },
-      rectDelta: {
-        left  : 0,
-        right : 0,
-        top   : 0,
-        bottom: 0,
-      },
-      coords: arg.coords,
-      eventProps: [],
-      changed: true,
-    }
+    const result = createResult(arg.coords, unmodifiedRect)
 
     for (const state of states) {
       const { options } = state
       const lastModifierCoords = extend({}, arg.coords)
       let returnValue = null
 
-      if (state.methods.set && this.shouldDo(options, preEnd, requireEndOnly, phase)) {
+      if (state.methods.set && this.shouldDo(options, preEnd, phase)) {
         arg.state = state
         returnValue = state.methods.set(arg as ModifierArg)
 
@@ -146,55 +116,46 @@ export default class Modification {
     result.delta.x = arg.coords.x - arg.pageCoords.x
     result.delta.y = arg.coords.y - arg.pageCoords.y
 
-    result.rectDelta.left   = arg.rect.left - rect.left
-    result.rectDelta.right  = arg.rect.right - rect.right
-    result.rectDelta.top    = arg.rect.top - rect.top
-    result.rectDelta.bottom = arg.rect.bottom - rect.bottom
+    result.rectDelta.left   = arg.rect.left - unmodifiedRect.left
+    result.rectDelta.right  = arg.rect.right - unmodifiedRect.right
+    result.rectDelta.top    = arg.rect.top - unmodifiedRect.top
+    result.rectDelta.bottom = arg.rect.bottom - unmodifiedRect.bottom
 
+    const prevCoords = this.result.coords
+    const prevRect = this.result.rect
     const rectChanged = !prevRect || result.rect.left !== prevRect.left ||
       result.rect.right !== prevRect.right ||
       result.rect.top !== prevRect.top ||
       result.rect.bottom !== prevRect.bottom
 
-    result.changed = !prevCoords || prevCoords.x !== result.coords.x ||
-      prevCoords.y !== result.coords.y ||
-      rectChanged
+    result.changed = rectChanged ||
+      prevCoords.x !== result.coords.x ||
+      prevCoords.y !== result.coords.y
 
+    result.rect = arg.rect
     return result
   }
 
-  beforeMove (arg: Partial<Interact.DoPhaseArg> & {
+  setAndApply (arg: Partial<Interact.DoPhaseArg> & {
     phase: Interact.EventPhase
     preEnd?: boolean
     skipModifiers?: number
-    prevCoords?: Interact.Point
-    prevRect?: Interact.FullRect
     modifiedCoords?: Interact.Point
   }): void | false {
     const { interaction } = this
-    const { phase, preEnd } = arg
-
-    const prevCoords = arg.prevCoords || (this.result
-      ? this.result.coords
-      : null)
-    const prevRect = arg.prevRect || (this.result
-      ? this.result.rect
-      : null)
+    const { phase, preEnd, skipModifiers } = arg
 
     const result = this.setAll({
       preEnd,
       phase,
       pageCoords: arg.modifiedCoords || interaction.coords.cur.page,
-      prevCoords,
-      prevRect,
-      requireEndOnly: false,
     })
 
     this.result = result
 
     // don't fire an action move if a modifier would keep the event in the same
     // cordinates as before
-    if (!result.changed && interaction.interacting()) {
+    if (!result.changed && (!skipModifiers || skipModifiers < this.states.length) && interaction.interacting()) {
       return false
     }
 
@@ -211,14 +172,14 @@ export default class Modification {
       result.delta.y += adjustment.y
     }
 
-    this.setCoords(arg)
+    this.applyToInteraction(arg)
   }
 
-  beforeEnd (arg: Omit<Interact.DoPhaseArg, 'iEvent'> & { noPreEnd?: boolean, state?: ModifierState }): void | false {
-    const { interaction, event, noPreEnd } = arg
+  beforeEnd (arg: Omit<Interact.DoPhaseArg, 'iEvent'> & { state?: ModifierState }): void | false {
+    const { interaction, event } = arg
     const states = this.states
 
-    if (noPreEnd || !states || !states.length) {
+    if (!states || !states.length) {
       return
     }
 
@@ -236,7 +197,7 @@ export default class Modification {
       }
 
       // if the endOnly or alwaysOnEnd options are true for any modifier
-      if (!didPreEnd && this.shouldDo(options, true, true)) {
+      if (!didPreEnd && this.shouldDo(options, true)) {
         // fire a move event at the modified coordinates
         interaction.move({ event, preEnd: true })
         didPreEnd = true
@@ -289,7 +250,7 @@ export default class Modification {
     return this.states
   }
 
-  setCoords (arg: { phase: Interact.EventPhase, rect?: Interact.Rect }) {
+  applyToInteraction (arg: { phase: Interact.EventPhase, rect?: Interact.Rect }) {
     const { interaction } = this
     const { phase } = arg
     const curCoords = interaction.coords.cur
@@ -320,7 +281,7 @@ export default class Modification {
     rect.height = rect.bottom - rect.top
   }
 
-  restoreCoords ({ interaction: { coords, rect, modification } }: { interaction: Interact.Interaction }) {
+  restoreInteractionCoords ({ interaction: { coords, rect, modification } }: { interaction: Interact.Interaction }) {
     if (!modification.result) { return }
 
     const { startDelta } = modification
@@ -344,19 +305,42 @@ export default class Modification {
     rect.bottom -= rectDelta.bottom
   }
 
-  shouldDo (options, preEnd?: boolean, requireEndOnly?: boolean, phase?: string) {
+  shouldDo (options, preEnd?: boolean, phase?: string) {
     return options
       ? options.enabled !== false &&
         (preEnd || !options.endOnly) &&
-        (!requireEndOnly || options.endOnly || options.alwaysOnEnd) &&
         (options.setStart || phase !== 'start')
-      : !requireEndOnly
+      : true
+  }
+
+  copyFrom (other: Modification) {
+    this.startOffset = other.startOffset
+    this.startDelta = other.startDelta
+    this.edges = other.edges
+    this.states = other.states.map(s => clone(s) as ModifierState)
+    this.result = createResult(other.result.coords, other.result.rect)
   }
 
   destroy () {
     for (const prop in this) {
       this[prop] = null
     }
+  }
+}
+
+function createResult (coords?: Interact.Point, rect?: Interact.FullRect): ModificationResult {
+  return {
+    rect,
+    coords,
+    delta: { x: 0, y: 0 },
+    rectDelta: {
+      left  : 0,
+      right : 0,
+      top   : 0,
+      bottom: 0,
+    },
+    eventProps: [],
+    changed: true,
   }
 }
 

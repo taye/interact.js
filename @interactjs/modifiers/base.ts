@@ -66,7 +66,6 @@ export interface ModifierArg<State extends ModifierState = ModifierState> {
   coords?: Interact.Point
   startOffset?: Interact.Rect
   preEnd?: boolean
-  requireEndOnly?: boolean
 }
 
 export interface ModifierModule<
@@ -122,7 +121,7 @@ export function makeModifier<
   return modifier
 }
 
-function addEventModifiers ({ iEvent, interaction: { modification: { result } } }: {
+export function addEventModifiers ({ iEvent, interaction: { modification: { result } } }: {
   iEvent: Interact.InteractEvent
   interaction: Interact.Interaction
 }) {
@@ -143,27 +142,33 @@ const modifiersBase: Interact.Plugin = {
 
     'interactions:before-action-start': arg => {
       const { modification } = arg.interaction
-      modification.start(arg, arg.interaction.coords.start.page, null, null)
-      arg.interaction.edges = modification.edges
-      modification.setCoords(arg)
-    },
-    'interactions:after-action-start': arg => arg.interaction.modification.restoreCoords(arg),
-    'interactions:before-action-move': arg => arg.interaction.modification.beforeMove(arg),
-    'interactions:after-action-move': arg => arg.interaction.modification.restoreCoords(arg),
 
-    'interactions:action-resume': arg => {
+      modification.start(arg, arg.interaction.coords.start.page)
+      arg.interaction.edges = modification.edges
+      modification.applyToInteraction(arg)
+    },
+
+    'interactions:before-action-resume': arg => {
       const { modification } = arg.interaction
-      const { coords: prevCoords, rect: prevRect } = modification.result
 
       modification.stop(arg)
-      modification.start(arg, arg.interaction.coords.cur.page, prevCoords, prevRect)
-      modification.beforeMove(arg)
+      modification.start(arg, arg.interaction.coords.cur.page)
+      modification.applyToInteraction(arg)
     },
 
+    'interactions:before-action-move': arg => arg.interaction.modification.setAndApply(arg),
+
+    'interactions:after-action-start': arg => arg.interaction.modification.restoreInteractionCoords(arg),
+    'interactions:after-action-move': arg => arg.interaction.modification.restoreInteractionCoords(arg),
+    'interactions:after-action-resume': arg => arg.interaction.modification.restoreInteractionCoords(arg),
+
     'interactions:before-action-end': arg => arg.interaction.modification.beforeEnd(arg),
+
     'interactions:action-start': addEventModifiers,
     'interactions:action-move': addEventModifiers,
+    'interactions:action-resume': addEventModifiers,
     'interactions:action-end': addEventModifiers,
+
     'interactions:stop': arg => arg.interaction.modification.stop(arg),
   },
   before: ['actions', 'action/drag', 'actions/resize', 'actions/gesture'],

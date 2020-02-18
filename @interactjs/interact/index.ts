@@ -9,11 +9,14 @@ import * as modifiers from '@interactjs/modifiers/index'
 import * as pointerEvents from '@interactjs/pointer-events/index'
 import reflow from '@interactjs/reflow/index'
 import interact, { scope } from './interact'
+import offset from '@interactjs/offset'
 
 export function init (window: Window) {
   scope.init(window)
 
   interact.use(interactablePreventDefault)
+
+  interact.use(offset)
 
   // pointerEvents
   interact.use(pointerEvents)

@@ -36,6 +36,7 @@ export type PointerArgProps<T extends {} = {}> = {
   event: Interact.PointerEventType
   eventTarget: Interact.EventTarget
   pointerIndex: number
+  pointerInfo: PointerInfo
   interaction: Interaction
 } & T
 
@@ -69,12 +70,9 @@ declare module '@interactjs/core/scope' {
       curEventTarget: EventTarget
     }
     'interactions:update-pointer': PointerArgProps<{
-      pointerInfo: PointerInfo
       down: boolean
     }>
-    'interactions:remove-pointer': PointerArgProps<{
-      pointerInfo: PointerInfo
-    }>
+    'interactions:remove-pointer': PointerArgProps
     'interactions:blur'
     'interactions:before-action-start': Omit<DoPhaseArg, 'iEvent'>
     'interactions:action-start': DoPhaseArg
@@ -209,12 +207,14 @@ export class Interaction<T extends ActionName = any> {
 
   pointerDown (pointer: Interact.PointerType, event: Interact.PointerEventType, eventTarget: Interact.EventTarget) {
     const pointerIndex = this.updatePointer(pointer, event, eventTarget, true)
+    const pointerInfo = this.pointers[pointerIndex]
 
     this._scopeFire('interactions:down', {
       pointer,
       event,
       eventTarget,
       pointerIndex,
+      pointerInfo,
       type: 'down',
       interaction: this,
     })
@@ -299,9 +299,11 @@ export class Interaction<T extends ActionName = any> {
       this.pointerWasMoved = utils.hypot(dx, dy) > this.pointerMoveTolerance
     }
 
+    const pointerIndex = this.getPointerIndex(pointer)
     const signalArg = {
       pointer,
-      pointerIndex: this.getPointerIndex(pointer),
+      pointerIndex,
+      pointerInfo: this.pointers[pointerIndex],
       event,
       type: 'move' as const,
       eventTarget,
@@ -319,7 +321,7 @@ export class Interaction<T extends ActionName = any> {
 
     this._scopeFire('interactions:move', signalArg)
 
-    if (!duplicateMove) {
+    if (!duplicateMove && !this.simulation) {
       // if interacting, fire an 'action-move' signal etc
       if (this.interacting()) {
         signalArg.type = null
@@ -380,6 +382,7 @@ export class Interaction<T extends ActionName = any> {
     this._scopeFire(`interactions:${type}` as 'interactions:up' | 'interactions:cancel', {
       pointer,
       pointerIndex,
+      pointerInfo: this.pointers[pointerIndex],
       event,
       eventTarget,
       type: type as any,
@@ -577,8 +580,7 @@ export class Interaction<T extends ActionName = any> {
 
     if (rect && phase === EventPhase.Move) {
       // update the rect modifications
-      const edges = this.edges || this.prepared.edges
-      utils.rect.addEdges(edges, rect, delta[this.interactable.options.deltaSource])
+      utils.rect.addEdges(this.edges, rect, delta[this.interactable.options.deltaSource])
 
       rect.width = rect.right - rect.left
       rect.height = rect.bottom - rect.top
