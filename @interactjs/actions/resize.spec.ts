@@ -30,7 +30,7 @@ test('resize', t => {
     buttons: 0,
   }
 
-  t.ok(scope.actions.names.includes('resize' as any), '"resize" in actions.names')
+  t.ok(scope.actions.map.resize, '"resize" in actions.names')
   t.equal(scope.actions.methodDict.resize, 'resizable')
   t.equal(typeof scope.Interactable.prototype.resizable, 'function', 'Interactable.resizable method is added')
 

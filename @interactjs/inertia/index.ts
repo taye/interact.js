@@ -1,18 +1,17 @@
-import { EventPhase } from '@interactjs/core/InteractEvent'
 import * as modifiers from '@interactjs/modifiers/base'
 import Modification from '@interactjs/modifiers/Modification'
 import * as dom from '@interactjs/utils/domUtils'
 import extend from '@interactjs/utils/extend'
 import hypot from '@interactjs/utils/hypot'
 import * as is from '@interactjs/utils/is'
-import raf from '@interactjs/utils/raf'
 import { setCoords } from '@interactjs/utils/pointerUtils'
+import raf from '@interactjs/utils/raf'
 
 declare module '@interactjs/core/InteractEvent' {
   // eslint-disable-next-line no-shadow
-  enum EventPhase {
-    Resume = 'resume',
-    InertiaStart = 'inertiastart',
+  interface PhaseMap {
+    resume: true
+    inertiastart: true
   }
 }
 
@@ -21,9 +20,6 @@ declare module '@interactjs/core/Interaction' {
     inertia?: InertiaState
   }
 }
-
-(EventPhase as any).Resume = 'resume'
-;(EventPhase as any).InertiaStart = 'inertiastart'
 
 declare module '@interactjs/core/defaultOptions' {
   interface PerActionDefaults {
@@ -40,7 +36,7 @@ declare module '@interactjs/core/defaultOptions' {
 
 declare module '@interactjs/core/scope' {
   interface SignalArgs {
-    'interactions:before-action-resume': Interact.DoPhaseArg
+    'interactions:before-action-resume': Omit<Interact.DoPhaseArg, 'iEvent'>
     'interactions:action-resume': Interact.DoPhaseArg
     'interactions:after-action-resume': Interact.DoPhaseArg
   }
@@ -99,18 +95,13 @@ export class InertiaState {
   ) {
     const { interaction } = this
     const options = getOptions(interaction)
-    const { client: velocityClient } = interaction.coords.velocity
-    const pointerSpeed = hypot(velocityClient.x, velocityClient.y)
 
-    // check if inertia should be started
-    if (
-      !options ||
-      !options.enabled ||
-      interaction.prepared.name === 'gesture'
-    ) {
+    if (!options || !options.enabled) {
       return false
     }
 
+    const { client: velocityClient } = interaction.coords.velocity
+    const pointerSpeed = hypot(velocityClient.x, velocityClient.y)
     const modification = this.modification || (this.modification = new Modification(interaction))
 
     modification.copyFrom(interaction.modification)
@@ -129,7 +120,7 @@ export class InertiaState {
       edges: interaction.edges,
       pageCoords: extend({}, this.startCoords),
       preEnd: true,
-      phase: EventPhase.InertiaStart,
+      phase: 'inertiastart',
     }
 
     const thrown = (
@@ -152,7 +143,7 @@ export class InertiaState {
       interaction,
       event,
       interaction.prepared.name,
-      EventPhase.InertiaStart,
+      'inertiastart',
       interaction.element,
     )
     // modification.restoreCoords(this.modifierArg)
@@ -314,9 +305,10 @@ export class InertiaState {
     // fire resume signals and event
     interaction._doPhase({
       interaction,
-      phase: EventPhase.Resume,
+      phase: 'resume',
       event: arg.event,
     })
+    interaction.move()
   }
 
   end () {

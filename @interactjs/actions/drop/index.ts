@@ -1,6 +1,6 @@
 import Interactable from '@interactjs/core/Interactable'
 import InteractEvent from '@interactjs/core/InteractEvent'
-import { ActionName, Scope } from '@interactjs/core/scope'
+import { Scope } from '@interactjs/core/scope'
 import * as utils from '@interactjs/utils/index'
 import drag from '../drag'
 import DropEvent from './DropEvent'
@@ -58,6 +58,10 @@ interface DropSignalArg {
 }
 
 declare module '@interactjs/core/scope' {
+  interface ActionMap {
+    drop?: typeof drop
+  }
+
   interface Scope {
     dynamicDrop?: boolean
   }
@@ -165,14 +169,14 @@ function install (scope: Scope) {
     return scope.dynamicDrop
   }
 
-  utils.arr.merge(actions.eventTypes, [
-    'dragenter',
-    'dragleave',
-    'dropactivate',
-    'dropdeactivate',
-    'dropmove',
-    'drop',
-  ])
+  utils.extend(actions.phaselessTypes, {
+    dragenter: true,
+    dragleave: true,
+    dropactivate: true,
+    dropdeactivate: true,
+    dropmove: true,
+    drop: true,
+  })
   actions.methodDict.drop = 'dropzone'
 
   scope.dynamicDrop = false
@@ -443,7 +447,7 @@ function dropCheckMethod (
   const dropOverlap = interactable.options.drop.overlap
 
   if (dropOverlap === 'pointer') {
-    const origin = utils.getOriginXY(draggable, draggableElement, ActionName.Drag)
+    const origin = utils.getOriginXY(draggable, draggableElement, 'drag')
     const page = utils.pointer.getPageXY(dragEvent)
 
     page.x += origin.x

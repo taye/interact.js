@@ -36,15 +36,15 @@ declare namespace Interact {
   export type Target = Interact.EventTarget | string
   export type interact = typeof interact
   export type Plugin = scope.Plugin
-  export type ActionProps<T extends ActionName = any> = interaction.ActionProps<T>
+  export type ActionProps<T extends scope.ActionName = any> = interaction.ActionProps<T>
   export type Interactable = _Interactable
   export type __InteractableSet = _InteractableSet
   export type Scope = scope.Scope
   export type Interaction<T extends scope.ActionName = any> = interaction.Interaction<T>
   export type PointerArgProps<T> = interaction.PointerArgProps<T>
   export type InteractEvent<
-    T extends scope.ActionName = any,
-    P extends iEvent.EventPhase = any,
+    T extends keyof scope.ActionMap = any,
+    P extends iEvent.EventPhase = never,
   > = iEvent.InteractEvent<T, P>
   export type EventPhase = iEvent.EventPhase
   export type Options = defaults.Options
@@ -52,7 +52,7 @@ declare namespace Interact {
   export type SignalArgs = scope.SignalArgs
   export type DoPhaseArg = interaction.DoPhaseArg
 
-  export type DragEvent = InteractEvent<scope.ActionName.Drag>
+  export type DragEvent = InteractEvent<'drag'>
   export type ResizeEvent = resize.ResizeEvent
   export type GestureEvent = gesture.GestureEvent
   export type PointerEvent<T extends string = any> = _PointerEvent<T>

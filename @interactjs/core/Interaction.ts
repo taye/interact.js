@@ -2,16 +2,15 @@ import * as utils from '@interactjs/utils/index'
 import Interactable from './Interactable'
 import InteractEvent, { EventPhase } from './InteractEvent'
 import PointerInfo from './PointerInfo'
-import { ActionName } from './scope'
 
-export interface ActionProps<T extends ActionName = any> {
+export interface ActionProps<T extends Interact.ActionName = any> {
   name: T
   axis?: 'x' | 'y' | 'xy'
   edges?: Interact.EdgeOptions
 }
 
 export interface StartAction extends ActionProps {
-  name: ActionName | string
+  name: Interact.ActionName | string
 }
 
 export enum _ProxyValues {
@@ -94,7 +93,7 @@ keyof typeof _ProxyValues | keyof typeof _ProxyMethods
 
 let idCounter = 0
 
-export class Interaction<T extends ActionName = any> {
+export class Interaction<T extends Interact.ActionName = any> {
   // current interactable being interacted with
   interactable: Interactable = null
 
@@ -254,7 +253,7 @@ export class Interaction<T extends ActionName = any> {
   start (action: StartAction, interactable: Interactable, element: Interact.Element) {
     if (this.interacting() ||
         !this.pointerIsDown ||
-        this.pointers.length < (action.name === ActionName.Gesture ? 2 : 1) ||
+        this.pointers.length < (action.name === 'gesture' ? 2 : 1) ||
         !interactable.options[action.name].enabled) {
       return false
     }
@@ -271,7 +270,7 @@ export class Interaction<T extends ActionName = any> {
     this._interacting = this._doPhase({
       interaction: this,
       event: this.downEvent,
-      phase: EventPhase.Start,
+      phase: 'start',
     }) && !this._stopped
 
     return this._interacting
@@ -364,7 +363,7 @@ export class Interaction<T extends ActionName = any> {
       interaction: this,
     }, signalArg || {})
 
-    signalArg.phase = EventPhase.Move
+    signalArg.phase = 'move'
 
     this._doPhase(signalArg)
   }
@@ -428,7 +427,7 @@ export class Interaction<T extends ActionName = any> {
       endPhaseResult = this._doPhase({
         event,
         interaction: this,
-        phase: EventPhase.End,
+        phase: 'end',
       })
     }
 
@@ -578,7 +577,7 @@ export class Interaction<T extends ActionName = any> {
     const { event, phase, preEnd, type } = signalArg
     const { rect, coords: { delta } } = this
 
-    if (rect && phase === EventPhase.Move) {
+    if (rect && phase === 'move') {
       // update the rect modifications
       utils.rect.addEdges(this.edges, rect, delta[this.interactable.options.deltaSource])
 

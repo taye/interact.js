@@ -70,6 +70,7 @@ export function mockScope (options = {} as any) {
   const scope = createScope().init(window)
 
   scope.interact = Object.assign(() => {}, { use () {} }) as any
+  utils.extend(scope.actions.phaselessTypes, { teststart: true, testmove: true, testend: true })
 
   return scope
 }

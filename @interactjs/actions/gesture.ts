@@ -1,5 +1,4 @@
 import InteractEvent from '@interactjs/core/InteractEvent'
-import { ActionName, Scope } from '@interactjs/core/scope'
 import * as utils from '@interactjs/utils/index'
 
 export type GesturableMethod = Interact.ActionMethod<Interact.GesturableOptions>
@@ -29,19 +28,12 @@ declare module '@interactjs/core/defaultOptions' {
 }
 
 declare module '@interactjs/core/scope' {
-  interface Actions {
-    [ActionName.Gesture]?: typeof gesture
-  }
-
-  // eslint-disable-next-line no-shadow
-  enum ActionName {
-    Gesture = 'gesture'
+  interface ActionMap {
+    gesture?: typeof gesture
   }
 }
 
-(ActionName as any).Gesture = 'gesture'
-
-export interface GestureEvent extends Interact.InteractEvent<ActionName.Gesture> {
+export interface GestureEvent extends Interact.InteractEvent<'gesture'> {
   distance: number
   angle: number
   da: number // angle change
@@ -53,11 +45,11 @@ export interface GestureEvent extends Interact.InteractEvent<ActionName.Gesture>
 
 export interface GestureSignalArg extends Interact.DoPhaseArg {
   iEvent: GestureEvent
-  interaction: Interact.Interaction<ActionName.Gesture>
+  interaction: Interact.Interaction<'gesture'>
   event: Interact.PointerEventType | GestureEvent
 }
 
-function install (scope: Scope) {
+function install (scope: Interact.Scope) {
   const {
     actions,
     Interactable,
@@ -90,8 +82,8 @@ function install (scope: Scope) {
   Interactable.prototype.gesturable = function (this: Interact.Interactable, options: Interact.GesturableOptions | boolean) {
     if (utils.is.object(options)) {
       this.options.gesture.enabled = options.enabled !== false
-      this.setPerAction(ActionName.Gesture, options)
-      this.setOnEvents(ActionName.Gesture, options)
+      this.setPerAction('gesture', options)
+      this.setOnEvents('gesture', options)
 
       return this
     }
@@ -105,13 +97,7 @@ function install (scope: Scope) {
     return this.options.gesture as Interact.Options
   } as GesturableMethod
 
-  actions[ActionName.Gesture] = gesture
-  actions.names.push(ActionName.Gesture)
-  utils.arr.merge(actions.eventTypes, [
-    'gesturestart',
-    'gesturemove',
-    'gestureend',
-  ])
+  actions.map.gesture = gesture
   actions.methodDict.gesture = 'gesturable'
 
   defaults.actions.gesture = gesture.defaults
@@ -198,7 +184,7 @@ const gesture: Interact.Plugin = {
         return undefined
       }
 
-      arg.action = { name: ActionName.Gesture }
+      arg.action = { name: 'gesture' }
 
       return false
     },

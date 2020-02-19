@@ -1,5 +1,4 @@
-import { ActionName, Scope } from '@interactjs/core/scope'
-import * as arr from '@interactjs/utils/arr'
+import { Scope } from '@interactjs/core/scope'
 import * as is from '@interactjs/utils/is'
 
 declare module '@interactjs/core/Interactable' {
@@ -15,19 +14,12 @@ declare module '@interactjs/core/defaultOptions' {
 }
 
 declare module '@interactjs/core/scope' {
-  interface Actions {
-    [ActionName.Drag]?: typeof drag
-  }
-
-  // eslint-disable-next-line no-shadow
-  enum ActionName {
-    Drag = 'drag'
+  interface ActionMap {
+    drag?: typeof drag
   }
 }
 
-(ActionName as any).Drag = 'drag'
-
-export type DragEvent = Interact.InteractEvent<ActionName.Drag>
+export type DragEvent = Interact.InteractEvent<'drag'>
 
 export type DraggableMethod = Interact.ActionMethod<Interact.DraggableOptions>
 
@@ -40,15 +32,7 @@ function install (scope: Scope) {
 
   Interactable.prototype.draggable = drag.draggable
 
-  actions[ActionName.Drag] = drag
-  actions.names.push(ActionName.Drag)
-  arr.merge(actions.eventTypes, [
-    'dragstart',
-    'dragmove',
-    'draginertiastart',
-    'dragresume',
-    'dragend',
-  ])
+  actions.map.drag = drag
   actions.methodDict.drag = 'draggable'
 
   defaults.actions.drag = drag.defaults
@@ -131,8 +115,8 @@ function move ({ iEvent, interaction }) {
 const draggable: DraggableMethod = function draggable (this: Interact.Interactable, options?: Interact.DraggableOptions | boolean): any {
   if (is.object(options)) {
     this.options.drag.enabled = options.enabled !== false
-    this.setPerAction(ActionName.Drag, options)
-    this.setOnEvents(ActionName.Drag, options)
+    this.setPerAction('drag', options)
+    this.setOnEvents('drag', options)
 
     if (/^(xy|x|y|start)$/.test(options.lockAxis)) {
       this.options.drag.lockAxis = options.lockAxis
@@ -177,7 +161,7 @@ const drag: Interact.Plugin = {
       }
 
       arg.action = {
-        name: ActionName.Drag,
+        name: 'drag',
         axis: (dragOptions.lockAxis === 'start'
           ? dragOptions.startAxis
           : dragOptions.lockAxis),

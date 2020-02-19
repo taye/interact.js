@@ -28,7 +28,7 @@ test('interactions', t => {
   t.equal(typeof newInteraction._scopeFire, 'function')
 
   t.assert(typeof scope.actions === 'object')
-  t.deepEqual(scope.actions.names, [])
+  t.deepEqual(scope.actions.map, {})
   t.deepEqual(scope.actions.methodDict, {})
 
   t.end()

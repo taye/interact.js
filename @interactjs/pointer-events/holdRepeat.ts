@@ -29,7 +29,7 @@ function install (scope: Interact.Scope) {
 
   // don't repeat by default
   pointerEvents.defaults.holdRepeatInterval = 0
-  pointerEvents.types.push('holdrepeat')
+  pointerEvents.types.holdrepeat = scope.actions.phaselessTypes.holdrepeat = true
 }
 
 function onNew ({ pointerEvent }: { pointerEvent: PointerEvent<any> }) {

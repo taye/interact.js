@@ -1,5 +1,4 @@
 import Interactable from '@interactjs/core/Interactable'
-import { EventPhase } from '@interactjs/core/InteractEvent'
 import { ActionProps, Interaction } from '@interactjs/core/Interaction'
 import { Scope } from '@interactjs/core/scope'
 import { arr, extend, is, pointer as pointerUtils, rect as rectUtils, win } from '@interactjs/utils/index'
@@ -19,25 +18,17 @@ declare module '@interactjs/core/Interaction' {
 
 declare module '@interactjs/core/InteractEvent' {
   // eslint-disable-next-line no-shadow
-  enum EventPhase {
-    Reflow = 'reflow',
+  interface PhaseMap {
+    reflow: true
   }
 }
 
-(EventPhase as any).Reflow = 'reflow'
-
 export function install (scope: Scope) {
   const {
-    actions,
     /** @lends Interactable */
     // eslint-disable-next-line no-shadow
     Interactable,
   } = scope
-
-  // add action reflow event types
-  for (const actionName of actions.names) {
-    actions.eventTypes.push(`${actionName}reflow`)
-  }
 
   /**
    * ```js
@@ -120,7 +111,7 @@ function startReflow (scope: Scope, interactable: Interactable, element: Interac
     event,
     pointer: event,
     eventTarget: element,
-    phase: EventPhase.Reflow,
+    phase: 'reflow',
   }
 
   interaction.interactable = interactable
@@ -160,7 +151,7 @@ export default {
   listeners: {
     // remove completed reflow interactions
     'interactions:stop': ({ interaction }, scope) => {
-      if (interaction.pointerType === EventPhase.Reflow) {
+      if (interaction.pointerType === 'reflow') {
         if (interaction._reflowResolve) {
           interaction._reflowResolve()
         }

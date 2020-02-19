@@ -104,15 +104,15 @@ const pointerEvents = {
   fire,
   collectEventTargets,
   defaults,
-  types: [
-    'down',
-    'move',
-    'up',
-    'cancel',
-    'tap',
-    'doubletap',
-    'hold',
-  ],
+  types: {
+    down: true,
+    move: true,
+    up: true,
+    cancel: true,
+    tap: true,
+    doubletap: true,
+    hold: true,
+  } as { [type: string]: true },
 }
 
 function fire<T extends string> (
@@ -331,6 +331,7 @@ function tapAfterUp ({ interaction, pointer, event, eventTarget }: Interact.Sign
 function install (scope: Scope) {
   scope.pointerEvents = pointerEvents
   scope.defaults.actions.pointerEvents = pointerEvents.defaults
+  utils.extend(scope.actions.phaselessTypes, pointerEvents.types)
 }
 
 export default pointerEvents

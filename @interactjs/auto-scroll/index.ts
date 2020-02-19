@@ -42,7 +42,7 @@ function install (scope: Scope) {
   scope.autoScroll = autoScroll
   autoScroll.now = () => scope.now()
 
-  actions.eventTypes.push('autoscroll')
+  actions.phaselessTypes.autoscroll = true
   defaults.perAction.autoScroll = autoScroll.defaults
 }
 

@@ -4,7 +4,7 @@ import defaults from './defaultOptions'
 import Eventable from './Eventable'
 import InteractableBase from './Interactable'
 import InteractableSet from './InteractableSet'
-import InteractEvent from './InteractEvent'
+import InteractEvent, { PhaseMap } from './InteractEvent'
 import interactions from './interactions'
 
 export interface SignalArgs {
@@ -35,13 +35,17 @@ const {
   events,
 } = utils
 
-export enum ActionName {
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+export interface ActionMap { // tslint:disable-line no-empty-interface
 }
 
+export type ActionName = keyof ActionMap
+
 export interface Actions {
-  names: ActionName[]
-  methodDict: { [key: string]: string }
-  eventTypes: string[]
+  map: ActionMap
+  phases: PhaseMap
+  methodDict: { [P in ActionName]?: string }
+  phaselessTypes: { [type: string]: true }
 }
 
 export function createScope () {
@@ -71,9 +75,14 @@ export class Scope {
   defaults: Defaults = utils.clone(defaults) as Defaults
   Eventable = Eventable
   actions: Actions = {
-    names: [],
+    map: {},
+    phases: {
+      start: true,
+      move: true,
+      end: true,
+    },
     methodDict: {},
-    eventTypes: [],
+    phaselessTypes: {},
   }
 
   InteractEvent = InteractEvent
@@ -248,6 +257,18 @@ export class Scope {
   now () {
     return ((this.window as any).Date as typeof Date || Date).now()
   }
+}
+
+export function isNonNativeEvent (type: string, actions: Actions) {
+  if (actions.phaselessTypes[type]) { return true }
+
+  for (const name in actions.map) {
+    if (type.indexOf(name) === 0 && type.substr(name.length) in actions.phases) {
+      return true
+    }
+  }
+
+  return false
 }
 
 export function initScope (scope: Scope, window: Window) {

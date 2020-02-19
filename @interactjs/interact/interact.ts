@@ -2,7 +2,7 @@
 
 import { Options } from '@interactjs/core/defaultOptions'
 import Interactable from '@interactjs/core/Interactable'
-import { Scope } from '@interactjs/core/scope'
+import { Scope, isNonNativeEvent } from '@interactjs/core/scope'
 import browser from '@interactjs/utils/browser'
 import events from '@interactjs/utils/events'
 import * as utils from '@interactjs/utils/index'
@@ -142,7 +142,7 @@ function on (type: string | Interact.EventTypes, listener: Interact.ListenersArg
   }
 
   // if it is an InteractEvent type, add listener to globalEvents
-  if (utils.arr.contains(scope.actions.eventTypes, type)) {
+  if (isNonNativeEvent(type, scope.actions)) {
     // if this type of event was never bound
     if (!globalEvents[type]) {
       globalEvents[type] = [listener]
@@ -193,16 +193,16 @@ function off (type: Interact.EventTypes, listener: any, options?: object) {
     return interact
   }
 
-  if (!utils.arr.contains(scope.actions.eventTypes, type)) {
-    events.remove(scope.document, type, listener, options)
-  }
-  else {
+  if (isNonNativeEvent(type, scope.actions)) {
     let index
 
     if (type in globalEvents &&
         (index = globalEvents[type].indexOf(listener)) !== -1) {
       globalEvents[type].splice(index, 1)
     }
+  }
+  else {
+    events.remove(scope.document, type, listener, options)
   }
 
   return interact

@@ -1,6 +1,5 @@
 import { Interaction } from '@interactjs/core/Interaction'
-import { ActionName, Scope } from '@interactjs/core/scope'
-import * as arr from '@interactjs/utils/arr'
+import { Scope } from '@interactjs/core/scope'
 import * as dom from '@interactjs/utils/domUtils'
 import extend from '@interactjs/utils/extend'
 import * as is from '@interactjs/utils/is'
@@ -29,19 +28,12 @@ declare module '@interactjs/core/defaultOptions' {
 }
 
 declare module '@interactjs/core/scope' {
-  interface Actions {
-    [ActionName.Resize]?: typeof resize
-  }
-
-  // eslint-disable-next-line no-shadow
-  enum ActionName {
-    Resize = 'resize'
+  interface ActionMap {
+    resize?: typeof resize
   }
 }
 
-(ActionName as any).Resize = 'resize'
-
-export interface ResizeEvent extends Interact.InteractEvent<ActionName.Resize> {
+export interface ResizeEvent extends Interact.InteractEvent<'resize'> {
   deltaRect?: Interact.FullRect
   edges?: Interact.ActionProps['edges']
 }
@@ -109,15 +101,7 @@ function install (scope: Scope) {
     return resizable(this, options, scope)
   } as ResizableMethod
 
-  actions[ActionName.Resize] = resize
-  actions.names.push(ActionName.Resize)
-  arr.merge(actions.eventTypes, [
-    'resizestart',
-    'resizemove',
-    'resizeinertiastart',
-    'resizeresume',
-    'resizeend',
-  ])
+  actions.map.resize = resize
   actions.methodDict.resize = 'resizable'
 
   defaults.actions.resize = resize.defaults
@@ -165,7 +149,7 @@ function resizeChecker (arg) {
 
     if (resizeEdges.left || resizeEdges.right || resizeEdges.top || resizeEdges.bottom) {
       arg.action = {
-        name: ActionName.Resize,
+        name: 'resize',
         edges: resizeEdges,
       }
     }
@@ -188,8 +172,8 @@ function resizeChecker (arg) {
 function resizable (interactable: Interact.Interactable, options: Interact.OrBoolean<Interact.ResizableOptions> | boolean, scope: Scope) {
   if (is.object(options)) {
     interactable.options.resize.enabled = options.enabled !== false
-    interactable.setPerAction(ActionName.Resize, options)
-    interactable.setOnEvents(ActionName.Resize, options)
+    interactable.setPerAction('resize', options)
+    interactable.setOnEvents('resize', options)
 
     if (is.string(options.axis) && /^x$|^y$|^xy$/.test(options.axis)) {
       interactable.options.resize.axis = options.axis
@@ -380,7 +364,7 @@ function end ({ iEvent, interaction }: { iEvent: ResizeEvent, interaction: Inter
 }
 
 function updateEventAxes ({ iEvent, interaction }: { iEvent: ResizeEvent, interaction: Interaction }) {
-  if (interaction.prepared.name !== ActionName.Resize || !interaction.resizeAxes) { return }
+  if (interaction.prepared.name !== 'resize' || !interaction.resizeAxes) { return }
 
   const options = interaction.interactable.options
 

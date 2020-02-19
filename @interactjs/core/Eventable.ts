@@ -1,13 +1,11 @@
 import * as arr from '@interactjs/utils/arr'
 import extend from '@interactjs/utils/extend'
 import normalize, { NormalizedListeners } from '@interactjs/utils/normalizeListeners'
-import { EventPhase, InteractEvent } from './InteractEvent'
-import { ActionName } from './scope'
 
 function fireUntilImmediateStopped<
-  T extends ActionName,
-  P extends EventPhase,
-> (event: InteractEvent<T, P>, listeners: Interact.Listener[]) {
+  T extends Interact.ActionName,
+  P extends Interact.EventPhase,
+> (event: Interact.InteractEvent<T, P>, listeners: Interact.Listener[]) {
   for (const listener of listeners) {
     if (event.immediatePropagationStopped) { break }
 

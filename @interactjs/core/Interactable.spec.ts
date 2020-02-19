@@ -62,7 +62,7 @@ test('Interactable copies and extends per action defaults', t => {
   const scope = helpers.mockScope()
   const { defaults } = scope
 
-  scope.actions.methodDict = { test: 'testize' }
+  scope.actions.methodDict = { test: 'testize' } as any
 
   ;(scope.Interactable.prototype as any).testize = function (options: any) {
     this.setPerAction('test', options)
@@ -109,17 +109,16 @@ test('Interactable.updatePerActionListeners', t => {
   let fired: any[] = []
   function addToFired (event: any) { fired.push(event) }
 
-  scope.actions.eventTypes.push('teststart', 'testmove', 'testend')
-  scope.actions.methodDict = { test: 'testize' }
-  ;(scope.Interactable.prototype as any).testize = function (options: any) {
-    this.setPerAction('test', options)
+  scope.actions.methodDict = { TEST: 'testize' } as any
+  ;(scope.Interactable.prototype as any).TESTize = function (options: any) {
+    this.setPerAction('TEST', options)
   }
 
-  ;(scope.defaults.actions as any).test = {}
+  ;(scope.defaults.actions as any).TEST = {}
 
   const interactable = scope.interactables.new('target')
 
-  interactable.setPerAction('test' as any, {
+  interactable.setPerAction('TEST' as any, {
     listeners: [{
       start: addToFired,
       move: addToFired,

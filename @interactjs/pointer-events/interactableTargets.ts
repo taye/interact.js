@@ -1,5 +1,4 @@
 import { Scope } from '@interactjs/core/scope'
-import { merge } from '@interactjs/utils/arr'
 import extend from '@interactjs/utils/extend'
 
 type Interactable = import ('@interactjs/core/Interactable').default
@@ -12,13 +11,7 @@ declare module '@interactjs/core/Interactable' {
 }
 
 function install (scope: Scope) {
-  const {
-    pointerEvents,
-    actions,
-    Interactable,
-  } = scope
-
-  merge(actions.eventTypes, pointerEvents.types)
+  const { Interactable } = scope
 
   Interactable.prototype.pointerEvents = pointerEventsMethod
 
