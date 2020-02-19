@@ -17,6 +17,7 @@ test('modifiers/base', t => {
 
   coords.client = coords.page
 
+  const testAction = { name: 'test' as Interact.ActionName }
   const element = target as Interact.Element
   const startCoords = { x: 100, y: 200 }
   const moveCoords = { x: 400, y: 500 }
@@ -39,7 +40,7 @@ test('modifiers/base', t => {
     ],
   }
 
-  interaction.start({ name: 'test' }, interactable, element)
+  interaction.start(testAction, interactable, element)
 
   t.ok(
     options.started,
@@ -106,7 +107,7 @@ test('modifiers/base', t => {
 
   utils.extend(coords.page, startCoords)
   interaction.pointerDown(event, event, element)
-  interaction.start({ name: 'test' }, interactable, element)
+  interaction.start(testAction, interactable, element)
 
   t.notOk(
     options.setted,

@@ -2,15 +2,16 @@ import * as utils from '@interactjs/utils/index'
 import Interactable from './Interactable'
 import InteractEvent, { EventPhase } from './InteractEvent'
 import PointerInfo from './PointerInfo'
+import { ActionName } from './scope'
 
-export interface ActionProps<T extends Interact.ActionName = any> {
+export interface ActionProps<T extends ActionName = Interact.ActionName> {
   name: T
   axis?: 'x' | 'y' | 'xy'
   edges?: Interact.EdgeOptions
 }
 
 export interface StartAction extends ActionProps {
-  name: Interact.ActionName | string
+  name: ActionName
 }
 
 export enum _ProxyValues {
@@ -39,14 +40,16 @@ export type PointerArgProps<T extends {} = {}> = {
   interaction: Interaction
 } & T
 
-export interface DoPhaseArg {
+export interface DoPhaseArg<T extends ActionName, P extends EventPhase> {
   event: Interact.PointerEventType
   phase: EventPhase
-  interaction: Interaction
-  iEvent: InteractEvent
+  interaction: Interaction<T>
+  iEvent: InteractEvent<T, P>
   preEnd?: boolean
   type?: string
 }
+
+export type DoAnyPhaseArg = DoPhaseArg<ActionName, EventPhase>
 
 declare module '@interactjs/core/scope' {
   interface SignalArgs {
@@ -73,15 +76,15 @@ declare module '@interactjs/core/scope' {
     }>
     'interactions:remove-pointer': PointerArgProps
     'interactions:blur'
-    'interactions:before-action-start': Omit<DoPhaseArg, 'iEvent'>
-    'interactions:action-start': DoPhaseArg
-    'interactions:after-action-start': DoPhaseArg
-    'interactions:before-action-move': Omit<DoPhaseArg, 'iEvent'>
-    'interactions:action-move': DoPhaseArg
-    'interactions:after-action-move': DoPhaseArg
-    'interactions:before-action-end': Omit<DoPhaseArg, 'iEvent'>
-    'interactions:action-end': DoPhaseArg
-    'interactions:after-action-end': DoPhaseArg
+    'interactions:before-action-start': Omit<DoAnyPhaseArg, 'iEvent'>
+    'interactions:action-start': DoAnyPhaseArg
+    'interactions:after-action-start': DoAnyPhaseArg
+    'interactions:before-action-move': Omit<DoAnyPhaseArg, 'iEvent'>
+    'interactions:action-move': DoAnyPhaseArg
+    'interactions:after-action-move': DoAnyPhaseArg
+    'interactions:before-action-end': Omit<DoAnyPhaseArg, 'iEvent'>
+    'interactions:action-end': DoAnyPhaseArg
+    'interactions:after-action-end': DoAnyPhaseArg
     'interactions:stop': { interaction: Interaction }
   }
 }
@@ -93,7 +96,7 @@ keyof typeof _ProxyValues | keyof typeof _ProxyMethods
 
 let idCounter = 0
 
-export class Interaction<T extends Interact.ActionName = any> {
+export class Interaction<T extends ActionName = ActionName> {
   // current interactable being interacted with
   interactable: Interactable = null
 
@@ -138,7 +141,7 @@ export class Interaction<T extends Interact.ActionName = any> {
   }
 
   // previous action event
-  prevEvent: InteractEvent<T> = null
+  prevEvent: InteractEvent<T, EventPhase> = null
 
   pointerIsDown = false
   pointerWasMoved = false
@@ -559,13 +562,11 @@ export class Interaction<T extends Interact.ActionName = any> {
     this._latestPointer.eventTarget = null
   }
 
-  _createPreparedEvent (event: Interact.PointerEventType, phase: EventPhase, preEnd?: boolean, type?: string) {
-    const actionName = this.prepared.name
-
-    return new InteractEvent(this, event, actionName, phase, this.element, null, preEnd, type)
+  _createPreparedEvent<P extends EventPhase> (event: Interact.PointerEventType, phase: P, preEnd?: boolean, type?: string) {
+    return new InteractEvent<T, P>(this, event, this.prepared.name, phase, this.element, preEnd, type)
   }
 
-  _fireEvent (iEvent: InteractEvent) {
+  _fireEvent<P extends EventPhase> (iEvent: InteractEvent<T, P>) {
     this.interactable.fire(iEvent)
 
     if (!this.prevEvent || iEvent.timeStamp >= this.prevEvent.timeStamp) {
@@ -573,7 +574,7 @@ export class Interaction<T extends Interact.ActionName = any> {
     }
   }
 
-  _doPhase (signalArg: Omit<DoPhaseArg, 'iEvent'> & { iEvent?: InteractEvent<T> }) {
+  _doPhase<P extends EventPhase> (signalArg: Omit<DoPhaseArg<T, P>, 'iEvent'> & { iEvent?: InteractEvent<T, P> }) {
     const { event, phase, preEnd, type } = signalArg
     const { rect, coords: { delta } } = this
 

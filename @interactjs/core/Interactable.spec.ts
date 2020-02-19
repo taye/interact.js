@@ -109,16 +109,16 @@ test('Interactable.updatePerActionListeners', t => {
   let fired: any[] = []
   function addToFired (event: any) { fired.push(event) }
 
-  scope.actions.methodDict = { TEST: 'testize' } as any
-  ;(scope.Interactable.prototype as any).TESTize = function (options: any) {
-    this.setPerAction('TEST', options)
+  scope.actions.methodDict = { test: 'testize' } as any
+  ;(scope.Interactable.prototype as any).testize = function (options: any) {
+    this.setPerAction('test', options)
   }
 
-  ;(scope.defaults.actions as any).TEST = {}
+  ;(scope.defaults.actions as any).test = {}
 
   const interactable = scope.interactables.new('target')
 
-  interactable.setPerAction('TEST' as any, {
+  interactable.setPerAction('test' as any, {
     listeners: [{
       start: addToFired,
       move: addToFired,

@@ -136,7 +136,7 @@ export default class Modification {
     return result
   }
 
-  setAndApply (arg: Partial<Interact.DoPhaseArg> & {
+  setAndApply (arg: Partial<Interact.DoAnyPhaseArg> & {
     phase: Interact.EventPhase
     preEnd?: boolean
     skipModifiers?: number
@@ -175,7 +175,7 @@ export default class Modification {
     this.applyToInteraction(arg)
   }
 
-  beforeEnd (arg: Omit<Interact.DoPhaseArg, 'iEvent'> & { state?: ModifierState }): void | false {
+  beforeEnd (arg: Omit<Interact.DoAnyPhaseArg, 'iEvent'> & { state?: ModifierState }): void | false {
     const { interaction, event } = arg
     const states = this.states
 

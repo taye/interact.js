@@ -11,7 +11,7 @@ declare module '@interactjs/core/scope' {
   interface Scope {
     Interaction: typeof InteractionBase
     interactions: {
-      new: (options: any) => InteractionBase
+      new: <T extends ActionName> (options: any) => InteractionBase<T>
       list: InteractionBase[]
       listeners: { [type: string]: Interact.Listener }
       docEvents: Array<{ type: string, listener: Interact.Listener }>
@@ -80,7 +80,7 @@ function install (scope: Scope) {
   // for ignoring browser's simulated mouse events
   scope.prevTouchTime = 0
 
-  scope.Interaction = class Interaction extends InteractionBase {
+  scope.Interaction = class Interaction<T extends Interact.ActionName> extends InteractionBase<T> {
     get pointerMoveTolerance () {
       return scope.interactions.pointerMoveTolerance
     }
@@ -95,10 +95,10 @@ function install (scope: Scope) {
   scope.interactions = {
     // all active and idle interactions
     list: [],
-    new (options: { pointerType?: string, scopeFire?: Scope['fire'] }) {
+    new<T extends Interact.ActionName> (options: { pointerType?: string, scopeFire?: Scope['fire'] }) {
       options.scopeFire = (name, arg) => scope.fire(name, arg)
 
-      const interaction = new scope.Interaction(options as Required<typeof options>)
+      const interaction = new scope.Interaction<T>(options as Required<typeof options>)
 
       scope.interactions.list.push(interaction)
       return interaction

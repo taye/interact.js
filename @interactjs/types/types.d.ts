@@ -41,16 +41,17 @@ declare namespace Interact {
   export type __InteractableSet = _InteractableSet
   export type Scope = scope.Scope
   export type Interaction<T extends scope.ActionName = any> = interaction.Interaction<T>
-  export type PointerArgProps<T> = interaction.PointerArgProps<T>
+  export type PointerArgProps<T extends {} = {}> = interaction.PointerArgProps<T>
   export type InteractEvent<
-    T extends keyof scope.ActionMap = any,
-    P extends iEvent.EventPhase = never,
+    T extends keyof scope.ActionMap = never,
+    P extends iEvent.EventPhase = iEvent.EventPhase,
   > = iEvent.InteractEvent<T, P>
   export type EventPhase = iEvent.EventPhase
   export type Options = defaults.Options
   export type ActionName = scope.ActionName
   export type SignalArgs = scope.SignalArgs
-  export type DoPhaseArg = interaction.DoPhaseArg
+  export type DoPhaseArg<T extends ActionName, P extends EventPhase> = interaction.DoPhaseArg<T, P>
+  export type DoAnyPhaseArg = interaction.DoAnyPhaseArg
 
   export type DragEvent = InteractEvent<'drag'>
   export type ResizeEvent = resize.ResizeEvent

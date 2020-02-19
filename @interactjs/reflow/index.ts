@@ -19,7 +19,7 @@ declare module '@interactjs/core/Interaction' {
 declare module '@interactjs/core/InteractEvent' {
   // eslint-disable-next-line no-shadow
   interface PhaseMap {
-    reflow: true
+    reflow?: true
   }
 }
 
@@ -29,6 +29,8 @@ export function install (scope: Scope) {
     // eslint-disable-next-line no-shadow
     Interactable,
   } = scope
+
+  scope.actions.phases.reflow = true
 
   /**
    * ```js
@@ -51,7 +53,7 @@ export function install (scope: Scope) {
   }
 }
 
-function reflow (interactable: Interactable, action: ActionProps, scope: Scope): Promise<Interactable> {
+function reflow<T extends Interact.ActionName> (interactable: Interactable, action: ActionProps<T>, scope: Scope): Promise<Interactable> {
   const elements = (is.string(interactable.target)
     ? arr.from(interactable._context.querySelectorAll(interactable.target))
     : [interactable.target]) as Interact.Element[]
@@ -93,7 +95,7 @@ function reflow (interactable: Interactable, action: ActionProps, scope: Scope):
       }
 
       const event = pointerUtils.coordsToEvent(coords)
-      reflowPromise = startReflow(scope, interactable, element, action, event)
+      reflowPromise = startReflow<T>(scope, interactable, element, action, event)
     }
 
     if (promises) {
@@ -104,7 +106,7 @@ function reflow (interactable: Interactable, action: ActionProps, scope: Scope):
   return promises && Promise.all(promises).then(() => interactable)
 }
 
-function startReflow (scope: Scope, interactable: Interactable, element: Interact.Element, action: ActionProps, event: any) {
+function startReflow<T extends Interact.ActionName> (scope: Scope, interactable: Interactable, element: Interact.Element, action: ActionProps<T>, event: any) {
   const interaction = scope.interactions.new({ pointerType: 'reflow' })
   const signalArg = {
     interaction,
@@ -112,7 +114,7 @@ function startReflow (scope: Scope, interactable: Interactable, element: Interac
     pointer: event,
     eventTarget: element,
     phase: 'reflow',
-  }
+  } as const
 
   interaction.interactable = interactable
   interaction.element = element

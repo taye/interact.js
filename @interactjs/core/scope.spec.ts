@@ -12,7 +12,7 @@ test('scope', t => {
   ;(interactable.options as any).test = { enabled: true }
 
   interaction.pointerDown(event, event, scope.document.body)
-  interaction.start({ name: 'test' }, interactable, scope.document.body)
+  interaction.start({ name: 'test' as Interact.ActionName }, interactable, scope.document.body)
 
   const started = interaction._interacting
 

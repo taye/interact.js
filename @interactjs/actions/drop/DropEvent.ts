@@ -1,7 +1,6 @@
 import BaseEvent from '@interactjs/core/BaseEvent'
 import Interactable from '@interactjs/core/Interactable'
 import InteractEvent from '@interactjs/core/InteractEvent'
-import Interaction from '@interactjs/core/Interaction'
 import * as arr from '@interactjs/utils/arr'
 
 class DropEvent extends BaseEvent {
@@ -17,7 +16,7 @@ class DropEvent extends BaseEvent {
   /**
    * Class of events fired on dropzones during drags with acceptable targets.
    */
-  constructor (dropState: Interaction['dropState'], dragEvent: InteractEvent, type: string) {
+  constructor (dropState: import('./').DropState, dragEvent: InteractEvent<'drag'>, type: string) {
     super(dragEvent._interaction)
 
     const { element, dropzone } = type === 'dragleave'

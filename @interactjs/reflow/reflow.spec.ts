@@ -1,7 +1,9 @@
 import test from '@interactjs/_dev/test/test'
-import PromisePolyfill from 'promise-polyfill'
 import * as helpers from '@interactjs/core/tests/_helpers'
+import PromisePolyfill from 'promise-polyfill'
 import reflow from './index'
+
+const testAction = { name: 'TEST' as Interact.ActionName }
 
 test('reflow', t => {
   const rect = Object.freeze({ top: 100, left: 200, bottom: 300, right: 400 })
@@ -35,7 +37,7 @@ test('reflow', t => {
     },
   })
 
-  interactable.reflow({ name: 'TEST' })
+  interactable.reflow(testAction)
 
   const phases = ['reflow', 'start', 'move', 'end']
 
@@ -99,7 +101,7 @@ test('async reflow', async t => {
   // test with Promise implementation
   ;(scope.window as any).Promise = PromisePolyfill
 
-  promise = interactable.reflow({ name: 'TEST' })
+  promise = interactable.reflow(testAction)
   t.ok(promise instanceof (scope.window as any).Promise, 'method returns a Promise if available')
   t.notOk(reflowEvent.interaction.interacting(), 'reflow may end synchronously')
 
@@ -115,7 +117,7 @@ test('async reflow', async t => {
   })
 
   stoppedFromTimeout = false
-  promise = interactable.reflow({ name: 'TEST' })
+  promise = interactable.reflow(testAction)
 
   t.ok(reflowEvent.interaction.interacting() && !stoppedFromTimeout, 'interaction continues if end is blocked')
   await promise
@@ -125,7 +127,7 @@ test('async reflow', async t => {
   stoppedFromTimeout = false
   ;(scope.window as any).Promise = undefined
 
-  promise = interactable.reflow({ name: 'TEST' })
+  promise = interactable.reflow(testAction)
   t.equal(promise, null, 'method returns null if no Proise is avilable')
   t.ok(reflowEvent.interaction.interacting() && !stoppedFromTimeout, 'interaction continues if end is blocked without Promise')
 

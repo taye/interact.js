@@ -1,5 +1,6 @@
 import * as modifiers from '@interactjs/modifiers/base'
 import Modification from '@interactjs/modifiers/Modification'
+import offset from '@interactjs/offset'
 import * as dom from '@interactjs/utils/domUtils'
 import extend from '@interactjs/utils/extend'
 import hypot from '@interactjs/utils/hypot'
@@ -10,8 +11,8 @@ import raf from '@interactjs/utils/raf'
 declare module '@interactjs/core/InteractEvent' {
   // eslint-disable-next-line no-shadow
   interface PhaseMap {
-    resume: true
-    inertiastart: true
+    resume?: true
+    inertiastart?: true
   }
 }
 
@@ -36,9 +37,9 @@ declare module '@interactjs/core/defaultOptions' {
 
 declare module '@interactjs/core/scope' {
   interface SignalArgs {
-    'interactions:before-action-resume': Omit<Interact.DoPhaseArg, 'iEvent'>
-    'interactions:action-resume': Interact.DoPhaseArg
-    'interactions:after-action-resume': Interact.DoPhaseArg
+    'interactions:before-action-resume': Omit<Interact.DoPhaseArg<Interact.ActionName, 'inertiastart'>, 'iEvent'>
+    'interactions:action-resume': Interact.DoPhaseArg<Interact.ActionName, 'inertiastart'>
+    'interactions:after-action-resume': Interact.DoPhaseArg<Interact.ActionName, 'inertiastart'>
   }
 }
 
@@ -70,7 +71,7 @@ export class InertiaState {
   modifierCount = 0
   modifierArg: modifiers.ModifierArg = null
 
-  startEvent: Interact.InteractEvent = null
+  startEvent: Interact.InteractEvent<Interact.ActionName> = null
   startCoords: Interact.Point = null
   startVelocity: Interact.Point = null
   t0 = 0
@@ -323,7 +324,7 @@ export class InertiaState {
   }
 }
 
-function start ({ interaction, event }: Interact.DoPhaseArg) {
+function start ({ interaction, event }: Interact.DoPhaseArg<Interact.ActionName, 'inertiastart'>) {
   if (!interaction._interacting || interaction.simulation) {
     return null
   }
@@ -355,7 +356,7 @@ function resume (arg: Interact.SignalArgs['interactions:down']) {
   }
 }
 
-function stop ({ interaction }: Interact.DoPhaseArg) {
+function stop ({ interaction }: Interact.DoPhaseArg<Interact.ActionName, 'inertiastart'>) {
   const state = interaction.inertia
 
   if (state.active) {

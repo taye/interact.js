@@ -15,11 +15,11 @@ export interface PhaseMap {
 
 export class InteractEvent<
   T extends Interact.ActionName = never,
-  P extends EventPhase = never,
+  P extends EventPhase = EventPhase,
 > extends BaseEvent<T> {
   target: Interact.Element
   currentTarget: Interact.Element
-  relatedTarget: Interact.Element
+  relatedTarget: null = null
   screenX?: number
   screenY?: number
   button: number
@@ -57,7 +57,6 @@ export class InteractEvent<
     actionName: T,
     phase: P,
     element: Interact.Element,
-    related?: Interact.Element,
     preEnd?: boolean,
     type?: string,
   ) {
@@ -98,7 +97,6 @@ export class InteractEvent<
     this.buttons       = (event as MouseEvent).buttons
     this.target        = element
     this.currentTarget = element
-    this.relatedTarget = related || null
     this.preEnd        = preEnd
     this.type          = type || (actionName + (phase || ''))
     this.interactable  = target

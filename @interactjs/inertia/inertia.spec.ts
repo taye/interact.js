@@ -28,7 +28,7 @@ test('inertia', t => {
   }
 
   let fired: any[] = []
-  let modifierCallPhases: any[] = []
+  let modifierCallPhases: Interact.EventPhase[] = []
 
   coords.client = coords.page
   scope.now = () => coords.timeStamp

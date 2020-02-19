@@ -360,7 +360,7 @@ test('Interaction.start', t => {
     down,
     stop,
   } = helpers.testEnv({ plugins: [drag] })
-  const action = { name: 'drag' }
+  const action = { name: 'drag' } as const
 
   interaction.start(action, interactable, element)
   t.equal(interaction.prepared.name, null, 'do nothing if !pointerIsDown')
@@ -451,7 +451,7 @@ test('interaction move() and stop() from start event', t => {
 test('Interaction createPreparedEvent', t => {
   const { interaction, interactable, target } = helpers.testEnv()
 
-  const action = { name: 'resize' }
+  const action = { name: 'resize' } as const
   const phase = 'TEST_PHASE' as Interact.EventPhase
 
   interaction.prepared = action

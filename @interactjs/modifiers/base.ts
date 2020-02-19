@@ -122,7 +122,7 @@ export function makeModifier<
 }
 
 export function addEventModifiers ({ iEvent, interaction: { modification: { result } } }: {
-  iEvent: Interact.InteractEvent
+  iEvent: Interact.InteractEvent<Interact.ActionName, Interact.EventPhase>
   interaction: Interact.Interaction
 }) {
   if (result) {
@@ -158,16 +158,16 @@ const modifiersBase: Interact.Plugin = {
 
     'interactions:before-action-move': arg => arg.interaction.modification.setAndApply(arg),
 
-    'interactions:after-action-start': arg => arg.interaction.modification.restoreInteractionCoords(arg),
-    'interactions:after-action-move': arg => arg.interaction.modification.restoreInteractionCoords(arg),
-    'interactions:after-action-resume': arg => arg.interaction.modification.restoreInteractionCoords(arg),
-
     'interactions:before-action-end': arg => arg.interaction.modification.beforeEnd(arg),
 
     'interactions:action-start': addEventModifiers,
     'interactions:action-move': addEventModifiers,
     'interactions:action-resume': addEventModifiers,
     'interactions:action-end': addEventModifiers,
+
+    'interactions:after-action-start': arg => arg.interaction.modification.restoreInteractionCoords(arg),
+    'interactions:after-action-move': arg => arg.interaction.modification.restoreInteractionCoords(arg),
+    'interactions:after-action-resume': arg => arg.interaction.modification.restoreInteractionCoords(arg),
 
     'interactions:stop': arg => arg.interaction.modification.stop(arg),
   },

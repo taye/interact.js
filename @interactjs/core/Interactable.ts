@@ -344,7 +344,7 @@ export class Interactable implements Partial<Eventable> {
 
     for (const actionName_ in this._actions.methodDict) {
       const actionName = actionName_ as Interact.ActionName
-      const methodName: any = this._actions.methodDict[actionName]
+      const methodName = this._actions.methodDict[actionName]
 
       this.options[actionName] = {}
       this.setPerAction(actionName, extend(extend({}, defaults.perAction), defaults.actions[actionName]))

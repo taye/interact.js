@@ -1,4 +1,3 @@
-import InteractEvent from '@interactjs/core/InteractEvent'
 import * as utils from '@interactjs/utils/index'
 
 export type GesturableMethod = Interact.ActionMethod<Interact.GesturableOptions>
@@ -43,10 +42,9 @@ export interface GestureEvent extends Interact.InteractEvent<'gesture'> {
   touches: Interact.PointerType[]
 }
 
-export interface GestureSignalArg extends Interact.DoPhaseArg {
+export interface GestureSignalArg extends Interact.DoPhaseArg<'gesture', Interact.EventPhase> {
   iEvent: GestureEvent
   interaction: Interact.Interaction<'gesture'>
-  event: Interact.PointerEventType | GestureEvent
 }
 
 function install (scope: Interact.Scope) {
@@ -103,7 +101,7 @@ function install (scope: Interact.Scope) {
   defaults.actions.gesture = gesture.defaults
 }
 
-function updateGestureProps ({ interaction, iEvent, event, phase }: GestureSignalArg) {
+function updateGestureProps ({ interaction, iEvent, phase }: GestureSignalArg) {
   if (interaction.prepared.name !== 'gesture') { return }
 
   const pointers = interaction.pointers.map(p => p.pointer)
@@ -124,7 +122,7 @@ function updateGestureProps ({ interaction, iEvent, event, phase }: GestureSigna
     interaction.gesture.startDistance = iEvent.distance
     interaction.gesture.startAngle = iEvent.angle
   }
-  else if (ending || event instanceof InteractEvent) {
+  else if (ending) {
     const prevEvent = interaction.prevEvent as GestureEvent
 
     iEvent.distance = prevEvent.distance
