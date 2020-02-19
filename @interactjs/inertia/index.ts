@@ -2,7 +2,6 @@ import * as modifiers from '@interactjs/modifiers/base'
 import Modification from '@interactjs/modifiers/Modification'
 import offset from '@interactjs/offset'
 import * as dom from '@interactjs/utils/domUtils'
-import extend from '@interactjs/utils/extend'
 import hypot from '@interactjs/utils/hypot'
 import * as is from '@interactjs/utils/is'
 import { setCoords } from '@interactjs/utils/pointerUtils'
@@ -119,7 +118,7 @@ export class InertiaState {
       element: interaction.element,
       rect: interaction.rect,
       edges: interaction.edges,
-      pageCoords: extend({}, this.startCoords),
+      pageCoords: this.startCoords,
       preEnd: true,
       phase: 'inertiastart',
     }
@@ -185,8 +184,10 @@ export class InertiaState {
     this.startVelocity = this.interaction.coords.velocity.client
     this.calcInertia()
 
-    modifierArg.pageCoords.x += this.targetOffset.x
-    modifierArg.pageCoords.y += this.targetOffset.y
+    modifierArg.pageCoords = {
+      x: this.startCoords.x + this.targetOffset.x,
+      y: this.startCoords.y + this.targetOffset.y,
+    }
 
     modification.result = modification.setAll(modifierArg)
 
@@ -309,7 +310,6 @@ export class InertiaState {
       phase: 'resume',
       event: arg.event,
     })
-    interaction.move()
   }
 
   end () {

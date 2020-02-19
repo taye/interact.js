@@ -76,17 +76,13 @@ const aspectRatio: ModifierModule<AspectRatioOptions, AspectRatioState> = {
 
     if (!modifiers || !modifiers.length) { return }
 
-    const subModiification = new Modification(arg.interaction)
-    subModiification.prepareStates(modifiers)
+    const subModification = new Modification(arg.interaction)
 
-    for (const subState of subModiification.states) {
-      subState.options = {
-        ...subState.options,
-      }
-    }
+    subModification.copyFrom(arg.interaction.modification)
+    subModification.prepareStates(modifiers)
 
-    state.subModification = subModiification
-    subModiification.startAll({ ...arg })
+    state.subModification = subModification
+    subModification.startAll({ ...arg })
   },
 
   set (arg) {

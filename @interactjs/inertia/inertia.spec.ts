@@ -15,6 +15,8 @@ test('inertia', t => {
     interactable,
     coords,
   } = helpers.testEnv({ plugins: [inertia, drag], rect: { left: 0, top: 0, bottom: 100, right: 100 } })
+
+  const state = interaction.inertia
   const modifierChange = 5
   const changeModifier = {
     options: { endOnly: false },
@@ -36,23 +38,22 @@ test('inertia', t => {
 
   // test inertia without modifiers or throw
   downStartMoveUp({ x: 100, y: 0, dt: 1000 })
-  t.notOk(interaction.inertia.active, '{ modifiers: [] } && !thrown: inertia is not activated')
+  t.notOk(state.active, '{ modifiers: [] } && !thrown: inertia is not activated')
 
   // test inertia without modifiers and with throw
   downStartMoveUp({ x: 100, y: 0, dt: 10 })
-  t.ok(interaction.inertia.active, 'thrown: inertia is activated')
+  t.ok(state.active, 'thrown: inertia is activated')
 
   interactable.draggable({ modifiers: [changeModifier as any] })
 
   // test inertia with { endOnly: false } modifier and with throw
   downStartMoveUp({ x: 100, y: 0, dt: 10 })
-  t.deepEqual(modifierCallPhases, ['move'], '{ endOnly: false } && thrown: modifier is not called from pointerUp (requireEndOnly)')
+  t.deepEqual(modifierCallPhases, ['move', 'inertiastart'], '{ endOnly: false } && thrown: modifier is called from pointerUp')
   t.deepEqual(
     fired.map(({ page, type }) => ({ ...page, type })),
     [
       { x: 0, y: 0, type: 'dragstart' },
       { x: modifierChange, y: modifierChange, type: 'dragmove' },
-      { x: modifierChange, y: modifierChange, type: 'draginertiastart' },
     ],
     '{ endOnly: false } && thrown: move, inertiastart, and end InteractEvents are modified',
   )
@@ -62,24 +63,25 @@ test('inertia', t => {
   downStartMoveUp({ x: 100, y: 0, dt: 10 })
   t.deepEqual(modifierCallPhases, ['inertiastart'], '{ endOnly: true } && thrown: modifier is called from pointerUp')
   t.deepEqual(
-    helpers.getProps(interaction.inertia, ['modifiedXe', 'modifiedYe'] as const),
+    state.modifiedOffset,
     {
       // modified target minus move coords
-      modifiedXe: modifierChange - 100,
-      modifiedYe: modifierChange - 0,
+      x: modifierChange - 100,
+      y: modifierChange - 0,
     },
-    '{ endOnly: true } && thrown: inertia target coords are correct')
+    '{ endOnly: true } && thrown: inertia target coords are correct',
+  )
 
   // test smoothEnd with { endOnly: false } modifier
   changeModifier.options.endOnly = false
   downStartMoveUp({ x: 1, y: 0, dt: 1000 })
-  t.notOk(interaction.inertia.active, '{ endOnly: false } && !thrown: inertia smoothEnd is not activated')
+  t.notOk(state.active, '{ endOnly: false } && !thrown: inertia smoothEnd is not activated')
   t.deepEqual(modifierCallPhases, ['move', 'inertiastart'], '{ endOnly: false } && !thrown: modifier is called from pointerUp')
 
   // test smoothEnd with { endOnly: true } modifier
   changeModifier.options.endOnly = true
   downStartMoveUp({ x: 1, y: 0, dt: 1000 })
-  t.ok(interaction.inertia.active, '{ endOnly: true } && !thrown: inertia smoothEnd is activated')
+  t.ok(state.active, '{ endOnly: true } && !thrown: inertia smoothEnd is activated')
   t.deepEqual(modifierCallPhases, ['inertiastart'], '{ endOnly: true } && !thrown: modifier is called from pointerUp')
 
   interaction.stop()
