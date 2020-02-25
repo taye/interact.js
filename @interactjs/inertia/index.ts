@@ -379,6 +379,20 @@ const inertia: Interact.Plugin = {
     'interactions:before-action-end': start,
     'interactions:down': resume,
     'interactions:stop': stop,
+
+    'interactions:before-action-resume': arg => {
+      const { modification } = arg.interaction
+
+      modification.stop(arg)
+      modification.start(arg, arg.interaction.coords.cur.page)
+      modification.applyToInteraction(arg)
+    },
+
+    'interactions:before-action-inertiastart': arg => arg.interaction.modification.setAndApply(arg),
+    'interactions:action-resume': modifiers.addEventModifiers,
+    'interactions:action-inertiastart': modifiers.addEventModifiers,
+    'interactions:after-action-inertiastart': arg => arg.interaction.modification.restoreInteractionCoords(arg),
+    'interactions:after-action-resume': arg => arg.interaction.modification.restoreInteractionCoords(arg),
   },
 }
 
