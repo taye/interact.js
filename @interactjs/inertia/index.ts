@@ -4,7 +4,6 @@ import offset from '@interactjs/offset'
 import * as dom from '@interactjs/utils/domUtils'
 import hypot from '@interactjs/utils/hypot'
 import * as is from '@interactjs/utils/is'
-import { setCoords } from '@interactjs/utils/pointerUtils'
 import raf from '@interactjs/utils/raf'
 
 declare module '@interactjs/core/InteractEvent' {
@@ -36,9 +35,12 @@ declare module '@interactjs/core/defaultOptions' {
 
 declare module '@interactjs/core/scope' {
   interface SignalArgs {
-    'interactions:before-action-resume': Omit<Interact.DoPhaseArg<Interact.ActionName, 'inertiastart'>, 'iEvent'>
-    'interactions:action-resume': Interact.DoPhaseArg<Interact.ActionName, 'inertiastart'>
-    'interactions:after-action-resume': Interact.DoPhaseArg<Interact.ActionName, 'inertiastart'>
+    'interactions:before-action-inertiastart': Omit<Interact.DoPhaseArg<Interact.ActionName, 'inertiastart'>, 'iEvent'>
+    'interactions:action-inertiastart': Interact.DoPhaseArg<Interact.ActionName, 'inertiastart'>
+    'interactions:after-action-inertiastart': Interact.DoPhaseArg<Interact.ActionName, 'inertiastart'>
+    'interactions:before-action-resume': Omit<Interact.DoPhaseArg<Interact.ActionName, 'resume'>, 'iEvent'>
+    'interactions:action-resume': Interact.DoPhaseArg<Interact.ActionName, 'resume'>
+    'interactions:after-action-resume': Interact.DoPhaseArg<Interact.ActionName, 'resume'>
   }
 }
 
@@ -49,6 +51,8 @@ function install (scope: Interact.Scope) {
 
   scope.usePlugin(offset)
   scope.usePlugin(modifiers.default)
+  scope.actions.phases.inertiastart = true
+  scope.actions.phases.resume = true
 
   defaults.perAction.inertia = {
     enabled          : false,
@@ -70,9 +74,7 @@ export class InertiaState {
   modifierCount = 0
   modifierArg: modifiers.ModifierArg = null
 
-  startEvent: Interact.InteractEvent<Interact.ActionName> = null
   startCoords: Interact.Point = null
-  startVelocity: Interact.Point = null
   t0 = 0
   v0 = 0
 
@@ -87,12 +89,9 @@ export class InertiaState {
 
   constructor (
     private readonly interaction: Interact.Interaction,
-    private readonly scope: Interact.Scope,
   ) {}
 
-  start (
-    event: Interact.PointerEventType,
-  ) {
+  start (event: Interact.PointerEventType) {
     const { interaction } = this
     const options = getOptions(interaction)
 
@@ -129,60 +128,54 @@ export class InertiaState {
       pointerSpeed > options.endSpeed
     )
 
-    if (!thrown) {
+    if (thrown) {
+      this.startInertia()
+    } else {
       modification.result = modification.setAll(this.modifierArg)
 
       if (!modification.result.changed) {
         return false
       }
+
+      this.startSmoothEnd()
     }
 
-    // FIXME
-    // modification.applyToInteraction(this.modifierArg)
-    this.startEvent = new this.scope.InteractEvent(
+    // force modification change
+    interaction.modification.result.rect = null
+
+    // bring inertiastart event to the target coords
+    interaction.offsetBy(this.targetOffset)
+    interaction._doPhase({
       interaction,
       event,
-      interaction.prepared.name,
-      'inertiastart',
-      interaction.element,
-    )
-    // modification.restoreCoords(this.modifierArg)
-    // iEvent.modifiers = modification.result.eventProps
+      phase: 'inertiastart',
+    })
+    interaction.offsetBy({ x: -this.targetOffset.x, y: -this.targetOffset.y })
+    // force modification change
+    interaction.modification.result.rect = null
 
     this.active = true
     interaction.simulation = this
-    interaction.interactable.fire(this.startEvent)
-
-    if (thrown) {
-      this.startInertia()
-    } else {
-      this.startSmoothEnd()
-    }
 
     return true
   }
 
-  calcInertia () {
+  startInertia () {
+    const startVelocity = this.interaction.coords.velocity.client
     const options = getOptions(this.interaction)
     const lambda = options.resistance
     const inertiaDur = -Math.log(options.endSpeed / this.v0) / lambda
 
-    this.t0 = this.startEvent.timeStamp / 1000
     this.targetOffset = {
-      x: (this.startVelocity.x - inertiaDur) / lambda,
-      y: (this.startVelocity.y - inertiaDur) / lambda,
+      x: (startVelocity.x - inertiaDur) / lambda,
+      y: (startVelocity.y - inertiaDur) / lambda,
     }
 
     this.te = inertiaDur
     this.lambda_v0 = lambda / this.v0
     this.one_ve_v0 = 1 - options.endSpeed / this.v0
-  }
 
-  startInertia () {
     const { modification, modifierArg } = this
-
-    this.startVelocity = this.interaction.coords.velocity.client
-    this.calcInertia()
 
     modifierArg.pageCoords = {
       x: this.startCoords.x + this.targetOffset.x,
@@ -217,7 +210,7 @@ export class InertiaState {
     const { interaction } = this
     const options = getOptions(interaction)
     const lambda = options.resistance
-    const t = interaction._now() / 1000 - this.t0
+    const t = (interaction._now() - this.t0) / 1000
 
     if (t < this.te) {
       const progress =  1 - (Math.exp(-lambda * t) - this.lambda_v0) / this.one_ve_v0
@@ -291,25 +284,26 @@ export class InertiaState {
     }
   }
 
-  resume (arg: Interact.PointerArgProps<{ type: 'down', down?: boolean }>) {
+  resume ({ pointer, event, eventTarget }: Interact.SignalArgs['interactions:down']) {
     const { interaction } = this
 
+    // undo inertia changes to interaction coords
     interaction.offsetBy({
       x: -this.currentOffset.x,
       y: -this.currentOffset.y,
     })
 
-    arg.down = true
-    this.scope.fire('interactions:update-pointer', arg as Interact.PointerArgProps<{ down: true }>)
-    this.stop()
-    setCoords(interaction.coords.cur, interaction.pointers.map(p => p.pointer), interaction._now())
+    // update pointer at pointer down position
+    interaction.updatePointer(pointer, event, eventTarget, true)
 
     // fire resume signals and event
     interaction._doPhase({
       interaction,
+      event,
       phase: 'resume',
-      event: arg.event,
     })
+
+    this.stop()
   }
 
   end () {
@@ -317,6 +311,7 @@ export class InertiaState {
     this.interaction.end()
     this.stop()
   }
+
   stop () {
     this.active = this.smoothEnd = false
     this.interaction.simulation = null
@@ -324,7 +319,7 @@ export class InertiaState {
   }
 }
 
-function start ({ interaction, event }: Interact.DoPhaseArg<Interact.ActionName, 'inertiastart'>) {
+function start ({ interaction, event }: Interact.DoPhaseArg<Interact.ActionName, 'end'>) {
   if (!interaction._interacting || interaction.simulation) {
     return null
   }
@@ -335,11 +330,12 @@ function start ({ interaction, event }: Interact.DoPhaseArg<Interact.ActionName,
   return started ? false : null
 }
 
+// Check if the down event hits the current inertia target
+// control should be return to the user
 function resume (arg: Interact.SignalArgs['interactions:down']) {
   const { interaction, eventTarget } = arg
   const state = interaction.inertia
 
-  // Check if the down event hits the current inertia target
   if (!state.active) { return }
 
   let element = eventTarget as Node
@@ -356,7 +352,7 @@ function resume (arg: Interact.SignalArgs['interactions:down']) {
   }
 }
 
-function stop ({ interaction }: Interact.DoPhaseArg<Interact.ActionName, 'inertiastart'>) {
+function stop ({ interaction }: { interaction: Interact.Interaction }) {
   const state = interaction.inertia
 
   if (state.active) {
@@ -376,8 +372,8 @@ const inertia: Interact.Plugin = {
   before: ['modifiers/base'],
   install,
   listeners: {
-    'interactions:new': ({ interaction }, scope) => {
-      interaction.inertia = new InertiaState(interaction, scope)
+    'interactions:new': ({ interaction }) => {
+      interaction.inertia = new InertiaState(interaction)
     },
 
     'interactions:before-action-end': start,

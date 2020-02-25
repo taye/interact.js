@@ -29,12 +29,14 @@ test('inertia', t => {
     },
   }
 
-  let fired: any[] = []
+  let fired: Array<Interact.InteractEvent<'drag'>> = []
   let modifierCallPhases: Interact.EventPhase[] = []
 
   coords.client = coords.page
   scope.now = () => coords.timeStamp
-  interactable.draggable({ inertia: true }).on('dragstart dragmove dragend draginertiastart', e => fired.push(e))
+  interactable
+    .draggable({ inertia: true })
+    .on(Object.keys(scope.actions.phases).map(p => `drag${p}`), e => fired.push(e))
 
   // test inertia without modifiers or throw
   downStartMoveUp({ x: 100, y: 0, dt: 1000 })
@@ -48,12 +50,13 @@ test('inertia', t => {
 
   // test inertia with { endOnly: false } modifier and with throw
   downStartMoveUp({ x: 100, y: 0, dt: 10 })
-  t.deepEqual(modifierCallPhases, ['move', 'inertiastart'], '{ endOnly: false } && thrown: modifier is called from pointerUp')
+  t.deepEqual(modifierCallPhases, ['move', 'inertiastart', 'inertiastart'], '{ endOnly: false } && thrown: modifier is called from pointerUp inertia calc and phase')
   t.deepEqual(
     fired.map(({ page, type }) => ({ ...page, type })),
     [
       { x: 0, y: 0, type: 'dragstart' },
       { x: modifierChange, y: modifierChange, type: 'dragmove' },
+      { x: modifierChange, y: modifierChange, type: 'draginertiastart' },
     ],
     '{ endOnly: false } && thrown: move, inertiastart, and end InteractEvents are modified',
   )
@@ -61,7 +64,7 @@ test('inertia', t => {
   // test inertia with { endOnly: true } modifier and with throw
   changeModifier.options.endOnly = true
   downStartMoveUp({ x: 100, y: 0, dt: 10 })
-  t.deepEqual(modifierCallPhases, ['inertiastart'], '{ endOnly: true } && thrown: modifier is called from pointerUp')
+  t.deepEqual(modifierCallPhases, ['inertiastart'], '{ endOnly: true } && thrown: modifier is called from pointerUp inertia calc')
   t.deepEqual(
     state.modifiedOffset,
     {
@@ -82,7 +85,71 @@ test('inertia', t => {
   changeModifier.options.endOnly = true
   downStartMoveUp({ x: 1, y: 0, dt: 1000 })
   t.ok(state.active, '{ endOnly: true } && !thrown: inertia smoothEnd is activated')
-  t.deepEqual(modifierCallPhases, ['inertiastart'], '{ endOnly: true } && !thrown: modifier is called from pointerUp')
+  t.deepEqual(modifierCallPhases, ['inertiastart'], '{ endOnly: true } && !thrown: modifier is called from pointerUp smooth end check')
+
+  interactable.draggable({
+    modifiers: [{
+      options: { endOnly: true },
+      methods: {
+        set ({ coords: modifiedCoords, phase }) {
+          extend(modifiedCoords, { x: 300, y: 400 })
+          modifierCallPhases.push(phase)
+        },
+      },
+    }],
+  })
+
+  downStartMoveUp({ x: 50, y: 70, dt: 1000 })
+  coords.timeStamp = 100
+  t.deepEqual(
+    state.targetOffset,
+    { x: 250, y: 330 },
+  )
+
+  extend(coords.page, { x: 50, y: 100 })
+  down()
+  t.ok(interaction._interacting && !state.active, 'inertia is stopped on resume')
+  t.deepEqual(
+    { coords: interaction.coords.cur.page, rect: interaction.rect },
+    { coords: coords.page, rect: { left: 50, top: 70, right: 150, bottom: 170, width: 100, height: 100 } },
+    'interaction coords are updated to down coords on resume',
+  )
+  t.deepEqual(
+    lastEvent().page,
+    coords.page,
+    'resume event coords are set correctly',
+  )
+
+  move()
+  t.deepEqual(
+    interaction.coords.cur.page,
+    coords.page,
+    'interaction coords are correct on duplicate move after resume',
+  )
+  t.deepEqual(
+    lastEvent().page,
+    coords.page,
+    'move event coords on duplicate move after resume',
+  )
+
+  extend(coords.page, { x: 200, y: 250 })
+  move()
+  up()
+  t.notDeepEqual(
+    state.targetOffset,
+    coords.page,
+    'second release inertia target is not the pointer event coords',
+  )
+  t.notDeepEqual(
+    state.targetOffset,
+    { x: 300, y: 400 },
+    'second release inertia target is not the modified target',
+  )
+  t.deepEqual(
+    helpers.getProps(lastEvent(), ['type', 'page'] as const),
+    { type: 'draginertiastart', page: coords.page },
+    'inertiastart is fired at non preEnd modified coords',
+  )
 
   interaction.stop()
   t.end()
@@ -102,5 +169,9 @@ test('inertia', t => {
     coords.timeStamp = dt
     move()
     up()
+  }
+
+  function lastEvent () {
+    return fired[fired.length - 1]
   }
 })

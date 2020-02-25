@@ -131,7 +131,7 @@ export class Interaction<T extends ActionName = ActionName> {
   downPointer: Interact.PointerType = {} as Interact.PointerType
 
   _latestPointer: {
-    pointer: Interact.EventTarget
+    pointer: Interact.PointerType
     event: Interact.PointerEventType
     eventTarget: Node
   } = {
@@ -282,7 +282,6 @@ export class Interaction<T extends ActionName = ActionName> {
   pointerMove (pointer: Interact.PointerType, event: Interact.PointerEventType, eventTarget: Interact.EventTarget) {
     if (!this.simulation && !(this.modification && this.modification.endResult)) {
       this.updatePointer(pointer, event, eventTarget, false)
-      utils.pointer.setCoords(this.coords.cur, this.pointers.map(p => p.pointer), this._now())
     }
 
     const duplicateMove = (this.coords.cur.page.x === this.coords.prev.page.x &&
@@ -317,7 +316,6 @@ export class Interaction<T extends ActionName = ActionName> {
 
     if (!duplicateMove) {
       // set pointer coordinate, time changes and velocity
-      utils.pointer.setCoordDeltas(this.coords.delta, this.coords.prev, this.coords.cur)
       utils.pointer.setCoordVelocity(this.coords.velocity, this.coords.delta)
     }
 
@@ -498,20 +496,21 @@ export class Interaction<T extends ActionName = ActionName> {
       pointerInfo.pointer = pointer
     }
 
+    utils.pointer.setCoords(this.coords.cur, this.pointers.map(p => p.pointer), this._now())
+    utils.pointer.setCoordDeltas(this.coords.delta, this.coords.prev, this.coords.cur)
+
     if (down) {
       this.pointerIsDown = true
 
-      if (!this.interacting()) {
-        utils.pointer.setCoords(this.coords.start, this.pointers.map(p => p.pointer), this._now())
+      pointerInfo.downTime = this.coords.cur.timeStamp
+      pointerInfo.downTarget = eventTarget
 
-        utils.pointer.copyCoords(this.coords.cur, this.coords.start)
-        utils.pointer.copyCoords(this.coords.prev, this.coords.start)
+      if (!this.interacting()) {
+        utils.pointer.copyCoords(this.coords.start, this.coords.cur)
+        utils.pointer.copyCoords(this.coords.prev, this.coords.cur)
         utils.pointer.pointerExtend(this.downPointer, pointer)
 
         this.downEvent = event
-        pointerInfo.downTime = this.coords.cur.timeStamp
-        pointerInfo.downTarget = eventTarget
-
         this.pointerWasMoved = false
       }
     }
@@ -576,11 +575,11 @@ export class Interaction<T extends ActionName = ActionName> {
 
   _doPhase<P extends EventPhase> (signalArg: Omit<DoPhaseArg<T, P>, 'iEvent'> & { iEvent?: InteractEvent<T, P> }) {
     const { event, phase, preEnd, type } = signalArg
-    const { rect, coords: { delta } } = this
+    const { rect } = this
 
     if (rect && phase === 'move') {
-      // update the rect modifications
-      utils.rect.addEdges(this.edges, rect, delta[this.interactable.options.deltaSource])
+      // update the rect changes due to pointer move
+      utils.rect.addEdges(this.edges, rect, this.coords.delta[this.interactable.options.deltaSource])
 
       rect.width = rect.right - rect.left
       rect.height = rect.bottom - rect.top

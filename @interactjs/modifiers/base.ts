@@ -156,15 +156,18 @@ const modifiersBase: Interact.Plugin = {
       modification.applyToInteraction(arg)
     },
 
+    'interactions:before-action-inertiastart': arg => arg.interaction.modification.setAndApply(arg),
     'interactions:before-action-move': arg => arg.interaction.modification.setAndApply(arg),
 
     'interactions:before-action-end': arg => arg.interaction.modification.beforeEnd(arg),
 
     'interactions:action-start': addEventModifiers,
+    'interactions:action-inertiastart': addEventModifiers,
     'interactions:action-move': addEventModifiers,
     'interactions:action-resume': addEventModifiers,
     'interactions:action-end': addEventModifiers,
 
+    'interactions:after-action-inertiastart': arg => arg.interaction.modification.restoreInteractionCoords(arg),
     'interactions:after-action-start': arg => arg.interaction.modification.restoreInteractionCoords(arg),
     'interactions:after-action-move': arg => arg.interaction.modification.restoreInteractionCoords(arg),
     'interactions:after-action-resume': arg => arg.interaction.modification.restoreInteractionCoords(arg),

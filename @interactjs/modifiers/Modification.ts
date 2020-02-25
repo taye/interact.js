@@ -136,6 +136,37 @@ export default class Modification {
     return newResult
   }
 
+  applyToInteraction (arg: { phase: Interact.EventPhase, rect?: Interact.Rect }) {
+    const { interaction } = this
+    const { phase } = arg
+    const curCoords = interaction.coords.cur
+    const startCoords = interaction.coords.start
+    const { result, startDelta } = this
+    const curDelta = result.delta
+
+    if (phase === 'start') {
+      extend(this.startDelta, result.delta)
+    }
+
+    for (const [coordsSet, delta] of [[startCoords, startDelta], [curCoords, curDelta]] as const) {
+      coordsSet.page.x   += delta.x
+      coordsSet.page.y   += delta.y
+      coordsSet.client.x += delta.x
+      coordsSet.client.y += delta.y
+    }
+
+    const { rectDelta } = this.result
+    const rect = arg.rect || interaction.rect
+
+    rect.left   += rectDelta.left
+    rect.right  += rectDelta.right
+    rect.top    += rectDelta.top
+    rect.bottom += rectDelta.bottom
+
+    rect.width = rect.right - rect.left
+    rect.height = rect.bottom - rect.top
+  }
+
   setAndApply (arg: Partial<Interact.DoAnyPhaseArg> & {
     phase: Interact.EventPhase
     preEnd?: boolean
@@ -250,37 +281,6 @@ export default class Modification {
     return this.states
   }
 
-  applyToInteraction (arg: { phase: Interact.EventPhase, rect?: Interact.Rect }) {
-    const { interaction } = this
-    const { phase } = arg
-    const curCoords = interaction.coords.cur
-    const startCoords = interaction.coords.start
-    const { result, startDelta } = this
-    const curDelta = result.delta
-
-    if (phase === 'start') {
-      extend(this.startDelta, result.delta)
-    }
-
-    for (const [coordsSet, delta] of [[startCoords, startDelta], [curCoords, curDelta]] as const) {
-      coordsSet.page.x   += delta.x
-      coordsSet.page.y   += delta.y
-      coordsSet.client.x += delta.x
-      coordsSet.client.y += delta.y
-    }
-
-    const { rectDelta } = this.result
-    const rect = arg.rect || interaction.rect
-
-    rect.left   += rectDelta.left
-    rect.right  += rectDelta.right
-    rect.top    += rectDelta.top
-    rect.bottom += rectDelta.bottom
-
-    rect.width = rect.right - rect.left
-    rect.height = rect.bottom - rect.top
-  }
-
   restoreInteractionCoords ({ interaction: { coords, rect, modification } }: { interaction: Interact.Interaction }) {
     if (!modification.result) { return }
 
@@ -318,7 +318,7 @@ export default class Modification {
     this.startDelta = other.startDelta
     this.edges = other.edges
     this.states = other.states.map(s => clone(s) as ModifierState)
-    this.result = createResult(other.result.coords, other.result.rect)
+    this.result = createResult(extend({}, other.result.coords), extend({}, other.result.rect))
   }
 
   destroy () {
