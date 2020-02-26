@@ -2,11 +2,11 @@ import test from '@interactjs/_dev/test/test'
 import drag from '@interactjs/actions/drag'
 import drop from '@interactjs/actions/drop'
 import autoStart from '@interactjs/auto-start/base'
+import extend from '@interactjs/utils/extend'
 import * as pointerUtils from '@interactjs/utils/pointerUtils'
 import InteractEvent from './InteractEvent'
 import Interaction from './Interaction'
 import * as helpers from './tests/_helpers'
-import extend from '@interactjs/utils/extend'
 
 test('Interaction constructor', t => {
   const testType = 'test'

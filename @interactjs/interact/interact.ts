@@ -2,7 +2,7 @@
 
 import { Options } from '@interactjs/core/defaultOptions'
 import Interactable from '@interactjs/core/Interactable'
-import { Scope, isNonNativeEvent } from '@interactjs/core/scope'
+import { isNonNativeEvent, Scope } from '@interactjs/core/scope'
 import browser from '@interactjs/utils/browser'
 import events from '@interactjs/utils/events'
 import * as utils from '@interactjs/utils/index'

@@ -6,10 +6,10 @@ import devTools from '@interactjs/dev-tools/index'
 import inertia from '@interactjs/inertia/index'
 import modifiersBase from '@interactjs/modifiers/base'
 import * as modifiers from '@interactjs/modifiers/index'
+import offset from '@interactjs/offset'
 import * as pointerEvents from '@interactjs/pointer-events/index'
 import reflow from '@interactjs/reflow/index'
 import interact, { scope } from './interact'
-import offset from '@interactjs/offset'
 
 export function init (window: Window) {
   scope.init(window)
