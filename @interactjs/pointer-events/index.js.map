@@ -1,0 +1,19 @@
+{
+	"version": 3,
+	"sources": [
+		"index.ts"
+	],
+	"names": [
+		"pointerEvents",
+		"holdRepeat",
+		"interactableTargets",
+		"install",
+		"scope",
+		"usePlugin",
+		"id"
+	],
+	"mappings": "AAAA,OAAO,KAAKA,aAAZ;AACA,OAAOC,UAAP;AACA,OAAOC,mBAAP;;AAEA,SAASC,OAAT,CAAkBC,KAAlB,EAAyC;AACvCA,EAAAA,KAAK,CAACC,SAAN,CAAgBL,aAAhB;AACAI,EAAAA,KAAK,CAACC,SAAN,CAAgBJ,UAAhB;AACAG,EAAAA,KAAK,CAACC,SAAN,CAAgBH,mBAAhB;AACD;;AAED,MAAMI,EAAE,GAAG,gBAAX;AAEA,SAASA,EAAT,EAAaN,aAAb,EAA4BC,UAA5B,EAAwCC,mBAAxC,EAA6DC,OAA7D",
+	"sourcesContent": [
+		"import * as pointerEvents from './base'\nimport holdRepeat from './holdRepeat'\nimport interactableTargets from './interactableTargets'\n\nfunction install (scope: Interact.Scope) {\n  scope.usePlugin(pointerEvents)\n  scope.usePlugin(holdRepeat)\n  scope.usePlugin(interactableTargets)\n}\n\nconst id = 'pointer-events'\n\nexport { id, pointerEvents, holdRepeat, interactableTargets, install }\n"
+	]
+}

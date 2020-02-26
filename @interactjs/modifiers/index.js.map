@@ -1,0 +1,29 @@
+{
+	"version": 3,
+	"sources": [
+		"index.ts"
+	],
+	"names": [
+		"aspectRatioModule",
+		"makeModifier",
+		"restrictEdgesModule",
+		"restrictModule",
+		"restrictRectModule",
+		"restrictSizeModule",
+		"snapEdgesModule",
+		"snapModule",
+		"snapSizeModule",
+		"snap",
+		"snapSize",
+		"snapEdges",
+		"restrict",
+		"restrictRect",
+		"restrictEdges",
+		"restrictSize",
+		"aspectRatio"
+	],
+	"mappings": "AAAA,OAAOA,iBAAP;AACA,SAASC,YAAT;AACA,OAAOC,mBAAP;AACA,OAAOC,cAAP;AACA,OAAOC,kBAAP;AACA,OAAOC,kBAAP;AACA,OAAOC,eAAP;AACA,OAAOC,UAAP;AACA,OAAOC,cAAP;AAEA,OAAO,MAAMC,IAAI,GAAGR,YAAY,CAACM,UAAD,EAAa,MAAb,CAAzB;AACP,OAAO,MAAMG,QAAQ,GAAGT,YAAY,CAACO,cAAD,EAAiB,UAAjB,CAA7B;AACP,OAAO,MAAMG,SAAS,GAAGV,YAAY,CAACK,eAAD,EAAkB,WAAlB,CAA9B;AACP,OAAO,MAAMM,QAAQ,GAAGX,YAAY,CAACE,cAAD,EAAiB,UAAjB,CAA7B;AACP,OAAO,MAAMU,YAAY,GAAGZ,YAAY,CAACG,kBAAD,EAAqB,cAArB,CAAjC;AACP,OAAO,MAAMU,aAAa,GAAGb,YAAY,CAACC,mBAAD,EAAsB,eAAtB,CAAlC;AACP,OAAO,MAAMa,YAAY,GAAGd,YAAY,CAACI,kBAAD,EAAqB,cAArB,CAAjC;AACP,OAAO,MAAMW,WAAW,GAAGf,YAAY,CAACD,iBAAD,EAAoB,aAApB,CAAhC",
+	"sourcesContent": [
+		"import aspectRatioModule from './aspectRatio'\nimport { makeModifier } from './base'\nimport restrictEdgesModule from './restrict/edges'\nimport restrictModule from './restrict/pointer'\nimport restrictRectModule from './restrict/rect'\nimport restrictSizeModule from './restrict/size'\nimport snapEdgesModule from './snap/edges'\nimport snapModule from './snap/pointer'\nimport snapSizeModule from './snap/size'\n\nexport const snap = makeModifier(snapModule, 'snap')\nexport const snapSize = makeModifier(snapSizeModule, 'snapSize')\nexport const snapEdges = makeModifier(snapEdgesModule, 'snapEdges')\nexport const restrict = makeModifier(restrictModule, 'restrict')\nexport const restrictRect = makeModifier(restrictRectModule, 'restrictRect')\nexport const restrictEdges = makeModifier(restrictEdgesModule, 'restrictEdges')\nexport const restrictSize = makeModifier(restrictSizeModule, 'restrictSize')\nexport const aspectRatio = makeModifier(aspectRatioModule, 'aspectRatio')\n"
+	]
+}
