@@ -117,19 +117,19 @@ test('inertia', t => {
   t.deepEqual(
     lastEvent().page,
     coords.page,
-    'resume event coords are set correctly',
+    'action resume event coords are set correctly',
   )
 
   move()
   t.deepEqual(
-    interaction.coords.cur.page,
-    coords.page,
+    { coords: interaction.coords.cur.page, rect: interaction.rect },
+    { coords: coords.page, rect: { left: 50, top: 70, right: 150, bottom: 170, width: 100, height: 100 } },
     'interaction coords are correct on duplicate move after resume',
   )
   t.deepEqual(
     lastEvent().page,
     coords.page,
-    'move event coords on duplicate move after resume',
+    'action move event coords on duplicate move after resume is correct',
   )
 
   extend(coords.page, { x: 200, y: 250 })
@@ -146,9 +146,23 @@ test('inertia', t => {
     'second release inertia target is not the modified target',
   )
   t.deepEqual(
-    helpers.getProps(lastEvent(), ['type', 'page'] as const),
-    { type: 'draginertiastart', page: coords.page },
+    helpers.getProps(lastEvent(), ['type', 'page', 'rect'] as const),
+    { type: 'draginertiastart', page: coords.page, rect: { left: 200, top: 220, right: 300, bottom: 320, width: 100, height: 100 } },
     'inertiastart is fired at non preEnd modified coords',
+  )
+
+  down()
+  extend(coords.page, { x: 150, y: 400 })
+  move()
+  t.deepEqual(
+    { coords: interaction.coords.cur.page, rect: interaction.rect },
+    { coords: coords.page, rect: { left: 150, top: 370, right: 250, bottom: 470, width: 100, height: 100 } },
+    'interaction coords after second resume are correct',
+  )
+  t.deepEqual(
+    helpers.getProps(lastEvent(), ['type', 'page', 'rect'] as const),
+    { type: 'dragmove', page: coords.page, rect: { left: 150, top: 370, right: 250, bottom: 470, width: 100, height: 100 } },
+    'action move event after second resume is fired at non preEnd modified coords',
   )
 
   interaction.stop()

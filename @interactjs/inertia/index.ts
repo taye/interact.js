@@ -5,6 +5,7 @@ import * as dom from '@interactjs/utils/domUtils'
 import hypot from '@interactjs/utils/hypot'
 import * as is from '@interactjs/utils/is'
 import raf from '@interactjs/utils/raf'
+import { copyCoords } from '@interactjs/utils/pointerUtils'
 
 declare module '@interactjs/core/InteractEvent' {
   // eslint-disable-next-line no-shadow
@@ -302,6 +303,7 @@ export class InertiaState {
       event,
       phase: 'resume',
     })
+    copyCoords(interaction.coords.prev, interaction.coords.cur)
 
     this.stop()
   }
