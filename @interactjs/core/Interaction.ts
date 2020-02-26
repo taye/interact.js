@@ -504,11 +504,11 @@ export class Interaction<T extends ActionName = ActionName> {
 
       pointerInfo.downTime = this.coords.cur.timeStamp
       pointerInfo.downTarget = eventTarget
+      utils.pointer.pointerExtend(this.downPointer, pointer)
 
       if (!this.interacting()) {
         utils.pointer.copyCoords(this.coords.start, this.coords.cur)
         utils.pointer.copyCoords(this.coords.prev, this.coords.cur)
-        utils.pointer.pointerExtend(this.downPointer, pointer)
 
         this.downEvent = event
         this.pointerWasMoved = false
