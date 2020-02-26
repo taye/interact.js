@@ -91,12 +91,13 @@ if (argv.watch) {
   const doEsnext = require('./esnext')
 
   b.on('update', ids => {
-    ids = ids.filter(id => /\.js$/.test(id))
+    ids = ids.filter(id => !/\.js$/.test(id))
 
     if (!ids.length) { return }
 
     update(ids)
     doEsnext(ids.filter(id => /\.tsx?/.test(id)).map(id => path.resolve(id)))
+      .then(() => console.log('Generated esnext files'))
   })
   b.on('log', msg => console.log(msg))
 
