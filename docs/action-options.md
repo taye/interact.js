@@ -40,6 +40,34 @@ The action will start after the pointer is held down for the given number of mil
 
 Change inertia settings for drag, and resize. See [docs/inertia](<%= url_for '/docs/inertia' %>).
 
+`cursorChecker`
+---------------
+
+You can disable default cursors with `interact(target).styleCursor(false)`, but
+that will disable cursor styling for all actions. To disable or change the
+cursor for each action, you can set a `cursorChecker` function which takes info
+about the current interaction and returns the CSS cursor value to set on the
+target element.
+
+```js
+interact(target)
+  .resizable({
+    edges: { left: true, right: true },
+    cursorChecker (action, interactable, element, interacting) {
+      // the library uses biderectional arrows <-> by default,
+      // but we want specific arrows (<- or ->) for each diriection
+      if (action.edges.left) { return 'w-resize'}
+      if (action.edges.right) { return 'e-resize'}
+    }
+  })
+  .draggable({
+    cursorChecker () {
+      // don't set a cursor for drag actions
+      return null
+    }
+  })
+```
+
 `autoScroll`
 ------------
 
