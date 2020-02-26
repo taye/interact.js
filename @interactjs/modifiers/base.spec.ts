@@ -1,5 +1,4 @@
 import test from '@interactjs/_dev/test/test'
-import { EventPhase } from '@interactjs/core/InteractEvent'
 import * as helpers from '@interactjs/core/tests/_helpers'
 import * as utils from '@interactjs/utils/index'
 import modifiersBase from './base'
@@ -14,12 +13,11 @@ test('modifiers/base', t => {
     event,
   } = helpers.testEnv({ plugins: [modifiersBase] })
 
-  scope.actions.eventTypes.push('TESTstart', 'TESTmove', 'TESTend')
-
-  t.ok(utils.is.object(interaction.modifiers), 'modifiers prop is added new Interaction')
+  t.ok(utils.is.object(interaction.modification), 'modifiers prop is added new Interaction')
 
   coords.client = coords.page
 
+  const testAction = { name: 'test' as Interact.ActionName }
   const element = target as Interact.Element
   const startCoords = { x: 100, y: 200 }
   const moveCoords = { x: 400, y: 500 }
@@ -27,12 +25,12 @@ test('modifiers/base', t => {
   let firedEvents = []
 
   interactable.rectChecker(() => ({ top: 0, left: 0, bottom: 50, right: 50 }))
-  interactable.on('TESTstart TESTmove TESTend', e => firedEvents.push(e))
+  interactable.on('teststart testmove testend', e => firedEvents.push(e))
 
   utils.extend(coords.page, startCoords)
   interaction.pointerDown(event, event, element)
 
-  ;(interactable.options as any).TEST = {
+  ;(interactable.options as any).test = {
     enabled: true,
     modifiers: [
       {
@@ -42,7 +40,7 @@ test('modifiers/base', t => {
     ],
   }
 
-  interaction.start({ name: 'TEST' }, interactable, element)
+  interaction.start(testAction, interactable, element)
 
   t.ok(
     options.started,
@@ -102,14 +100,14 @@ test('modifiers/base', t => {
   // don't set start
   options.setStart = null
   // add second modifier
-  ;(interactable.options as any).TEST.modifiers.push({
+  ;(interactable.options as any).test.modifiers.push({
     options,
     methods: doubleModifier,
   })
 
   utils.extend(coords.page, startCoords)
   interaction.pointerDown(event, event, element)
-  interaction.start({ name: 'TEST' }, interactable, element)
+  interaction.start(testAction, interactable, element)
 
   t.notOk(
     options.setted,
@@ -139,7 +137,9 @@ test('modifiers/base', t => {
   t.doesNotThrow(() => {
     interaction._scopeFire('interactions:action-resume', {
       interaction,
-      phase: EventPhase.Resume,
+      phase: 'resume',
+      iEvent: {} as any,
+      event,
     })
   }, 'action-resume doesn\'t throw errors')
 

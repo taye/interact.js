@@ -1,0 +1,11 @@
+{
+  "name": "@interactjs/offset",
+  "version": "1.8.4",
+  "peerDependencies": {
+    "@interactjs/core": "1.8.4",
+    "@interactjs/utils": "1.8.4"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

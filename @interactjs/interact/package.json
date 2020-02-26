@@ -10,6 +10,7 @@
     "@interactjs/dev-tools": "1.8.4",
     "@interactjs/inertia": "1.8.4",
     "@interactjs/modifiers": "1.8.4",
+    "@interactjs/offset": "1.8.4",
     "@interactjs/pointer-events": "1.8.4",
     "@interactjs/reflow": "1.8.4",
     "@interactjs/utils": "1.8.4"

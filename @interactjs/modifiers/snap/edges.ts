@@ -32,6 +32,8 @@ import { ModifierArg, ModifierModule } from '../base'
 import { SnapOptions, SnapState } from './pointer'
 import snapSize from './size'
 
+export type SnapEdgesOptions = Pick<SnapOptions, 'targets' | 'range' | 'offset' | 'endOnly' | 'enabled'>
+
 function start (arg: ModifierArg<SnapState>) {
   const { edges } = arg
 
@@ -44,14 +46,16 @@ function start (arg: ModifierArg<SnapState>) {
   return snapSize.start(arg)
 }
 
-const snapEdges: ModifierModule<SnapOptions, SnapState> = {
+const snapEdges: ModifierModule<SnapEdgesOptions, SnapState> = {
   start,
   set: snapSize.set,
   defaults: extend(
     clone(snapSize.defaults),
     {
+      targets: null,
+      range: null,
       offset: { x: 0, y: 0 },
-    } as SnapOptions,
+    } as const,
   ),
 }
 

@@ -1,4 +1,3 @@
-import { ActionName } from '@interactjs/core/scope'
 import { parentNode } from '@interactjs/utils/domUtils'
 import * as is from '@interactjs/utils/is'
 import autoStart from './base'
@@ -36,7 +35,7 @@ function beforeStart ({ interaction, eventTarget, dx, dy }: Interact.SignalArgs[
           interaction.downPointer, interaction.downEvent, interaction, element)
 
         if (action &&
-            action.name === ActionName.Drag &&
+            action.name === 'drag' &&
             checkStartAxis(currentAxis, interactable) &&
             autoStart.validateAction(action, interactable, element, eventTarget, scope)) {
           return interactable
@@ -49,7 +48,7 @@ function beforeStart ({ interaction, eventTarget, dx, dy }: Interact.SignalArgs[
       const interactable = scope.interactables.forEachMatch(element, getDraggable)
 
       if (interactable) {
-        interaction.prepared.name = ActionName.Drag
+        interaction.prepared.name = 'drag'
         interaction.interactable = interactable
         interaction.element = element
         break
@@ -63,7 +62,7 @@ function beforeStart ({ interaction, eventTarget, dx, dy }: Interact.SignalArgs[
 function checkStartAxis (startAxis: string, interactable: Interact.Interactable) {
   if (!interactable) { return false }
 
-  const thisAxis = interactable.options[ActionName.Drag].startAxis
+  const thisAxis = interactable.options.drag.startAxis
 
   return (startAxis === 'xy' || thisAxis === 'xy' || thisAxis === startAxis)
 }

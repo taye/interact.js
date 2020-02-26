@@ -1,5 +1,4 @@
 import test from '@interactjs/_dev/test/test'
-import { ActionName } from '@interactjs/core/scope'
 import * as helpers from '@interactjs/core/tests/_helpers'
 import { extend } from '@interactjs/utils'
 import * as pointerUtils from '@interactjs/utils/pointerUtils'
@@ -10,7 +9,7 @@ test('drag action init', t => {
 
   scope.usePlugin(drag)
 
-  t.ok(scope.actions.names.includes(ActionName.Drag), '"drag" in actions.names')
+  t.ok(scope.actions.map.drag, '"drag" in actions.names')
   t.equal(scope.actions.methodDict.drag, 'draggable')
   t.equal(typeof scope.Interactable.prototype.draggable, 'function')
 

@@ -1,14 +1,6 @@
 import Interactable from './Interactable'
-import { ActionName } from './scope'
 
-export enum EventPhase {
-  Start = 'start',
-  Move = 'move',
-  End = 'end',
-  _NONE = '',
-}
-
-export class BaseEvent<T extends ActionName = any> {
+export class BaseEvent<T extends Interact.ActionName = any> {
   type: string
   target: EventTarget
   currentTarget: EventTarget

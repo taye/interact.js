@@ -17,8 +17,8 @@ test('actions integration', t => {
 
   interaction1.pointerDown(event, event, element)
 
-  for (const name of scope.actions.names) {
-    interaction1.start({ name }, interactable, element)
+  for (const name in scope.actions.map) {
+    interaction1.start({ name: name as Interact.ActionName }, interactable, element)
     interaction1.stop()
 
     t.doesNotThrow(() => {
@@ -26,7 +26,9 @@ test('actions integration', t => {
     }, `${name} start and stop does not throw`)
   }
 
-  for (const order of [scope.actions.names, [...scope.actions.names].reverse()]) {
+  const actionNames = Object.keys(scope.actions.map)
+
+  for (const order of ([actionNames, [...actionNames].reverse()] as Interact.ActionName[][])) {
     const interaction2 = scope.interactions.new({})
 
     for (const name of order) {

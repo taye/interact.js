@@ -6,6 +6,7 @@ import * as pointerUtils from '@interactjs/utils/pointerUtils'
 import InteractEvent from './InteractEvent'
 import Interaction from './Interaction'
 import * as helpers from './tests/_helpers'
+import extend from '@interactjs/utils/extend'
 
 test('Interaction constructor', t => {
   const testType = 'test'
@@ -254,15 +255,16 @@ test('Interaction.pointer{Down,Move,Up} updatePointer', t => {
 })
 
 test('Interaction.pointerDown', t => {
-  const { interaction, scope } = helpers.testEnv()
-  const coords = helpers.newCoordsSet()
-  const eventTarget = {} as Interact.Element
-  const event: any = {
-    type: 'down',
-    target: eventTarget,
-  }
-  const pointer: any = helpers.newPointer()
+  const { interaction, scope, coords, event, target } = helpers.testEnv()
   let signalArg: any
+
+  const coordsSet = helpers.newCoordsSet()
+  scope.now = () => coords.timeStamp
+
+  extend(coords, {
+    target,
+    type: 'down',
+  })
 
   const signalListener = (arg: any) => {
     signalArg = arg
@@ -273,41 +275,47 @@ test('Interaction.pointerDown', t => {
   })
 
   const pointerCoords: any = { page: {}, client: {} }
-  pointerUtils.setCoords(pointerCoords, [pointer], event.timeStamp)
+  pointerUtils.setCoords(pointerCoords, [event], event.timeStamp)
 
-  for (const prop in coords) {
-    pointerUtils.copyCoords(interaction.coords[prop as keyof typeof coords], coords[prop as keyof typeof coords])
+  for (const prop in coordsSet) {
+    pointerUtils.copyCoords(interaction.coords[prop as keyof typeof coordsSet], coordsSet[prop as keyof typeof coordsSet])
   }
+
+  t.deepEqual(interaction.downPointer, {} as any, 'downPointer is initially empty')
 
   // test while interacting
   interaction._interacting = true
-  interaction.pointerDown(pointer, event, eventTarget)
+  interaction.pointerDown(event, event, target)
 
   t.equal(interaction.downEvent, null, 'downEvent is not updated')
   t.deepEqual(
     interaction.pointers,
     [{
-      id: pointer.pointerId,
-      pointer,
+      id: event.pointerId,
       event,
-      downTime: null,
-      downTarget: null,
+      pointer: event,
+      downTime: 0,
+      downTarget: target,
     }],
     'pointer is added',
   )
 
-  t.deepEqual(interaction.downPointer, {} as any, 'downPointer is not updated')
+  t.notDeepEqual(interaction.downPointer, {} as any, 'downPointer is updated')
 
-  t.deepEqual(interaction.coords.start, coords.start, 'coords.start are not modified')
-  t.deepEqual(interaction.coords.cur,   coords.cur,   'coords.cur   are not modified')
-  t.deepEqual(interaction.coords.prev,  coords.prev,  'coords.prev  are not modified')
+  t.deepEqual(interaction.coords.start, coordsSet.start, 'coords.start are not modified')
+  t.deepEqual(interaction.coords.prev,  coordsSet.prev,  'coords.prev  are not modified')
+
+  t.deepEqual(
+    interaction.coords.cur,
+    helpers.getProps(event, ['page', 'client', 'timeStamp']),
+    'coords.cur   *are* modified')
 
   t.ok(interaction.pointerIsDown, 'pointerIsDown')
   t.notOk(interaction.pointerWasMoved, '!pointerWasMoved')
 
-  t.equal(signalArg.pointer,      pointer,     'pointer      in down signal arg')
+  t.equal(signalArg.pointer,      event,       'pointer      in down signal arg')
   t.equal(signalArg.event,        event,       'event        in down signal arg')
-  t.equal(signalArg.eventTarget,  eventTarget, 'eventTarget  in down signal arg')
+  t.equal(signalArg.eventTarget,  target,      'eventTarget  in down signal arg')
   t.equal(signalArg.pointerIndex, 0,           'pointerIndex in down signal arg')
 
   // test while not interacting
@@ -319,8 +327,8 @@ test('Interaction.pointerDown', t => {
   // reset signalArg object
   signalArg = undefined
 
-  interaction.removePointer(pointer, null)
-  interaction.pointerDown(pointer, event, eventTarget)
+  interaction.removePointer(event, null)
+  interaction.pointerDown(event, event, target)
 
   // timeStamp is assigned with new Date.getTime()
   // don't let it cause deepEaual to fail
@@ -331,11 +339,11 @@ test('Interaction.pointerDown', t => {
   t.deepEqual(
     interaction.pointers,
     [{
-      id: pointer.pointerId,
-      pointer,
+      id: event.pointerId,
       event,
+      pointer: event,
       downTime: pointerCoords.timeStamp,
-      downTarget: eventTarget,
+      downTarget: target,
     }],
     'interaction.pointers is updated')
 
@@ -360,7 +368,7 @@ test('Interaction.start', t => {
     down,
     stop,
   } = helpers.testEnv({ plugins: [drag] })
-  const action = { name: 'drag' }
+  const action = { name: 'drag' } as const
 
   interaction.start(action, interactable, element)
   t.equal(interaction.prepared.name, null, 'do nothing if !pointerIsDown')
@@ -451,7 +459,7 @@ test('interaction move() and stop() from start event', t => {
 test('Interaction createPreparedEvent', t => {
   const { interaction, interactable, target } = helpers.testEnv()
 
-  const action = { name: 'resize' }
+  const action = { name: 'resize' } as const
   const phase = 'TEST_PHASE' as Interact.EventPhase
 
   interaction.prepared = action

@@ -1,6 +1,5 @@
 import { Interaction } from '@interactjs/core/Interaction'
-import { ActionName, Scope } from '@interactjs/core/scope'
-import * as arr from '@interactjs/utils/arr'
+import { Scope } from '@interactjs/core/scope'
 import * as dom from '@interactjs/utils/domUtils'
 import extend from '@interactjs/utils/extend'
 import * as is from '@interactjs/utils/is'
@@ -29,19 +28,12 @@ declare module '@interactjs/core/defaultOptions' {
 }
 
 declare module '@interactjs/core/scope' {
-  interface Actions {
-    [ActionName.Resize]?: typeof resize
-  }
-
-  // eslint-disable-next-line no-shadow
-  enum ActionName {
-    Resize = 'resize'
+  interface ActionMap {
+    resize?: typeof resize
   }
 }
 
-(ActionName as any).Resize = 'resize'
-
-export interface ResizeEvent extends Interact.InteractEvent<ActionName.Resize> {
+export interface ResizeEvent<P extends Interact.EventPhase = Interact.EventPhase> extends Interact.InteractEvent<'resize', P> {
   deltaRect?: Interact.FullRect
   edges?: Interact.ActionProps['edges']
 }
@@ -109,15 +101,7 @@ function install (scope: Scope) {
     return resizable(this, options, scope)
   } as ResizableMethod
 
-  actions[ActionName.Resize] = resize
-  actions.names.push(ActionName.Resize)
-  arr.merge(actions.eventTypes, [
-    'resizestart',
-    'resizemove',
-    'resizeinertiastart',
-    'resizeresume',
-    'resizeend',
-  ])
+  actions.map.resize = resize
   actions.methodDict.resize = 'resizable'
 
   defaults.actions.resize = resize.defaults
@@ -165,7 +149,7 @@ function resizeChecker (arg) {
 
     if (resizeEdges.left || resizeEdges.right || resizeEdges.top || resizeEdges.bottom) {
       arg.action = {
-        name: ActionName.Resize,
+        name: 'resize',
         edges: resizeEdges,
       }
     }
@@ -188,8 +172,8 @@ function resizeChecker (arg) {
 function resizable (interactable: Interact.Interactable, options: Interact.OrBoolean<Interact.ResizableOptions> | boolean, scope: Scope) {
   if (is.object(options)) {
     interactable.options.resize.enabled = options.enabled !== false
-    interactable.setPerAction(ActionName.Resize, options)
-    interactable.setOnEvents(ActionName.Resize, options)
+    interactable.setPerAction('resize', options)
+    interactable.setOnEvents('resize', options)
 
     if (is.string(options.axis) && /^x$|^y$|^xy$/.test(options.axis)) {
       interactable.options.resize.axis = options.axis
@@ -292,11 +276,12 @@ function initCursors (browser: typeof import ('@interactjs/utils/browser').defau
   })
 }
 
-function start ({ iEvent, interaction }: { iEvent: ResizeEvent, interaction: Interaction }) {
+function start ({ iEvent, interaction }: { iEvent: Interact.InteractEvent<any, any>, interaction: Interaction }) {
   if (interaction.prepared.name !== 'resize' || !interaction.prepared.edges) {
     return
   }
 
+  const resizeEvent = iEvent as ResizeEvent
   const rect = interaction.rect
 
   interaction._rects = {
@@ -313,14 +298,15 @@ function start ({ iEvent, interaction }: { iEvent: ResizeEvent, interaction: Int
     },
   }
 
-  iEvent.edges = interaction.prepared.edges
-  iEvent.rect = interaction._rects.corrected
-  iEvent.deltaRect = interaction._rects.delta
+  resizeEvent.edges = interaction.prepared.edges
+  resizeEvent.rect = interaction._rects.corrected
+  resizeEvent.deltaRect = interaction._rects.delta
 }
 
-function move ({ iEvent, interaction }: { iEvent: ResizeEvent, interaction: Interaction }) {
+function move ({ iEvent, interaction }: { iEvent: Interact.InteractEvent<any, any>, interaction: Interaction }) {
   if (interaction.prepared.name !== 'resize' || !interaction.prepared.edges) { return }
 
+  const resizeEvent = iEvent as ResizeEvent
   const resizeOptions = interaction.interactable.options.resize
   const invert = resizeOptions.invert
   const invertible = invert === 'reposition' || invert === 'negate'
@@ -366,41 +352,44 @@ function move ({ iEvent, interaction }: { iEvent: ResizeEvent, interaction: Inte
     deltaRect[edge] = corrected[edge] - previous[edge]
   }
 
-  iEvent.edges = interaction.prepared.edges
-  iEvent.rect = corrected
-  iEvent.deltaRect = deltaRect
+  resizeEvent.edges = interaction.prepared.edges
+  resizeEvent.rect = corrected
+  resizeEvent.deltaRect = deltaRect
 }
 
-function end ({ iEvent, interaction }: { iEvent: ResizeEvent, interaction: Interaction }) {
+function end ({ iEvent, interaction }: { iEvent: Interact.InteractEvent<any, any>, interaction: Interaction }) {
   if (interaction.prepared.name !== 'resize' || !interaction.prepared.edges) { return }
 
-  iEvent.edges = interaction.prepared.edges
-  iEvent.rect = interaction._rects.corrected
-  iEvent.deltaRect = interaction._rects.delta
+  const resizeEvent = iEvent as ResizeEvent
+
+  resizeEvent.edges = interaction.prepared.edges
+  resizeEvent.rect = interaction._rects.corrected
+  resizeEvent.deltaRect = interaction._rects.delta
 }
 
-function updateEventAxes ({ iEvent, interaction }: { iEvent: ResizeEvent, interaction: Interaction }) {
-  if (interaction.prepared.name !== ActionName.Resize || !interaction.resizeAxes) { return }
+function updateEventAxes ({ iEvent, interaction }: { iEvent: Interact.InteractEvent<any, any>, interaction: Interaction }) {
+  if (interaction.prepared.name !== 'resize' || !interaction.resizeAxes) { return }
 
   const options = interaction.interactable.options
+  const resizeEvent = iEvent as ResizeEvent
 
   if (options.resize.square) {
     if (interaction.resizeAxes === 'y') {
-      iEvent.delta.x = iEvent.delta.y
+      resizeEvent.delta.x = resizeEvent.delta.y
     }
     else {
-      iEvent.delta.y = iEvent.delta.x
+      resizeEvent.delta.y = resizeEvent.delta.x
     }
-    iEvent.axes = 'xy'
+    resizeEvent.axes = 'xy'
   }
   else {
-    iEvent.axes = interaction.resizeAxes
+    resizeEvent.axes = interaction.resizeAxes
 
     if (interaction.resizeAxes === 'x') {
-      iEvent.delta.y = 0
+      resizeEvent.delta.y = 0
     }
     else if (interaction.resizeAxes === 'y') {
-      iEvent.delta.x = 0
+      resizeEvent.delta.x = 0
     }
   }
 }

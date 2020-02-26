@@ -4,14 +4,14 @@ import InteractEvent, { EventPhase } from './InteractEvent'
 import PointerInfo from './PointerInfo'
 import { ActionName } from './scope'
 
-export interface ActionProps<T extends ActionName = any> {
+export interface ActionProps<T extends ActionName = Interact.ActionName> {
   name: T
   axis?: 'x' | 'y' | 'xy'
   edges?: Interact.EdgeOptions
 }
 
 export interface StartAction extends ActionProps {
-  name: ActionName | string
+  name: ActionName
 }
 
 export enum _ProxyValues {
@@ -36,17 +36,20 @@ export type PointerArgProps<T extends {} = {}> = {
   event: Interact.PointerEventType
   eventTarget: Interact.EventTarget
   pointerIndex: number
+  pointerInfo: PointerInfo
   interaction: Interaction
 } & T
 
-export interface DoPhaseArg {
+export interface DoPhaseArg<T extends ActionName, P extends EventPhase> {
   event: Interact.PointerEventType
   phase: EventPhase
-  interaction: Interaction
-  iEvent: InteractEvent
+  interaction: Interaction<T>
+  iEvent: InteractEvent<T, P>
   preEnd?: boolean
   type?: string
 }
+
+export type DoAnyPhaseArg = DoPhaseArg<ActionName, EventPhase>
 
 declare module '@interactjs/core/scope' {
   interface SignalArgs {
@@ -69,22 +72,19 @@ declare module '@interactjs/core/scope' {
       curEventTarget: EventTarget
     }
     'interactions:update-pointer': PointerArgProps<{
-      pointerInfo: PointerInfo
       down: boolean
     }>
-    'interactions:remove-pointer': PointerArgProps<{
-      pointerInfo: PointerInfo
-    }>
+    'interactions:remove-pointer': PointerArgProps
     'interactions:blur'
-    'interactions:before-action-start': Omit<DoPhaseArg, 'iEvent'>
-    'interactions:action-start': DoPhaseArg
-    'interactions:after-action-start': DoPhaseArg
-    'interactions:before-action-move': Omit<DoPhaseArg, 'iEvent'>
-    'interactions:action-move': DoPhaseArg
-    'interactions:after-action-move': DoPhaseArg
-    'interactions:before-action-end': Omit<DoPhaseArg, 'iEvent'>
-    'interactions:action-end': DoPhaseArg
-    'interactions:after-action-end': DoPhaseArg
+    'interactions:before-action-start': Omit<DoAnyPhaseArg, 'iEvent'>
+    'interactions:action-start': DoAnyPhaseArg
+    'interactions:after-action-start': DoAnyPhaseArg
+    'interactions:before-action-move': Omit<DoAnyPhaseArg, 'iEvent'>
+    'interactions:action-move': DoAnyPhaseArg
+    'interactions:after-action-move': DoAnyPhaseArg
+    'interactions:before-action-end': Omit<DoAnyPhaseArg, 'iEvent'>
+    'interactions:action-end': DoAnyPhaseArg
+    'interactions:after-action-end': DoAnyPhaseArg
     'interactions:stop': { interaction: Interaction }
   }
 }
@@ -96,7 +96,7 @@ keyof typeof _ProxyValues | keyof typeof _ProxyMethods
 
 let idCounter = 0
 
-export class Interaction<T extends ActionName = any> {
+export class Interaction<T extends ActionName = ActionName> {
   // current interactable being interacted with
   interactable: Interactable = null
 
@@ -131,7 +131,7 @@ export class Interaction<T extends ActionName = any> {
   downPointer: Interact.PointerType = {} as Interact.PointerType
 
   _latestPointer: {
-    pointer: Interact.EventTarget
+    pointer: Interact.PointerType
     event: Interact.PointerEventType
     eventTarget: Node
   } = {
@@ -141,7 +141,7 @@ export class Interaction<T extends ActionName = any> {
   }
 
   // previous action event
-  prevEvent: InteractEvent<T> = null
+  prevEvent: InteractEvent<T, EventPhase> = null
 
   pointerIsDown = false
   pointerWasMoved = false
@@ -209,12 +209,14 @@ export class Interaction<T extends ActionName = any> {
 
   pointerDown (pointer: Interact.PointerType, event: Interact.PointerEventType, eventTarget: Interact.EventTarget) {
     const pointerIndex = this.updatePointer(pointer, event, eventTarget, true)
+    const pointerInfo = this.pointers[pointerIndex]
 
     this._scopeFire('interactions:down', {
       pointer,
       event,
       eventTarget,
       pointerIndex,
+      pointerInfo,
       type: 'down',
       interaction: this,
     })
@@ -254,7 +256,7 @@ export class Interaction<T extends ActionName = any> {
   start (action: StartAction, interactable: Interactable, element: Interact.Element) {
     if (this.interacting() ||
         !this.pointerIsDown ||
-        this.pointers.length < (action.name === ActionName.Gesture ? 2 : 1) ||
+        this.pointers.length < (action.name === 'gesture' ? 2 : 1) ||
         !interactable.options[action.name].enabled) {
       return false
     }
@@ -264,21 +266,22 @@ export class Interaction<T extends ActionName = any> {
     this.interactable = interactable
     this.element      = element
     this.rect         = interactable.getRect(element)
-    this.edges        = utils.extend({}, this.prepared.edges)
+    this.edges        = this.prepared.edges
+      ? utils.extend({}, this.prepared.edges)
+      : { left: true, right: true, top: true, bottom: true }
     this._stopped     = false
     this._interacting = this._doPhase({
       interaction: this,
       event: this.downEvent,
-      phase: EventPhase.Start,
+      phase: 'start',
     }) && !this._stopped
 
     return this._interacting
   }
 
   pointerMove (pointer: Interact.PointerType, event: Interact.PointerEventType, eventTarget: Interact.EventTarget) {
-    if (!this.simulation && !(this.modifiers && this.modifiers.endResult)) {
+    if (!this.simulation && !(this.modification && this.modification.endResult)) {
       this.updatePointer(pointer, event, eventTarget, false)
-      utils.pointer.setCoords(this.coords.cur, this.pointers.map(p => p.pointer), this._now())
     }
 
     const duplicateMove = (this.coords.cur.page.x === this.coords.prev.page.x &&
@@ -297,9 +300,11 @@ export class Interaction<T extends ActionName = any> {
       this.pointerWasMoved = utils.hypot(dx, dy) > this.pointerMoveTolerance
     }
 
+    const pointerIndex = this.getPointerIndex(pointer)
     const signalArg = {
       pointer,
-      pointerIndex: this.getPointerIndex(pointer),
+      pointerIndex,
+      pointerInfo: this.pointers[pointerIndex],
       event,
       type: 'move' as const,
       eventTarget,
@@ -311,13 +316,12 @@ export class Interaction<T extends ActionName = any> {
 
     if (!duplicateMove) {
       // set pointer coordinate, time changes and velocity
-      utils.pointer.setCoordDeltas(this.coords.delta, this.coords.prev, this.coords.cur)
       utils.pointer.setCoordVelocity(this.coords.velocity, this.coords.delta)
     }
 
     this._scopeFire('interactions:move', signalArg)
 
-    if (!duplicateMove) {
+    if (!duplicateMove && !this.simulation) {
       // if interacting, fire an 'action-move' signal etc
       if (this.interacting()) {
         signalArg.type = null
@@ -360,7 +364,7 @@ export class Interaction<T extends ActionName = any> {
       interaction: this,
     }, signalArg || {})
 
-    signalArg.phase = EventPhase.Move
+    signalArg.phase = 'move'
 
     this._doPhase(signalArg)
   }
@@ -378,6 +382,7 @@ export class Interaction<T extends ActionName = any> {
     this._scopeFire(`interactions:${type}` as 'interactions:up' | 'interactions:cancel', {
       pointer,
       pointerIndex,
+      pointerInfo: this.pointers[pointerIndex],
       event,
       eventTarget,
       type: type as any,
@@ -423,7 +428,7 @@ export class Interaction<T extends ActionName = any> {
       endPhaseResult = this._doPhase({
         event,
         interaction: this,
-        phase: EventPhase.End,
+        phase: 'end',
       })
     }
 
@@ -491,20 +496,21 @@ export class Interaction<T extends ActionName = any> {
       pointerInfo.pointer = pointer
     }
 
+    utils.pointer.setCoords(this.coords.cur, this.pointers.map(p => p.pointer), this._now())
+    utils.pointer.setCoordDeltas(this.coords.delta, this.coords.prev, this.coords.cur)
+
     if (down) {
       this.pointerIsDown = true
 
-      if (!this.interacting()) {
-        utils.pointer.setCoords(this.coords.start, this.pointers.map(p => p.pointer), this._now())
+      pointerInfo.downTime = this.coords.cur.timeStamp
+      pointerInfo.downTarget = eventTarget
+      utils.pointer.pointerExtend(this.downPointer, pointer)
 
-        utils.pointer.copyCoords(this.coords.cur, this.coords.start)
-        utils.pointer.copyCoords(this.coords.prev, this.coords.start)
-        utils.pointer.pointerExtend(this.downPointer, pointer)
+      if (!this.interacting()) {
+        utils.pointer.copyCoords(this.coords.start, this.coords.cur)
+        utils.pointer.copyCoords(this.coords.prev, this.coords.cur)
 
         this.downEvent = event
-        pointerInfo.downTime = this.coords.cur.timeStamp
-        pointerInfo.downTarget = eventTarget
-
         this.pointerWasMoved = false
       }
     }
@@ -555,13 +561,11 @@ export class Interaction<T extends ActionName = any> {
     this._latestPointer.eventTarget = null
   }
 
-  _createPreparedEvent (event: Interact.PointerEventType, phase: EventPhase, preEnd?: boolean, type?: string) {
-    const actionName = this.prepared.name
-
-    return new InteractEvent(this, event, actionName, phase, this.element, null, preEnd, type)
+  _createPreparedEvent<P extends EventPhase> (event: Interact.PointerEventType, phase: P, preEnd?: boolean, type?: string) {
+    return new InteractEvent<T, P>(this, event, this.prepared.name, phase, this.element, preEnd, type)
   }
 
-  _fireEvent (iEvent: InteractEvent) {
+  _fireEvent<P extends EventPhase> (iEvent: InteractEvent<T, P>) {
     this.interactable.fire(iEvent)
 
     if (!this.prevEvent || iEvent.timeStamp >= this.prevEvent.timeStamp) {
@@ -569,14 +573,13 @@ export class Interaction<T extends ActionName = any> {
     }
   }
 
-  _doPhase (signalArg: Omit<DoPhaseArg, 'iEvent'> & { iEvent?: InteractEvent<T> }) {
+  _doPhase<P extends EventPhase> (signalArg: Omit<DoPhaseArg<T, P>, 'iEvent'> & { iEvent?: InteractEvent<T, P> }) {
     const { event, phase, preEnd, type } = signalArg
-    const { rect, coords: { delta } } = this
+    const { rect } = this
 
-    if (rect && phase === EventPhase.Move) {
-      // update the rect modifications
-      const edges = this.edges || this.prepared.edges || { left: true, right: true, top: true, bottom: true }
-      utils.rect.addEdges(edges, rect, delta[this.interactable.options.deltaSource])
+    if (rect && phase === 'move') {
+      // update the rect changes due to pointer move
+      utils.rect.addEdges(this.edges, rect, this.coords.delta[this.interactable.options.deltaSource])
 
       rect.width = rect.right - rect.left
       rect.height = rect.bottom - rect.top

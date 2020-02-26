@@ -9,7 +9,7 @@ import normalizeListeners from '@interactjs/utils/normalizeListeners'
 import { getWindow } from '@interactjs/utils/window'
 import { ActionDefaults, Defaults, Options } from './defaultOptions'
 import Eventable from './Eventable'
-import { Actions } from './scope'
+import { Actions, isNonNativeEvent } from './scope'
 
 type IgnoreValue = string | Interact.Element | boolean
 
@@ -149,7 +149,7 @@ export class Interactable implements Partial<Eventable> {
     if (trySelector(newValue) || is.object(newValue)) {
       (this.options[optionName] as any) = newValue
 
-      for (const action of this._actions.names) {
+      for (const action in this._actions.map) {
         (this.options[action][optionName] as any) = newValue
       }
 
@@ -282,7 +282,7 @@ export class Interactable implements Partial<Eventable> {
 
       for (const listener of listeners[type]) {
         // if it is an action event type
-        if (arr.contains(this._actions.eventTypes, type)) {
+        if (isNonNativeEvent(type, this._actions)) {
           this.events[method](type, listener)
         }
         // delegated event
@@ -344,7 +344,7 @@ export class Interactable implements Partial<Eventable> {
 
     for (const actionName_ in this._actions.methodDict) {
       const actionName = actionName_ as Interact.ActionName
-      const methodName: any = this._actions.methodDict[actionName]
+      const methodName = this._actions.methodDict[actionName]
 
       this.options[actionName] = {}
       this.setPerAction(actionName, extend(extend({}, defaults.perAction), defaults.actions[actionName]))

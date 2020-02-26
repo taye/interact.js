@@ -5,6 +5,7 @@
   "peerDependencies": {
     "@interactjs/core": "1.8.4",
     "@interactjs/modifiers": "1.8.4",
+    "@interactjs/offset": "1.8.4",
     "@interactjs/utils": "1.8.4"
   },
   "devDependencies": {

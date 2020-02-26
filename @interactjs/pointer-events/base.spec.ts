@@ -6,15 +6,15 @@ import interactableTargets from './interactableTargets'
 
 test('pointerEvents.types', t => {
   t.deepEqual(pointerEvents.types,
-    [
-      'down',
-      'move',
-      'up',
-      'cancel',
-      'tap',
-      'doubletap',
-      'hold',
-    ],
+    {
+      down: true,
+      move: true,
+      up: true,
+      cancel: true,
+      tap: true,
+      doubletap: true,
+      hold: true,
+    },
     'pointerEvents.types is as expected')
 
   t.end()
@@ -172,7 +172,7 @@ test('pointerEvents down hold up tap', async t => {
 
   const fired: PointerEvent[] = []
 
-  for (const type of pointerEvents.types) {
+  for (const type in pointerEvents.types) {
     interactable.on(type, e => fired.push(e))
   }
 

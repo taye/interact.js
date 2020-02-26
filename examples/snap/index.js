@@ -124,8 +124,9 @@ function circle (x, y, radius, color) {
 window.CanvasRenderingContext2D.prototype.circle = circle;
 
 function dragMove (event) {
-  const snap = event._interaction.modifiers.states.find((m) => m.name === 'snap');
+  const snap = event._interaction.modification.states.find((m) => m.name === 'snap');
   const closest = snap && snap.closest
+  const rect = interact.getElementRect(canvas);
 
   context.clearRect(
     prevCoords.x - cursorRadius - 2,
@@ -134,13 +135,23 @@ function dragMove (event) {
     cursorRadius * 2 + 4);
 
   context.clearRect(
-    prevClosest.target.x - prevClosest.range - 2,
-    prevClosest.target.y - prevClosest.range - 2,
-    prevClosest.range * 2 + 4,
-    prevClosest.range * 2 + 4);
+    prevClosest.target.x - prevClosest.range - rect.left - 2,
+    prevClosest.target.y - prevClosest.range - rect.top - 2,
+    prevClosest.range * 2 + 4 + rect.left,
+    prevClosest.range * 2 + 4 + rect.top);
 
   if (closest && closest.range !== Infinity) {
-    context.circle(closest.target.x, closest.target.y, closest.range + 1, 'rgba(102, 225, 117, 0.8)').fill();
+    const closestTarget = {
+      x: closest.target.x - rect.left,
+      y: closest.target.y - rect.top,
+    }
+
+    context.circle(
+      closestTarget.x,
+      closestTarget.y,
+      closest.range + 1,
+      'rgba(102, 225, 117, 0.8)'
+    ).fill();
   }
 
   context.circle(event.pageX, event.pageY, cursorRadius, tango).fill();
@@ -239,6 +250,7 @@ function modeChange (event) {
         zeroResumeDelta: false,
       },
       modifiers: [
+        interact.modifiers.restrict({ restriction: 'self' }),
         interact.modifiers.snap({
           targets: status.gridMode.checked? [gridFunc] : status.anchorMode.checked? anchors : null,
           enabled: !status.offMode.checked,

@@ -1,5 +1,4 @@
 import test from '@interactjs/_dev/test/test'
-import { ActionName } from '@interactjs/core/scope'
 import * as helpers from '@interactjs/core/tests/_helpers'
 import * as utils from '@interactjs/utils/index'
 import { coordsToEvent, newCoords } from '@interactjs/utils/pointerUtils'
@@ -14,7 +13,7 @@ test('gesture action init', t => {
 
   scope.usePlugin(gesture)
 
-  t.ok(scope.actions.names.includes(ActionName.Gesture), '"gesture" in actions.names')
+  t.ok(scope.actions.map.gesture, '"gesture" in actions.names')
   t.equal(scope.actions.methodDict.gesture, 'gesturable')
   t.equal(typeof scope.Interactable.prototype.gesturable, 'function')
 
@@ -68,7 +67,7 @@ test('Interactable.gesturable method', t => {
   scope.fire('auto-start:check', checkArg)
   t.ok(checkArg.action, 'allowed with 2 pointers')
 
-  start({ name: ActionName.Gesture })
+  start({ name: 'gesture' })
 
   t.deepEqual(
     interaction.gesture,
@@ -190,7 +189,7 @@ test('Interactable.gesturable method', t => {
     'not allowed with re-added second pointers',
   )
 
-  interaction.start({ name: ActionName.Gesture }, interactable, element)
+  interaction.start({ name: 'gesture' }, interactable, element)
 
   t.deepEqual(
     interaction.gesture,

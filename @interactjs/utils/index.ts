@@ -19,26 +19,6 @@ export function warnOnce<T> (this: T, method: (...args: any[]) => any, message: 
   }
 }
 
-// http://stackoverflow.com/a/5634528/2280888
-export function _getQBezierValue (t: number, p1: number, p2: number, p3: number) {
-  const iT = 1 - t
-  return iT * iT * p1 + 2 * iT * t * p2 + t * t * p3
-}
-
-export function getQuadraticCurvePoint (
-  startX: number, startY: number, cpX: number, cpY: number, endX: number, endY: number, position: number) {
-  return {
-    x:  _getQBezierValue(position, startX, cpX, endX),
-    y:  _getQBezierValue(position, startY, cpY, endY),
-  }
-}
-
-// http://gizma.com/easing/
-export function easeOutQuad (t: number, b: number, c: number, d: number) {
-  t /= d
-  return -c * t * (t - 2) + b
-}
-
 export function copyAction (dest: Interact.ActionProps, src: Interact.ActionProps) {
   dest.name  = src.name
   dest.axis  = src.axis

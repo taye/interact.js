@@ -1,5 +1,4 @@
 import Interactable from '@interactjs/core/Interactable'
-import { EventPhase } from '@interactjs/core/InteractEvent'
 import { ActionProps, Interaction } from '@interactjs/core/Interaction'
 import { Scope } from '@interactjs/core/scope'
 import { arr, extend, is, pointer as pointerUtils, rect as rectUtils, win } from '@interactjs/utils/index'
@@ -19,25 +18,19 @@ declare module '@interactjs/core/Interaction' {
 
 declare module '@interactjs/core/InteractEvent' {
   // eslint-disable-next-line no-shadow
-  enum EventPhase {
-    Reflow = 'reflow',
+  interface PhaseMap {
+    reflow?: true
   }
 }
 
-(EventPhase as any).Reflow = 'reflow'
-
 export function install (scope: Scope) {
   const {
-    actions,
     /** @lends Interactable */
     // eslint-disable-next-line no-shadow
     Interactable,
   } = scope
 
-  // add action reflow event types
-  for (const actionName of actions.names) {
-    actions.eventTypes.push(`${actionName}reflow`)
-  }
+  scope.actions.phases.reflow = true
 
   /**
    * ```js
@@ -60,7 +53,7 @@ export function install (scope: Scope) {
   }
 }
 
-function reflow (interactable: Interactable, action: ActionProps, scope: Scope): Promise<Interactable> {
+function reflow<T extends Interact.ActionName> (interactable: Interactable, action: ActionProps<T>, scope: Scope): Promise<Interactable> {
   const elements = (is.string(interactable.target)
     ? arr.from(interactable._context.querySelectorAll(interactable.target))
     : [interactable.target]) as Interact.Element[]
@@ -102,7 +95,7 @@ function reflow (interactable: Interactable, action: ActionProps, scope: Scope):
       }
 
       const event = pointerUtils.coordsToEvent(coords)
-      reflowPromise = startReflow(scope, interactable, element, action, event)
+      reflowPromise = startReflow<T>(scope, interactable, element, action, event)
     }
 
     if (promises) {
@@ -113,15 +106,15 @@ function reflow (interactable: Interactable, action: ActionProps, scope: Scope):
   return promises && Promise.all(promises).then(() => interactable)
 }
 
-function startReflow (scope: Scope, interactable: Interactable, element: Interact.Element, action: ActionProps, event: any) {
+function startReflow<T extends Interact.ActionName> (scope: Scope, interactable: Interactable, element: Interact.Element, action: ActionProps<T>, event: any) {
   const interaction = scope.interactions.new({ pointerType: 'reflow' })
   const signalArg = {
     interaction,
     event,
     pointer: event,
     eventTarget: element,
-    phase: EventPhase.Reflow,
-  }
+    phase: 'reflow',
+  } as const
 
   interaction.interactable = interactable
   interaction.element = element
@@ -160,7 +153,7 @@ export default {
   listeners: {
     // remove completed reflow interactions
     'interactions:stop': ({ interaction }, scope) => {
-      if (interaction.pointerType === EventPhase.Reflow) {
+      if (interaction.pointerType === 'reflow') {
         if (interaction._reflowResolve) {
           interaction._reflowResolve()
         }

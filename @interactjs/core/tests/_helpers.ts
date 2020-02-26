@@ -70,6 +70,7 @@ export function mockScope (options = {} as any) {
   const scope = createScope().init(window)
 
   scope.interact = Object.assign(() => {}, { use () {} }) as any
+  utils.extend(scope.actions.phaselessTypes, { teststart: true, testmove: true, testend: true })
 
   return scope
 }
@@ -123,7 +124,7 @@ export function testEnv<T extends Interact.Target = HTMLElement> ({
     stop: () => interaction.stop(),
     down: () => interaction.pointerDown(event, event, target as HTMLElement),
     move: (force?: boolean) => force ? interaction.move() : interaction.pointerMove(event, event, target as HTMLElement),
-    up: () => interaction.pointerMove(event, event, target as HTMLElement),
+    up: () => interaction.pointerUp(event, event, target as HTMLElement, target as HTMLElement),
   }
 }
 

@@ -356,7 +356,7 @@ function setInteractionCursor<T extends Interact.ActionName> (interaction: Inter
       cursor = cursorChecker(prepared, interactable, element, interaction._interacting)
     }
     else {
-      cursor = scope.actions[prepared.name].getCursor(prepared)
+      cursor = scope.actions.map[prepared.name].getCursor(prepared)
     }
   }
 

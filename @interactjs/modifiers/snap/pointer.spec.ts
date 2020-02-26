@@ -96,7 +96,7 @@ test('modifiers/snap', t => {
   start({ name: 'drag' })
   move(true)
 
-  const { startOffset } = interaction.modifiers
+  const { startOffset } = interaction.modification
   const relativeOffset = {
     x: options.offset.x + startOffset.left,
     y: options.offset.y + startOffset.top,
