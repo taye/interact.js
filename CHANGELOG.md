@@ -1,3 +1,7 @@
+## v1.8.5
+
+ - fixed a but causing incorrect modifications after resuming inertia (#790)
+
 ## v1.8.4
 
  - fixed bug when calling interaction.move() from start event (#791)
