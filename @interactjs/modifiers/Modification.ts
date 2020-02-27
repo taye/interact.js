@@ -29,7 +29,9 @@ export default class Modification {
   endResult?: Interact.Point = null
   edges: Interact.EdgeOptions
 
-  constructor (readonly interaction: Readonly<Interact.Interaction>) {}
+  constructor (readonly interaction: Readonly<Interact.Interaction>) {
+    this.result = createResult()
+  }
 
   start (
     { phase }: MethodArg,
@@ -123,16 +125,18 @@ export default class Modification {
 
     const prevCoords = this.result.coords
     const prevRect = this.result.rect
-    const rectChanged = !prevRect || newResult.rect.left !== prevRect.left ||
-      newResult.rect.right !== prevRect.right ||
-      newResult.rect.top !== prevRect.top ||
-      newResult.rect.bottom !== prevRect.bottom
 
-    newResult.changed = rectChanged ||
-      prevCoords.x !== newResult.coords.x ||
-      prevCoords.y !== newResult.coords.y
+    if (prevCoords && prevRect) {
+      const rectChanged = newResult.rect.left !== prevRect.left ||
+        newResult.rect.right !== prevRect.right ||
+        newResult.rect.top !== prevRect.top ||
+        newResult.rect.bottom !== prevRect.bottom
 
-    newResult.rect = arg.rect
+      newResult.changed = rectChanged ||
+        prevCoords.x !== newResult.coords.x ||
+        prevCoords.y !== newResult.coords.y
+    }
+
     return newResult
   }
 
