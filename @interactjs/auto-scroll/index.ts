@@ -61,9 +61,11 @@ const autoScroll = {
   now: Date.now,
 
   interaction: null as Interact.Interaction,
-  i: 0,    // the handle returned by window.setInterval
+  i: 0, // the handle returned by window.setInterval
+
+  // Direction each pulse is to scroll in
   x: 0,
-  y: 0, // Direction each pulse is to scroll in
+  y: 0,
 
   isScrolling: false,
   prevTime: 0,
@@ -92,7 +94,7 @@ const autoScroll = {
   scroll () {
     const { interaction } = autoScroll
     const { interactable, element } = interaction
-    const actionName: Interact.ActionName = interaction.prepared.name
+    const actionName = interaction.prepared.name
     const options = interactable.options[actionName].autoScroll
     const container = getContainer(options.container, interactable, element)
     const now = autoScroll.now()

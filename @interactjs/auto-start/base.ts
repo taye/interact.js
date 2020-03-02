@@ -129,7 +129,7 @@ function startOnMove (arg: Interact.SignalArgs['interactions:move'], scope: Inte
   scope.fire('autoStart:before-start', arg)
 
   const { interactable } = interaction
-  const actionName: Interact.ActionName = interaction.prepared.name
+  const actionName = interaction.prepared.name
 
   if (actionName && interactable) {
     // check manualStart and interaction limit
