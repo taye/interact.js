@@ -1,8 +1,7 @@
-// tslint:disable no-var-requires
-require('../@interactjs/types/index')
+import '../@interactjs/types/index'
 
-const glob = require('glob')
-const path = require('path')
+import glob from 'glob'
+import path from 'path'
 
 const globOptions = {
   ignore: ['**/node_modules/**', '**/_*', '**/_*/**'],

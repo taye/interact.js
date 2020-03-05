@@ -16,6 +16,9 @@ parserOptions:
 plugins:
   - '@typescript-eslint'
 
+globals:
+  globalThis: false
+
 rules:
   brace-style: off
   comma-dangle: [error, 'always-multiline']

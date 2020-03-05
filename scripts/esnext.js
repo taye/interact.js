@@ -14,6 +14,11 @@ try {
   babelrc = require('../.babelrc')
 }
 
+const bareImportRewriteOptions = {
+  resolveDirectories: ['.'],
+  extensions: ['.ts', '.tsx', '.js'],
+}
+
 const babelOptions = {
   ignore: babelrc.ignore,
   babelrc: false,
@@ -27,9 +32,20 @@ const babelOptions = {
   plugins: [
     require('@babel/plugin-proposal-class-properties'),
     require('babel-plugin-transform-inline-environment-variables'),
-    [require('babel-plugin-bare-import-rewrite'), {
-      resolveDirectories: ['.'],
-    }],
+    [require('babel-plugin-bare-import-rewrite'), bareImportRewriteOptions],
+    function changeTsToJs () {
+      const fixSource = ({ node: { source } }) => {
+        if (!source) { return }
+        source.value = source.value.replace(/\.ts$/, '.js')
+      }
+
+      return {
+        visitor: {
+          ImportDeclaration: fixSource,
+          ExportNamedDeclaration: fixSource,
+        },
+      }
+    },
   ],
 }
 
@@ -39,12 +55,6 @@ module.exports = async sources => {
   sources = sources || await getSources()
 
   queue.clear()
-
-  // touch the .js files so they can be resolved successfully
-  await Promise.all(sources.map(sourceFile => {
-    const jsName = getJsName(sourceFile)
-    return fs.promises.writeFile(jsName, '')
-  }))
 
   await Promise.all(sources.map(sourceFile => queue.add(async () => {
     const jsName = getJsName(sourceFile)
@@ -67,6 +77,7 @@ module.exports = async sources => {
 }
 
 module.exports.babelOptions = babelOptions
+module.exports.bareImportRewriteOptions = bareImportRewriteOptions
 
 function getJsName (tsName) {
   return tsName.replace(/\.[jt]sx?$/, '.js')
