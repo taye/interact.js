@@ -231,10 +231,10 @@ export default class Modification {
         return false
       }
 
-      doPreend = doPreend || (!doPreend && this.shouldDo(options, true))
+      doPreend = doPreend || (!doPreend && this.shouldDo(options, true, arg.phase, true))
     }
 
-    if (!doPreend) {
+    if (doPreend) {
       // trigger a final modified move before ending
       interaction.move({ event, preEnd: true })
     }
@@ -309,12 +309,21 @@ export default class Modification {
     rect.bottom -= rectDelta.bottom
   }
 
-  shouldDo (options, preEnd?: boolean, phase?: string) {
-    return options
-      ? options.enabled !== false &&
-        (preEnd || !options.endOnly) &&
-        (options.setStart || phase !== 'start')
-      : true
+  shouldDo (options, preEnd?: boolean, phase?: string, requireEndOnly?: boolean) {
+    if (
+      // ignore disabled modifiers
+      (!options || options.enabled === false) ||
+      // check if we require endOnly option to fire move before end
+      (requireEndOnly && !options.endOnly) ||
+      // don't apply endOnly modifiers when not ending
+      (options.endOnly && !preEnd) ||
+      // check if modifier should run be applied on start
+      (phase === 'start' && !options.setStart)
+    ) {
+      return false
+    }
+
+    return true
   }
 
   copyFrom (other: Modification) {
