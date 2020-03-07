@@ -5,6 +5,7 @@ cc-test-reporter
 **/*.d.ts
 **/*.d.ts.map
 !@interactjs/types/types.d.ts
+@interactjs/*/use/**/*.ts
 *interactjs/**/*.js
 *interactjs/**/*.js.map
 **/node_modules

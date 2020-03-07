@@ -73,6 +73,9 @@ run_build() {
   npx lerna exec --no-private -- "echo '# copied from [root]/.npmignore' > .npmignore
     cat $ROOT/.npmignore >> .npmignore" &&
 
+  # create @interactjs/**/use/* modules
+  $ROOT/scripts/add-use-modules.js
+
   ## generate esnext .js modules
   npm run esnext &&
 
