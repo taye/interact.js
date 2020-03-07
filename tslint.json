@@ -6,6 +6,7 @@
     "jsRules": {},
     "rules": {
       "align": true,
+      "array-type": false,
       "arrow-parens": false,
       "forin": false,
       "interface-name": [true, "never-prefix"],
