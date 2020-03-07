@@ -1,17 +1,19 @@
 import extend from '../../utils/extend'
-import restrictPointer from './pointer'
+import { restrict } from './pointer'
+import { makeModifier } from '../base'
 
 const defaults = extend({
   get elementRect () {
     return { top: 0, left: 0, bottom: 1, right: 1 }
   },
   set elementRect (_) {},
-}, restrictPointer.defaults)
+}, restrict.defaults)
 
 const restrictRect = {
-  start: restrictPointer.start,
-  set: restrictPointer.set,
+  start: restrict.start,
+  set: restrict.set,
   defaults,
 }
 
-export default restrictRect
+export default makeModifier(restrictRect, 'restrictRect')
+export { restrictRect }

@@ -1,18 +1,36 @@
-import aspectRatioModule from './aspectRatio'
-import { makeModifier } from './base'
-import restrictEdgesModule from './restrict/edges'
-import restrictModule from './restrict/pointer'
-import restrictRectModule from './restrict/rect'
-import restrictSizeModule from './restrict/size'
-import snapEdgesModule from './snap/edges'
-import snapModule from './snap/pointer'
-import snapSizeModule from './snap/size'
+import base from './base'
 
-export const snap = makeModifier(snapModule, 'snap')
-export const snapSize = makeModifier(snapSizeModule, 'snapSize')
-export const snapEdges = makeModifier(snapEdgesModule, 'snapEdges')
-export const restrict = makeModifier(restrictModule, 'restrict')
-export const restrictRect = makeModifier(restrictRectModule, 'restrictRect')
-export const restrictEdges = makeModifier(restrictEdgesModule, 'restrictEdges')
-export const restrictSize = makeModifier(restrictSizeModule, 'restrictSize')
-export const aspectRatio = makeModifier(aspectRatioModule, 'aspectRatio')
+import * as all from './all'
+import extend from '@interactjs/utils/extend'
+import * as snappers from '@interactjs/utils/snappers/index'
+
+declare module '@interactjs/interact/index' {
+  interface InteractStatic {
+    modifiers: typeof all
+    snappers: typeof snappers
+    createSnapGrid: typeof snappers.grid
+  }
+}
+
+const modifiers: Interact.Plugin = {
+  id: 'modifiers',
+  install (scope) {
+    const { interact } = scope
+
+    scope.usePlugin(base)
+
+    interact.modifiers = extend(interact.modifiers || {}, all)
+    interact.snappers = extend(interact.snappers || {}, snappers)
+    interact.createSnapGrid = interact.snappers.grid
+
+    // for backwrads compatibility
+    for (const type in all) {
+      const { _defaults, _methods } = all[type as keyof typeof all]
+
+      ;(_defaults as any)._methods = _methods
+      ;(scope.defaults.perAction as any)[type] = _defaults
+    }
+  },
+}
+
+export default modifiers

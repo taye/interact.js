@@ -7,6 +7,18 @@
   },
   "license": "MIT",
   "dependencies": {
+    "@interactjs/actions": "1.8.5",
+    "@interactjs/auto-scroll": "1.8.5",
+    "@interactjs/auto-start": "1.8.5",
+    "@interactjs/core": "1.8.5",
+    "@interactjs/dev-tools": "1.8.5",
+    "@interactjs/inertia": "1.8.5",
+    "@interactjs/interact": "1.8.5",
+    "@interactjs/modifiers": "1.8.5",
+    "@interactjs/offset": "1.8.5",
+    "@interactjs/pointer-events": "1.8.5",
+    "@interactjs/utils": "1.8.5",
+    "@interactjs/reflow": "1.8.5",
     "@interactjs/types": "1.8.5"
   },
   "devDependencies": {

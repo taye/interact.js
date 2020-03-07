@@ -3,8 +3,8 @@
 
 import extend from '@interactjs/utils/extend'
 import * as is from '@interactjs/utils/is'
-import { ModifierArg } from '../base'
-import snap, { SnapOptions, SnapState } from './pointer'
+import { ModifierArg, makeModifier } from '../base'
+import { SnapOptions, SnapState, snap } from './pointer'
 
 export type SnapSizeOptions = Pick<
 SnapOptions,
@@ -97,4 +97,5 @@ const snapSize = {
   defaults,
 }
 
-export default snapSize
+export default makeModifier(snapSize, 'snapSize')
+export { snapSize }

@@ -1,7 +1,7 @@
 import test from '@interactjs/_dev/test/test'
 import * as helpers from '@interactjs/core/tests/_helpers'
 import * as pointerUtils from '@interactjs/utils/pointerUtils'
-import * as actions from './index'
+import actions from './index'
 
 test('actions integration', t => {
   const scope: Interact.Scope = helpers.mockScope()

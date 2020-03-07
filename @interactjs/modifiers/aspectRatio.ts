@@ -21,6 +21,7 @@ import extend from '@interactjs/utils/extend'
 import { addEdges } from '@interactjs/utils/rect'
 import { Modifier, ModifierModule, ModifierState } from './base'
 import Modification from './Modification'
+import { makeModifier } from './base'
 
 export interface AspectRatioOptions {
   ratio?: number | 'preserve'
@@ -150,4 +151,5 @@ function setRatio ({ startRect, startCoords, ratio, edgeSign }: AspectRatioState
   }
 }
 
-export default aspectRatio
+export default makeModifier(aspectRatio, 'aspectRatio')
+export { aspectRatio }

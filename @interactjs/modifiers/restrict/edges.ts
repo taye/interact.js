@@ -11,7 +11,7 @@
 
 import extend from '@interactjs/utils/extend'
 import * as rectUtils from '@interactjs/utils/rect'
-import { ModifierArg, ModifierState } from '../base'
+import { ModifierArg, ModifierState, makeModifier } from '../base'
 import { getRestrictionRect, RestrictOptions } from './pointer'
 
 export interface RestrictEdgesOptions {
@@ -105,4 +105,5 @@ const restrictEdges = {
   defaults,
 }
 
-export default restrictEdges
+export default makeModifier(restrictEdges, 'restrictEdges')
+export { restrictEdges }

@@ -1,7 +1,7 @@
 import * as utils from '@interactjs/utils/index'
 import InteractableMethods from './InteractableMethods'
 
-declare module '@interactjs/interact/interact' {
+declare module '@interactjs/interact/index' {
   interface InteractStatic {
     maxInteractions: (newValue: any) => any
   }
@@ -365,7 +365,7 @@ function setInteractionCursor<T extends Interact.ActionName> (interaction: Inter
 
 const autoStart: Interact.Plugin = {
   id: 'auto-start/base',
-  before: ['actions', 'action/drag', 'actions/resize', 'actions/gesture'],
+  before: ['actions', 'actions/drag', 'actions/resize', 'actions/gesture'],
   install,
   listeners: {
     'interactions:down': prepareOnDown,

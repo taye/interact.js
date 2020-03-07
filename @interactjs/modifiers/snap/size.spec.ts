@@ -1,6 +1,6 @@
 import test from '@interactjs/_dev/test/test'
 import * as helpers from '@interactjs/core/tests/_helpers'
-import snapSize from '../snap/size'
+import { snapSize } from '../snap/size'
 
 test('modifiers/snapSize', t => {
   const { interaction, interactable } = helpers.testEnv()

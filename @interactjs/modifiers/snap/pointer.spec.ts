@@ -2,7 +2,7 @@ import test from '@interactjs/_dev/test/test'
 import drag from '@interactjs/actions/drag'
 import * as helpers from '@interactjs/core/tests/_helpers'
 import extend from '@interactjs/utils/extend'
-import modifiersBase, { makeModifier } from '../base'
+import modifiersBase from '../base'
 import snap from '../snap/pointer'
 
 test('modifiers/snap', t => {
@@ -22,7 +22,6 @@ test('modifiers/snap', t => {
 
   coords.client = coords.page
 
-  const snapModifier = makeModifier(snap, 'snap')
   const origin = { x: 120, y: 120 }
   let funcArgs = null
   const target0 = Object.freeze({ x:  50, y:  100 })
@@ -46,7 +45,7 @@ test('modifiers/snap', t => {
   let lastEventModifiers: any[] = null
   interactable.draggable({
     origin,
-    modifiers: [snapModifier(options)],
+    modifiers: [snap(options)],
   }).on('dragmove dragstart dragend', e => { lastEventModifiers = e.modifiers })
 
   down()

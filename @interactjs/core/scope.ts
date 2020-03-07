@@ -64,6 +64,7 @@ export interface Plugin {
 
 export class Scope {
   id = `__interact_scope_${Math.floor(Math.random() * 100)}`
+  isInitialized = false
   listenerMaps: Array<{
     map: ListenerMap
     id: string
@@ -110,9 +111,9 @@ export class Scope {
   }
 
   constructor () {
-    const scope = this as Scope
+    const scope = this
 
-    ;(this as { Interactable: typeof InteractableBase }).Interactable = class Interactable extends InteractableBase implements InteractableBase {
+    this.Interactable = class Interactable extends InteractableBase implements InteractableBase {
       get _defaults () { return scope.defaults }
 
       set (options: Interact.Options) {
@@ -128,19 +129,7 @@ export class Scope {
 
       unset () {
         super.unset()
-        for (let i = scope.interactions.list.length - 1; i >= 0; i--) {
-          const interaction = scope.interactions.list[i]
-
-          if (interaction.interactable === this) {
-            interaction.stop()
-            scope.fire('interactions:destroy', { interaction })
-            interaction.destroy()
-
-            if (scope.interactions.list.length > 2) {
-              scope.interactions.list.splice(i, 1)
-            }
-          }
-        }
+        scope.interactables.list.splice(scope.interactables.list.indexOf(this), 1)
 
         scope.fire('interactable:unset', { interactable: this })
       }
@@ -162,7 +151,9 @@ export class Scope {
   onWindowUnload = (event: BeforeUnloadEvent) => this.removeDocument(event.target as Document)
 
   init (window: Window) {
-    return initScope(this, window)
+    return this.isInitialized
+      ? this
+      : initScope(this, window)
   }
 
   pluginIsInstalled (plugin: Plugin) {
@@ -272,6 +263,7 @@ export function isNonNativeEvent (type: string, actions: Actions) {
 }
 
 export function initScope (scope: Scope, window: Window) {
+  scope.isInitialized = true
   win.init(window)
   domObjects.init(window)
   browser.init(window)

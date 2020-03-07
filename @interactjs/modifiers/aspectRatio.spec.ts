@@ -2,12 +2,10 @@ import test from '@interactjs/_dev/test/test'
 import resize from '@interactjs/actions/resize'
 import * as helpers from '@interactjs/core/tests/_helpers'
 import aspectRatio, { AspectRatioOptions } from './aspectRatio'
-import modifiersBase, { makeModifier } from './base'
+import modifiersBase from './base'
 import restrictSize from './restrict/size'
 
 const { ltrbwh } = helpers
-const aspectRatioModifier = makeModifier(aspectRatio, 'aspectRatio')
-const resztrictSizeModifier = makeModifier(restrictSize)
 
 test('modifiers/aspectRatio', t => {
   const rect = Object.freeze({ left: 0, top: 0, right: 10, bottom: 20, width: 10, height: 20 })
@@ -29,7 +27,7 @@ test('modifiers/aspectRatio', t => {
 
   interactable.resizable({
     edges: { left: true, top: true, right: true, bottom: true },
-    modifiers: [aspectRatioModifier(options)],
+    modifiers: [aspectRatio(options)],
     listeners: { move (e) { lastRect = e.rect } },
   })
 
@@ -58,7 +56,7 @@ test('modifiers/aspectRatio', t => {
   )
 
   // combine with restrictSize
-  options.modifiers = [resztrictSizeModifier({
+  options.modifiers = [restrictSize({
     max: { width: 20, height: 20 },
   })]
   options.equalDelta = false

@@ -1,11 +1,5 @@
 import Modification from './Modification'
 
-declare module '@interactjs/core/scope' {
-  interface Scope {
-    modifiers?: any
-  }
-}
-
 declare module '@interactjs/core/Interaction' {
   interface Interaction {
     modification?: Modification
@@ -20,6 +14,7 @@ declare module '@interactjs/core/InteractEvent' {
     }>
   }
 }
+
 declare module '@interactjs/core/defaultOptions' {
   interface PerActionDefaults {
     modifiers?: Modifier[]

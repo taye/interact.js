@@ -1,5 +1,5 @@
 import * as utils from '@interactjs/utils/index'
-import { ModifierArg, ModifierState } from '../base'
+import { ModifierArg, ModifierState, makeModifier } from '../base'
 
 export interface Offset {
   x: number
@@ -204,4 +204,5 @@ const snap = {
   defaults,
 }
 
-export default snap
+export default makeModifier(snap, 'snap')
+export { snap }

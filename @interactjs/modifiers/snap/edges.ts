@@ -28,9 +28,9 @@
 
 import clone from '@interactjs/utils/clone'
 import extend from '@interactjs/utils/extend'
-import { ModifierArg, ModifierModule } from '../base'
+import { ModifierArg, ModifierModule, makeModifier } from '../base'
 import { SnapOptions, SnapState } from './pointer'
-import snapSize from './size'
+import { snapSize } from './size'
 
 export type SnapEdgesOptions = Pick<SnapOptions, 'targets' | 'range' | 'offset' | 'endOnly' | 'enabled'>
 
@@ -59,4 +59,5 @@ const snapEdges: ModifierModule<SnapEdgesOptions, SnapState> = {
   ),
 }
 
-export default snapEdges
+export default makeModifier(snapEdges, 'snapEdges')
+export { snapEdges }

@@ -239,14 +239,32 @@ function onDocSignal<T extends 'scope:add-document' | 'scope:remove-document'> (
   }
 }
 
-export default {
+const interactions: Interact.Plugin = {
   id: 'core/interactions',
   install,
   listeners: {
     'scope:add-document': arg => onDocSignal(arg, 'add'),
     'scope:remove-document': arg => onDocSignal(arg, 'remove'),
+    'interactable:unset': ({ interactable }, scope) => {
+      // Stop and destroy related interactions when an Interactable is unset
+      for (let i = scope.interactions.list.length - 1; i >= 0; i--) {
+        const interaction = scope.interactions.list[i]
+
+        if (interaction.interactable !== interactable) { continue }
+
+        interaction.stop()
+        scope.fire('interactions:destroy', { interaction })
+        interaction.destroy()
+
+        if (scope.interactions.list.length > 2) {
+          scope.interactions.list.splice(i, 1)
+        }
+      }
+    },
   },
   onDocSignal,
   doOnInteractions,
   methodNames,
 }
+
+export default interactions
