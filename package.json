@@ -23,7 +23,7 @@
     "start": "yarn clean && scripts/add-use-modules.js && cd interactjs && NODE_ENV=development ../scripts/bundle.js --watch",
     "bundle": "cd interactjs; NODE_ENV=production ../scripts/bundle.js",
     "esnext": "scripts/add-use-modules.js && scripts/esnext-bin.js",
-    "build": "yarn clean && yarn docs && yarn bundle && scripts/add-use-modules.js && tsc -b -f && yarn esnext",
+    "build": "yarn clean && yarn docs && yarn bundle && scripts/add-use-modules.js && tsc -b -f && scripts/esnext-bin.js",
     "docs": "node jsdoc/index.js",
     "clean": "scripts/clean.js",
     "lint": "scripts/lint.js --fail-on-error",
