@@ -2,7 +2,6 @@ import '@interactjs/types/index'
 import actions from '@interactjs/actions/index'
 import autoScroll from '@interactjs/auto-scroll/index'
 import autoStart from '@interactjs/auto-start/index'
-import interactablePreventDefault from '@interactjs/core/interactablePreventDefault'
 import devTools from '@interactjs/dev-tools/index'
 import inertia from '@interactjs/inertia/index'
 import modifiers from '@interactjs/modifiers/index'
@@ -19,8 +18,6 @@ export default interact
 
 export function init (win: Window) {
   initInteract(win)
-
-  interact.use(interactablePreventDefault)
 
   interact.use(offset)
 

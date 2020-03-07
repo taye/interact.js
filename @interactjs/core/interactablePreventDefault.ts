@@ -10,7 +10,10 @@ declare module '@interactjs/core/Interactable' {
   }
 }
 
-function preventDefault (this: Interact.Interactable, newValue?: 'always' | 'never' | 'auto') {
+type PreventDefaultValue = 'always' | 'never' | 'auto'
+function preventDefault (this: Interact.Interactable): PreventDefaultValue
+function preventDefault (this: Interact.Interactable, newValue: PreventDefaultValue): typeof this
+function preventDefault (this: Interact.Interactable, newValue?: PreventDefaultValue) {
   if (/^(always|never|auto)$/.test(newValue)) {
     this.options.preventDefault = newValue
     return this

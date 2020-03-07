@@ -181,6 +181,8 @@ function defaultActionChecker (
   return arg.action
 }
 
+function styleCursor (this: Interact.Interactable): boolean
+function styleCursor (this: Interact.Interactable, newValue: boolean): typeof this
 function styleCursor (this: Interact.Interactable, newValue?: boolean) {
   if (is.bool(newValue)) {
     this.options.styleCursor = newValue

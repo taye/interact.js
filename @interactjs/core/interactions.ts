@@ -6,6 +6,7 @@ import * as pointerUtils from '@interactjs/utils/pointerUtils'
 import InteractionBase from './Interaction'
 import finder, { SearchDetails } from './interactionFinder'
 import { Scope } from './scope'
+import interactablePreventDefault from './interactablePreventDefault'
 
 declare module '@interactjs/core/scope' {
   interface Scope {
@@ -126,6 +127,8 @@ function install (scope: Scope) {
       }
     }
   }
+
+  scope.usePlugin(interactablePreventDefault)
 }
 
 function doOnInteractions (method, scope) {
