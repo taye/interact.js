@@ -50,10 +50,6 @@ module.exports = function (options) {
         global: true,
         ...babelrc,
       }],
-      [require('envify'), {
-        global: true,
-        _: 'purge',
-      }],
     ],
 
     plugin: plugins,

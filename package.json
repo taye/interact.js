@@ -20,16 +20,16 @@
   },
   "scripts": {
     "bootstrap": "npx yarn install --pure-lockfile",
-    "start": "npm run clean && scripts/add-use-modules.js && cd interactjs && NODE_ENV=development ../scripts/bundle.js --watch",
+    "start": "yarn clean && scripts/add-use-modules.js && cd interactjs && NODE_ENV=development ../scripts/bundle.js --watch",
     "bundle": "cd interactjs; NODE_ENV=production ../scripts/bundle.js",
     "esnext": "scripts/add-use-modules.js && scripts/esnext-bin.js",
-    "build": "npm run clean && npm run docs && npm run bundle && scripts/add-use-modules.js && tsc -b -f && npm run esnext",
+    "build": "yarn clean && yarn docs && yarn bundle && scripts/add-use-modules.js && tsc -b -f && yarn esnext",
     "docs": "node jsdoc/index.js",
     "clean": "scripts/clean.js",
     "lint": "scripts/lint.js --fail-on-error",
     "test": "scripts/test.sh",
-    "test:debug": "TEST_RUNNER=nodemon TEST_RUNNER_ARGS='-x node --inspect' npm run test",
-    "tsc_lint_test": "scripts/add-use-modules.js && tsc -b -f && tsc -b --clean && npm run lint -- --fail-on-error && npm test",
+    "test:debug": "TEST_RUNNER=nodemon TEST_RUNNER_ARGS='-x node --inspect' yarn test",
+    "tsc_lint_test": "scripts/add-use-modules.js && tsc -b -f && tsc -b --clean && yarn lint --fail-on-error && npm test",
     "dev-link": "yarn link; for p in @interactjs/*; do cd $p; yarn link; cd ../..; done",
     "dev-unlink": "yarn unlink; for p in @interactjs/*; do cd $p; yarn unlink; cd ../..; done",
     "release": "sh scripts/release.sh",
@@ -52,7 +52,6 @@
     "babel-eslint": "latest",
     "babel-plugin-bare-import-rewrite": "latest",
     "babel-plugin-istanbul": "latest",
-    "babel-plugin-transform-es2015-modules-commonjs": "latest",
     "babel-plugin-transform-inline-environment-variables": "latest",
     "babelify": "latest",
     "browser-pack-flat": "latest",
@@ -60,7 +59,6 @@
     "combine-source-map": "latest",
     "common-shakeify": "latest",
     "domator": "latest",
-    "envify": "latest",
     "errorify": "latest",
     "eslint": "latest",
     "eslint-config-standard": "latest",
@@ -95,8 +93,8 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "npm run lint -- --fail-on-error",
-      "pre-push": "npm run tsc_lint_test"
+      "pre-commit": "yarn lint --fail-on-error",
+      "pre-push": "yarn tsc_lint_test"
     }
   }
 }

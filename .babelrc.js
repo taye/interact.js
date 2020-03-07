@@ -23,7 +23,9 @@ module.exports = {
           regenerator: false,
         }],
         require('@babel/plugin-proposal-class-properties'),
-        require('babel-plugin-transform-inline-environment-variables'),
+        [require('babel-plugin-transform-inline-environment-variables'), {
+          include: ['NODE_ENV', 'npm_package_version'],
+        }],
       ],
 
   ignore: [/\/node_modules\/(?!@interactjs\/)/],
