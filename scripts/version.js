@@ -1,6 +1,13 @@
 #!/usr/bin/env node
 const path = require('path')
 
+const depFields = [
+  'dependencies',
+  'peerDependencies',
+  'devDependencies',
+  'optionalDependencies',
+]
+
 let newVersion
 
 module.exports.get = () => {
@@ -38,7 +45,7 @@ if (!module.parent) {
 
       pkg.version = newVersion
 
-      for (const deps of ['dependencies', 'peerDependencies', 'devDependencies'].map(f => pkg[f]).filter(Boolean)) {
+      for (const deps of depFields.map(f => pkg[f]).filter(Boolean)) {
         for (const name of Object.keys(deps).filter(n => /@?interactjs\//.test(n))) {
           if (deps[name] === oldVersion) {
             deps[name] = newVersion
