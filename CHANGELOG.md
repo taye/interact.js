@@ -1,3 +1,9 @@
+## v1.9.0
+
+ - added various `@interactjs/*/use` packages for simpler selective imports
+   (#800)
+ - fixed endOnly modifiers without inertia
+
 ## v1.8.5
 
  - fixed a but causing incorrect modifications after resuming inertia (#790)
