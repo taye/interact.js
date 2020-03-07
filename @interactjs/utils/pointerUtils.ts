@@ -253,6 +253,7 @@ export function coordsToEvent (coords: MockCoords) {
     get type () { return this.coords.type },
     get pointerType () { return this.coords.pointerType },
     get buttons () { return this.coords.buttons },
+    preventDefault () {},
   }
 
   return event as typeof event & Interact.PointerType & Interact.PointerEventType
