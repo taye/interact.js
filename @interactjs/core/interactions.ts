@@ -81,7 +81,7 @@ function install (scope: Scope) {
   // for ignoring browser's simulated mouse events
   scope.prevTouchTime = 0
 
-  scope.Interaction = class Interaction<T extends Interact.ActionName> extends InteractionBase<T> {
+  scope.Interaction = class <T extends Interact.ActionName> extends InteractionBase<T> {
     get pointerMoveTolerance () {
       return scope.interactions.pointerMoveTolerance
     }

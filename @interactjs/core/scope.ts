@@ -113,7 +113,7 @@ export class Scope {
   constructor () {
     const scope = this
 
-    this.Interactable = class Interactable extends InteractableBase implements InteractableBase {
+    this.Interactable = class extends InteractableBase {
       get _defaults () { return scope.defaults }
 
       set (options: Interact.Options) {
