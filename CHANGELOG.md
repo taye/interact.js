@@ -1,3 +1,9 @@
+## v1.9.1
+
+ - added `@interactjs/*/use/*.min.js` builds
+ - fixed issue with webpack minifier (#800)
+ - fixed typescript issues
+
 ## v1.9.0
 
  - added various `@interactjs/*/use` packages for simpler selective imports
