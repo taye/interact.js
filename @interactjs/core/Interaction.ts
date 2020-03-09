@@ -89,8 +89,8 @@ declare module '@interactjs/core/scope' {
   }
 }
 
-export type _InteractionProxy = Pick<
-Interaction,
+export type InteractionProxy<T extends ActionName = ActionName> = Pick<
+Interaction<T>,
 keyof typeof _ProxyValues | keyof typeof _ProxyMethods
 >
 
@@ -148,7 +148,7 @@ export class Interaction<T extends ActionName = ActionName> {
   _interacting = false
   _ending = false
   _stopped = true
-  _proxy: _InteractionProxy = null
+  _proxy: InteractionProxy<T> = null
 
   simulation = null
 
@@ -190,7 +190,7 @@ export class Interaction<T extends ActionName = ActionName> {
 
     const that = this
 
-    this._proxy = {} as _InteractionProxy
+    this._proxy = {} as InteractionProxy<T>
 
     for (const key in _ProxyValues) {
       Object.defineProperty(this._proxy, key, {

@@ -43,6 +43,7 @@ declare namespace Interact {
   export type __InteractableSet = _InteractableSet
   export type Scope = scope.Scope
   export type Interaction<T extends scope.ActionName = any> = interaction.Interaction<T>
+  export type InteractionProxy<T extends scope.ActionName = any> = interaction.InteractionProxy<T>
   export type PointerArgProps<T extends {} = {}> = interaction.PointerArgProps<T>
   export type InteractEvent<
     T extends keyof scope.ActionMap = never,
@@ -217,9 +218,9 @@ declare namespace Interact {
 
   export type RectChecker = (element: Element)  => Rect
 
-  export type NativePointerEventType = _NativePointerEventType
-  export type PointerEventType = MouseEvent | TouchEvent | _NativePointerEventType | PointerEvent | InteractEvent
-  export type PointerType = MouseEvent | Touch | _NativePointerEventType | PointerEvent | InteractEvent
+  export type NativePointerEventType = typeof _NativePointerEventType
+  export type PointerEventType = MouseEvent | TouchEvent | NativePointerEventType | PointerEvent | InteractEvent
+  export type PointerType = MouseEvent | Touch | NativePointerEventType | PointerEvent | InteractEvent
 
   export type EventTypes = string | ListenerMap | Array<(string | ListenerMap)>
 

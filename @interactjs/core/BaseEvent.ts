@@ -1,16 +1,14 @@
-import Interactable from './Interactable'
-
 export class BaseEvent<T extends Interact.ActionName = any> {
   type: string
   target: EventTarget
   currentTarget: EventTarget
-  interactable: Interactable
+  interactable: Interact.Interactable
   _interaction: Interact.Interaction<T>
   timeStamp: any
   immediatePropagationStopped = false
   propagationStopped = false
 
-  get interaction () {
+  get interaction (): Interact.InteractionProxy<T> {
     return this._interaction._proxy
   }
 
