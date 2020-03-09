@@ -1,3 +1,7 @@
+## v1.9.2
+
+  - fixed imports within generated modules
+
 ## v1.9.1
 
  - added `@interactjs/*/use/*.min.js` builds
