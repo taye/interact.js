@@ -1,0 +1,45 @@
+{
+	"version": 3,
+	"sources": [
+		"index.ts"
+	],
+	"names": [
+		"_ProxyMethods",
+		"rectUtils",
+		"offsetBy",
+		"addTotal",
+		"interaction",
+		"pointerIsDown",
+		"addToCoords",
+		"coords",
+		"cur",
+		"offset",
+		"total",
+		"pending",
+		"x",
+		"y",
+		"beforeAction",
+		"applyPending",
+		"beforeEnd",
+		"hadPending",
+		"move",
+		"end",
+		"hasPending",
+		"delta",
+		"addEdges",
+		"edges",
+		"rect",
+		"page",
+		"client",
+		"id",
+		"install",
+		"scope",
+		"Interaction",
+		"prototype",
+		"listeners"
+	],
+	"mappings": "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",
+	"sourcesContent": [
+		"import { _ProxyMethods } from '@interactjs/core/Interaction'\nimport * as rectUtils from '@interactjs/utils/rect'\n\ndeclare module '@interactjs/core/Interaction' {\n  interface Interaction {\n    offsetBy?: typeof offsetBy\n    offset: {\n      total: Interact.Point\n      pending: Interact.Point\n    }\n  }\n\n  // eslint-disable-next-line no-shadow\n  enum _ProxyMethods {\n    // eslint-disable-next-line no-shadow\n    offsetBy = ''\n  }\n}\n\n(_ProxyMethods as any).offsetBy = ''\n\nexport function addTotal (interaction: Interact.Interaction) {\n  if (!interaction.pointerIsDown) { return }\n\n  addToCoords(interaction.coords.cur, interaction.offset.total)\n\n  interaction.offset.pending.x = 0\n  interaction.offset.pending.y = 0\n}\n\nfunction beforeAction ({ interaction }: { interaction: Interact.Interaction }) {\n  applyPending(interaction)\n}\n\nfunction beforeEnd ({ interaction }: { interaction: Interact.Interaction }): boolean | void {\n  const hadPending = applyPending(interaction)\n\n  if (!hadPending) { return }\n\n  interaction.move({ offset: true })\n  interaction.end()\n\n  return false\n}\n\nfunction end ({ interaction }: { interaction: Interact.Interaction }) {\n  interaction.offset.total.x = 0\n  interaction.offset.total.y = 0\n  interaction.offset.pending.x = 0\n  interaction.offset.pending.y = 0\n}\n\nexport function applyPending (interaction: Interact.Interaction) {\n  if (!hasPending(interaction)) {\n    return false\n  }\n\n  const { pending } = interaction.offset\n\n  addToCoords(interaction.coords.cur, pending)\n  addToCoords(interaction.coords.delta, pending)\n  rectUtils.addEdges(interaction.edges, interaction.rect, pending)\n\n  pending.x = 0\n  pending.y = 0\n\n  return true\n}\n\nfunction offsetBy (this: Interact.Interaction, { x, y }: Interact.Point) {\n  this.offset.pending.x += x\n  this.offset.pending.y += y\n\n  this.offset.total.x += x\n  this.offset.total.y += y\n}\n\nfunction addToCoords ({ page, client }, { x, y }: Interact.Point) {\n  page.x += x\n  page.y += y\n  client.x += x\n  client.y += y\n}\n\nfunction hasPending (interaction) {\n  return !!(interaction.offset.pending.x || interaction.offset.pending.y)\n}\n\nconst offset: Interact.Plugin = {\n  id: 'offset',\n  install (scope) {\n    scope.Interaction.prototype.offsetBy = offsetBy\n  },\n  listeners: {\n    'interactions:new': ({ interaction }) => {\n      interaction.offset = {\n        total: { x: 0, y: 0 },\n        pending: { x: 0, y: 0 },\n      }\n    },\n    'interactions:update-pointer': ({ interaction }) => addTotal(interaction),\n    'interactions:before-action-start': beforeAction,\n    'interactions:before-action-move': beforeAction,\n    'interactions:before-action-end': beforeEnd,\n    'interactions:stop': end,\n  },\n}\n\nexport default offset\n"
+	]
+}
