@@ -1,3 +1,5 @@
+const fs = require('fs')
+const path = require('path')
 const { promisify } = require('util')
 const glob = promisify(require('glob'))
 
@@ -26,10 +28,146 @@ const getBuiltJsFiles = ({ cwd = process.cwd() } = {}) => glob(
     nodir: true,
   })
 
+function getBabelrc () {
+  let babelrc
+
+  try {
+    babelrc = require(path.join(process.cwd(), '.babelrc'))
+  } catch (e) {
+    babelrc = require('../.babelrc')
+  }
+
+  return babelrc
+}
+
+function getBabelOptions () {
+  const babelrc = getBabelrc()
+
+  return {
+    ignore: babelrc.ignore,
+    babelrc: false,
+    sourceMaps: true,
+    presets: [
+      [require('@babel/preset-typescript'), {
+        allExtensions: true,
+        isTSX: true,
+      }],
+    ],
+    plugins: [
+      [require('@babel/plugin-proposal-class-properties'), { loose: true }],
+    ],
+  }
+}
+
+function getModuleName (tsName) {
+  return tsName.replace(/\.[jt]sx?$/, '')
+}
+
+function transformRelativeImports () {
+  const resolve = require('resolve')
+
+  const fixImportSource = ({ node: { source } }, { opts, filename }) => {
+    if (!source) { return }
+
+    const {
+      moduleDirectory = [process.cwd(), path.join(__dirname, '..')],
+      extension = '.js',
+    } = opts
+    let resolvedImport = ''
+
+    resolvedImport = resolve.sync(source.value, {
+      extensions: ['.ts', '.tsx'],
+      basedir: path.dirname(filename),
+      moduleDirectory: moduleDirectory,
+    })
+
+    const relativeImport = path.relative(
+      path.dirname(getRelativeToRoot(filename, moduleDirectory)),
+      getRelativeToRoot(resolvedImport, moduleDirectory),
+    )
+
+    source.value = relativeImport.replace(/^\//, './').replace(/\.tsx?$/, extension)
+  }
+
+  return {
+    visitor: {
+      ImportDeclaration: fixImportSource,
+      ExportNamedDeclaration: fixImportSource,
+    },
+  }
+}
+
+function transformInlineEnvironmentVariables ({ types: t }) {
+  return {
+    visitor: {
+      // eslint-disable-next-line no-shadow
+      MemberExpression (path, { opts: { include, exclude, env } = {} }) {
+        if (path.get('object').matchesPattern('process.env')) {
+          const key = path.toComputedKey()
+          if (
+            t.isStringLiteral(key) &&
+            (!include || include.indexOf(key.value) !== -1) &&
+            (!exclude || exclude.indexOf(key.value) === -1)
+          ) {
+            const name = key.value
+            const value = env && name in env ? env[name] : process.env[name]
+            path.replaceWith(t.valueToNode(value))
+          }
+        }
+      },
+    },
+  }
+};
+
+function extendBabelOptions ({ ignore = [], plugins = [], presets = [], ...others }, base = getBabelOptions()) {
+  return {
+    ...base,
+    ...others,
+    ignore: [...base.ignore || [], ...ignore],
+    presets: [...base.presets || [], ...presets],
+    plugins: [...base.plugins || [], ...plugins],
+  }
+}
+
+function getPackageDir (filename) {
+  let packageDir = filename
+
+  while (!fs.existsSync(path.join(packageDir, 'package.json'))) {
+    packageDir = path.dirname(packageDir)
+
+    if (packageDir === path.sep) {
+      packageDir = process.cwd()
+      break
+    }
+  }
+
+  return packageDir
+}
+
+function getRelativeToRoot (filename, moduleDirectory) {
+  filename = path.normalize(filename)
+  const pkgDir = getPackageDir(filename)
+
+  const root = moduleDirectory.find(r => pkgDir.startsWith(path.normalize(r)))
+
+  if (!root) {
+    throw new Error(`Couldn't find the module ${filename} in the given roots ${JSON.stringify(moduleDirectory)}`)
+  }
+
+  return path.join('/', path.relative(root, filename))
+}
+
 module.exports = {
   getSources,
   sourcesGlob,
   sourcesIgnoreGlobs,
   lintIgnoreGlobs,
   getBuiltJsFiles,
+  getBabelrc,
+  getBabelOptions,
+  extendBabelOptions,
+  getModuleName,
+  getRelativeToRoot,
+  transformRelativeImports,
+  transformInlineEnvironmentVariables,
 }

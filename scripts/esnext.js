@@ -3,82 +3,95 @@ const os = require('os')
 const fs = require('fs')
 const babel = require('@babel/core')
 const PQueue = require('p-queue').default
+const Terser = require('terser')
 
-const { getSources } = require('./utils')
+const {
+  getSources,
+  getBabelOptions,
+  extendBabelOptions,
+  getModuleName,
+  transformRelativeImports,
+  transformInlineEnvironmentVariables,
+} = require('./utils')
 
-let babelrc
-
-try {
-  babelrc = require(path.join(process.cwd(), '.babelrc'))
-} catch (e) {
-  babelrc = require('../.babelrc')
-}
-
-const bareImportRewriteOptions = {
-  resolveDirectories: ['.'],
-  extensions: ['.ts', '.tsx', '.js'],
-}
-
-const babelOptions = {
-  ignore: babelrc.ignore,
-  babelrc: false,
-  sourceMaps: true,
-  presets: [
-    [require('@babel/preset-typescript'), {
-      allExtensions: true,
-      isTSX: true,
-    }],
-  ],
-  plugins: [
-    require('@babel/plugin-proposal-class-properties'),
-    require('babel-plugin-transform-inline-environment-variables'),
-    [require('babel-plugin-bare-import-rewrite'), bareImportRewriteOptions],
-    function changeTsToJs () {
-      const fixSource = ({ node: { source } }) => {
-        if (!source) { return }
-        source.value = source.value.replace(/\.ts$/, '.js')
-      }
+const OUTPUT_VERSIONS = [
+  // development
+  {
+    extension: '.js',
+    env: {
+      NODE_ENV: 'development',
+    },
+  },
+  // production
+  {
+    extension: '.min.js',
+    env: {
+      NODE_ENV: 'production',
+    },
+    async post (result) {
+      const { code, map } = Terser.minify(result.code, {
+        sourceMap: { content: result.map },
+        module: true,
+        keep_classnames: true,
+      })
 
       return {
-        visitor: {
-          ImportDeclaration: fixSource,
-          ExportNamedDeclaration: fixSource,
-        },
+        code,
+        map: JSON.parse(map),
       }
     },
-  ],
-}
+  },
+]
 
 const queue = new PQueue({ concurrency: os.cpus().length })
 
-module.exports = async sources => {
+async function generate (sources, babelOptions = getBabelOptions(), filter) {
   sources = sources || await getSources()
+
+  if (filter) {
+    sources = sources.filter(filter)
+  }
 
   queue.clear()
 
-  await Promise.all(sources.map(sourceFile => queue.add(async () => {
-    const jsName = getJsName(sourceFile)
-    const mapName = `${jsName}.map`
+  for (const sourceFilename of sources) {
+    queue.add(async () => {
+      const sourceCode = (await fs.promises.readFile(sourceFilename)).toString()
+      const moduleName = getModuleName(sourceFilename)
+      const ast = babel.parseSync(sourceCode, { ...babelOptions, filename: sourceFilename })
 
-    const { code, map } = await babel.transformFileAsync(sourceFile, babelOptions)
+      return Promise.all(OUTPUT_VERSIONS.map(async (version) => {
+        const { extension, env } = version
+        const finalBabelOptions = extendBabelOptions({
+          filename: sourceFilename,
+          plugins: [
+            [transformInlineEnvironmentVariables, { env }],
+            [transformRelativeImports, { extension }],
+          ],
+        }, babelOptions)
+        const result = await babel.transformFromAstSync(ast, sourceCode, finalBabelOptions)
 
-    const jsStream = fs.createWriteStream(jsName)
-    jsStream.write(code)
-    jsStream.end(`\n//# sourceMappingURL=${path.basename(mapName)}`)
+        const { code, map } = version.post ? await version.post(result) : result
+        const jsFilename = `${moduleName}${extension}`
+        const mapFilename = `${jsFilename}.map`
 
-    const mapStream = fs.createWriteStream(mapName)
-    mapStream.end(JSON.stringify(map, null, '\t'))
+        const jsStream = fs.createWriteStream(jsFilename)
 
-    return Promise.all([
-      new Promise(resolve => jsStream.on('close', resolve)),
-      new Promise(resolve => mapStream.on('close', resolve)),
-    ])
-  })))
+        jsStream.write(code)
+        jsStream.end(`\n//# sourceMappingURL=${path.basename(mapFilename)}`)
+
+        return Promise.all([
+          new Promise((resolve, reject) => {
+            jsStream.on('close', resolve)
+            jsStream.on('error', reject)
+          }),
+          fs.promises.writeFile(mapFilename, JSON.stringify(map, null, '\t')),
+        ])
+      }))
+    })
+  }
+
+  return queue.onIdle()
 }
 
-module.exports.babelOptions = babelOptions
-module.exports.bareImportRewriteOptions = bareImportRewriteOptions
-
-function getJsName (tsName) {
-  return tsName.replace(/\.[jt]sx?$/, '.js')
-}
+module.exports = generate

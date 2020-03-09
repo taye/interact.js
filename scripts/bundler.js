@@ -1,4 +1,5 @@
 const path = require('path')
+const { getBabelrc } = require('./utils')
 
 process.env.NODE_PATH = `${process.env.NODE_PATH || ''}:${path.resolve(__dirname, '..', 'node_modules')}`
 require('module').Module._initPaths()
@@ -28,13 +29,7 @@ module.exports = function (options) {
       : []
   })()
 
-  let babelrc
-
-  try {
-    babelrc = require(path.join(process.cwd(), '.babelrc'))
-  } catch (e) {
-    babelrc = require('../.babelrc')
-  }
+  const babelrc = getBabelrc()
 
   const b = browserify(options.entries, {
     extensions: ['.ts', '.tsx'],

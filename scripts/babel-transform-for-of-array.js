@@ -1,4 +1,4 @@
-/* eslint-disable one-var, space-before-function-paren */
+/* eslint-disable one-var, space-before-function-paren, comma-dangle */
 module.exports = function({ template, types: t }) {
   const pushComputedProps = pushComputedPropsLoose
 
