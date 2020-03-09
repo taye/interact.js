@@ -1,0 +1,27 @@
+{
+	"version": 3,
+	"sources": [
+		"index.ts"
+	],
+	"names": [
+		"actions",
+		"autoScroll",
+		"autoStart",
+		"devTools",
+		"inertia",
+		"modifiers",
+		"offset",
+		"pointerEvents",
+		"reflow",
+		"interact",
+		"init",
+		"initInteract",
+		"window",
+		"win",
+		"use"
+	],
+	"mappings": "AAAA,OAAO,mBAAP;AACA,OAAOA,OAAP,MAAoB,qBAApB;AACA,OAAOC,UAAP,MAAuB,yBAAvB;AACA,OAAOC,SAAP,MAAsB,wBAAtB;AACA,OAAOC,QAAP,MAAqB,uBAArB;AACA,OAAOC,OAAP,MAAoB,qBAApB;AACA,OAAOC,SAAP,MAAsB,uBAAtB;AACA,OAAOC,MAAP,MAAmB,oBAAnB;AACA,OAAOC,aAAP,MAA0B,4BAA1B;AACA,OAAOC,MAAP,MAAmB,oBAAnB;AACA,OAAOC,QAAP,IAAmBC,IAAI,IAAIC,YAA3B,QAA+C,sBAA/C;;AAEA,IAAI,OAAOC,MAAP,KAAkB,QAAlB,IAA8B,CAAC,CAACA,MAApC,EAA4C;AAC1CF,EAAAA,IAAI,CAACE,MAAD,CAAJ;AACD;;AAED,eAAeH,QAAf;AAEA,OAAO,SAASC,IAAT,CAAeG,GAAf,EAA4B;AACjCF,EAAAA,YAAY,CAACE,GAAD,CAAZ;AAEAJ,EAAAA,QAAQ,CAACK,GAAT,CAAaR,MAAb,EAHiC,CAKjC;;AACAG,EAAAA,QAAQ,CAACK,GAAT,CAAaP,aAAb,EANiC,CAQjC;;AACAE,EAAAA,QAAQ,CAACK,GAAT,CAAaV,OAAb,EATiC,CAWjC;;AACAK,EAAAA,QAAQ,CAACK,GAAT,CAAaT,SAAb,EAZiC,CAcjC;;AACAI,EAAAA,QAAQ,CAACK,GAAT,CAAaZ,SAAb,EAfiC,CAiBjC;;AACAO,EAAAA,QAAQ,CAACK,GAAT,CAAad,OAAb,EAlBiC,CAoBjC;;AACAS,EAAAA,QAAQ,CAACK,GAAT,CAAab,UAAb,EArBiC,CAuBjC;;AACAQ,EAAAA,QAAQ,CAACK,GAAT,CAAaN,MAAb,EAxBiC,CA0BjC;;AACA,MAAI,kBAAyB,YAA7B,EAA2C;AACzCC,IAAAA,QAAQ,CAACK,GAAT,CAAaX,QAAb;AACD;;AAED,SAAOM,QAAP;AACD",
+	"sourcesContent": [
+		"import '@interactjs/types/index'\nimport actions from '@interactjs/actions/index'\nimport autoScroll from '@interactjs/auto-scroll/index'\nimport autoStart from '@interactjs/auto-start/index'\nimport devTools from '@interactjs/dev-tools/index'\nimport inertia from '@interactjs/inertia/index'\nimport modifiers from '@interactjs/modifiers/index'\nimport offset from '@interactjs/offset'\nimport pointerEvents from '@interactjs/pointer-events/index'\nimport reflow from '@interactjs/reflow/index'\nimport interact, { init as initInteract } from '@interactjs/interact/index'\n\nif (typeof window === 'object' && !!window) {\n  init(window)\n}\n\nexport default interact\n\nexport function init (win: Window) {\n  initInteract(win)\n\n  interact.use(offset)\n\n  // pointerEvents\n  interact.use(pointerEvents)\n\n  // inertia\n  interact.use(inertia)\n\n  // snap, resize, etc.\n  interact.use(modifiers)\n\n  // autoStart, hold\n  interact.use(autoStart)\n\n  // drag and drop, resize, gesture\n  interact.use(actions)\n\n  // autoScroll\n  interact.use(autoScroll)\n\n  // reflow\n  interact.use(reflow)\n\n  // eslint-disable-next-line no-undef\n  if (process.env.NODE_ENV !== 'production') {\n    interact.use(devTools)\n  }\n\n  return interact\n}\n"
+	]
+}
