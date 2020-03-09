@@ -86,7 +86,13 @@ function transformRelativeImports () {
       getRelativeToRoot(resolvedImport, moduleDirectory),
     )
 
-    source.value = relativeImport.replace(/^\//, './').replace(/\.tsx?$/, extension)
+    const importWithDir = /^[./]/.test(relativeImport)
+      ? relativeImport
+      : `/${relativeImport}`
+
+    source.value = importWithDir
+      .replace(/^\//, './')
+      .replace(/\.tsx?$/, extension)
   }
 
   return {
