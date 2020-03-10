@@ -16,14 +16,9 @@ main() {
 ensure_clean_index() {
   echo_funcname
 
-  # ignore filemode changes
-  git config core.fileMode false
-
   # make sure the repo is clean
-  if ! git diff-index HEAD --stat --exit-code; then
-    exit_code=$?
-    echo
-    quit "working directory must be clean" $exit_code
+  if ! git diff-index -G . HEAD --stat --exit-code; then
+    quit "working directory must be clean" 1
   fi
 }
 
@@ -66,7 +61,7 @@ run_build() {
 
   # copy license file
   lerna exec --no-private -- cp -v $ROOT/LICENSE . ||
-    quit "failed to copy LICENSE"
+    quit "failed to copy LICENSE" 1
 
   # copy .npmignore to all packages
   lerna exec --no-private -- "echo '# copied from [root]/.npmignore' > .npmignore
