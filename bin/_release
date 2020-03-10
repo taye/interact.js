@@ -1,7 +1,6 @@
 #!/bin/bash
-PATH=$PATH:$PWD/node_modules/.bin
-
 ROOT=$(dirname $(readlink -f $0))/..
+PATH=$PATH:$PWD/node_modules/.bin:$ROOT/bin
 INITIAL_BRANCH=$(git rev-parse --abbrev-ref HEAD)
 
 main() {
@@ -31,8 +30,8 @@ ensure_clean_index() {
 check_version() {
   echo_funcname
 
-  NEW_VERSION=$(node $ROOT/scripts/version.js)
-  NEW_TAG="v$(npx semver clean $NEW_VERSION)"
+  NEW_VERSION=$(_version)
+  NEW_TAG="v$(semver clean $NEW_VERSION)"
 
   if [[ $NEW_TAG == v ]]; then
     quit "failed parsing version from '$NEW_VERSION'" 1
@@ -56,7 +55,7 @@ git_detach() {
 }
 
 clean() {
-  npm run clean
+  _clean
 }
 
 run_build() {
@@ -66,21 +65,21 @@ run_build() {
   cp $ROOT/README.md interactjs/ &&
 
   # copy license file
-  npx lerna exec --no-private -- cp -v $ROOT/LICENSE . ||
+  lerna exec --no-private -- cp -v $ROOT/LICENSE . ||
     quit "failed to copy LICENSE"
 
   # copy .npmignore to all packages
-  npx lerna exec --no-private -- "echo '# copied from [root]/.npmignore' > .npmignore
+  lerna exec --no-private -- "echo '# copied from [root]/.npmignore' > .npmignore
     cat $ROOT/.npmignore >> .npmignore" &&
 
   # create @interactjs/**/use/* modules
-  $ROOT/scripts/add-use-modules.js
+  _add_use_modules
 
   ## generate esnext .js modules
-  npm run esnext &&
+  _esnext &&
 
   # bundle interactjs, generate docs, transpile modules, generate declaration files
-  npm run build || exit $?
+  yarn build || exit $?
 }
 
 commit_and_tag() {
@@ -104,10 +103,10 @@ push_and_publish() {
   git push --no-verify origin $NEW_TAG || quit "failed to push git tag $NEW_TAG to origin" $?
 
   # add gitHead to package.json files
-  node $ROOT/scripts/setGitHead.js
+  _set_git_head
 
   # publish to npm with release tag if provided
-  npx lerna exec --no-private -- npm publish $tag_arg || quit "failed to publish to npm" $?
+  lerna exec --no-private -- npm publish $tag_arg || quit "failed to publish to npm" $?
 
   git checkout $(git ls-files '**package.json')
 }

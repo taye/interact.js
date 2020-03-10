@@ -12,12 +12,12 @@ module.exports = {
   plugins:
     process.env.NODE_ENV !== 'production'
       ? [
-        require('./scripts/babel-transform-for-of-array'),
+        require('./scripts/babelTransformForOfArray'),
         require('@babel/plugin-proposal-class-properties').default,
         require('@babel/plugin-transform-modules-commonjs').default,
       ]
       : [
-        require('./scripts/babel-transform-for-of-array'),
+        require('./scripts/babelTransformForOfArray'),
         [require('@babel/plugin-transform-runtime').default, {
           helpers: false,
           regenerator: false,

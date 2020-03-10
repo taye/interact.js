@@ -29,12 +29,29 @@ const OUTPUT_VERSIONS = [
       NODE_ENV: 'production',
     },
     async post (result) {
-      const { code, map } = Terser.minify(result.code, {
-        sourceMap: { content: result.map },
+      const { code, map, error } = Terser.minify(result.code, {
         module: true,
-        keep_classnames: true,
+        sourceMap: { content: result.map },
+        mangle: {
+          module: true,
+        },
+        compress: {
+          ecma: 8,
+          unsafe: true,
+          unsafe_Function: true,
+          unsafe_arrows: true,
+          unsafe_methods: true,
+        },
+        output: {
+          beautify: true,
+        },
       })
 
+      if (error) {
+        throw error
+      }
+
+      debugger
       return {
         code,
         map: JSON.parse(map),
@@ -91,7 +108,7 @@ async function generate (sources, babelOptions = getBabelOptions(), filter) {
     })
   }
 
-  return queue.onIdle()
+  await queue.onIdle()
 }
 
 module.exports = generate

@@ -1,0 +1,15 @@
+#!/usr/bin/env node
+require('../scripts/addUseModules')([
+  'actions/index',
+  'actions/drag',
+  'actions/drop',
+  'actions/resize',
+  'actions/gesture',
+  'auto-scroll/index',
+  'auto-start/index',
+  'dev-tools/index',
+  'inertia/index',
+  'modifiers/index',
+  'pointer-events/index',
+  'reflow/index',
+])

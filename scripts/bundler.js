@@ -11,7 +11,7 @@ require('module')._initPaths()
 
 module.exports = function (options) {
   const browserify = require('browserify')
-  const writer = options.writer || require('./bundleProcessor')
+  const writer = options.writer || require('./bundleWriter')
 
   const plugins = (() => {
     if (options.watch) {

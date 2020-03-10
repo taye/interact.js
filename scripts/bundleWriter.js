@@ -1,9 +1,9 @@
-const uglify       = require('uglify-js')
-const mkdirp       = require('mkdirp')
-const path         = require('path')
-const fs           = require('fs')
-const bundleHeader = require('./bundle-header')
-const replacer     = require('./replacer')
+const uglify = require('uglify-js')
+const mkdirp = require('mkdirp')
+const path = require('path')
+const fs = require('fs')
+const bundleHeader = require('./bundleHeader')
+const replacer = require('./replacer')
 
 const pwd = process.env.PWD
 

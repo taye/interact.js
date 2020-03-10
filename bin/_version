@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 const path = require('path')
+const getVersion = require('../scripts/getVersion')
 
 const depFields = [
   'dependencies',
@@ -10,19 +11,13 @@ const depFields = [
 
 let newVersion
 
-module.exports.get = () => {
-  const rootPkg = require(path.resolve('package.json'))
-
-  return rootPkg.version
-}
-
 if (!module.parent) {
   const semver = require('semver')
   const fs = require('fs')
   const glob = require('glob')
 
   const [,, versionChange, prereleaseId] = process.argv
-  const oldVersion = module.exports.get()
+  const oldVersion = getVersion()
 
   if (versionChange) {
     if (/^(major|minor|patch|premajor|preminor|prepatch|prerelease)$/.test(versionChange)) {

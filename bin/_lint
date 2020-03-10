@@ -2,7 +2,7 @@
 
 const { existsSync } = require('fs')
 
-const { sourcesGlob, lintIgnoreGlobs } = require('./utils')
+const { sourcesGlob, lintIgnoreGlobs } = require('../scripts/utils')
 
 const jsExt = /\.js$/
 const dtsExt = /\.d\.ts$/

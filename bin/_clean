@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 const fs = require('fs')
 const shell = require('shelljs')
-const { getBuiltJsFiles } = require('./utils')
+const { getBuiltJsFiles } = require('../scripts/utils')
 
 console.log('removing typescript generated files.')
 shell.exec('tsc -b --clean')

@@ -8,4 +8,4 @@ git fetch --tags
 
 # undo permission changes to bin files
 git checkout -- $TRAVIS_BUILD_DIR/{jsdoc,scripts}
-bash $TRAVIS_BUILD_DIR/scripts/release.sh $@
+yarn _release $@
