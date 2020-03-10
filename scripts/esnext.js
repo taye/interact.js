@@ -47,7 +47,7 @@ const OUTPUT_VERSIONS = [
           unsafe_methods: true,
         },
         output: {
-          beautify: true,
+          beautify: false,
         },
       })
 
