@@ -1,6 +1,23 @@
 #!/usr/bin/env node
 const [,, ...args] = process.argv
 
+const fileArgs = []
+let watch = false
+let serve = false
+
+for (const arg of args) {
+  if (arg === '--watch') {
+    watch = true
+  } else if (arg === '--serve') {
+    serve = true
+  } else {
+    fileArgs.push(arg)
+  }
+}
+
+debugger
 require('../scripts/esnext')({
-  sources: args.length ? args : undefined,
+  sources: fileArgs.length ? fileArgs : undefined,
+  watch,
+  serve,
 })

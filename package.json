@@ -13,7 +13,7 @@
   },
   "scripts": {
     "bootstrap": "npx yarn install --pure-lockfile",
-    "start": "_clean && _add_use_modules && cd interactjs && NODE_ENV=development ../bin/_bundle --watch",
+    "start": "yarn esnext --serve",
     "bundle": "cd interactjs; NODE_ENV=production ../bin/_bundle",
     "esnext": "_add_use_modules && _esnext",
     "build": "_clean && yarn docs && yarn bundle && _add_use_modules && tsc -b -f && _esnext",
@@ -44,7 +44,9 @@
     "babel-plugin-transform-inline-environment-variables": "latest",
     "babelify": "latest",
     "browser-pack-flat": "latest",
+    "browser-sync": "latest",
     "browserify": "latest",
+    "chokidar": "latest",
     "combine-source-map": "latest",
     "common-shakeify": "latest",
     "domator": "latest",
