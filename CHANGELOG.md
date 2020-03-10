@@ -1,3 +1,7 @@
+## v1.9.3
+
+ - unbeautified .min.js outputs
+
 ## v1.9.2
 
   - fixed imports within generated modules
