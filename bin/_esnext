@@ -1,4 +1,6 @@
 #!/usr/bin/env node
 const [,, ...args] = process.argv
 
-require('../scripts/esnext')(args.length ? args : undefined)
+require('../scripts/esnext')({
+  sources: args.length ? args : undefined,
+})

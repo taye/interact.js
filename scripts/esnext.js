@@ -1,15 +1,18 @@
 const path = require('path')
 const os = require('os')
-const fs = require('fs')
+const { createWriteStream, promises: fs } = require('fs')
 const babel = require('@babel/core')
 const PQueue = require('p-queue').default
 const Terser = require('terser')
+const mkdirp = require('mkdirp')
 
 const {
   getSources,
   getBabelOptions,
   extendBabelOptions,
   getModuleName,
+  getPackageDir,
+  getRelativeToRoot,
   transformRelativeImports,
   transformInlineEnvironmentVariables,
 } = require('./utils')
@@ -51,7 +54,6 @@ const OUTPUT_VERSIONS = [
         throw error
       }
 
-      debugger
       return {
         code,
         map: JSON.parse(map),
@@ -62,19 +64,38 @@ const OUTPUT_VERSIONS = [
 
 const queue = new PQueue({ concurrency: os.cpus().length })
 
-async function generate (sources, babelOptions = getBabelOptions(), filter) {
+async function generate ({
+  sources,
+  shim = () => {},
+  babelOptions = getBabelOptions(),
+  filter,
+  outDir = process.cwd(),
+  moduleDirectory = [process.cwd(), path.join(__dirname, '..')]
+} = {}) {
   sources = sources || await getSources()
 
   if (filter) {
     sources = sources.filter(filter)
   }
 
+  console.log(`generating javascript files for ${sources.length} modules...`)
   queue.clear()
 
   for (const sourceFilename of sources) {
     queue.add(async () => {
-      const sourceCode = (await fs.promises.readFile(sourceFilename)).toString()
+      const shimResult = await shim(sourceFilename)
       const moduleName = getModuleName(sourceFilename)
+      const rootRelativeModuleName = getRelativeToRoot(moduleName, moduleDirectory)
+      const outModuleName = path.join(outDir, rootRelativeModuleName)
+
+      if (shimResult) {
+        await mkdirp(path.dirname(outModuleName))
+        return Promise.all(OUTPUT_VERSIONS.map(
+          ({ extension }) => fs.writeFile(`${outModuleName}${extension}`, shimResult))
+        )
+      }
+
+      const sourceCode = (await fs.readFile(sourceFilename)).toString()
       const ast = babel.parseSync(sourceCode, { ...babelOptions, filename: sourceFilename })
 
       return Promise.all(OUTPUT_VERSIONS.map(async (version) => {
@@ -83,16 +104,19 @@ async function generate (sources, babelOptions = getBabelOptions(), filter) {
           filename: sourceFilename,
           plugins: [
             [transformInlineEnvironmentVariables, { env }],
-            [transformRelativeImports, { extension }],
+            [transformRelativeImports, { extension, moduleDirectory }],
           ],
         }, babelOptions)
         const result = await babel.transformFromAstSync(ast, sourceCode, finalBabelOptions)
 
         const { code, map } = version.post ? await version.post(result) : result
-        const jsFilename = `${moduleName}${extension}`
+        const jsFilename = `${outModuleName}${extension}`
         const mapFilename = `${jsFilename}.map`
 
-        const jsStream = fs.createWriteStream(jsFilename)
+        if (/home.*home/.test(jsFilename)) debugger
+        await mkdirp(path.dirname(jsFilename))
+
+        const jsStream = createWriteStream(jsFilename)
 
         jsStream.write(code)
         jsStream.end(`\n//# sourceMappingURL=${path.basename(mapFilename)}`)
@@ -102,9 +126,13 @@ async function generate (sources, babelOptions = getBabelOptions(), filter) {
             jsStream.on('close', resolve)
             jsStream.on('error', reject)
           }),
-          fs.promises.writeFile(mapFilename, JSON.stringify(map, null, '\t')),
+          fs.writeFile(mapFilename, JSON.stringify(map, null, '\t')),
         ])
       }))
+    }).catch(error => {
+      queue.clear()
+      console.error(error)
+      process.exit
     })
   }
 

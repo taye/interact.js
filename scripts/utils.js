@@ -4,18 +4,20 @@ const { promisify } = require('util')
 const glob = promisify(require('glob'))
 
 const sourcesGlob = '{,@}interactjs/**/**/*{.ts,.tsx}'
-const lintIgnoreGlobs = ['**/node_modules/**', '**/*_*', '**/*.d.ts', '**/dist/**']
+const lintIgnoreGlobs = ['**/node_modules/**', '**/*_*', '**/*.d.ts', '**/dist/**', '**/@interactjs/*/use/**']
 const sourcesIgnoreGlobs = [...lintIgnoreGlobs, '**/*.spec.ts']
 const builtFilesGlob = '{{**/dist/**,{,@}interactjs/**/**/*.js{,.map}},@interactjs/*/use/**}'
 const builtFilesIgnoreGlobs = ['**/node_modules/**']
 
-const getSources = ({ cwd = process.cwd() } = {}) => glob(
+const getSources = ({ cwd = process.cwd(), ...options } = {}) => glob(
   sourcesGlob,
   {
     cwd,
     ignore: sourcesIgnoreGlobs,
     strict: false,
     nodir: true,
+    absolute: true,
+    ...options,
   },
 )
 
@@ -70,7 +72,7 @@ function transformRelativeImports () {
     if (!source) { return }
 
     const {
-      moduleDirectory = [process.cwd(), path.join(__dirname, '..')],
+      moduleDirectory,
       extension = '.js',
     } = opts
     let resolvedImport = ''
@@ -78,7 +80,7 @@ function transformRelativeImports () {
     resolvedImport = resolve.sync(source.value, {
       extensions: ['.ts', '.tsx'],
       basedir: path.dirname(filename),
-      moduleDirectory: moduleDirectory,
+      moduleDirectory,
     })
 
     const relativeImport = path.relative(
@@ -99,6 +101,7 @@ function transformRelativeImports () {
     visitor: {
       ImportDeclaration: fixImportSource,
       ExportNamedDeclaration: fixImportSource,
+      ExportAllDeclaration: fixImportSource,
     },
   }
 }
@@ -173,6 +176,7 @@ module.exports = {
   getBabelOptions,
   extendBabelOptions,
   getModuleName,
+  getPackageDir,
   getRelativeToRoot,
   transformRelativeImports,
   transformInlineEnvironmentVariables,

@@ -54,20 +54,22 @@ module.exports = function (options) {
   }).exclude('jsdom')
 
   if (options.watch) {
-    const doEsnext = require('./esnext')
+    const generateEsnext = require('./esnext')
 
     b.on('update', ids => {
       ids = ids.filter(id => !/\.js$/.test(id))
 
       if (!ids.length) { return }
 
+      console.log(ids)
       update(ids)
-      doEsnext(ids.filter(id => /\.tsx?/.test(id)).map(id => path.resolve(id)))
-        .then(() => console.log('Generated esnext files'))
+      generateEsnext({
+        sources: ids.filter(id => /\.tsx?/.test(id)).map(id => path.resolve(id)),
+      })
     })
     b.on('log', msg => console.log(msg))
 
-    doEsnext()
+    generateEsnext()
   }
   else {
   }
