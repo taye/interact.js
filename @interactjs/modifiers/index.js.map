@@ -1,0 +1,29 @@
+{
+	"version": 3,
+	"sources": [
+		"index.ts"
+	],
+	"names": [
+		"base",
+		"all",
+		"extend",
+		"snappers",
+		"modifiers",
+		"id",
+		"install",
+		"scope",
+		"interact",
+		"usePlugin",
+		"createSnapGrid",
+		"grid",
+		"type",
+		"_defaults",
+		"_methods",
+		"defaults",
+		"perAction"
+	],
+	"mappings": "AAAA,OAAOA,IAAP,MAAiB,WAAjB;AAEA,OAAO,KAAKC,GAAZ,MAAqB,UAArB;AACA,OAAOC,MAAP,MAAmB,oBAAnB;AACA,OAAO,KAAKC,QAAZ,MAA0B,4BAA1B;AAUA,MAAMC,SAA0B,GAAG;AACjCC,EAAAA,EAAE,EAAE,WAD6B;;AAEjCC,EAAAA,OAAO,CAAEC,KAAF,EAAS;AACd,UAAM;AAAEC,MAAAA;AAAF,QAAeD,KAArB;AAEAA,IAAAA,KAAK,CAACE,SAAN,CAAgBT,IAAhB;AAEAQ,IAAAA,QAAQ,CAACJ,SAAT,GAAqBF,MAAM,CAACM,QAAQ,CAACJ,SAAT,IAAsB,EAAvB,EAA2BH,GAA3B,CAA3B;AACAO,IAAAA,QAAQ,CAACL,QAAT,GAAoBD,MAAM,CAACM,QAAQ,CAACL,QAAT,IAAqB,EAAtB,EAA0BA,QAA1B,CAA1B;AACAK,IAAAA,QAAQ,CAACE,cAAT,GAA0BF,QAAQ,CAACL,QAAT,CAAkBQ,IAA5C,CAPc,CASd;;AACA,SAAK,MAAMC,IAAX,IAAmBX,GAAnB,EAAwB;AACtB,YAAM;AAAEY,QAAAA,SAAF;AAAaC,QAAAA;AAAb,UAA0Bb,GAAG,CAACW,IAAD,CAAnC;AAEEC,MAAAA,SAAD,CAAmBC,QAAnB,GAA8BA,QAA9B;AACCP,MAAAA,KAAK,CAACQ,QAAN,CAAeC,SAAhB,CAAkCJ,IAAlC,IAA0CC,SAA1C;AACF;AACF;;AAlBgC,CAAnC;AAqBA,eAAeT,SAAf",
+	"sourcesContent": [
+		"import base from './base'\n\nimport * as all from './all'\nimport extend from '@interactjs/utils/extend'\nimport * as snappers from '@interactjs/utils/snappers/index'\n\ndeclare module '@interactjs/interact/index' {\n  interface InteractStatic {\n    modifiers: typeof all\n    snappers: typeof snappers\n    createSnapGrid: typeof snappers.grid\n  }\n}\n\nconst modifiers: Interact.Plugin = {\n  id: 'modifiers',\n  install (scope) {\n    const { interact } = scope\n\n    scope.usePlugin(base)\n\n    interact.modifiers = extend(interact.modifiers || {}, all)\n    interact.snappers = extend(interact.snappers || {}, snappers)\n    interact.createSnapGrid = interact.snappers.grid\n\n    // for backwrads compatibility\n    for (const type in all) {\n      const { _defaults, _methods } = all[type as keyof typeof all]\n\n      ;(_defaults as any)._methods = _methods\n      ;(scope.defaults.perAction as any)[type] = _defaults\n    }\n  },\n}\n\nexport default modifiers\n"
+	]
+}

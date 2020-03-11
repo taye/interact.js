@@ -1,0 +1,21 @@
+{
+	"version": 3,
+	"sources": [
+		"all.ts"
+	],
+	"names": [
+		"default",
+		"aspectRatio",
+		"restrictEdges",
+		"restrict",
+		"restrictRect",
+		"restrictSize",
+		"snapEdges",
+		"snap",
+		"snapSize"
+	],
+	"mappings": "AAAA,SAASA,OAAO,IAAIC,WAApB,QAAuC,kBAAvC;AACA,SAASD,OAAO,IAAIE,aAApB,QAAyC,qBAAzC;AACA,SAASF,OAAO,IAAIG,QAApB,QAAoC,uBAApC;AACA,SAASH,OAAO,IAAII,YAApB,QAAwC,oBAAxC;AACA,SAASJ,OAAO,IAAIK,YAApB,QAAwC,oBAAxC;AACA,SAASL,OAAO,IAAIM,SAApB,QAAqC,iBAArC;AACA,SAASN,OAAO,IAAIO,IAApB,QAAgC,mBAAhC;AACA,SAASP,OAAO,IAAIQ,QAApB,QAAoC,gBAApC",
+	"sourcesContent": [
+		"export { default as aspectRatio } from './aspectRatio'\nexport { default as restrictEdges } from './restrict/edges'\nexport { default as restrict } from './restrict/pointer'\nexport { default as restrictRect } from './restrict/rect'\nexport { default as restrictSize } from './restrict/size'\nexport { default as snapEdges } from './snap/edges'\nexport { default as snap } from './snap/pointer'\nexport { default as snapSize } from './snap/size'\n"
+	]
+}
