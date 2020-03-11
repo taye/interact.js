@@ -8,4 +8,6 @@ git fetch --tags
 
 # undo permission changes to bin files
 git checkout -- $TRAVIS_BUILD_DIR/{jsdoc,scripts}
-yarn _release $@
+
+# use npx to avoid yarn registry
+npx _release $@
