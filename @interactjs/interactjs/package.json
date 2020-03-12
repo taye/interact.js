@@ -1,30 +1,30 @@
 {
   "name": "@interactjs/interactjs",
-  "version": "1.9.3",
+  "version": "1.9.4",
   "repository": {
     "type": "git",
     "url": "https://github.com/taye/interact.js.git"
   },
   "license": "MIT",
   "dependencies": {
-    "@interactjs/actions": "1.9.3",
-    "@interactjs/auto-scroll": "1.9.3",
-    "@interactjs/auto-start": "1.9.3",
-    "@interactjs/dev-tools": "1.9.3",
-    "@interactjs/inertia": "1.9.3",
-    "@interactjs/interact": "1.9.3",
-    "@interactjs/modifiers": "1.9.3",
-    "@interactjs/offset": "1.9.3",
-    "@interactjs/pointer-events": "1.9.3",
-    "@interactjs/utils": "1.9.3",
-    "@interactjs/reflow": "1.9.3",
-    "@interactjs/types": "1.9.3"
+    "@interactjs/actions": "1.9.4",
+    "@interactjs/auto-scroll": "1.9.4",
+    "@interactjs/auto-start": "1.9.4",
+    "@interactjs/dev-tools": "1.9.4",
+    "@interactjs/inertia": "1.9.4",
+    "@interactjs/interact": "1.9.4",
+    "@interactjs/modifiers": "1.9.4",
+    "@interactjs/offset": "1.9.4",
+    "@interactjs/pointer-events": "1.9.4",
+    "@interactjs/utils": "1.9.4",
+    "@interactjs/reflow": "1.9.4",
+    "@interactjs/types": "1.9.4"
   },
   "devDependencies": {
-    "@interactjs/_dev": "1.9.3",
-    "@interactjs/interact": "1.9.3",
-    "@interactjs/modifiers": "1.9.3",
-    "@interactjs/utils": "1.9.3"
+    "@interactjs/_dev": "1.9.4",
+    "@interactjs/interact": "1.9.4",
+    "@interactjs/modifiers": "1.9.4",
+    "@interactjs/utils": "1.9.4"
   },
   "publishConfig": {
     "access": "public"

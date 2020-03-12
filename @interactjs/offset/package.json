@@ -1,13 +1,13 @@
 {
   "name": "@interactjs/offset",
-  "version": "1.9.3",
+  "version": "1.9.4",
   "license": "MIT",
   "peerDependencies": {
-    "@interactjs/core": "1.9.3",
-    "@interactjs/utils": "1.9.3"
+    "@interactjs/core": "1.9.4",
+    "@interactjs/utils": "1.9.4"
   },
   "optionalDependencies": {
-    "@interactjs/interact": "1.9.3"
+    "@interactjs/interact": "1.9.4"
   },
   "publishConfig": {
     "access": "public"

@@ -1,6 +1,6 @@
-## v1.9.3
+## v1.9.4
 
- - unbeautified .min.js outputs
+ - restored `@interactjs/*/use/*.js*` builds
 
 ## v1.9.2
 
