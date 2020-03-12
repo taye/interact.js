@@ -44,6 +44,12 @@ module.exports = function (options) {
         sourceType: 'module',
         global: true,
         ...babelrc,
+        extensions: [
+          '.ts',
+          '.tsx',
+          '.js',
+          '.jsx',
+        ],
       }],
     ],
 

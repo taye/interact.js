@@ -29,11 +29,4 @@ module.exports = {
       ],
 
   ignore: [/\/node_modules\/(?!@interactjs\/)/],
-
-  extensions: [
-    '.ts',
-    '.tsx',
-    '.js',
-    '.jsx',
-  ]
 }
