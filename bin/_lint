@@ -2,7 +2,7 @@
 
 const { existsSync } = require('fs')
 
-const { sourcesGlob, lintIgnoreGlobs } = require('../scripts/utils')
+const { lintSourcesGlob, lintIgnoreGlobs } = require('../scripts/utils')
 
 const jsExt = /\.js$/
 const dtsExt = /\.d\.ts$/
@@ -30,7 +30,7 @@ const argv = require('yargs')
 function getSources () {
   const glob = require('glob')
 
-  const sources = glob.sync(sourcesGlob, {
+  const sources = glob.sync(lintSourcesGlob, {
     ignore: lintIgnoreGlobs,
     silent: true,
   })

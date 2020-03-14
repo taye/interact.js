@@ -4,6 +4,7 @@ const { promisify } = require('util')
 const glob = promisify(require('glob'))
 
 const sourcesGlob = '{,@}interactjs/**/**/*{.ts,.tsx}'
+const lintSourcesGlob = `{${sourcesGlob},scripts/**/*.js,bin/**/*}`
 const commonIgnoreGlobs = ['**/node_modules/**', '**/*_*', '**/*.d.ts', '**/dist/**']
 const lintIgnoreGlobs = [...commonIgnoreGlobs, '**/@interactjs/*/use/**']
 const sourcesIgnoreGlobs = [...commonIgnoreGlobs, '**/*.spec.ts']
@@ -170,6 +171,7 @@ function getRelativeToRoot (filename, moduleDirectory) {
 module.exports = {
   getSources,
   sourcesGlob,
+  lintSourcesGlob,
   sourcesIgnoreGlobs,
   lintIgnoreGlobs,
   getBuiltJsFiles,
