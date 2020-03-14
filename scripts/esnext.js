@@ -12,7 +12,6 @@ const {
   getBabelOptions,
   extendBabelOptions,
   getModuleName,
-  getPackageDir,
   getRelativeToRoot,
   transformRelativeImports,
   transformInlineEnvironmentVariables,
@@ -22,16 +21,12 @@ const OUTPUT_VERSIONS = [
   // development
   {
     extension: '.js',
-    env: {
-      NODE_ENV: 'development',
-    },
+    nodeEnv: 'development',
   },
   // production
   {
     extension: '.min.js',
-    env: {
-      NODE_ENV: 'production',
-    },
+    nodeEnv: 'production',
     async post (result) {
       const { code, map, error } = Terser.minify(result.code, {
         module: true,
@@ -95,9 +90,9 @@ async function generate ({
     disableGlobbing: true,
     usePolling: true,
   })
-  const onChange = path => {
-    console.log(`regenerating ${path}`)
-    _generate([path])
+  const onChange = p => {
+    console.log(`regenerating ${p}`)
+    _generate([p])
   }
 
   watcher.on('change', onChange)
@@ -109,7 +104,7 @@ async function generate ({
 
   const serverWatch = [
     ...OUTPUT_VERSIONS.map(v => sources.map(
-      s => `${getModuleName(s)}${v.extension}`)
+      s => `${getModuleName(s)}${v.extension}`),
     ).flat(),
     glob.sync('**/*.{html,css}', { ignore: ['**/node_modules/**'] }),
   ]
@@ -138,7 +133,7 @@ async function generate ({
         if (shimResult) {
           await mkdirp(path.dirname(outModuleName))
           return Promise.all(OUTPUT_VERSIONS.map(
-            ({ extension }) => fs.writeFile(`${outModuleName}${extension}`, shimResult))
+            ({ extension }) => fs.writeFile(`${outModuleName}${extension}`, shimResult)),
           )
         }
 
@@ -146,7 +141,8 @@ async function generate ({
         const ast = babel.parseSync(sourceCode, { ...babelOptions, filename: sourceFilename })
 
         return Promise.all(OUTPUT_VERSIONS.map(async (version) => {
-          const { extension, env } = version
+          const { extension, nodeEnv } = version
+          const env = { NODE_ENV: nodeEnv, INTERACTJS_ESNEXT: true }
           const finalBabelOptions = extendBabelOptions({
             filename: sourceFilename,
             plugins: [
@@ -154,7 +150,7 @@ async function generate ({
               [transformRelativeImports, { extension, moduleDirectory }],
             ],
           }, babelOptions)
-          const result = await babel.transformFromAstSync(ast, sourceCode, finalBabelOptions)
+          const result = await babel.transformFromAst(ast, sourceCode, finalBabelOptions)
 
           const { code, map } = version.post ? await version.post(result) : result
           const jsFilename = `${outModuleName}${extension}`
@@ -178,7 +174,7 @@ async function generate ({
       }).catch(error => {
         queue.clear()
         console.error(error)
-        process.exit
+        process.exit(1)
       })
     }
 

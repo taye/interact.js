@@ -22,13 +22,14 @@ module.exports = plugins => {
       }
 
       // eslint-disable-next-line no-undef
-      if (process.env.NODE_ENV !== 'production' && !(interact as any).__warnedUseImport) {
+      if ((process.env.NODE_ENV !== 'production' || process.env.INTERACTJS_ESNEXT) && !(interact as any).__warnedUseImport) {
         (interact as any).__warnedUseImport = true
         // eslint-disable-next-line no-console
         console.warn('[interact.js] The "@interactjs/*/use" packages are not quite stable yet. Use them with caution.')
       }
 
-      interact.use(plugin)\n`.replace(/^ {4}/mg, '').trimLeft())
+      interact.use(plugin)
+    `.replace(/^ {6}/mg, '').trim())
 
     console.log(`wrote ${dest}`)
   }))
