@@ -1,7 +1,7 @@
 import * as utils from '@interactjs/utils/index'
 import InteractableMethods from './InteractableMethods'
 
-declare module '@interactjs/interact/index' {
+declare module '@interactjs/core/InteractStatic' {
   interface InteractStatic {
     maxInteractions: (newValue: any) => any
   }
@@ -58,7 +58,7 @@ export interface AutoStart {
 
 function install (scope: Interact.Scope) {
   const {
-    interact,
+    interactStatic: interact,
     defaults,
   } = scope
 

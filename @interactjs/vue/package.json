@@ -1,0 +1,11 @@
+{
+  "name": "@interactjs/vue",
+  "version": "1.9.4",
+  "license": "MIT",
+  "peerDependencies": {
+    "@interactjs/utils": "1.9.4"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

@@ -1,6 +1,6 @@
 import Interactable from '@interactjs/core/Interactable'
 import InteractEvent from '@interactjs/core/InteractEvent'
-import { Scope } from '@interactjs/core/scope'
+import Scope from '@interactjs/core/scope'
 import * as utils from '@interactjs/utils/index'
 import drag from '../drag'
 import DropEvent from './DropEvent'
@@ -79,7 +79,7 @@ function install (scope: Scope) {
   const {
     actions,
     /** @lends module:interact */
-    interact,
+    interactStatic: interact,
     /** @lends Interactable */
     Interactable, // eslint-disable-line no-shadow
     defaults,

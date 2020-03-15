@@ -15,7 +15,7 @@ test('interactions', t => {
 
   const listeners = scope.interactions.listeners
 
-  t.ok(interactions.methodNames.reduce((acc, m) => acc && typeof listeners[m] === 'function', true),
+  t.ok(interactions.methodNames.reduce((acc: boolean, m: string) => acc && typeof listeners[m] === 'function', true),
     'interactions object added to scope')
 
   scope = helpers.mockScope()

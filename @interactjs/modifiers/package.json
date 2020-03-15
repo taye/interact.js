@@ -4,6 +4,7 @@
   "license": "MIT",
   "peerDependencies": {
     "@interactjs/core": "1.9.4",
+    "@interactjs/snappers": "1.9.4",
     "@interactjs/utils": "1.9.4"
   },
   "devDependencies": {

@@ -4,6 +4,7 @@
   "license": "MIT",
   "dependencies": {
     "@interactjs/actions": "1.9.4",
+    "@interactjs/arrange": "1.9.4",
     "@interactjs/auto-scroll": "1.9.4",
     "@interactjs/auto-start": "1.9.4",
     "@interactjs/core": "1.9.4",
@@ -13,6 +14,7 @@
     "@interactjs/modifiers": "1.9.4",
     "@interactjs/pointer-events": "1.9.4",
     "@interactjs/reflow": "1.9.4",
+    "@interactjs/symbol-tree": "1.9.4",
     "@interactjs/utils": "1.9.4"
   },
   "devDependencies": {

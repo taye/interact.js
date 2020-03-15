@@ -6,6 +6,7 @@ import InteractableBase from './Interactable'
 import InteractableSet from './InteractableSet'
 import InteractEvent, { PhaseMap } from './InteractEvent'
 import interactions from './interactions'
+import InteractStatic from './InteractStatic'
 
 export interface SignalArgs {
   'scope:add-document': DocSignalArg
@@ -48,12 +49,6 @@ export interface Actions {
   phaselessTypes: { [type: string]: true }
 }
 
-export function createScope () {
-  return new Scope()
-}
-
-export type Defaults = typeof defaults
-
 export interface Plugin {
   [key: string]: any
   id?: string
@@ -62,7 +57,7 @@ export interface Plugin {
   install? (scope: Scope, options?: any): void
 }
 
-export class Scope {
+export default class Scope {
   id = `__interact_scope_${Math.floor(Math.random() * 100)}`
   isInitialized = false
   listenerMaps: Array<{
@@ -73,7 +68,7 @@ export class Scope {
   browser = browser
   events = events
   utils = utils
-  defaults: Defaults = utils.clone(defaults) as Defaults
+  defaults = utils.clone(defaults) as typeof defaults
   Eventable = Eventable
   actions: Actions = {
     map: {},
@@ -86,6 +81,7 @@ export class Scope {
     phaselessTypes: {},
   }
 
+  interactStatic = new InteractStatic(this)
   InteractEvent = InteractEvent
   Interactable!: typeof InteractableBase
   interactables = new InteractableSet(this)
@@ -276,3 +272,5 @@ export function initScope (scope: Scope, window: Window) {
 
   return scope
 }
+
+export { Scope }

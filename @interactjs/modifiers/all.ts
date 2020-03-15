@@ -1,8 +1,30 @@
-export { default as aspectRatio } from './aspectRatio'
-export { default as restrictEdges } from './restrict/edges'
-export { default as restrict } from './restrict/pointer'
-export { default as restrictRect } from './restrict/rect'
-export { default as restrictSize } from './restrict/size'
-export { default as snapEdges } from './snap/edges'
-export { default as snap } from './snap/pointer'
-export { default as snapSize } from './snap/size'
+/* eslint-disable node/no-extraneous-import */
+import aspectRatio from './aspectRatio'
+import restrictEdges from './restrict/edges'
+import restrict from './restrict/pointer'
+import restrictRect from './restrict/rect'
+import restrictSize from './restrict/size'
+import snapEdges from './snap/edges'
+import snap from './snap/pointer'
+import snapSize from './snap/size'
+
+import spring from '@interactjs/modifiers/spring'
+import avoid from '@interactjs/modifiers/avoid'
+import transform from '@interactjs/modifiers/transform'
+import rubberband from '@interactjs/modifiers/rubberband'
+
+export default {
+  aspectRatio,
+  restrictEdges,
+  restrict,
+  restrictRect,
+  restrictSize,
+  snapEdges,
+  snap,
+  snapSize,
+
+  spring,
+  avoid,
+  transform,
+  rubberband,
+}

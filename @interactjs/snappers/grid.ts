@@ -1,4 +1,10 @@
-function createGrid (grid: (Partial<Interact.Rect> | Interact.Point) & { range?: number, limits?: Interact.Rect, offset?: Interact.Point }) {
+export type GridOptions = (Partial<Interact.Rect> | Interact.Point) & {
+  range?: number
+  limits?: Interact.Rect
+  offset?: Interact.Point
+}
+
+export default (grid: GridOptions) => {
   const coordFields = ([
     ['x', 'y'],
     ['left', 'top'],
@@ -41,5 +47,3 @@ function createGrid (grid: (Partial<Interact.Rect> | Interact.Point) & { range?:
 
   return gridFunc
 }
-
-export default createGrid

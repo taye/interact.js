@@ -13,7 +13,7 @@ export interface ActionDefaults {
 export interface BaseDefaults {
   preventDefault?: 'auto' | 'never' | string
   deltaSource?: 'page' | 'client'
-  context?: Interact.EventTarget
+  context?: Node
 }
 
 export interface PerActionDefaults {

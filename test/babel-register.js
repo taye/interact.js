@@ -13,6 +13,7 @@ try {
 
 const babelConfig = {
   babelrc: false,
+  extensions: ['.ts', '.tsx', '.js', '.jsx'],
   ...babelrc,
 }
 

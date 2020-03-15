@@ -11,7 +11,7 @@ const globOptions = {
 
 const [, , ...fileArgs] = process.argv
 
-function getMatches (pattern) {
+function getMatches (pattern: string) {
   return new Promise<string[]>((resolve, reject) => {
     glob(
       pattern,

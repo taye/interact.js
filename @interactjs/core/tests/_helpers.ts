@@ -2,7 +2,7 @@
 import { doc } from '@interactjs/_dev/test/domator'
 import * as utils from '@interactjs/utils/index'
 import { MockCoords } from '@interactjs/utils/pointerUtils'
-import { createScope } from '../scope'
+import Scope from '../scope'
 
 let counter = 0
 
@@ -10,7 +10,7 @@ export function unique () {
   return (counter++)
 }
 
-export function uniqueProps (obj) {
+export function uniqueProps (obj: any) {
   for (const prop in obj) {
     if (!obj.hasOwnProperty(prop)) { continue }
 
@@ -67,9 +67,8 @@ export function mockScope (options = {} as any) {
   const document = options.document || doc
   const window = document.defaultView
 
-  const scope = createScope().init(window)
+  const scope = new Scope().init(window)
 
-  scope.interact = Object.assign(() => {}, { use () {} }) as any
   utils.extend(scope.actions.phaselessTypes, { teststart: true, testmove: true, testend: true })
 
   return scope
@@ -94,7 +93,7 @@ export function testEnv<T extends Interact.Target = HTMLElement> ({
   target?: T
   rect?: Interact.Rect
 } = {}) {
-  const scope: Interact.Scope = mockScope()
+  const scope = mockScope()
 
   for (const plugin of plugins) {
     scope.usePlugin(plugin)
@@ -120,6 +119,7 @@ export function testEnv<T extends Interact.Target = HTMLElement> ({
     interactable,
     coords,
     event,
+    interact: scope.interactStatic,
     start: (action: Interact.ActionProps) => interaction.start(action, interactable, target as HTMLElement),
     stop: () => interaction.stop(),
     down: () => interaction.pointerDown(event, event, target as HTMLElement),
@@ -128,7 +128,7 @@ export function testEnv<T extends Interact.Target = HTMLElement> ({
   }
 }
 
-export function timeout (n) {
+export function timeout (n: number) {
   return new Promise(resolve => setTimeout(resolve, n))
 }
 

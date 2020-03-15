@@ -1,0 +1,11 @@
+{
+  "name": "@interactjs/snappers",
+  "version": "1.9.4",
+  "peerDependencies": {
+    "@interactjs/utils": "1.9.4"
+  },
+  "publishConfig": {
+    "access": "restricted",
+    "registry": "https://registry.interactjs.io"
+  }
+}

@@ -27,7 +27,7 @@ export class Interactable implements Partial<Eventable> {
   readonly _actions: Actions
   readonly target: Interact.Target
   readonly events = new Eventable()
-  readonly _context: Document | Interact.Element
+  readonly _context: Interact.Context
   readonly _win: Window
   readonly _doc: Document
 

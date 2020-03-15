@@ -22,11 +22,22 @@ import '@interactjs/actions/drop'
 import '@interactjs/auto-scroll'
 import '@interactjs/auto-start'
 import '@interactjs/auto-start/InteractableMethods'
+import '@interactjs/core/InteractStatic'
 import '@interactjs/core/interactablePreventDefault'
+import '@interactjs/dev-tools'
 import '@interactjs/inertia'
+import '@interactjs/interactions'
 import '@interactjs/modifiers'
 import '@interactjs/pointer-events/interactableTargets'
+import '@interactjs/pointer-events/base'
 import '@interactjs/reflow'
+
+import * as arrange from '@interactjs/arrange'
+import SymbolTree from '@interactjs/symbol-tree'
+import _ElementState from '@interactjs/utils/ElementState'
+
+declare namespace InteractPro {
+}
 
 declare namespace Interact {
   type OrBoolean<T> = {
@@ -34,6 +45,7 @@ declare namespace Interact {
   }
 
   export type Element = HTMLElement | SVGElement
+  export type Context = Document | Element
   export type EventTarget = Window | Document | Element
   export type Target = Interact.EventTarget | string
   export type interact = typeof interact
@@ -229,6 +241,46 @@ declare namespace Interact {
   export type ListenersArg = Listener | ListenerMap | Array<(Listener | ListenerMap)>
   export interface ListenerMap {
     [index: string]: ListenersArg | ListenersArg[]
+  }
+
+  type ArrayElementType<T> = T extends Array<infer P> ? P : never
+
+  export type ElementState = _ElementState
+
+  export namespace Arrange {
+    export type Mode = arrange.ArrangeMode
+    export type ArrangeEvent = arrange.ArrangeEvent
+
+    export interface State {
+      active: boolean
+      mode: arrange.ArrangeMode
+      relativePoint: Interact.Point
+      ending: boolean
+      tree: typeof SymbolTree
+      startPos: Position
+      prevPos: Position
+      rejected: Position
+      finalPos: Position
+      prevSwap?: Swap
+      prevDropzone?: ArrayElementType<Interact.Interaction['dropState']['activeDrops']>
+      draggableChild: ElementState
+      feedbackChild: ElementState
+      mirroring: boolean
+      dropzones: Interact.Interaction['dropState']['activeDrops']
+      updatePromise: PromiseLike<void>
+      movedDuringDisplacement: boolean
+    }
+
+    export interface Position {
+      dropzone: Interact.Interactable
+      parent: Element
+      index: number
+    }
+
+    export interface Swap {
+      child: ElementState
+      parent: Element
+    }
   }
 }
 

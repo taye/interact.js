@@ -1,0 +1,5 @@
+extends: '../.eslintrc.yml'
+
+parserOptions:
+  sourceType: script
+  ecmaVersion: 2018

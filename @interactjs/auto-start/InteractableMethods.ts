@@ -23,12 +23,6 @@ declare module '@interactjs/core/Interactable' {
   }
 }
 
-declare module '@interactjs/core/Interaction' {
-  interface Interaction {
-    pointerIsDown: boolean
-  }
-}
-
 function install (scope: Interact.Scope) {
   const {
     /** @lends Interactable */

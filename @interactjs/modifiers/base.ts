@@ -74,6 +74,16 @@ export interface ModifierModule<
   stop? (arg: ModifierArg<State>): void
 }
 
+export interface ModifierFunction <
+  Defaults extends { enabled?: boolean },
+  State extends ModifierState,
+  Name extends string,
+> {
+  (_options?: Partial<Defaults>): Modifier<Defaults, State, Name>
+  _defaults: Defaults
+  _methods: ModifierModule<Defaults, State>
+}
+
 export function makeModifier<
   Defaults extends { enabled?: boolean },
   State extends ModifierState,

@@ -1,27 +1,23 @@
 import base from './base'
 
-import * as all from './all'
-import extend from '@interactjs/utils/extend'
-import * as snappers from '@interactjs/utils/snappers/index'
+import all from './all'
+import snappers from '@interactjs/snappers/index'
 
-declare module '@interactjs/interact/index' {
+declare module '@interactjs/core/InteractStatic' {
   interface InteractStatic {
     modifiers: typeof all
-    snappers: typeof snappers
-    createSnapGrid: typeof snappers.grid
   }
 }
 
 const modifiers: Interact.Plugin = {
   id: 'modifiers',
   install (scope) {
-    const { interact } = scope
+    const { interactStatic: interact } = scope
 
     scope.usePlugin(base)
+    scope.usePlugin(snappers)
 
-    interact.modifiers = extend(interact.modifiers || {}, all)
-    interact.snappers = extend(interact.snappers || {}, snappers)
-    interact.createSnapGrid = interact.snappers.grid
+    interact.modifiers = all
 
     // for backwrads compatibility
     for (const type in all) {

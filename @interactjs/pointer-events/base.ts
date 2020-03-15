@@ -1,7 +1,7 @@
 import { PerActionDefaults } from '@interactjs/core/defaultOptions'
 import Eventable from '@interactjs/core/Eventable'
 import Interaction from '@interactjs/core/Interaction'
-import { Scope } from '@interactjs/core/scope'
+import Scope from '@interactjs/core/scope'
 import * as utils from '@interactjs/utils/index'
 import PointerEvent from './PointerEvent'
 

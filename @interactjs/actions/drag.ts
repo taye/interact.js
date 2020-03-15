@@ -1,4 +1,4 @@
-import { Scope } from '@interactjs/core/scope'
+import Scope from '@interactjs/core/scope'
 import * as is from '@interactjs/utils/is'
 
 declare module '@interactjs/core/Interactable' {

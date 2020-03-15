@@ -1,4 +1,4 @@
-import interact, { init } from '@interactjs/interactjs/index'
+import interact from '@interactjs/interactjs/index'
 
 if (typeof module === 'object' && !!module) {
   try { module.exports = interact }
@@ -6,7 +6,5 @@ if (typeof module === 'object' && !!module) {
 }
 
 (interact as any).default = interact
-;(interact as any).init = init
 
 export default interact
-export { init }

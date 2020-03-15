@@ -1,6 +1,6 @@
 import Interactable from '@interactjs/core/Interactable'
 import { ActionProps, Interaction } from '@interactjs/core/Interaction'
-import { Scope } from '@interactjs/core/scope'
+import Scope from '@interactjs/core/scope'
 import { arr, extend, is, pointer as pointerUtils, rect as rectUtils, win } from '@interactjs/utils/index'
 
 declare module '@interactjs/core/Interactable' {

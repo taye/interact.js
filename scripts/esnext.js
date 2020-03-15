@@ -71,6 +71,7 @@ async function generate ({
   watch = false,
 } = {}) {
   sources = sources || await getSources()
+  watch = watch || serve
 
   if (filter) {
     sources = sources.filter(filter)
@@ -80,7 +81,7 @@ async function generate ({
 
   const initialRun = _generate(sources)
 
-  if (!watch && !serve) {
+  if (!watch) {
     return initialRun
   }
 
@@ -172,9 +173,12 @@ async function generate ({
           ])
         }))
       }).catch(error => {
-        queue.clear()
         console.error(error)
-        process.exit(1)
+
+        if (!watch) {
+          queue.clear()
+          process.exit(1)
+        }
       })
     }
 

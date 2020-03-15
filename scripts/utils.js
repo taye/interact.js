@@ -77,13 +77,24 @@ function transformRelativeImports () {
       moduleDirectory,
       extension = '.js',
     } = opts
+
+    const basedir = path.dirname(getRelativeToRoot(filename, moduleDirectory))
     let resolvedImport = ''
 
-    resolvedImport = resolve.sync(source.value, {
-      extensions: ['.ts', '.tsx'],
-      basedir: path.dirname(filename),
-      moduleDirectory,
-    })
+    for (const root of moduleDirectory) {
+      try {
+        resolvedImport = resolve.sync(source.value, {
+          extensions: ['.ts', '.tsx'],
+          basedir: path.join(root, basedir),
+          moduleDirectory,
+        })
+        break
+      } catch {}
+    }
+
+    if (!resolvedImport) {
+      throw new Error(`Couldn't find module "${source.value}" from "${filename}"`)
+    }
 
     const relativeImport = path.relative(
       path.dirname(getRelativeToRoot(filename, moduleDirectory)),

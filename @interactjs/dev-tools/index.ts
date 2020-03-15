@@ -5,10 +5,17 @@ import { parentNode } from '@interactjs/utils/domUtils'
 import extend from '@interactjs/utils/extend'
 import * as is from '@interactjs/utils/is'
 import win from '@interactjs/utils/window'
+import visualizer from './visualizer'
 
 declare module '@interactjs/core/scope' {
   interface Scope {
     logger: Logger
+  }
+}
+
+declare module '@interactjs/core/InteractStatic' {
+  interface InteractStatic {
+    visializer: typeof visualizer
   }
 }
 

@@ -44,7 +44,7 @@ test('actions/drop start', t => {
   const dropzone = scope.interactables.new('[data-drop]').dropzone({})
 
   t.doesNotThrow(() => {
-    scope.interact.dynamicDrop(false)
+    scope.interactStatic.dynamicDrop(false)
 
     down()
     start({ name: 'drag' })
@@ -53,7 +53,7 @@ test('actions/drop start', t => {
   }, 'no error with dynamicDrop === false')
 
   t.doesNotThrow(() => {
-    scope.interact.dynamicDrop(true)
+    scope.interactStatic.dynamicDrop(true)
     down()
     start({ name: 'drag' })
     move()
