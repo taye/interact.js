@@ -4,13 +4,13 @@ import interact from '../../interactjs/index.js'
 * This demo is very broken!
 */
 
-let snapTarget = {};
+let snapTarget = {}
 
 interact('#gallery .thumbnail')
   .draggable({
     snap: {
       targets: [],
-      relativePoints: [ { x: 0.5, y: 0.5 } ],
+      relativePoints: [{ x: 0.5, y: 0.5 }],
       endOnly: true,
     },
     inertia: true,
@@ -19,57 +19,57 @@ interact('#gallery .thumbnail')
         x: $('#gallery .stage').width() / 2,
         y: $('#gallery .stage').height() / 2,
         range: Infinity,
-      };
+      }
 
-      const thumb = event.target;
+      const thumb = event.target
 
-      thumb.classList.add('dragging');
-      thumb.dataset.dragX = 0;
-      thumb.dataset.dragY = 0;
+      thumb.classList.add('dragging')
+      thumb.dataset.dragX = 0
+      thumb.dataset.dragY = 0
     },
     onmove: function (event) {
-      let thumb = event.target,
-        x = (thumb.dataset.dragX|0) + event.dx,
-        y = (thumb.dataset.dragY|0) + event.dy;
+      const thumb = event.target
+      const x = (thumb.dataset.dragX | 0) + event.dx
+      const y = (thumb.dataset.dragY | 0) + event.dy
 
-      thumb.style.transform = 'translate(' + x + 'px,' + y + 'px)';
+      thumb.style.transform = 'translate(' + x + 'px,' + y + 'px)'
 
-      thumb.dataset.dragX = x;
-      thumb.dataset.dragY = y;
+      thumb.dataset.dragX = x
+      thumb.dataset.dragY = y
     },
     onend: function (event) {
-      const $thumb = $(event.target);
+      const $thumb = $(event.target)
 
       // if the drag was snapped to the stage
       if (event.dropzone) {
-        $('#gallery .stage img').removeClass('active');
+        $('#gallery .stage img').removeClass('active')
         $('#gallery .thumbnail').removeClass('expanded')
-          .not($thumb).css('transform', '');
+          .not($thumb).css('transform', '')
 
-        $thumb.addClass('expanded');
-        $('#gallery [data-image=' + $thumb.data('for') + ']').addClass('active');
+        $thumb.addClass('expanded')
+        $('#gallery [data-image=' + $thumb.data('for') + ']').addClass('active')
       }
       else {
-        $thumb.css('transform', '');
+        $thumb.css('transform', '')
       }
 
-      $thumb.removeClass('dragging');
+      $thumb.removeClass('dragging')
     },
   })
-  .origin($('#gallery')[0]);
+  .origin($('#gallery')[0])
 
 interact('#gallery .stage')
   .dropzone({
     accept: ' #gallery .thumbnail',
     overlap: 1,
   })
-  .on('dragenter', function (event) {
+  .on('dragenter', (event) => {
     event.draggable.draggable({
       snap: { targets: [snapTarget] },
-    });
+    })
   })
-  .on('dragleave drop', function (event) {
+  .on('dragleave drop', (event) => {
     event.draggable.draggable({
       snap: { targets: [] },
-    });
-  });
+    })
+  })

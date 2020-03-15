@@ -1,4 +1,4 @@
-extends: '../packages/.eslintrc.yml'
+extends: '../.eslintrc.yml'
 
 globals:
   interact: false
@@ -6,4 +6,5 @@ globals:
   $: false
 
 rules:
-  no-console: 0
+  no-console: off
+  node/no-missing-import: off
