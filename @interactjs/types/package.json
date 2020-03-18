@@ -13,6 +13,7 @@
     "@interactjs/modifiers": "1.9.6",
     "@interactjs/pointer-events": "1.9.6",
     "@interactjs/reflow": "1.9.6",
+    "@interactjs/snappers": "1.9.6",
     "@interactjs/symbol-tree": "1.9.6",
     "@interactjs/utils": "1.9.6"
   },

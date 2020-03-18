@@ -57,6 +57,12 @@ interface DropSignalArg {
   dragEvent: Interact.DragEvent
 }
 
+export interface ActiveDrop {
+  dropzone: Interactable
+  element: Interact.Element
+  rect: Interact.Rect
+}
+
 export interface DropState {
   cur: {
     dropzone: Interactable    // the dropzone a drag target might be dropped into
@@ -68,11 +74,7 @@ export interface DropState {
   }
   rejected: boolean           // wheather the potential drop was rejected from a listener
   events: any                 // the drop events related to the current drag event
-  activeDrops: Array<{
-    dropzone: Interactable
-    element: Interact.Element
-    rect: Interact.Rect
-  }>
+  activeDrops: ActiveDrop[]
 }
 
 function install (scope: Scope) {

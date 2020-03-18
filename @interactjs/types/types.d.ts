@@ -4,37 +4,37 @@
 //                  Taye Adeyemi <taye.me>
 
 import * as drag from '@interactjs/actions/drag'
+import * as drop from '@interactjs/actions/drop'
 import * as gesture from '@interactjs/actions/gesture'
 import * as resize from '@interactjs/actions/resize'
-import * as defaults from '@interactjs/core/defaultOptions'
+import * as arrange from '@interactjs/arrange'
+import * as iEvent from '@interactjs/core/InteractEvent'
+import _InteractStatic from '@interactjs/core/InteractStatic'
 import _Interactable from '@interactjs/core/Interactable'
 import _InteractableSet from '@interactjs/core/InteractableSet'
-import _InteractStatic from '@interactjs/core/InteractStatic'
-import * as iEvent from '@interactjs/core/InteractEvent'
 import * as interaction from '@interactjs/core/Interaction'
+import * as defaults from '@interactjs/core/defaultOptions'
 import * as scope from '@interactjs/core/scope'
 import * as snap from '@interactjs/modifiers/snap/pointer'
 import { PointerEvent as _PointerEvent } from '@interactjs/pointer-events/PointerEvent'
-import _NativePointerEventType from './NativePointerEventType'
 
 // import module augmentations
-import '@interactjs/actions/drop'
 import '@interactjs/auto-scroll'
 import '@interactjs/auto-start'
 import '@interactjs/auto-start/InteractableMethods'
 import '@interactjs/core/interactablePreventDefault'
 import '@interactjs/dev-tools'
 import '@interactjs/inertia'
-import '@interactjs/interactions'
+import '@interactjs/core/interactions'
 import '@interactjs/modifiers'
 import '@interactjs/pointer-events/base'
 import '@interactjs/pointer-events/interactableTargets'
 import '@interactjs/reflow'
 import '@interactjs/snappers'
 
-import * as arrange from '@interactjs/arrange'
 import SymbolTree from '@interactjs/symbol-tree'
 import _ElementState from '@interactjs/utils/ElementState'
+import _NativePointerEventType from './NativePointerEventType'
 
 declare namespace Interact {
   type OrBoolean<T> = {
@@ -259,11 +259,11 @@ declare namespace Interact {
       rejected: Position
       finalPos: Position
       prevSwap?: Swap
-      prevDropzone?: ArrayElementType<Interact.Interaction['dropState']['activeDrops']>
+      prevDropzone?: ArrayElementType<drop.ActiveDrop>
       draggableChild: ElementState
       feedbackChild: ElementState
       mirroring: boolean
-      dropzones: Interact.Interaction['dropState']['activeDrops']
+      dropzones: drop.ActiveDrop[]
       updatePromise: PromiseLike<void>
       movedDuringDisplacement: boolean
     }
