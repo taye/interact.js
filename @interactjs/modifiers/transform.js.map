@@ -1,0 +1,14 @@
+{
+	"version": 3,
+	"sources": [
+		"transform.ts"
+	],
+	"names": [
+		"transform",
+		"_defaults"
+	],
+	"mappings": "AAEA,MAAMA,SAAS,GAAI,MAAM,CACxB,CADD;;AAGAA,SAAS,CAACC,SAAV,GAAsB,EAAtB;AAEA,eAAeD,SAAf",
+	"sourcesContent": [
+		"import { ModifierFunction } from './base'\n\nconst transform = (() => {\n}) as unknown as ModifierFunction<any, any, 'transform'>\n\ntransform._defaults = {}\n\nexport default transform\n"
+	]
+}
