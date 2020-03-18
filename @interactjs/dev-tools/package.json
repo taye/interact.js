@@ -1,17 +1,17 @@
 {
   "name": "@interactjs/dev-tools",
-  "version": "1.9.6",
+  "version": "1.9.7",
   "license": "MIT",
   "dependencies": {
-    "@interactjs/utils": "1.9.6"
+    "@interactjs/utils": "1.9.7"
   },
   "devDependencies": {
-    "@interactjs/_dev": "1.9.6",
-    "@interactjs/actions": "1.9.6",
-    "@interactjs/core": "1.9.6"
+    "@interactjs/_dev": "1.9.7",
+    "@interactjs/actions": "1.9.7",
+    "@interactjs/core": "1.9.7"
   },
   "optionalDependencies": {
-    "@interactjs/interact": "1.9.6"
+    "@interactjs/interact": "1.9.7"
   },
   "publishConfig": {
     "access": "public"

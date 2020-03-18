@@ -1,6 +1,6 @@
 {
   "name": "@interactjs/arrange",
-  "version": "1.9.6",
+  "version": "1.9.7",
   "license": "MIT",
   "publishConfig": {
     "access": "public"

@@ -1,3 +1,7 @@
+## v1.9.5
+
+ - fixed typing issues
+
 ## v1.9.6
 
  - improved package dependencies
