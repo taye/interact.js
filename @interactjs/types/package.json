@@ -1,24 +1,24 @@
 {
   "name": "@interactjs/types",
-  "version": "1.9.4",
+  "version": "1.9.5",
   "license": "MIT",
   "dependencies": {
-    "@interactjs/actions": "1.9.4",
-    "@interactjs/arrange": "1.9.4",
-    "@interactjs/auto-scroll": "1.9.4",
-    "@interactjs/auto-start": "1.9.4",
-    "@interactjs/core": "1.9.4",
-    "@interactjs/dev-tools": "1.9.4",
-    "@interactjs/inertia": "1.9.4",
-    "@interactjs/interact": "1.9.4",
-    "@interactjs/modifiers": "1.9.4",
-    "@interactjs/pointer-events": "1.9.4",
-    "@interactjs/reflow": "1.9.4",
-    "@interactjs/symbol-tree": "1.9.4",
-    "@interactjs/utils": "1.9.4"
+    "@interactjs/actions": "1.9.5",
+    "@interactjs/arrange": "1.9.5",
+    "@interactjs/auto-scroll": "1.9.5",
+    "@interactjs/auto-start": "1.9.5",
+    "@interactjs/core": "1.9.5",
+    "@interactjs/dev-tools": "1.9.5",
+    "@interactjs/inertia": "1.9.5",
+    "@interactjs/interact": "1.9.5",
+    "@interactjs/modifiers": "1.9.5",
+    "@interactjs/pointer-events": "1.9.5",
+    "@interactjs/reflow": "1.9.5",
+    "@interactjs/symbol-tree": "1.9.5",
+    "@interactjs/utils": "1.9.5"
   },
   "devDependencies": {
-    "@interactjs/_dev": "1.9.4"
+    "@interactjs/_dev": "1.9.5"
   },
   "publishConfig": {
     "access": "public"

@@ -1,3 +1,7 @@
+## v1.9.5
+
+ - made `core` and `utils` packages dependencies of `interact`
+
 ## v1.9.4
 
  - restored `@interactjs/*/use/*.js*` builds
