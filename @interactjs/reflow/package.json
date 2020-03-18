@@ -1,17 +1,17 @@
 {
   "name": "@interactjs/reflow",
-  "version": "1.9.5",
+  "version": "1.9.6",
   "license": "MIT",
   "peerDependencies": {
-    "@interactjs/core": "1.9.5",
-    "@interactjs/utils": "1.9.5"
+    "@interactjs/core": "1.9.6",
+    "@interactjs/utils": "1.9.6"
   },
   "devDependencies": {
-    "@interactjs/_dev": "1.9.5",
+    "@interactjs/_dev": "1.9.6",
     "promise-polyfill": "latest"
   },
   "optionalDependencies": {
-    "@interactjs/interact": "1.9.5"
+    "@interactjs/interact": "1.9.6"
   },
   "publishConfig": {
     "access": "public"

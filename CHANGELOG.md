@@ -1,3 +1,7 @@
+## v1.9.6
+
+ - improved package dependencies
+
 ## v1.9.5
 
  - made `core` and `utils` packages dependencies of `interact`
