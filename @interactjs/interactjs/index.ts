@@ -1,29 +1,29 @@
 import '@interactjs/types'
 
-import interact from '@interactjs/interact'
-import interactablePreventDefault from '@interactjs/core/interactablePreventDefault'
-import inertia from '@interactjs/inertia'
-import pointerEvents from '@interactjs/pointer-events'
-import autoStart from '@interactjs/auto-start'
 import actions from '@interactjs/actions'
-import modifiers from '@interactjs/modifiers/index'
-import autoScroll from '@interactjs/auto-scroll'
-import reflow from '@interactjs/reflow'
-import devTools from '@interactjs/dev-tools'
 
-import multiTarget from '@interactjs/multi-target'
-import offset from '@interactjs/offset'
 import arrange from '@interactjs/arrange'
+import autoScroll from '@interactjs/auto-scroll'
+import autoStart from '@interactjs/auto-start'
 
-import * as feedback from '@interactjs/feedback'
 import clone from '@interactjs/clone'
 
-import * as vueComponents from '@interactjs/vue'
 import components from '@interactjs/components'
+import interactablePreventDefault from '@interactjs/core/interactablePreventDefault'
+import devTools from '@interactjs/dev-tools'
+import * as feedback from '@interactjs/feedback'
+import inertia from '@interactjs/inertia'
+import interact from '@interactjs/interact'
+import modifiers from '@interactjs/modifiers/index'
+import multiTarget from '@interactjs/multi-target'
+import offset from '@interactjs/offset'
+import pointerEvents from '@interactjs/pointer-events'
+import reflow from '@interactjs/reflow'
 
-import * as pointerUtils from '@interactjs/utils/pointerUtils'
 import * as displace from '@interactjs/utils/displace'
 import { exchange } from '@interactjs/utils/exchange'
+import * as pointerUtils from '@interactjs/utils/pointerUtils'
+import * as vueComponents from '@interactjs/vue'
 
 declare module '@interactjs/core/InteractStatic' {
   interface InteractStatic {

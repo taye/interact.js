@@ -1,4 +1,4 @@
-// eslint-disable-next-line node/no-extraneous-import
+// eslint-disable-next-line import/no-extraneous-dependencies
 import interact from '@interactjs/interactjs/index'
 
 // Interactables

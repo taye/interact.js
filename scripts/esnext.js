@@ -1,11 +1,11 @@
-const path = require('path')
-const os = require('os')
 const { createWriteStream, promises: fs } = require('fs')
+const os = require('os')
+const path = require('path')
 const babel = require('@babel/core')
+const glob = require('glob')
+const mkdirp = require('mkdirp')
 const PQueue = require('p-queue').default
 const Terser = require('terser')
-const mkdirp = require('mkdirp')
-const glob = require('glob')
 
 const {
   getSources,

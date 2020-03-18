@@ -1,5 +1,5 @@
-const combineSourceMap = require('combine-source-map')
 const fs = require('fs')
+const combineSourceMap = require('combine-source-map')
 
 module.exports = function combine (options) {
   const headerContent = (options.replacer || (s => s))(options.headerContent ||

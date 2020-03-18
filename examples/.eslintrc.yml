@@ -7,4 +7,4 @@ globals:
 
 rules:
   no-console: off
-  node/no-missing-import: off
+  import/no-unresolved: off

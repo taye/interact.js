@@ -1,7 +1,6 @@
-import base from './base'
-
-import all from './all'
 import snappers from '@interactjs/snappers/index'
+import all from './all'
+import base from './base'
 
 declare module '@interactjs/core/InteractStatic' {
   interface InteractStatic {

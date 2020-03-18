@@ -1,6 +1,6 @@
 import extend from '../../utils/extend'
-import { restrict } from './pointer'
 import { makeModifier } from '../base'
+import { restrict } from './pointer'
 
 const defaults = extend({
   get elementRect () {

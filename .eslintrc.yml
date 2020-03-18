@@ -1,5 +1,8 @@
 extends:
   - 'standard'
+  - 'plugin:import/errors'
+  - 'plugin:import/warnings'
+  - 'plugin:import/typescript'
 
 env:
   commonjs: true
@@ -35,10 +38,9 @@ rules:
   no-shadow: error
   no-useless-constructor: off
   no-var: error
-  # node/file-extension-in-import: [error, always]
-  node/no-extraneous-import: [error, { allowModules: ['@interactjs/_dev'] }]
-  node/no-missing-import: error
-  node/no-unsupported-features/es-syntax: off
+  import/no-extraneous-dependencies: [error, { devDependencies: false }]
+  import/no-named-as-default: off
+  import/order: [error, { alphabetize: { order: asc } }]
   prefer-arrow-callback: [error, { allowNamedFunctions: true }]
   prefer-const: error
   standard/array-bracket-even-spacing: off
@@ -59,10 +61,10 @@ overrides:
     files: '*.spec.ts'
     rules:
       array-bracket-spacing: off
+      import/no-extraneous-dependencies: [error, { devDependencies: true }]
   -
     files: '*.ts'
     rules:
       arrow-parens: [error, 'as-needed']
       no-unused-vars: off
       no-use-before-define: off
-      node/no-missing-import: off

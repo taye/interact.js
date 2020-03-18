@@ -1,11 +1,11 @@
 /** @module interact */
 
-import { Options } from './defaultOptions'
-import Interactable from './Interactable'
-import { isNonNativeEvent } from './scope'
 import browser from '@interactjs/utils/browser'
 import events from '@interactjs/utils/events'
 import * as utils from '@interactjs/utils/index'
+import Interactable from './Interactable'
+import { Options } from './defaultOptions'
+import { isNonNativeEvent } from './scope'
 
 export interface InteractStatic {
   (target: Interact.Target, options?: Options): Interactable
@@ -25,7 +25,7 @@ export class InteractStatic {
 
   globalEvents: any = {}
 
-  dynamicDrop: (newValue?: boolean) => boolean | Interact.interact
+  dynamicDrop: (newValue?: boolean) => boolean | this
 
   // eslint-disable-next-line no-undef
   version = process.env.npm_package_version

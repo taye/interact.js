@@ -1,7 +1,7 @@
 import extend from '@interactjs/utils/extend'
 import * as rectUtils from '@interactjs/utils/rect'
-import { ModifierArg, ModifierState, makeModifier } from '../base'
-import { RestrictEdgesState, restrictEdges } from './edges'
+import { makeModifier, ModifierArg, ModifierState } from '../base'
+import { restrictEdges, RestrictEdgesState } from './edges'
 import { getRestrictionRect, RestrictOptions } from './pointer'
 
 const noMin = { width: -Infinity, height: -Infinity }

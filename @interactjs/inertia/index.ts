@@ -1,5 +1,5 @@
-import * as modifiers from '@interactjs/modifiers/base'
 import Modification from '@interactjs/modifiers/Modification'
+import * as modifiers from '@interactjs/modifiers/base'
 import offset from '@interactjs/offset/index'
 import * as dom from '@interactjs/utils/domUtils'
 import hypot from '@interactjs/utils/hypot'

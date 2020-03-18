@@ -4,8 +4,8 @@ const { promisify } = require('util')
 const glob = promisify(require('glob'))
 
 const sourcesGlob = '{,@}interactjs/**/**/*{.ts,.tsx}'
-const lintSourcesGlob = `{${sourcesGlob},scripts/**/*.js,bin/**/*}`
-const commonIgnoreGlobs = ['**/node_modules/**', '**/*_*', '**/*.d.ts', '**/dist/**']
+const lintSourcesGlob = `{${sourcesGlob},{scripts,examples}/**/*.js,bin/**/*}`
+const commonIgnoreGlobs = ['**/node_modules/**', '**/*_*', '**/*.d.ts', '**/dist/**', 'examples/js/**']
 const lintIgnoreGlobs = [...commonIgnoreGlobs, '**/@interactjs/*/use/**']
 const sourcesIgnoreGlobs = [...commonIgnoreGlobs, '**/*.spec.ts']
 const builtFilesGlob = '{{**/dist/**,{,@}interactjs/**/**/*.js{,.map}},@interactjs/*/use/**}'

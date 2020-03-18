@@ -1,4 +1,4 @@
-function setInteractables () {
+window.setInteractables = () => {
   interact('.draggable', { context: document })
     .draggable({
       onmove: onMove,

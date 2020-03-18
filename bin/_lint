@@ -21,10 +21,6 @@ function isNotGenerated (source) {
 const argv = require('yargs')
   .boolean('fix')
   .boolean('failOnError')
-  .option('sources', {
-    array: true,
-    default: getSources,
-  })
   .argv
 
 function getSources () {
@@ -50,7 +46,8 @@ const cli = new CLIEngine({
   },
 })
 
-const report = cli.executeOnFiles(argv.sources)
+const sources = argv._.length ? argv._ : getSources()
+const report = cli.executeOnFiles(sources)
 const errors = CLIEngine.getErrorResults(report.results)
 const formatted = cli.getFormatter('table')(errors)
 

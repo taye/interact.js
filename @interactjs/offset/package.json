@@ -9,6 +9,9 @@
   "optionalDependencies": {
     "@interactjs/interact": "1.9.5"
   },
+  "devDependencies": {
+    "@interactjs/_dev": "1.9.5"
+  },
   "publishConfig": {
     "access": "public"
   }

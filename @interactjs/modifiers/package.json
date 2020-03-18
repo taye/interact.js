@@ -2,9 +2,11 @@
   "name": "@interactjs/modifiers",
   "version": "1.9.5",
   "license": "MIT",
+  "dependencies": {
+    "@interactjs/snappers": "1.9.5"
+  },
   "peerDependencies": {
     "@interactjs/core": "1.9.5",
-    "@interactjs/snappers": "1.9.5",
     "@interactjs/utils": "1.9.5"
   },
   "devDependencies": {

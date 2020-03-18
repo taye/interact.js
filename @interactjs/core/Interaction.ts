@@ -1,6 +1,6 @@
 import * as utils from '@interactjs/utils/index'
-import Interactable from './Interactable'
 import InteractEvent, { EventPhase } from './InteractEvent'
+import Interactable from './Interactable'
 import PointerInfo from './PointerInfo'
 import { ActionName } from './scope'
 

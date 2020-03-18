@@ -164,11 +164,13 @@ function onReady () {
     window.svg = svg
 
     for (i = 0; i < 2; i++) {
+      // eslint-disable-next-line no-new
       new DemoGraphic('graphic' + i)
     }
   }
 
   for (i = 0; i < 2; i++) {
+    // eslint-disable-next-line no-new
     new DemoNode('node' + i)
   }
 

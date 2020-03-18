@@ -9,10 +9,10 @@ import * as resize from '@interactjs/actions/resize'
 import * as defaults from '@interactjs/core/defaultOptions'
 import _Interactable from '@interactjs/core/Interactable'
 import _InteractableSet from '@interactjs/core/InteractableSet'
+import _InteractStatic from '@interactjs/core/InteractStatic'
 import * as iEvent from '@interactjs/core/InteractEvent'
 import * as interaction from '@interactjs/core/Interaction'
 import * as scope from '@interactjs/core/scope'
-import interact from '@interactjs/interact/index'
 import * as snap from '@interactjs/modifiers/snap/pointer'
 import { PointerEvent as _PointerEvent } from '@interactjs/pointer-events/PointerEvent'
 import _NativePointerEventType from './NativePointerEventType'
@@ -22,22 +22,19 @@ import '@interactjs/actions/drop'
 import '@interactjs/auto-scroll'
 import '@interactjs/auto-start'
 import '@interactjs/auto-start/InteractableMethods'
-import '@interactjs/core/InteractStatic'
 import '@interactjs/core/interactablePreventDefault'
 import '@interactjs/dev-tools'
 import '@interactjs/inertia'
 import '@interactjs/interactions'
 import '@interactjs/modifiers'
-import '@interactjs/pointer-events/interactableTargets'
 import '@interactjs/pointer-events/base'
+import '@interactjs/pointer-events/interactableTargets'
 import '@interactjs/reflow'
+import '@interactjs/snappers'
 
 import * as arrange from '@interactjs/arrange'
 import SymbolTree from '@interactjs/symbol-tree'
 import _ElementState from '@interactjs/utils/ElementState'
-
-declare namespace InteractPro {
-}
 
 declare namespace Interact {
   type OrBoolean<T> = {
@@ -48,7 +45,7 @@ declare namespace Interact {
   export type Context = Document | Element
   export type EventTarget = Window | Document | Element
   export type Target = Interact.EventTarget | string
-  export type interact = typeof interact
+  export type InteractStatic = _InteractStatic
   export type Plugin = scope.Plugin
   export type ActionProps<T extends scope.ActionName = any> = interaction.ActionProps<T>
   export type Interactable = _Interactable

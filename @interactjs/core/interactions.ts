@@ -4,9 +4,9 @@ import { nodeContains } from '@interactjs/utils/domUtils'
 import events from '@interactjs/utils/events'
 import * as pointerUtils from '@interactjs/utils/pointerUtils'
 import InteractionBase from './Interaction'
+import interactablePreventDefault from './interactablePreventDefault'
 import finder, { SearchDetails } from './interactionFinder'
 import Scope from './scope'
-import interactablePreventDefault from './interactablePreventDefault'
 
 declare module '@interactjs/core/scope' {
   interface Scope {

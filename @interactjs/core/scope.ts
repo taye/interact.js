@@ -1,12 +1,12 @@
 import domObjects from '@interactjs/utils/domObjects'
 import * as utils from '@interactjs/utils/index'
-import defaults from './defaultOptions'
 import Eventable from './Eventable'
+import InteractEvent, { PhaseMap } from './InteractEvent'
+import InteractStatic from './InteractStatic'
 import InteractableBase from './Interactable'
 import InteractableSet from './InteractableSet'
-import InteractEvent, { PhaseMap } from './InteractEvent'
+import defaults from './defaultOptions'
 import interactions from './interactions'
-import InteractStatic from './InteractStatic'
 
 export interface SignalArgs {
   'scope:add-document': DocSignalArg

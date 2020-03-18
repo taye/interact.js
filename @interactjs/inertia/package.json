@@ -2,10 +2,12 @@
   "name": "@interactjs/inertia",
   "version": "1.9.5",
   "license": "MIT",
+  "dependencies": {
+    "@interactjs/offset": "1.9.5"
+  },
   "peerDependencies": {
     "@interactjs/core": "1.9.5",
     "@interactjs/modifiers": "1.9.5",
-    "@interactjs/offset": "1.9.5",
     "@interactjs/utils": "1.9.5"
   },
   "devDependencies": {
