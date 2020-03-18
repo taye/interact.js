@@ -1,0 +1,14 @@
+{
+	"version": 3,
+	"sources": [
+		"avoid.ts"
+	],
+	"names": [
+		"avoid",
+		"_defaults"
+	],
+	"mappings": "AAEA,MAAMA,KAAK,GAAI,MAAM,CACpB,CADD;;AAGAA,KAAK,CAACC,SAAN,GAAkB,EAAlB;AAEA,eAAeD,KAAf",
+	"sourcesContent": [
+		"import { ModifierFunction } from './base'\n\nconst avoid = (() => {\n}) as unknown as ModifierFunction<any, any, 'avoid'>\n\navoid._defaults = {}\n\nexport default avoid\n"
+	]
+}

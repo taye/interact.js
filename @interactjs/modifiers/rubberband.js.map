@@ -1,0 +1,14 @@
+{
+	"version": 3,
+	"sources": [
+		"rubberband.ts"
+	],
+	"names": [
+		"rubberband",
+		"_defaults"
+	],
+	"mappings": "AAEA,MAAMA,UAAU,GAAI,MAAM,CACzB,CADD;;AAGAA,UAAU,CAACC,SAAX,GAAuB,EAAvB;AAEA,eAAeD,UAAf",
+	"sourcesContent": [
+		"import { ModifierFunction } from './base'\n\nconst rubberband = (() => {\n}) as unknown as ModifierFunction<any, any, 'rubberband'>\n\nrubberband._defaults = {}\n\nexport default rubberband\n"
+	]
+}
