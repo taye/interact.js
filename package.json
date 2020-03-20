@@ -53,6 +53,7 @@
     "errorify": "latest",
     "eslint": "latest",
     "eslint-config-standard": "latest",
+    "eslint-import-resolver-typescript": "^2.0.0",
     "eslint-plugin-import": "latest",
     "eslint-plugin-node": "latest",
     "eslint-plugin-promise": "latest",

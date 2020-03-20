@@ -61,10 +61,15 @@ overrides:
     files: '*.spec.ts'
     rules:
       array-bracket-spacing: off
-      import/no-extraneous-dependencies: [error, { devDependencies: true }]
+      import/no-extraneous-dependencies: off
   -
     files: '*.ts'
     rules:
       arrow-parens: [error, 'as-needed']
       no-unused-vars: off
       no-use-before-define: off
+
+settings:
+  import/resolver:
+    typescript:
+      directory: './tsconfig.json'

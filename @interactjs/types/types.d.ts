@@ -259,7 +259,7 @@ declare namespace Interact {
       rejected: Position
       finalPos: Position
       prevSwap?: Swap
-      prevDropzone?: ArrayElementType<drop.ActiveDrop>
+      prevDropzone?: drop.ActiveDrop
       draggableChild: ElementState
       feedbackChild: ElementState
       mirroring: boolean
