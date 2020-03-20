@@ -1,125 +1,114 @@
-#!/bin/bash
-ROOT=$(dirname $(readlink -f $0))/..
-PATH=$PATH:$PWD/node_modules/.bin:$ROOT/bin
-INITIAL_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+#!/usr/bin/env node
+const fs = require('fs')
+const path = require('path')
+const shell = require('shelljs')
+const { getPackages } = require('../scripts/utils')
 
-main() {
-  ensure_clean_index &&
-    check_version &&
-    git_detach &&
-    clean &&
-    run_build &&
-    commit_and_tag &&
-    push_and_publish
+const cwd = process.cwd()
+
+process.env.PATH = `${cwd}/bin:${cwd}/node_modules/.bin:${process.env.PATH}`
+
+shell.config.verbose = true
+shell.config.fatal = true
+
+ensureCleanIndex()
+
+const { gitTag } = checkVersion()
+
+let packages
+
+(async ps => {
+  packages = await getPackages()
+
+  gitDetatch()
+  clean()
+
+  await runBuild()
+
+  commitAndTag()
+  pushAndPublish()
+})().catch(error => {
+  console.error(error)
+
+  process.exit(1)
+})
+
+function ensureCleanIndex () {
+  // make sure the repo is clean
+  try {
+    shell.exec('git diff-index -G . HEAD --stat --exit-code')
+  } catch {
+    throw new Error('working directory must be clean')
+  }
 }
 
-ensure_clean_index() {
-  echo_funcname
+function checkVersion () {
+  const getVersion = require('../scripts/getVersion')
+  const version = require('semver').clean(getVersion())
 
-  # make sure the repo is clean
-  if ! git diff-index -G . HEAD --stat --exit-code; then
-    quit "working directory must be clean" 1
-  fi
+  if (!version) {
+    throw new Error('failed to parse version')
+  }
+
+  return {
+    version,
+    gitTag: 'v' + version,
+  }
 }
 
-check_version() {
-  echo_funcname
-
-  NEW_VERSION=$(_version)
-  NEW_TAG="v$(semver clean $NEW_VERSION)"
-
-  if [[ $NEW_TAG == v ]]; then
-    quit "failed parsing version from '$NEW_VERSION'" 1
-  fi
-
-  # if the version tag already exists
-  if [[ $(git tag -l $NEW_TAG) == $NEW_TAG ]]; then
-    quit "$NEW_TAG tag already exists" 1
-  fi
-
-  if [[ -n $NPM_TAG ]]; then
-    echo "will publish to npm with '$NPM_TAG' tag"
-  fi
+function gitDetatch () {
+  shell.exec('git checkout --detach')
 }
 
-git_detach() {
-  echo_funcname
-
-  # detach HEAD
-  git checkout --detach || exit $?
+function clean () {
+  shell.exec('_clean')
 }
 
-clean() {
-  _clean
+async function runBuild () {
+  // copy README to interactjs package
+  fs.copyFileSync(`${cwd}/README.md`, 'interactjs/README.md')
+
+  // copy license file and npmignore to all packages
+  for (const pkg of packages) {
+    fs.copyFileSync('LICENSE', pkg + '/LICENSE')
+    fs.copyFileSync('.npmignore', pkg + '/.npmignore')
+  }
+
+  // create @interactjs/**/use/* modules
+  shell.exec('_add_use_modules')
+
+  // generate esnext .js modules
+  shell.exec('_esnext')
+
+  // bundle interactjs, generate docs, transpile modules, generate declaration files
+  shell.exec('yarn build')
 }
 
-run_build() {
-  echo_funcname
-
-  # copy README
-  cp $ROOT/README.md interactjs/ &&
-
-  # copy license file
-  lerna exec --no-private -- cp -v $ROOT/LICENSE . ||
-    quit "failed to copy LICENSE" 1
-
-  # copy .npmignore to all packages
-  lerna exec --no-private -- "echo '# copied from [root]/.npmignore' > .npmignore
-    cat $ROOT/.npmignore >> .npmignore" &&
-
-  # create @interactjs/**/use/* modules
-  _add_use_modules
-
-  ## generate esnext .js modules
-  _esnext &&
-
-  # bundle interactjs, generate docs, transpile modules, generate declaration files
-  yarn build || exit $?
+function commitAndTag () {
+  // commit and add new version tag
+  shell.exec('git add --all')
+  shell.exec('git add --force interactjs @interactjs/**/*.{ts,js,js.map}')
+  shell.exec('git reset **/node_modules/**')
+  shell.exec(`git commit -m ${gitTag}`)
+  shell.exec(`git tag ${gitTag}`)
 }
 
-commit_and_tag() {
-  echo_funcname
+function pushAndPublish () {
+  const { NPM_TAG } = process.env
 
-  # commit and add new version tag
-  git add --all &&
-    git add --force *interactjs/**/*.{ts,js,js.map} interactjs/dist &&
-    git commit -m $NEW_TAG &&
-    git tag $NEW_TAG
+  try {
+    shell.exec(`git push --no-verify origin ${gitTag}`)
+  } catch {
+    throw new Error(`failed to push git tag ${gitTag} to origin`)
+  }
+
+  shell.exec('_set_git_head')
+
+  const npmPublishCommand = 'npm publish' +  (NPM_TAG ? ` --tag ${NPM_TAG}` : '')
+
+  for (const pkg of packages) {
+    shell.exec(npmPublishCommand, { cwd: path.resolve(pkg) })
+  }
+
+  shell.exec('git checkout $(git ls-files "**package.json")')
 }
-
-push_and_publish() {
-  echo_funcname
-
-  if [[ -n $NPM_TAG ]]; then
-    tag_arg="--tag $NPM_TAG"
-  fi
-
-  # push branch and tags to git origin
-  git push --no-verify origin $NEW_TAG || quit "failed to push git tag $NEW_TAG to origin" $?
-
-  # add gitHead to package.json files
-  _set_git_head
-
-  # publish to npm with release tag if provided
-  lerna exec --no-private -- npm publish $tag_arg || quit "failed to publish to npm" $?
-
-  git checkout $(git ls-files '**package.json')
-}
-
-echo_funcname() {
-  echo -e "\n==== ${FUNCNAME[1]} ====\n"
-}
-
-quit() {
-  if [ -n "$1" ]; then
-    if [ -z "$2" ] || [ "$2" == 0 ]; then
-      echo $1
-    else
-      echo $1 >&2
-    fi
-  fi
-
-  exit $2
-}
-
-main

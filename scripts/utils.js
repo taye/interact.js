@@ -63,8 +63,27 @@ function getBabelOptions () {
   }
 }
 
+function getDevPackageDir () {
+  return path.join(__dirname, '..')
+}
+
 function getModuleName (tsName) {
   return tsName.replace(/\.[jt]sx?$/, '')
+}
+
+function getModuleDirectories () {
+  return [
+    process.cwd(),
+    path.join(process.cwd(), 'node_modules'),
+    path.join(__dirname, '..'),
+  ]
+}
+
+async function getPackages () {
+  const packageJsonPaths = await glob('{@interactjs/*,interactjs}/package.json', { ignore: commonIgnoreGlobs })
+  const packageDirs = packageJsonPaths.map(getPackageDir)
+
+  return [...new Set(packageDirs)]
 }
 
 function transformRelativeImports () {
@@ -168,28 +187,39 @@ function getPackageDir (filename) {
 
 function getRelativeToRoot (filename, moduleDirectory) {
   filename = path.normalize(filename)
-  const pkgDir = getPackageDir(filename)
 
-  const root = moduleDirectory.find(r => pkgDir.startsWith(path.normalize(r)))
+  let relative = ''
 
-  if (!root) {
+  for (const root of moduleDirectory.filter(r => filename.startsWith(path.normalize(r)))) {
+    const r = path.relative(root, filename)
+
+    if (!relative || r.length < relative) {
+      relative = r
+    }
+  }
+
+  if (!relative) {
     throw new Error(`Couldn't find the module ${filename} in the given roots ${JSON.stringify(moduleDirectory)}`)
   }
 
-  return path.join('/', path.relative(root, filename))
+  return path.join('/', relative)
 }
 
 module.exports = {
   getSources,
   sourcesGlob,
   lintSourcesGlob,
+  commonIgnoreGlobs,
   sourcesIgnoreGlobs,
   lintIgnoreGlobs,
   getBuiltJsFiles,
   getBabelrc,
   getBabelOptions,
   extendBabelOptions,
+  getDevPackageDir,
+  getPackages,
   getModuleName,
+  getModuleDirectories,
   getPackageDir,
   getRelativeToRoot,
   transformRelativeImports,

@@ -12,6 +12,7 @@ const {
   getBabelOptions,
   extendBabelOptions,
   getModuleName,
+  getModuleDirectories,
   getRelativeToRoot,
   transformRelativeImports,
   transformInlineEnvironmentVariables,
@@ -66,7 +67,7 @@ async function generate ({
   babelOptions = getBabelOptions(),
   filter,
   outDir = process.cwd(),
-  moduleDirectory = [process.cwd(), path.join(__dirname, '..')],
+  moduleDirectory = getModuleDirectories(),
   serve = false,
   watch = false,
 } = {}) {
