@@ -33,8 +33,7 @@ module.exports = function (options) {
 
   const b = browserify(options.entries, {
     extensions: ['.ts', '.tsx'],
-
-    debug: options.debug,
+    debug: true,
 
     standalone: options.standalone,
 

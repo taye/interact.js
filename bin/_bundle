@@ -4,41 +4,19 @@ const path = require('path')
 process.env.NODE_PATH = `${process.env.NODE_PATH || ''}:${path.resolve(__dirname, '..', 'node_modules')}`
 require('module').Module._initPaths()
 
-const options = require('yargs')
-  .config()
-  .pkgConf('_dev')
-  .default({
-    watch: false,
-    debug: true,
-    headerFile: require.resolve('../scripts/header.js'),
-    minHeaderFile: require.resolve('../scripts/minHeader.js'),
-    name: 'index',
-  })
-  .boolean('watch')
-  .boolean('debug')
-  .option('entries', {
-    required: true,
-    array: 'true',
-    coerce: entries => {
-      return entries.map(entry => path.resolve(entry))
-    },
-  })
-  .option('destDir', {
-    required: true,
-    coerce: path.resolve,
-  })
-  .argv
-
 const bundler = require('../scripts/bundler')
 
-if (options.watch) {
-  console.log('Bundling...')
-}
-else {
-  process.stdout.write('Bundling...')
-  process.on('beforeExit', () => {
-    console.log(' done.')
-  })
-}
+process.stdout.write('Bundling...')
 
-bundler(options)
+process.on('beforeExit', () => {
+  console.log(' done.')
+})
+
+bundler({
+  entries: './interactjs/index.ts',
+  standalone: 'interact',
+  destDir: './interactjs/dist',
+  name: 'interact',
+  headerFile: require.resolve('../scripts/header.js'),
+  minHeaderFile: require.resolve('../scripts/minHeader.js'),
+})

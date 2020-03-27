@@ -27,24 +27,7 @@ module.exports = function bundleProcessor ({
 
   bundleStream.on('data', chunk => { streamCode += chunk })
   bundleStream.on('end', () => {
-    let raw
-
-    try {
-      raw = bundleHeader(getHeaderOpts(headerFile, filenames.raw, streamCode))
-    }
-    catch (e) {
-      for (const filename in filenames) {
-        write({
-          destDir,
-          filename: filenames[filename],
-          code: streamCode,
-          map: { sources: [] },
-        })
-      }
-
-      return
-    }
-
+    const raw = bundleHeader(getHeaderOpts(headerFile, filenames.raw, streamCode))
     write(raw)
 
     const minifiedResult = uglify.minify(raw.code, {
