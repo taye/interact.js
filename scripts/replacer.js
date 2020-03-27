@@ -1,5 +1,5 @@
-const version = require('./getVersion')
+const getVersion = require('./getVersion')
 
 module.exports = (input) => [
-  [/[{]VERSION[}]/g, version.get()],
+  [/[{]VERSION[}]/g, getVersion()],
 ].reduce((result, [rx, str]) => result.replace(rx, str), input)
