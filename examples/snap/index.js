@@ -192,11 +192,7 @@ function anchorDragEnd (event) {
   draggingAnchor = null
 }
 
-function sliderChange (event, valid) {
-  if (!valid) {
-    return
-  }
-
+function sliderChange () {
   snapGrid.x = Number(status.gridX.value)
   snapGrid.y = Number(status.gridY.value)
   snapGrid.range = Number(status.range.value)
@@ -245,7 +241,6 @@ function modeChange (event) {
     .draggable({
       inertia: {
         enabled: status.inertia.checked,
-        zeroResumeDelta: false,
       },
       modifiers: [
         interact.modifiers.restrict({ restriction: 'self' }),
@@ -274,7 +269,7 @@ function sliderInput (event) {
     return
   }
 
-  sliderChange(event, true)
+  sliderChange()
 }
 
 interact(document).on('DOMContentLoaded', () => {
@@ -321,14 +316,14 @@ interact(document).on('DOMContentLoaded', () => {
     relative: document.getElementById('relative'),
   }
 
-  interact(status.sliders)
-    .on('change', sliderChange)
+  interact('#sliders')
+    .on('change', sliderInput)
     .on('input', sliderInput)
 
-  interact(document.getElementById('modes'))
+  interact('#modes')
     .on('change', modeChange)
 
-  sliderChange(null, true)
+  sliderChange()
   modeChange()
 })
 
