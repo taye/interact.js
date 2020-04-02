@@ -87,8 +87,8 @@ async function runBuild () {
 function commitAndTag () {
   // commit and add new version tag
   shell.exec('git add --all')
-  shell.exec('git add --force interactjs @interactjs/**/*.{ts,js,js.map}')
-  shell.exec('git reset **/node_modules/**')
+  shell.exec('git add --force interactjs @interactjs')
+  shell.exec('git reset **/node_modules')
   shell.exec(`git commit -m ${gitTag}`)
   shell.exec(`git tag ${gitTag}`)
 }
