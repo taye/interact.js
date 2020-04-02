@@ -1,6 +1,6 @@
 {
   "name": "@interactjs/feedback",
-  "version": "1.9.7",
+  "version": "1.9.8",
   "license": "MIT",
   "publishConfig": {
     "access": "public"

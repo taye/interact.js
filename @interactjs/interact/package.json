@@ -1,14 +1,14 @@
 {
   "name": "@interactjs/interact",
-  "version": "1.9.7",
+  "version": "1.9.8",
   "license": "MIT",
   "dependencies": {
-    "@interactjs/core": "1.9.7",
-    "@interactjs/types": "1.9.7",
-    "@interactjs/utils": "1.9.7"
+    "@interactjs/core": "1.9.8",
+    "@interactjs/types": "1.9.8",
+    "@interactjs/utils": "1.9.8"
   },
   "devDependencies": {
-    "@interactjs/_dev": "1.9.7"
+    "@interactjs/_dev": "1.9.8"
   },
   "publishConfig": {
     "access": "public"

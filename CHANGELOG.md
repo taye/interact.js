@@ -1,3 +1,8 @@
+## v1.9.6
+
+ - fixed minified bundle (#802)
+ - fixed issue with removing delegated events (#801)
+
 ## v1.9.5
 
  - fixed typing issues
