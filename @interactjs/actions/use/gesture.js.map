@@ -1,0 +1,20 @@
+{
+	"version": 3,
+	"sources": [
+		"gesture.ts"
+	],
+	"names": [
+		"interact",
+		"init",
+		"plugin",
+		"window",
+		"__warnedUseImport",
+		"console",
+		"warn",
+		"use"
+	],
+	"mappings": "AAAA,OAAOA,QAAP,IAAmBC,IAAnB,QAA+B,yBAA/B;AACA,OAAOC,MAAP,MAAmB,eAAnB;;AAEA,IAAI,OAAOC,MAAP,KAAkB,QAAlB,IAA8B,CAAC,CAACA,MAApC,EAA4C;AAC1CF,EAAAA,IAAI,CAACE,MAAD,CAAJ;AACD,C,CAED;;;AACA,IAAI,CAAC,kBAAyB,YAAzB,QAAD,KAA4E,CAAEH,QAAD,CAAkBI,iBAAnG,EAAsH;AACnHJ,EAAAA,QAAD,CAAkBI,iBAAlB,GAAsC,IAAtC,CADoH,CAEpH;;AACAC,EAAAA,OAAO,CAACC,IAAR,CAAa,iGAAb;AACD;;AAEDN,QAAQ,CAACO,GAAT,CAAaL,MAAb",
+	"sourcesContent": [
+		"import interact, { init } from '@interactjs/interact'\nimport plugin from '../gesture'\n\nif (typeof window === 'object' && !!window) {\n  init(window)\n}\n\n// eslint-disable-next-line no-undef\nif ((process.env.NODE_ENV !== 'production' || process.env.INTERACTJS_ESNEXT) && !(interact as any).__warnedUseImport) {\n  (interact as any).__warnedUseImport = true\n  // eslint-disable-next-line no-console\n  console.warn('[interact.js] The \"@interactjs/*/use\" packages are not quite stable yet. Use them with caution.')\n}\n\ninteract.use(plugin)"
+	]
+}

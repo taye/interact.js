@@ -1,0 +1,41 @@
+{
+	"version": 3,
+	"sources": [
+		"index.ts"
+	],
+	"names": [
+		"arr",
+		"dom",
+		"is",
+		"pointer",
+		"rect",
+		"win",
+		"warnOnce",
+		"method",
+		"message",
+		"warned",
+		"window",
+		"console",
+		"warn",
+		"apply",
+		"arguments",
+		"copyAction",
+		"dest",
+		"src",
+		"name",
+		"axis",
+		"edges",
+		"default",
+		"browser",
+		"clone",
+		"extend",
+		"getOriginXY",
+		"hypot",
+		"normalizeListeners",
+		"raf"
+	],
+	"mappings": "AAAA,OAAO,KAAKA,GAAZ,MAAqB,UAArB;AACA,OAAO,KAAKC,GAAZ,MAAqB,eAArB;AACA,OAAO,KAAKC,EAAZ,MAAoB,SAApB;AACA,OAAO,KAAKC,OAAZ,MAAyB,mBAAzB;AACA,OAAO,KAAKC,IAAZ,MAAsB,WAAtB;AACA,OAAOC,GAAP,MAAgB,aAAhB;AAEA,OAAO,SAASC,QAAT,CAA+BC,MAA/B,EAAgEC,OAAhE,EAAiF;AACtF,MAAIC,MAAM,GAAG,KAAb,CADsF,CAGtF;;AACA,SAAO,YAAmB;AACxB,QAAI,CAACA,MAAL,EAAa;AACVJ,MAAAA,GAAD,CAAaK,MAAb,CAAoBC,OAApB,CAA4BC,IAA5B,CAAiCJ,OAAjC;AACAC,MAAAA,MAAM,GAAG,IAAT;AACD;;AAED,WAAOF,MAAM,CAACM,KAAP,CAAa,IAAb,EAAmBC,SAAnB,CAAP;AACD,GAPD;AAQD;AAED,OAAO,SAASC,UAAT,CAAqBC,IAArB,EAAiDC,GAAjD,EAA4E;AACjFD,EAAAA,IAAI,CAACE,IAAL,GAAaD,GAAG,CAACC,IAAjB;AACAF,EAAAA,IAAI,CAACG,IAAL,GAAaF,GAAG,CAACE,IAAjB;AACAH,EAAAA,IAAI,CAACI,KAAL,GAAaH,GAAG,CAACG,KAAjB;AAEA,SAAOJ,IAAP;AACD;AAED,SAASK,OAAO,IAAIC,OAApB,QAAmC,cAAnC;AACA,SAASD,OAAO,IAAIE,KAApB,QAAiC,YAAjC;AACA,SAASF,OAAO,IAAIG,MAApB,QAAkC,aAAlC;AACA,SAASH,OAAO,IAAII,WAApB,QAAuC,kBAAvC;AACA,SAASJ,OAAO,IAAIK,KAApB,QAAiC,YAAjC;AACA,SAASL,OAAO,IAAIM,kBAApB,QAA8C,yBAA9C;AACA,SAASN,OAAO,IAAIO,GAApB,QAA+B,UAA/B;AACA,SAASvB,GAAT,EAAcL,GAAd,EAAmBC,GAAnB,EAAwBC,EAAxB,EAA4BC,OAA5B,EAAqCC,IAArC",
+	"sourcesContent": [
+		"import * as arr from './arr'\nimport * as dom from './domUtils'\nimport * as is from './is'\nimport * as pointer from './pointerUtils'\nimport * as rect from './rect'\nimport win from './window'\n\nexport function warnOnce<T> (this: T, method: (...args: any[]) => any, message: string) {\n  let warned = false\n\n  // eslint-disable-next-line no-shadow\n  return function (this: T) {\n    if (!warned) {\n      (win as any).window.console.warn(message)\n      warned = true\n    }\n\n    return method.apply(this, arguments)\n  }\n}\n\nexport function copyAction (dest: Interact.ActionProps, src: Interact.ActionProps) {\n  dest.name  = src.name\n  dest.axis  = src.axis\n  dest.edges = src.edges\n\n  return dest\n}\n\nexport { default as browser } from './browser'\nexport { default as clone } from './clone'\nexport { default as extend } from './extend'\nexport { default as getOriginXY } from './getOriginXY'\nexport { default as hypot } from './hypot'\nexport { default as normalizeListeners } from './normalizeListeners'\nexport { default as raf } from './raf'\nexport { win, arr, dom, is, pointer, rect }\n"
+	]
+}

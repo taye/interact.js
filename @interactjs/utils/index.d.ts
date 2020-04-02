@@ -1,0 +1,16 @@
+import * as arr from './arr';
+import * as dom from './domUtils';
+import * as is from './is';
+import * as pointer from './pointerUtils';
+import * as rect from './rect';
+import win from './window';
+export declare function warnOnce<T>(this: T, method: (...args: any[]) => any, message: string): (this: T) => any;
+export declare function copyAction(dest: Interact.ActionProps, src: Interact.ActionProps): import("@interactjs/core/Interaction").ActionProps<any>;
+export { default as browser } from './browser';
+export { default as clone } from './clone';
+export { default as extend } from './extend';
+export { default as getOriginXY } from './getOriginXY';
+export { default as hypot } from './hypot';
+export { default as normalizeListeners } from './normalizeListeners';
+export { default as raf } from './raf';
+export { win, arr, dom, is, pointer, rect };
