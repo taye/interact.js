@@ -1,5 +1,4 @@
 import { matchesSelector, nodeContains } from '@interactjs/utils/domUtils'
-import events from '@interactjs/utils/events'
 import * as is from '@interactjs/utils/is'
 import { getWindow } from '@interactjs/utils/window'
 
@@ -42,7 +41,7 @@ function checkAndPreventDefault (interactable: Interact.Interactable, scope: Int
   // if the browser supports passive event listeners and isn't running on iOS,
   // don't preventDefault of touch{start,move} events. CSS touch-action and
   // user-select should be used instead of calling event.preventDefault().
-  if (events.supportsPassive && /^touch(start|move)$/.test(event.type)) {
+  if (scope.events.supportsPassive && /^touch(start|move)$/.test(event.type)) {
     const doc = getWindow(event.target).document
     const docOptions = scope.getDocOptions(doc)
 

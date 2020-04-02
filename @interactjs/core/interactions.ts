@@ -1,7 +1,6 @@
 import browser from '@interactjs/utils/browser'
 import domObjects from '@interactjs/utils/domObjects'
 import { nodeContains } from '@interactjs/utils/domUtils'
-import events from '@interactjs/utils/events'
 import * as pointerUtils from '@interactjs/utils/pointerUtils'
 import InteractionBase from './Interaction'
 import interactablePreventDefault from './interactablePreventDefault'
@@ -222,7 +221,7 @@ function getInteraction (searchDetails: SearchDetails) {
 }
 
 function onDocSignal<T extends 'scope:add-document' | 'scope:remove-document'> ({ doc, scope, options }: Interact.SignalArgs[T], eventMethodName: 'add' | 'remove') {
-  const { docEvents } = scope.interactions
+  const { interactions: { docEvents }, events } = scope
   const eventMethod = events[eventMethodName]
 
   if (scope.browser.isIOS && !options.events) {

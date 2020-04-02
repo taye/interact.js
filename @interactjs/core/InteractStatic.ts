@@ -1,7 +1,6 @@
 /** @module interact */
 
 import browser from '@interactjs/utils/browser'
-import events from '@interactjs/utils/events'
 import * as utils from '@interactjs/utils/index'
 import Interactable from './Interactable'
 import { Options } from './defaultOptions'
@@ -154,7 +153,7 @@ export class InteractStatic {
     }
     // If non InteractEvent type, addEventListener to document
     else {
-      events.add(this.scope.document, type, listener as Interact.Listener, { options })
+      this.scope.events.add(this.scope.document, type, listener as Interact.Listener, { options })
     }
 
     return this
@@ -202,7 +201,7 @@ export class InteractStatic {
       }
     }
     else {
-      events.remove(this.scope.document, type, listener, options)
+      this.scope.events.remove(this.scope.document, type, listener, options)
     }
 
     return this

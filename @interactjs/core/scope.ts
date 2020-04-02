@@ -6,6 +6,7 @@ import InteractStatic from './InteractStatic'
 import InteractableBase from './Interactable'
 import InteractableSet from './InteractableSet'
 import defaults from './defaultOptions'
+import events from './events'
 import interactions from './interactions'
 
 export interface SignalArgs {
@@ -33,7 +34,6 @@ const {
   win,
   browser,
   raf,
-  events,
 } = utils
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
@@ -66,7 +66,6 @@ export default class Scope {
   }> = []
 
   browser = browser
-  events = events
   utils = utils
   defaults = utils.clone(defaults) as typeof defaults
   Eventable = Eventable
@@ -200,12 +199,12 @@ export default class Scope {
     options = options ? utils.extend({}, options) : {}
 
     this.documents.push({ doc, options })
-    events.documents.push(doc)
+    this.events.documents.push(doc)
 
     // don't add an unload event for the main document
     // so that the page may be cached in browser history
     if (doc !== this.document) {
-      events.add(window, 'unload', this.onWindowUnload)
+      this.events.add(window, 'unload', this.onWindowUnload)
     }
 
     this.fire('scope:add-document', { doc, window, scope: this, options })
@@ -217,10 +216,10 @@ export default class Scope {
     const window = win.getWindow(doc)
     const options = this.documents[index].options
 
-    events.remove(window, 'unload', this.onWindowUnload)
+    this.events.remove(window, 'unload', this.onWindowUnload)
 
     this.documents.splice(index, 1)
-    events.documents.splice(index, 1)
+    this.events.documents.splice(index, 1)
 
     this.fire('scope:remove-document', { doc, window, scope: this, options })
   }
@@ -264,11 +263,12 @@ export function initScope (scope: Scope, window: Window) {
   domObjects.init(window)
   browser.init(window)
   raf.init(window)
-  events.init(window)
+
+  scope.window = window
+  scope.document = window.document
 
   scope.usePlugin(interactions)
-  scope.document = window.document
-  scope.window = window
+  scope.usePlugin(events)
 
   return scope
 }

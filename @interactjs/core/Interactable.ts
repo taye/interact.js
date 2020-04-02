@@ -2,7 +2,6 @@ import * as arr from '@interactjs/utils/arr'
 import browser from '@interactjs/utils/browser'
 import clone from '@interactjs/utils/clone'
 import { getElementRect, matchesUpTo, nodeContains, trySelector } from '@interactjs/utils/domUtils'
-import events from '@interactjs/utils/events'
 import extend from '@interactjs/utils/extend'
 import * as is from '@interactjs/utils/is'
 import normalizeListeners from '@interactjs/utils/normalizeListeners'
@@ -32,7 +31,7 @@ export class Interactable implements Partial<Eventable> {
   readonly _doc: Document
 
   /** */
-  constructor (target: Interact.Target, options: any, defaultContext: Document | Interact.Element) {
+  constructor (target: Interact.Target, options: any, defaultContext: Document | Interact.Element, private readonly _scopeEvents: Interact.Scope['events']) {
     this._actions = options.actions
     this.target   = target
     this._context = options.context || defaultContext
@@ -287,11 +286,11 @@ export class Interactable implements Partial<Eventable> {
         }
         // delegated event
         else if (is.string(this.target)) {
-          events[`${addRemove}Delegate` as 'addDelegate' | 'removeDelegate'](this.target, this._context, type, listener, options)
+          this._scopeEvents[`${addRemove}Delegate` as 'addDelegate' | 'removeDelegate'](this.target, this._context, type, listener, options)
         }
         // remove listener from this Interactable's element
         else {
-          (events[addRemove] as typeof events.remove)(this.target, type, listener, options)
+          this._scopeEvents[addRemove](this.target, type, listener, options)
         }
       }
     }
@@ -364,30 +363,28 @@ export class Interactable implements Partial<Eventable> {
   /**
    * Remove this interactable from the list of interactables and remove it's
    * action capabilities and event listeners
-   *
-   * @return {interact}
    */
   unset () {
-    events.remove(this.target as Node, 'all')
-
     if (is.string(this.target)) {
       // remove delegated events
-      for (const type in events.delegatedEvents) {
-        const delegated = events.delegatedEvents[type]
+      for (const type in this._scopeEvents.delegatedEvents) {
+        const delegated = this._scopeEvents.delegatedEvents[type]
 
-        if (delegated.selectors[0] === this.target &&
-            delegated.contexts[0] === this._context) {
-          delegated.selectors.splice(0, 1)
-          delegated.contexts.splice(0, 1)
-          delegated.listeners.splice(0, 1)
+        for (let i = delegated.length - 1; i >= 0; i--) {
+          const { selector, context, listeners } = delegated[i]
+
+          if (selector === this.target && context === this._context) {
+            delegated.splice(i, 1)
+          }
+
+          for (let l = listeners.length - 1; l >= 0; l--) {
+            this._scopeEvents.removeDelegate(this.target, this._context, type, listeners[l][0], listeners[l][1])
+          }
         }
-
-        events.remove(this._context, type, events.delegateListener)
-        events.remove(this._context, type, events.delegateUseCapture, true)
       }
     }
     else {
-      events.remove(this.target as Node, 'all')
+      this._scopeEvents.remove(this.target as Node, 'all')
     }
   }
 }

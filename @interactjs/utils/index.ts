@@ -29,7 +29,6 @@ export function copyAction (dest: Interact.ActionProps, src: Interact.ActionProp
 
 export { default as browser } from './browser'
 export { default as clone } from './clone'
-export { default as events } from './events'
 export { default as extend } from './extend'
 export { default as getOriginXY } from './getOriginXY'
 export { default as hypot } from './hypot'

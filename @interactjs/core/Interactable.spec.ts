@@ -1,5 +1,6 @@
 import d from '@interactjs/_dev/test/domator'
 import test from '@interactjs/_dev/test/test'
+import drag from '@interactjs/actions/drag'
 import * as helpers from './tests/_helpers'
 
 test('Interactable copies and extends defaults', t => {
@@ -156,6 +157,49 @@ test('Interactable.updatePerActionListeners', t => {
   interactable.fire({ type: 'teststart' })
   interactable.fire({ type: 'testmove' })
   interactable.fire({ type: 'testend' })
+  t.deepEqual(fired, [])
+
+  t.end()
+})
+
+test('Interactable.{on,off}', t => {
+  const {
+    interactable: elInteractable,
+    interact,
+    target: element,
+  } = helpers.testEnv({ plugins: [drag] })
+
+  let fired: Array<{ type: any }> = []
+  const listener = (e: { type: any }) => fired.push(e)
+  const selectorInteractable = interact('html')
+
+  elInteractable.on('dragstart click', listener)
+  selectorInteractable.on('dragstart click change', listener)
+
+  elInteractable.fire({ type: 'dragstart' })
+  t.equal(fired.length, 1)
+  t.equal(fired[0].type, 'dragstart')
+
+  elInteractable.off('dragstart', listener)
+  fired = []
+  elInteractable.fire({ type: 'dragstart' })
+  t.deepEqual(fired, [])
+
+  element.click()
+  t.deepEqual(fired.map(e => e.type), ['click', 'click'])
+
+  selectorInteractable.off('click', listener)
+  fired = []
+  element.click()
+  t.deepEqual(fired.map(e => e.type), ['click'])
+
+  fired = []
+  selectorInteractable.fire({ type: 'dragstart' })
+  t.deepEqual(fired.map(e => e.type), ['dragstart'])
+
+  selectorInteractable.off('dragstart', listener)
+  fired = []
+  selectorInteractable.fire({ type: 'dragstart' })
   t.deepEqual(fired, [])
 
   t.end()

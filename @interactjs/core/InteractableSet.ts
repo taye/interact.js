@@ -50,7 +50,7 @@ export default class InteractableSet {
     options = extend(options || {}, {
       actions: this.scope.actions,
     })
-    const interactable = new this.scope.Interactable(target, options, this.scope.document)
+    const interactable = new this.scope.Interactable(target, options, this.scope.document, this.scope.events)
     const mappingInfo = { context: interactable._context, interactable }
 
     this.scope.addDocument(interactable._doc)
