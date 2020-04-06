@@ -5,6 +5,7 @@ const babel = require('@babel/core')
 const glob = require('glob')
 const mkdirp = require('mkdirp')
 const PQueue = require('p-queue').default
+const temp = require('temp').track()
 const Terser = require('terser')
 
 const {
@@ -66,13 +67,14 @@ async function generate ({
   shim = () => {},
   babelOptions = getBabelOptions(),
   filter,
-  outDir = process.cwd(),
   moduleDirectory = getModuleDirectories(),
   serve = false,
   watch = false,
+  outDir = serve ? temp.mkdirSync('ijs-serve') : process.cwd(),
 } = {}) {
   sources = sources || await getSources()
   watch = watch || serve
+  moduleDirectory = [outDir, ...moduleDirectory]
 
   if (filter) {
     sources = sources.filter(filter)
@@ -117,7 +119,8 @@ async function generate ({
     files: serverWatch,
     port: 8081,
     open: false,
-    server: process.cwd(),
+    server: outDir,
+    serveStatic: [process.cwd()],
   })
 
   sync.pause()

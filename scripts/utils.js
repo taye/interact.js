@@ -188,21 +188,40 @@ function getPackageDir (filename) {
 function getRelativeToRoot (filename, moduleDirectory) {
   filename = path.normalize(filename)
 
-  let relative = ''
+  return withBestRoot(
+    root => {
+      const valid = filename.startsWith(root)
+      const result = valid && path.join('/', path.relative(root, filename))
 
-  for (const root of moduleDirectory.filter(r => filename.startsWith(path.normalize(r)))) {
-    const r = path.relative(root, filename)
+      return { valid, result }
+    },
+    moduleDirectory,
+  )
+}
 
-    if (!relative || r.length < relative) {
-      relative = r
+/**
+ * use the result of `func` most shallow valid root
+ */
+function withBestRoot (func, moduleDirectory) {
+  const roots = moduleDirectory
+    .map(path.normalize)
+    .map(root => path.normalize(root))
+
+  const { result: bestResult } = roots.reduce((best, root) => {
+    const { result, valid } = func(root)
+
+    if (!valid) { return best }
+
+    const depth = (root.match(new RegExp(`[\\${path.sep}]`, 'g')) || []).length
+
+    if (!best || best.depth < depth) {
+      return { depth, result }
     }
-  }
 
-  if (!relative) {
-    throw new Error(`Couldn't find the module ${filename} in the given roots ${JSON.stringify(moduleDirectory)}`)
-  }
+    return best
+  }, null) || {}
 
-  return path.join('/', relative)
+  return bestResult
 }
 
 module.exports = {
@@ -222,6 +241,7 @@ module.exports = {
   getModuleDirectories,
   getPackageDir,
   getRelativeToRoot,
+  withBestRoot,
   transformRelativeImports,
   transformInlineEnvironmentVariables,
 }
