@@ -1,11 +1,11 @@
 ## v1.9.9
 
- - fixed typescript issue (#807)
+ - fixed typescript issue #807
 
 ## v1.9.8
 
- - fixed minified bundle (#802)
- - fixed issue with removing delegated events (#801)
+ - fixed minified bundle #802
+ - fixed issue with removing delegated events #801
 
 ## v1.9.7
 
@@ -30,28 +30,28 @@
 ## v1.9.1
 
  - added `@interactjs/*/use/*.min.js` builds
- - fixed issue with webpack minifier (#800)
+ - fixed issue with webpack minifier #800
  - fixed typescript issues
 
 ## v1.9.0
 
  - added various `@interactjs/*/use` packages for simpler selective imports
-   (#800)
+   #800
  - fixed endOnly modifiers without inertia
 
 ## v1.8.5
 
- - fixed a but causing incorrect modifications after resuming inertia (#790)
+ - fixed a but causing incorrect modifications after resuming inertia #790
 
 ## v1.8.4
 
- - fixed bug when calling interaction.move() from start event (#791)
+ - fixed bug when calling interaction.move() from start event #791
 
 ## v1.8.3
 
- - fixed bug when calling interaction.move() from start event (#791)
- - fixed invalid non-array argument spread types (#789)
- - fixed missing typescript definition of some interactable methods (#788)
+ - fixed bug when calling interaction.move() from start event #791
+ - fixed invalid non-array argument spread types #789
+ - fixed missing typescript definition of some interactable methods #788
  - disabled `.d.ts.map` files output since the `.ts` source files are not
    published
  - fixed typings for modifiers
@@ -63,7 +63,7 @@
 
 ## v1.8.1
 
- - fixed an issue causing flickering a cursor on Firefox for Windows (#781)
+ - fixed an issue causing flickering a cursor on Firefox for Windows #781
 
 ## v1.8.0
 
@@ -87,12 +87,12 @@ issues and pull requests.
 
 ## v1.8.0-rc.0
 
- - fixed `modifiers.restrictSize` (#779)
- - fixed option types in typescript and fixed devTools options (#776)
+ - fixed `modifiers.restrictSize` #779
+ - fixed option types in typescript and fixed devTools options #776
 
 ## v1.8.0-alpha.7
 
- - reverted to typescript@3.6 to avoid backwards compatibility issues (#775)
+ - reverted to typescript@3.6 to avoid backwards compatibility issues #775
 
 ## v1.8.0-alpha.6
 
@@ -104,7 +104,7 @@ issues and pull requests.
 
 ## v1.8.0-alpha.4
 
- - added `main` field to interactjs package.json (#774)
+ - added `main` field to interactjs package.json #774
  - removed baseUrl from project tsconfig to avoid relative imports in generated
    declarations
 
@@ -119,11 +119,11 @@ issues and pull requests.
 
 ## v1.8.0-alpha.1
 
- - added `event.modifiers` array (#772)
+ - added `event.modifiers` array #772
 
 ## v1.8.0-alpha.0
 
- - added `aspectRatio` modifier (#638)
+ - added `aspectRatio` modifier #638
 
 ## v1.7.4
 
@@ -133,12 +133,12 @@ issues and pull requests.
 
 ## v1.7.3
 
- - fixed interactjs package main and browser fields (#774)
- - reverted to typescript@3.6 to avoid backwards compatibility issues (#775)
+ - fixed interactjs package main and browser fields #774
+ - reverted to typescript@3.6 to avoid backwards compatibility issues #775
 
 ## v1.7.2
 
- - fixed typescript definition files (#771)
+ - fixed typescript definition files #771
 
 ## v1.7.1
 
@@ -147,16 +147,16 @@ issues and pull requests.
 ## v1.7.0
 
  - fixed hold repeat `event.count`
- - added esnext js builds (#769)
+ - added esnext js builds #769
 
 ## v1.6.3
 
- - fixed issue with inertia resume with `endOnly: false` (#765)
+ - fixed issue with inertia resume with `endOnly: false` #765
 
 ## v1.6.2
 
- - @mlucool added license field to package.json of sub modules (#755)
- - added `rect`, `deltaRect` and `edges` to resizestart and resizeend events (#754)
+ - @mlucool added license field to package.json of sub modules #755
+ - added `rect`, `deltaRect` and `edges` to resizestart and resizeend events #754
 
 ## v1.6.1
 
@@ -164,14 +164,14 @@ issues and pull requests.
 
 ## v1.6.0
 
- - avoided accessing deprecated event.mozPressure (#751)
- - changed typings to use `HTMLElement | SVGElement` for `event.target` (#747)
- - added `interacting` arg to cursorChecker (#739)
+ - avoided accessing deprecated event.mozPressure #751
+ - changed typings to use `HTMLElement | SVGElement` for `event.target` #747
+ - added `interacting` arg to cursorChecker #739
  - added zIndex compare for sibling dropzones
 
 ## v1.5.4
 
- - fixed broken modifiers (#746)
+ - fixed broken modifiers #746
 
 ## v1.5.3
 
@@ -179,23 +179,23 @@ issues and pull requests.
 
 ## v1.5.2
 
- - fixed null restriction issue (#737)
+ - fixed null restriction issue #737
  - improved typings for modifiers
 
 ## v1.5.1
 
- - fixed typing issues (#738)
+ - fixed typing issues #738
 
 ## v1.5.0
 
- - added `cursorChecker` option for drag and resize (#736)
- - allowed restrictions larger than the target element (#735)
- - added `interact.modifiers.restrictRect` with pre-set elementRect (#735)
+ - added `cursorChecker` option for drag and resize #736
+ - allowed restrictions larger than the target element #735
+ - added `interact.modifiers.restrictRect` with pre-set elementRect #735
 
 ## v1.4.14
 
  - fixed issue with string restriction values that don't resolve to a rect
-   (#731)
+   #731
  - changed plugin order so that `pointer-events` is installed before `inertia`
 
 ## v1.4.13
@@ -204,28 +204,28 @@ issues and pull requests.
 
 ## v1.4.12
 
- - fixed errors from calling `interaction.stop()` in start event (#725)
+ - fixed errors from calling `interaction.stop()` in start event #725
 
 ## v1.4.11
 
- - fixed hold events (#730)
+ - fixed hold events #730
 
 ## v1.4.10
 
- - fixed regression of preventing native drag behaviour (#729)
+ - fixed regression of preventing native drag behaviour #729
 
 ## v1.4.9
 
- - fixed modifiers with inertia action-resume (#728)
- - fixed docs for snap grid limits (#717)
+ - fixed modifiers with inertia action-resume #728
+ - fixed docs for snap grid limits #717
 
 ## v1.4.8
 
- - fixed exports in generated typings (#727)
+ - fixed exports in generated typings #727
 
 ## v1.4.7
 
- - fixed exports in generated typings (#726)
+ - fixed exports in generated typings #726
 
 ## v1.4.6
 
@@ -233,12 +233,12 @@ issues and pull requests.
 
 ## v1.4.5
 
- - @0xflotus fixed typos in docs (#724)
- - fixed error on iOS (#682)
+ - @0xflotus fixed typos in docs #724
+ - fixed error on iOS #682
 
 ## v1.4.4
 
- - fixed an issue with interactions lingering on removed elements (#723)
+ - fixed an issue with interactions lingering on removed elements #723
 
 ## v1.4.3
 
@@ -526,7 +526,7 @@ interact(target).draggable({
 
 The current `Interaction` is now passed as the third parameter to snap functions.
 
-```javascript
+```js
 interact(target).draggable({
   snap: {
     targets: [ function (x, y, interaction) {
@@ -534,7 +534,8 @@ interact(target).draggable({
         return { x: 0, y: 0 };
       }
     } ]
-  });
+  }
+});
 ```
 
 #### snap.relativePoints and offset
