@@ -1,0 +1,27 @@
+{
+	"version": 3,
+	"sources": [
+		"window.ts"
+	],
+	"names": [
+		"isWindow",
+		"win",
+		"realWindow",
+		"undefined",
+		"window",
+		"getWindow",
+		"init",
+		"el",
+		"document",
+		"createTextNode",
+		"ownerDocument",
+		"wrap",
+		"node",
+		"rootNode",
+		"defaultView"
+	],
+	"mappings": "AAAA,OAAOA,QAAP,MAAqB,eAArB;AAEA,MAAMC,GAAG,GAAG;AACVC,EAAAA,UAAU,EAAEC,SADF;AAEVC,EAAAA,MAAM,EAAED,SAFE;AAGVE,EAAAA,SAHU;AAIVC,EAAAA;AAJU,CAAZ;AAOA,OAAO,SAASA,IAAT,CAAeF,MAAf,EAAoE;AACzE;AAEAH,EAAAA,GAAG,CAACC,UAAJ,GAAiBE,MAAjB,CAHyE,CAKzE;;AACA,QAAMG,EAAE,GAAGH,MAAM,CAACI,QAAP,CAAgBC,cAAhB,CAA+B,EAA/B,CAAX,CANyE,CAQzE;;AACA,MAAIF,EAAE,CAACG,aAAH,KAAqBN,MAAM,CAACI,QAA5B,IACA,OAAOJ,MAAM,CAACO,IAAd,KAAuB,UADvB,IAEFP,MAAM,CAACO,IAAP,CAAYJ,EAAZ,MAAoBA,EAFtB,EAE0B;AACxB;AACAH,IAAAA,MAAM,GAAGA,MAAM,CAACO,IAAP,CAAYP,MAAZ,CAAT;AACD;;AAEDH,EAAAA,GAAG,CAACG,MAAJ,GAAaA,MAAb;AACD;;AAED,IAAI,OAAOA,MAAP,KAAkB,WAAtB,EAAmC;AACjCH,EAAAA,GAAG,CAACG,MAAJ,GAAiBD,SAAjB;AACAF,EAAAA,GAAG,CAACC,UAAJ,GAAiBC,SAAjB;AACD,CAHD,MAIK;AACHG,EAAAA,IAAI,CAACF,MAAD,CAAJ;AACD;;AAED,OAAO,SAASC,SAAT,CAAoBO,IAApB,EAA+B;AACpC,MAAIZ,QAAQ,CAACY,IAAD,CAAZ,EAAoB;AAClB,WAAOA,IAAP;AACD;;AAED,QAAMC,QAAQ,GAAID,IAAI,CAACF,aAAL,IAAsBE,IAAxC;AAEA,SAAOC,QAAQ,CAACC,WAAT,IAAwBb,GAAG,CAACG,MAAnC;AACD;AAEDH,GAAG,CAACK,IAAJ,GAAWA,IAAX;AAEA,eAAeL,GAAf",
+	"sourcesContent": [
+		"import isWindow from './isWindow'\n\nconst win = {\n  realWindow: undefined as Window,\n  window: undefined as Window,\n  getWindow,\n  init,\n}\n\nexport function init (window: Window & { wrap?: (...args: any[]) => any }) {\n  // get wrapped window if using Shadow DOM polyfill\n\n  win.realWindow = window\n\n  // create a TextNode\n  const el = window.document.createTextNode('')\n\n  // check if it's wrapped by a polyfill\n  if (el.ownerDocument !== window.document &&\n      typeof window.wrap === 'function' &&\n    window.wrap(el) === el) {\n    // use wrapped window\n    window = window.wrap(window)\n  }\n\n  win.window = window\n}\n\nif (typeof window === 'undefined') {\n  win.window     = undefined\n  win.realWindow = undefined\n}\nelse {\n  init(window)\n}\n\nexport function getWindow (node: any) {\n  if (isWindow(node)) {\n    return node\n  }\n\n  const rootNode = (node.ownerDocument || node)\n\n  return rootNode.defaultView || win.window\n}\n\nwin.init = init\n\nexport default win\n"
+	]
+}

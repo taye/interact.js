@@ -1,0 +1,14 @@
+{
+	"version": 3,
+	"sources": [
+		"spring.ts"
+	],
+	"names": [
+		"spring",
+		"_defaults"
+	],
+	"mappings": "AAEA,MAAMA,MAAM,GAAI,MAAM,CACrB,CADD;;AAGAA,MAAM,CAACC,SAAP,GAAmB,EAAnB;AAEA,eAAeD,MAAf",
+	"sourcesContent": [
+		"import { ModifierFunction } from './base'\n\nconst spring = (() => {\n}) as unknown as ModifierFunction<any, any, 'spring'>\n\nspring._defaults = {}\n\nexport default spring\n"
+	]
+}
