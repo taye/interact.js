@@ -1,6 +1,6 @@
 {
   "name": "interactjs",
-  "version": "1.9.8",
+  "version": "1.9.9",
   "repository": {
     "type": "git",
     "url": "https://github.com/taye/interact.js.git"
@@ -39,8 +39,8 @@
   },
   "license": "MIT",
   "dependencies": {
-    "@interactjs/interactjs": "1.9.8",
-    "@interactjs/types": "1.9.8"
+    "@interactjs/interactjs": "1.9.9",
+    "@interactjs/types": "1.9.9"
   },
   "_dev": {
     "entries": "./index.ts",

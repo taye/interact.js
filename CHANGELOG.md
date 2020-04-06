@@ -1,9 +1,13 @@
-## v1.9.6
+## v1.9.9
+
+ - fixed typescript issue (#807)
+
+## v1.9.8
 
  - fixed minified bundle (#802)
  - fixed issue with removing delegated events (#801)
 
-## v1.9.5
+## v1.9.7
 
  - fixed typing issues
 

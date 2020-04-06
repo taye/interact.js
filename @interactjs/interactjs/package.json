@@ -1,34 +1,34 @@
 {
   "name": "@interactjs/interactjs",
-  "version": "1.9.8",
+  "version": "1.9.9",
   "repository": {
     "type": "git",
     "url": "https://github.com/taye/interact.js.git"
   },
   "license": "MIT",
   "dependencies": {
-    "@interactjs/actions": "1.9.8",
-    "@interactjs/arrange": "1.9.8",
-    "@interactjs/auto-scroll": "1.9.8",
-    "@interactjs/auto-start": "1.9.8",
-    "@interactjs/clone": "1.9.8",
-    "@interactjs/components": "1.9.8",
-    "@interactjs/core": "1.9.8",
-    "@interactjs/dev-tools": "1.9.8",
-    "@interactjs/feedback": "1.9.8",
-    "@interactjs/inertia": "1.9.8",
-    "@interactjs/interact": "1.9.8",
-    "@interactjs/modifiers": "1.9.8",
-    "@interactjs/multi-target": "1.9.8",
-    "@interactjs/offset": "1.9.8",
-    "@interactjs/pointer-events": "1.9.8",
-    "@interactjs/reflow": "1.9.8",
-    "@interactjs/types": "1.9.8",
-    "@interactjs/utils": "1.9.8",
-    "@interactjs/vue": "1.9.8"
+    "@interactjs/actions": "1.9.9",
+    "@interactjs/arrange": "1.9.9",
+    "@interactjs/auto-scroll": "1.9.9",
+    "@interactjs/auto-start": "1.9.9",
+    "@interactjs/clone": "1.9.9",
+    "@interactjs/components": "1.9.9",
+    "@interactjs/core": "1.9.9",
+    "@interactjs/dev-tools": "1.9.9",
+    "@interactjs/feedback": "1.9.9",
+    "@interactjs/inertia": "1.9.9",
+    "@interactjs/interact": "1.9.9",
+    "@interactjs/modifiers": "1.9.9",
+    "@interactjs/multi-target": "1.9.9",
+    "@interactjs/offset": "1.9.9",
+    "@interactjs/pointer-events": "1.9.9",
+    "@interactjs/reflow": "1.9.9",
+    "@interactjs/types": "1.9.9",
+    "@interactjs/utils": "1.9.9",
+    "@interactjs/vue": "1.9.9"
   },
   "devDependencies": {
-    "@interactjs/_dev": "1.9.8"
+    "@interactjs/_dev": "1.9.9"
   },
   "publishConfig": {
     "access": "public"
