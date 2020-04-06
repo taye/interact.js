@@ -1,5 +1,6 @@
-// eslint-disable-next-line import/no-extraneous-dependencies
+/* eslint-disable import/no-extraneous-dependencies */
 import interact from '@interactjs/interactjs/index'
+import '@interactjs/types'
 
 // Interactables
 interact(document.body)
