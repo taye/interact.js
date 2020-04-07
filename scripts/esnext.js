@@ -107,8 +107,11 @@ async function generate ({
   if (!serve) { return }
 
   const serverWatch = [
-    ...OUTPUT_VERSIONS.map(v => sources.map(
-      s => `${getModuleName(s)}${v.extension}`),
+    ...OUTPUT_VERSIONS.map(v => sources.map(s => {
+      const outModuleName = path.join(outDir, getRelativeToRoot(s, moduleDirectory))
+
+      return `${getModuleName(outModuleName)}${v.extension}`
+    }),
     ).flat(),
     glob.sync('**/*.{html,css}', { ignore: ['**/node_modules/**'] }),
   ]
@@ -117,6 +120,7 @@ async function generate ({
 
   sync.init({
     files: serverWatch,
+    watch: true,
     port: 8081,
     open: false,
     server: outDir,
