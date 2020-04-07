@@ -11,7 +11,7 @@ import clone from '@interactjs/clone'
 import components from '@interactjs/components'
 import interactablePreventDefault from '@interactjs/core/interactablePreventDefault'
 import devTools from '@interactjs/dev-tools'
-import * as feedback from '@interactjs/feedback'
+import feedback from '@interactjs/feedback'
 import inertia from '@interactjs/inertia'
 import interact from '@interactjs/interact'
 import modifiers from '@interactjs/modifiers/index'
@@ -32,7 +32,6 @@ declare module '@interactjs/core/InteractStatic' {
       displace: typeof displace
       pointer: typeof pointerUtils
     }
-    feedback: typeof feedback
     vue: {
       components: typeof vueComponents
     }
@@ -72,7 +71,7 @@ interact.use(autoScroll)
 // reflow
 interact.use(reflow)
 
-interact.feedback = feedback
+interact.use(feedback)
 
 interact.use(components)
 
