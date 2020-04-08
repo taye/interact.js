@@ -8,6 +8,8 @@ const cwd = process.cwd()
 
 process.env.PATH = `${cwd}/bin:${cwd}/node_modules/.bin:${process.env.PATH}`
 
+const { NO_CLEAN } = process.env
+
 shell.config.verbose = true
 shell.config.fatal = true
 
@@ -21,7 +23,10 @@ let packages
   packages = await getPackages()
 
   gitDetatch()
-  clean()
+
+  if (NO_CLEAN !== 'true') {
+    clean()
+  }
 
   await runBuild()
 
