@@ -15,7 +15,7 @@ const {
   getModuleName,
   getModuleDirectories,
   getRelativeToRoot,
-  transformRelativeImports,
+  transformImportsToRelative,
   transformInlineEnvironmentVariables,
 } = require('./utils')
 
@@ -108,7 +108,7 @@ async function generate ({
 
   const serverWatch = [
     ...OUTPUT_VERSIONS.map(v => sources.map(s => {
-      const outModuleName = path.join(outDir, getRelativeToRoot(s, moduleDirectory))
+      const outModuleName = path.join(outDir, getRelativeToRoot(s, moduleDirectory).result)
 
       return `${getModuleName(outModuleName)}${v.extension}`
     }),
@@ -136,7 +136,7 @@ async function generate ({
       queue.add(async () => {
         const shimResult = await shim(sourceFilename)
         const moduleName = getModuleName(sourceFilename)
-        const rootRelativeModuleName = getRelativeToRoot(moduleName, moduleDirectory)
+        const rootRelativeModuleName = getRelativeToRoot(moduleName, moduleDirectory).result
         const outModuleName = path.join(outDir, rootRelativeModuleName)
 
         if (shimResult) {
@@ -156,7 +156,7 @@ async function generate ({
             filename: sourceFilename,
             plugins: [
               [transformInlineEnvironmentVariables, { env }],
-              [transformRelativeImports, { extension, moduleDirectory }],
+              [transformImportsToRelative, { extension, moduleDirectory }],
             ],
           }, babelOptions)
           const result = await babel.transformFromAst(ast, sourceCode, finalBabelOptions)

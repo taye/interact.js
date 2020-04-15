@@ -2,6 +2,7 @@ const fs = require('fs')
 const path = require('path')
 const { promisify } = require('util')
 const glob = promisify(require('glob'))
+const resolveSync = require('resolve').sync
 
 const sourcesGlob = '{,@}interactjs/**/**/*{.ts,.tsx}'
 const lintSourcesGlob = `{${sourcesGlob},{scripts,examples}/**/*.js,bin/**/*}`
@@ -86,18 +87,18 @@ async function getPackages () {
   return [...new Set(packageDirs)]
 }
 
-function transformRelativeImports () {
+function transformImportsToRelative () {
   const resolve = require('resolve')
 
   const fixImportSource = ({ node: { source } }, { opts, filename }) => {
-    if (!source) { return }
+    if (!source || (opts.ignore && opts.ignore(filename))) { return }
 
     const {
       moduleDirectory,
       extension = '.js',
     } = opts
 
-    const basedir = path.dirname(getRelativeToRoot(filename, moduleDirectory))
+    const basedir = path.dirname(getRelativeToRoot(filename, moduleDirectory).result)
     let resolvedImport = ''
 
     for (const root of moduleDirectory) {
@@ -116,8 +117,8 @@ function transformRelativeImports () {
     }
 
     const relativeImport = path.relative(
-      path.dirname(getRelativeToRoot(filename, moduleDirectory)),
-      getRelativeToRoot(resolvedImport, moduleDirectory),
+      basedir,
+      getRelativeToRoot(resolvedImport, moduleDirectory).result,
     )
 
     const importWithDir = /^[./]/.test(relativeImport)
@@ -134,6 +135,41 @@ function transformRelativeImports () {
       ImportDeclaration: fixImportSource,
       ExportNamedDeclaration: fixImportSource,
       ExportAllDeclaration: fixImportSource,
+    },
+  }
+}
+
+function transformImportsToAbsolute () {
+  const resolve = require('resolve')
+
+  const fixImportSource = ({ node: { source } }, { opts, filename }) => {
+    if (!source || (opts.ignore && opts.ignore(filename, source.value))) { return }
+
+    const {
+      moduleDirectory,
+      extension = '',
+      prefix,
+    } = opts
+
+    let resolvedImport = ''
+
+    resolvedImport = resolve.sync(source.value, {
+      extensions: ['.ts', '.tsx', '.js'],
+      basedir: path.dirname(filename),
+      moduleDirectory,
+    })
+
+    const unrootedImport = getRelativeToRoot(resolvedImport, moduleDirectory, prefix).result
+
+    const ret = unrootedImport.replace(/\.[jt]sx?$/, extension)
+
+    source.value = ret
+  }
+
+  return {
+    visitor: {
+      ImportDeclaration: fixImportSource,
+      ExportNamedDeclaration: fixImportSource,
     },
   }
 }
@@ -185,15 +221,16 @@ function getPackageDir (filename) {
   return packageDir
 }
 
-function getRelativeToRoot (filename, moduleDirectory) {
+function getRelativeToRoot (filename, moduleDirectory, prefix = '/') {
   filename = path.normalize(filename)
 
   return withBestRoot(
     root => {
       const valid = filename.startsWith(root)
-      const result = valid && path.join('/', path.relative(root, filename))
+      const result = valid && path.join(prefix, path.relative(root, filename))
+      const priority = valid && -result.length
 
-      return { valid, result }
+      return { valid, result, priority }
     },
     moduleDirectory,
   )
@@ -207,21 +244,25 @@ function withBestRoot (func, moduleDirectory) {
     .map(path.normalize)
     .map(root => path.normalize(root))
 
-  const { result: bestResult } = roots.reduce((best, root) => {
-    const { result, valid } = func(root)
+  return roots.reduce((best, root) => {
+    const { result, valid, priority } = func(root)
 
     if (!valid) { return best }
 
-    const depth = (root.match(new RegExp(`[\\${path.sep}]`, 'g')) || []).length
-
-    if (!best || best.depth < depth) {
-      return { depth, result }
+    if (!best || priority > best.priority) {
+      return { result, priority, root }
     }
 
     return best
   }, null) || {}
+}
 
-  return bestResult
+function resolveImport (specifier, basedir, moduleDirectory) {
+  if (specifier.startsWith('.')) {
+    specifier = path.join(basedir, specifier)
+  }
+
+  return resolveSync(specifier, { extensions: ['.ts', '.tsx'], moduleDirectory })
 }
 
 module.exports = {
@@ -242,6 +283,8 @@ module.exports = {
   getPackageDir,
   getRelativeToRoot,
   withBestRoot,
-  transformRelativeImports,
+  resolveImport,
+  transformImportsToRelative,
+  transformImportsToAbsolute,
   transformInlineEnvironmentVariables,
 }
