@@ -27,7 +27,10 @@ export default class InteractableSet {
     [selector: string]: InteractableScopeProp[]
   } = {}
 
-  constructor (protected scope: Interact.Scope) {
+  scope: Interact.Scope
+
+  constructor (scope: Interact.Scope) {
+    this.scope = scope
     scope.addListeners({
       'interactable:unset': ({ interactable }) => {
         const { target, _context: context } = interactable

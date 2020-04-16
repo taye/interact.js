@@ -245,8 +245,10 @@ function install (scope: Interact.Scope) {
 
 export class FakeEvent implements Partial<Event> {
   currentTarget: EventTarget
+  originalEvent: Event
 
-  constructor (public originalEvent: Event) {
+  constructor (originalEvent: Event) {
+    this.originalEvent = originalEvent
     // duplicate the event so that currentTarget can be changed
     pExtend(this, originalEvent)
   }

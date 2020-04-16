@@ -28,8 +28,10 @@ export default class Modification {
   result?: ModificationResult = null
   endResult?: Interact.Point = null
   edges: Interact.EdgeOptions
+  readonly interaction: Readonly<Interact.Interaction>
 
-  constructor (readonly interaction: Readonly<Interact.Interaction>) {
+  constructor (interaction: Interact.Interaction) {
+    this.interaction = interaction
     this.result = createResult()
   }
 

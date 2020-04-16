@@ -150,20 +150,28 @@ function transformImportsToAbsolute () {
       extension = '',
       prefix,
     } = opts
+    const basedir = path.dirname(filename)
 
     let resolvedImport = ''
 
     resolvedImport = resolve.sync(source.value, {
       extensions: ['.ts', '.tsx', '.js'],
-      basedir: path.dirname(filename),
+      basedir,
       moduleDirectory,
     })
 
-    const unrootedImport = getRelativeToRoot(resolvedImport, moduleDirectory, prefix).result
+    try {
+      const unrootedImport = getRelativeToRoot(resolvedImport, moduleDirectory, prefix).result
 
-    const ret = unrootedImport.replace(/\.[jt]sx?$/, extension)
-
-    source.value = ret
+      source.value = extension === null
+        ? unrootedImport
+        : unrootedImport.replace(/\.[jt]sx?$/, extension)
+    } catch (error) {
+      source.value = resolve.sync(source.value, {
+        basedir,
+        moduleDirectory,
+      })
+    }
   }
 
   return {
@@ -224,7 +232,7 @@ function getPackageDir (filename) {
 function getRelativeToRoot (filename, moduleDirectory, prefix = '/') {
   filename = path.normalize(filename)
 
-  return withBestRoot(
+  const ret = withBestRoot(
     root => {
       const valid = filename.startsWith(root)
       const result = valid && path.join(prefix, path.relative(root, filename))
@@ -234,6 +242,12 @@ function getRelativeToRoot (filename, moduleDirectory, prefix = '/') {
     },
     moduleDirectory,
   )
+
+  if (!ret) {
+    throw new Error(`Couldn't find module ${filename} in ${moduleDirectory.join(' or')}.`)
+  }
+
+  return ret
 }
 
 /**

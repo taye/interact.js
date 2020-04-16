@@ -87,10 +87,11 @@ export class InertiaState {
   lambda_v0? = 0 // eslint-disable-line camelcase
   one_ve_v0? = 0 // eslint-disable-line camelcase
   timeout: number = null
+  readonly interaction: Interact.Interaction
 
-  constructor (
-    private readonly interaction: Interact.Interaction,
-  ) {}
+  constructor (interaction: Interact.Interaction) {
+    this.interaction = interaction
+  }
 
   start (event: Interact.PointerEventType) {
     const { interaction } = this

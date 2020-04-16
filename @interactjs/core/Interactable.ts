@@ -29,14 +29,16 @@ export class Interactable implements Partial<Eventable> {
   readonly _context: Interact.Context
   readonly _win: Window
   readonly _doc: Document
+  readonly _scopeEvents: Interact.Scope['events']
 
   /** */
-  constructor (target: Interact.Target, options: any, defaultContext: Document | Interact.Element, private readonly _scopeEvents: Interact.Scope['events']) {
+  constructor (target: Interact.Target, options: any, defaultContext: Document | Interact.Element, scopeEvents: Interact.Scope['events']) {
     this._actions = options.actions
     this.target   = target
     this._context = options.context || defaultContext
     this._win     = getWindow(trySelector(target) ? this._context : target)
     this._doc     = this._win.document
+    this._scopeEvents = scopeEvents
 
     this.set(options)
   }

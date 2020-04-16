@@ -29,8 +29,11 @@ export class InteractStatic {
   // eslint-disable-next-line no-undef
   version = process.env.npm_package_version
   interact: InteractStatic
+  scope: Interact.Scope
 
-  constructor (private scope: Interact.Scope) {
+  constructor (scope: Interact.Scope) {
+    this.scope = scope
+
     const { prototype } = this.constructor
 
     /**
