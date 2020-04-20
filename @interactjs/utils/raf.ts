@@ -4,14 +4,14 @@ let cancel
 
 function init (window) {
   request = window.requestAnimationFrame
-  cancel = window.cancelAnimationFrame
+  let cancelFn = window.cancelAnimationFrame
 
   if (!request) {
     const vendors = ['ms', 'moz', 'webkit', 'o']
 
     for (const vendor of vendors) {
       request = window[`${vendor}RequestAnimationFrame`]
-      cancel = window[`${vendor}CancelAnimationFrame`] || window[`${vendor}CancelRequestAnimationFrame`]
+      cancelFn = window[`${vendor}CancelAnimationFrame`] || window[`${vendor}CancelRequestAnimationFrame`]
     }
   }
 
@@ -27,8 +27,10 @@ function init (window) {
       return token
     }
 
-    cancel = token => clearTimeout(token)
+    cancelFn = token => clearTimeout(token)
   }
+
+  cancel = token => cancelFn.call(window, token)
 }
 
 export default {
