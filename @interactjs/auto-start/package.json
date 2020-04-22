@@ -1,16 +1,16 @@
 {
   "name": "@interactjs/auto-start",
-  "version": "1.9.9",
+  "version": "1.9.10",
   "license": "MIT",
   "peerDependencies": {
-    "@interactjs/core": "1.9.9",
-    "@interactjs/utils": "1.9.9"
+    "@interactjs/core": "1.9.10",
+    "@interactjs/utils": "1.9.10"
   },
   "devDependencies": {
-    "@interactjs/actions": "1.9.9"
+    "@interactjs/actions": "1.9.10"
   },
   "optionalDependencies": {
-    "@interactjs/interact": "1.9.9"
+    "@interactjs/interact": "1.9.10"
   },
   "publishConfig": {
     "access": "public"

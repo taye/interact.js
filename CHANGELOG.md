@@ -1,3 +1,7 @@
+## v1.9.10
+
+ - fixed issue with uninitialized scope in non browser env #803
+
 ## v1.9.9
 
  - fixed typescript issue #807
