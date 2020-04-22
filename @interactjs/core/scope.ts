@@ -156,6 +156,10 @@ export default class Scope {
   }
 
   usePlugin (plugin: Plugin, options?: { [key: string]: any }) {
+    if (!this.isInitialized) {
+      return this
+    }
+
     if (this.pluginIsInstalled(plugin)) {
       return this
     }
