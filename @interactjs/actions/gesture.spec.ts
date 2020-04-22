@@ -1,8 +1,8 @@
+import gesture from './gesture'
 import test from '@interactjs/_dev/test/test'
 import * as helpers from '@interactjs/core/tests/_helpers'
 import * as utils from '@interactjs/utils/index'
 import { coordsToEvent, newCoords } from '@interactjs/utils/pointerUtils'
-import gesture from './gesture'
 
 function getGestureProps (event: Interact.GestureEvent) {
   return helpers.getProps(event, ['type', 'angle', 'distance', 'scale', 'ds', 'da'])

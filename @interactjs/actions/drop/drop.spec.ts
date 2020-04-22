@@ -1,6 +1,6 @@
+import drop from '../drop/index'
 import test from '@interactjs/_dev/test/test'
 import * as helpers from '@interactjs/core/tests/_helpers'
-import drop from '../drop/index'
 
 test('actions/drop options', t => {
   const {

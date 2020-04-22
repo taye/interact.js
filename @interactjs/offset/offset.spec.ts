@@ -1,6 +1,6 @@
+import offset from './'
 import test from '@interactjs/_dev/test/test'
 import * as helpers from '@interactjs/core/tests/_helpers'
-import offset from './'
 
 test('plugins/spring', t => {
   const {

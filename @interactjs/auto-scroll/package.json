@@ -5,9 +5,6 @@
   "peerDependencies": {
     "@interactjs/utils": "1.9.9"
   },
-  "devDependencies": {
-    "@interactjs/_dev": "1.9.9"
-  },
   "optionalDependencies": {
     "@interactjs/interact": "1.9.9"
   },

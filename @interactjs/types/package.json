@@ -17,9 +17,6 @@
     "@interactjs/symbol-tree": "1.9.9",
     "@interactjs/utils": "1.9.9"
   },
-  "devDependencies": {
-    "@interactjs/_dev": "1.9.9"
-  },
   "publishConfig": {
     "access": "public"
   }

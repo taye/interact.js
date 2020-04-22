@@ -1,6 +1,6 @@
+import resize from './resize'
 import test from '@interactjs/_dev/test/test'
 import * as helpers from '@interactjs/core/tests/_helpers'
-import resize from './resize'
 
 const { ltrbwh } = helpers
 

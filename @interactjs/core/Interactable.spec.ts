@@ -1,7 +1,7 @@
+import * as helpers from './tests/_helpers'
 import d from '@interactjs/_dev/test/domator'
 import test from '@interactjs/_dev/test/test'
 import drag from '@interactjs/actions/drag'
-import * as helpers from './tests/_helpers'
 
 test('Interactable copies and extends defaults', t => {
   const scope = helpers.mockScope() as any

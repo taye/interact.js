@@ -1,8 +1,8 @@
+import interactablePreventDefault from './interactablePreventDefault'
+import * as helpers from './tests/_helpers'
 import test from '@interactjs/_dev/test/test'
 import drag from '@interactjs/actions/drag'
 import { autoStart } from '@interactjs/auto-start/index'
-import interactablePreventDefault from './interactablePreventDefault'
-import * as helpers from './tests/_helpers'
 
 test('interactablePreventDefault', t => {
   const {

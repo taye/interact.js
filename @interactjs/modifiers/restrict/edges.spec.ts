@@ -1,6 +1,6 @@
+import { restrictEdges } from '../restrict/edges'
 import test from '@interactjs/_dev/test/test'
 import * as helpers from '@interactjs/core/tests/_helpers'
-import { restrictEdges } from '../restrict/edges'
 
 test('restrictEdges', t => {
   const { interaction } = helpers.testEnv()

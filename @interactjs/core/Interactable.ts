@@ -1,3 +1,6 @@
+import Eventable from './Eventable'
+import { ActionDefaults, Defaults, Options } from './defaultOptions'
+import { Actions, isNonNativeEvent } from './scope'
 import * as arr from '@interactjs/utils/arr'
 import browser from '@interactjs/utils/browser'
 import clone from '@interactjs/utils/clone'
@@ -6,9 +9,6 @@ import extend from '@interactjs/utils/extend'
 import * as is from '@interactjs/utils/is'
 import normalizeListeners from '@interactjs/utils/normalizeListeners'
 import { getWindow } from '@interactjs/utils/window'
-import Eventable from './Eventable'
-import { ActionDefaults, Defaults, Options } from './defaultOptions'
-import { Actions, isNonNativeEvent } from './scope'
 
 type IgnoreValue = string | Interact.Element | boolean
 

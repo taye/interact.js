@@ -1,6 +1,6 @@
-import { ListenerMap } from '@interactjs/core/scope'
 import PointerEvent from './PointerEvent'
 import basePlugin from './base'
+import { ListenerMap } from '@interactjs/core/scope'
 
 declare module '@interactjs/core/Interaction' {
   interface Interaction {

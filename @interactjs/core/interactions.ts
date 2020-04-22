@@ -1,11 +1,11 @@
-import browser from '@interactjs/utils/browser'
-import domObjects from '@interactjs/utils/domObjects'
-import { nodeContains } from '@interactjs/utils/domUtils'
-import * as pointerUtils from '@interactjs/utils/pointerUtils'
 import InteractionBase from './Interaction'
 import interactablePreventDefault from './interactablePreventDefault'
 import finder, { SearchDetails } from './interactionFinder'
 import Scope from './scope'
+import browser from '@interactjs/utils/browser'
+import domObjects from '@interactjs/utils/domObjects'
+import { nodeContains } from '@interactjs/utils/domUtils'
+import * as pointerUtils from '@interactjs/utils/pointerUtils'
 
 declare module '@interactjs/core/scope' {
   interface Scope {

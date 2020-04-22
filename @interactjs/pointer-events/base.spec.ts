@@ -1,8 +1,8 @@
+import pointerEvents, { EventTargetList } from './base'
+import interactableTargets from './interactableTargets'
 import test from '@interactjs/_dev/test/test'
 import Eventable from '@interactjs/core/Eventable'
 import * as helpers from '@interactjs/core/tests/_helpers'
-import pointerEvents, { EventTargetList } from './base'
-import interactableTargets from './interactableTargets'
 
 test('pointerEvents.types', t => {
   t.deepEqual(pointerEvents.types,

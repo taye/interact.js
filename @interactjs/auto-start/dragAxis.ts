@@ -1,6 +1,6 @@
+import autoStart from './base'
 import { parentNode } from '@interactjs/utils/domUtils'
 import * as is from '@interactjs/utils/is'
-import autoStart from './base'
 
 function beforeStart ({ interaction, eventTarget, dx, dy }: Interact.SignalArgs['interactions:move'], scope: Interact.Scope) {
   if (interaction.prepared.name !== 'drag') { return }

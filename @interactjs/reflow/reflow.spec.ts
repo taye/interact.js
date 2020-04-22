@@ -1,7 +1,7 @@
-import test from '@interactjs/_dev/test/test'
-import * as helpers from '@interactjs/core/tests/_helpers'
 import PromisePolyfill from 'promise-polyfill'
 import reflow from './index'
+import test from '@interactjs/_dev/test/test'
+import * as helpers from '@interactjs/core/tests/_helpers'
 
 const testAction = { name: 'TEST' as Interact.ActionName }
 

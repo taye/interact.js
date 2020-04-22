@@ -1,6 +1,6 @@
-import test from '@interactjs/_dev/test/test'
 import finder from './interactionFinder'
 import * as helpers from './tests/_helpers'
+import test from '@interactjs/_dev/test/test'
 
 test('modifiers/snap', t => {
   const {

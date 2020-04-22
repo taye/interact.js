@@ -1,9 +1,9 @@
-import extend from '@interactjs/utils/extend'
-import getOriginXY from '@interactjs/utils/getOriginXY'
-import hypot from '@interactjs/utils/hypot'
 import BaseEvent from './BaseEvent'
 import Interaction from './Interaction'
 import defaults from './defaultOptions'
+import extend from '@interactjs/utils/extend'
+import getOriginXY from '@interactjs/utils/getOriginXY'
+import hypot from '@interactjs/utils/hypot'
 
 export type EventPhase = keyof PhaseMap
 

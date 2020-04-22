@@ -1,8 +1,8 @@
-import * as utils from '@interactjs/utils/index'
 import InteractEvent, { EventPhase } from './InteractEvent'
 import Interactable from './Interactable'
 import PointerInfo from './PointerInfo'
 import { ActionName } from './scope'
+import * as utils from '@interactjs/utils/index'
 
 export interface ActionProps<T extends ActionName = Interact.ActionName> {
   name: T

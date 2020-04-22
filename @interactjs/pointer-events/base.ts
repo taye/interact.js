@@ -1,9 +1,9 @@
+import PointerEvent from './PointerEvent'
 import Eventable from '@interactjs/core/Eventable'
 import Interaction from '@interactjs/core/Interaction'
 import { PerActionDefaults } from '@interactjs/core/defaultOptions'
 import Scope from '@interactjs/core/scope'
 import * as utils from '@interactjs/utils/index'
-import PointerEvent from './PointerEvent'
 
 export type EventTargetList = Array<{
   node: Node

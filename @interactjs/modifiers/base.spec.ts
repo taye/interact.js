@@ -1,7 +1,7 @@
+import modifiersBase from './base'
 import test from '@interactjs/_dev/test/test'
 import * as helpers from '@interactjs/core/tests/_helpers'
 import * as utils from '@interactjs/utils/index'
-import modifiersBase from './base'
 
 test('modifiers/base', t => {
   const {

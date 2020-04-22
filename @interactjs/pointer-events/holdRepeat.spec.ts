@@ -1,7 +1,7 @@
+import holdRepeat from './holdRepeat'
 import test from '@interactjs/_dev/test/test'
 import Eventable from '@interactjs/core/Eventable'
 import * as helpers from '@interactjs/core/tests/_helpers'
-import holdRepeat from './holdRepeat'
 
 test('holdRepeat count', t => {
   const pointerEvent = {

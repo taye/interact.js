@@ -7,8 +7,7 @@
     "@interactjs/utils": "1.9.9"
   },
   "devDependencies": {
-    "@interactjs/_dev": "1.9.9",
-    "promise-polyfill": "^8.1.3"
+    "promise-polyfill": "latest"
   },
   "optionalDependencies": {
     "@interactjs/interact": "1.9.9"

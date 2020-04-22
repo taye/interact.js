@@ -1,7 +1,7 @@
+import PointerEvent from './PointerEvent'
 import test from '@interactjs/_dev/test/test'
 import * as helpers from '@interactjs/core/tests/_helpers'
 import * as pointerUtils from '@interactjs/utils/pointerUtils'
-import PointerEvent from './PointerEvent'
 
 test('PointerEvent constructor', t => {
   const type = 'TEST_EVENT'

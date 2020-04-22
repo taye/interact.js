@@ -41,11 +41,5 @@
   "dependencies": {
     "@interactjs/interactjs": "1.9.9",
     "@interactjs/types": "1.9.9"
-  },
-  "_dev": {
-    "entries": "./index.ts",
-    "standalone": "interact",
-    "destDir": "./dist",
-    "name": "interact"
   }
 }
