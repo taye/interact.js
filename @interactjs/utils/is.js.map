@@ -1,0 +1,35 @@
+{
+	"version": 3,
+	"sources": [
+		"is.ts"
+	],
+	"names": [
+		"isWindow",
+		"win",
+		"window",
+		"thing",
+		"docFrag",
+		"object",
+		"nodeType",
+		"func",
+		"number",
+		"bool",
+		"string",
+		"element",
+		"_window",
+		"getWindow",
+		"test",
+		"Element",
+		"nodeName",
+		"plainObject",
+		"constructor",
+		"toString",
+		"array",
+		"length",
+		"splice"
+	],
+	"mappings": "AAAA;AAEA,OAAOA,QAAP,MAAqB,eAArB;AACA,OAAOC,GAAP,MAAgB,aAAhB;AAEA,OAAO,MAAMC,MAAM,GAAIC,KAAD,IACpBA,KAAK,KAAKF,GAAG,CAACC,MAAd,IAAwBF,QAAQ,CAACG,KAAD,CAD3B;AAGP,OAAO,MAAMC,OAAO,GAAID,KAAD,IACrBE,MAAM,CAACF,KAAD,CAAN,IAAiBA,KAAK,CAACG,QAAN,KAAmB,EAD/B;AAGP,OAAO,MAAMD,MAAM,GAAIF,KAAD,IACpB,CAAC,CAACA,KAAF,IAAY,OAAOA,KAAP,KAAiB,QADxB;AAGP,OAAO,MAAMI,IAAI,GAAIJ,KAAD,IAClB,OAAOA,KAAP,KAAiB,UADZ;AAGP,OAAO,MAAMK,MAAM,GAAIL,KAAD,IACpB,OAAOA,KAAP,KAAiB,QADZ;AAGP,OAAO,MAAMM,IAAI,GAAIN,KAAD,IAClB,OAAOA,KAAP,KAAiB,SADZ;AAGP,OAAO,MAAMO,MAAM,GAAIP,KAAD,IACpB,OAAOA,KAAP,KAAiB,QADZ;AAGP,OAAO,MAAMQ,OAAO,GAAIR,KAAD,IAA2C;AAChE,MAAI,CAACA,KAAD,IAAW,OAAOA,KAAP,KAAiB,QAAhC,EAA2C;AAAE,WAAO,KAAP;AAAc;;AAE3D,QAAMS,OAAO,GAAGX,GAAG,CAACY,SAAJ,CAAcV,KAAd,KAAwBF,GAAG,CAACC,MAA5C;;AAEA,SAAQ,kBAAkBY,IAAlB,CAAuB,OAAOF,OAAO,CAACG,OAAtC,IACJZ,KAAK,YAAYS,OAAO,CAACG,OADrB,CAC6B;AAD7B,IAEJZ,KAAK,CAACG,QAAN,KAAmB,CAAnB,IAAwB,OAAOH,KAAK,CAACa,QAAb,KAA0B,QAFtD;AAGD,CARM;AAUP,OAAO,MAAMC,WAA0B,GAAId,KAAD,IACxCE,MAAM,CAACF,KAAD,CAAN,IACA,CAAC,CAACA,KAAK,CAACe,WADR,IAEA,oBAAoBJ,IAApB,CAAyBX,KAAK,CAACe,WAAN,CAAkBC,QAAlB,EAAzB,CAHK;AAKP,OAAO,MAAMC,KAAK,GAAuBjB,KAApB,IAClBE,MAAM,CAACF,KAAD,CAAN,IACA,OAAOA,KAAK,CAACkB,MAAb,KAAwB,WADxB,IAEDd,IAAI,CAACJ,KAAK,CAACmB,MAAP,CAHC",
+	"sourcesContent": [
+		"// tslint:disable variable-name\n\nimport isWindow from './isWindow'\nimport win from './window'\n\nexport const window = (thing: any): thing is Window =>\n  thing === win.window || isWindow(thing)\n\nexport const docFrag = (thing: any): thing is DocumentFragment =>\n  object(thing) && thing.nodeType === 11\n\nexport const object = (thing: any): thing is { [index: string]: any } =>\n  !!thing && (typeof thing === 'object')\n\nexport const func = (thing: any): thing is (...args: any[]) => any =>\n  typeof thing === 'function'\n\nexport const number = (thing: any): thing is number =>\n  typeof thing === 'number'\n\nexport const bool = (thing: any): thing is boolean =>\n  typeof thing === 'boolean'\n\nexport const string = (thing: any): thing is string =>\n  typeof thing === 'string'\n\nexport const element = (thing: any): thing is Interact.Element => {\n  if (!thing || (typeof thing !== 'object')) { return false }\n\n  const _window = win.getWindow(thing) || win.window\n\n  return (/object|function/.test(typeof _window.Element)\n    ? thing instanceof _window.Element // DOM2\n    : thing.nodeType === 1 && typeof thing.nodeName === 'string')\n}\n\nexport const plainObject: typeof object = (thing: any): thing is { [index: string]: any } =>\n  object(thing) &&\n  !!thing.constructor &&\n  /function Object\\b/.test(thing.constructor.toString())\n\nexport const array = <T extends unknown>(thing: any): thing is T[] =>\n  (object(thing) &&\n  (typeof thing.length !== 'undefined') &&\n  func(thing.splice))\n"
+	]
+}

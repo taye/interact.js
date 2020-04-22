@@ -1,0 +1,23 @@
+{
+	"version": 3,
+	"sources": [
+		"index.ts"
+	],
+	"names": [
+		"allSnappers",
+		"extend",
+		"snappersPlugin",
+		"id",
+		"install",
+		"scope",
+		"interactStatic",
+		"interact",
+		"snappers",
+		"createSnapGrid",
+		"grid"
+	],
+	"mappings": "AAAA,OAAO,KAAKA,WAAZ,MAA6B,UAA7B;AACA,OAAOC,MAAP,MAAmB,oBAAnB;AASA,MAAMC,cAA+B,GAAG;AACtCC,EAAAA,EAAE,EAAE,UADkC;;AAEtCC,EAAAA,OAAO,CAAEC,KAAF,EAAS;AACd,UAAM;AAAEC,MAAAA,cAAc,EAAEC;AAAlB,QAA+BF,KAArC;AAEAE,IAAAA,QAAQ,CAACC,QAAT,GAAoBP,MAAM,CAACM,QAAQ,CAACC,QAAT,IAAqB,EAAtB,EAA0BR,WAA1B,CAA1B;AACAO,IAAAA,QAAQ,CAACE,cAAT,GAA0BF,QAAQ,CAACC,QAAT,CAAkBE,IAA5C;AACD;;AAPqC,CAAxC;AAUA,eAAeR,cAAf",
+	"sourcesContent": [
+		"import * as allSnappers from './all'\nimport extend from '@interactjs/utils/extend'\n\ndeclare module '@interactjs/core/InteractStatic' {\n  interface InteractStatic {\n    snappers: typeof allSnappers\n    createSnapGrid: typeof allSnappers.grid\n  }\n}\n\nconst snappersPlugin: Interact.Plugin = {\n  id: 'snappers',\n  install (scope) {\n    const { interactStatic: interact } = scope\n\n    interact.snappers = extend(interact.snappers || {}, allSnappers)\n    interact.createSnapGrid = interact.snappers.grid\n  },\n}\n\nexport default snappersPlugin\n"
+	]
+}

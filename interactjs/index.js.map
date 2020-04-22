@@ -1,0 +1,16 @@
+{
+	"version": 3,
+	"sources": [
+		"index.ts"
+	],
+	"names": [
+		"interact",
+		"module",
+		"exports",
+		"default"
+	],
+	"mappings": "AAAA,OAAOA,QAAP,MAAqB,oCAArB;;AAEA,IAAI,OAAOC,MAAP,KAAkB,QAAlB,IAA8B,CAAC,CAACA,MAApC,EAA4C;AAC1C,MAAI;AAAEA,IAAAA,MAAM,CAACC,OAAP,GAAiBF,QAAjB;AAA2B,GAAjC,CACA,MAAM,CAAE;AACT;;AAEAA,QAAD,CAAkBG,OAAlB,GAA4BH,QAA5B;AAEA,eAAeA,QAAf",
+	"sourcesContent": [
+		"import interact from '@interactjs/interactjs/index'\n\nif (typeof module === 'object' && !!module) {\n  try { module.exports = interact }\n  catch {}\n}\n\n(interact as any).default = interact\n\nexport default interact\n"
+	]
+}
