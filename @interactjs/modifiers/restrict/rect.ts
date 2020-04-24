@@ -1,5 +1,6 @@
 import extend from '../../utils/extend'
 import { makeModifier } from '../base'
+
 import { restrict } from './pointer'
 
 const defaults = extend({

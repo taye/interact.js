@@ -75,7 +75,11 @@ async function runBuild () {
 
   // copy license file and npmignore to all packages
   for (const pkg of packages) {
-    fs.copyFileSync('LICENSE', pkg + '/LICENSE')
+    try {
+      fs.copyFileSync('LICENSE', pkg + '/LICENSE')
+    } catch {
+      fs.copyFileSync('LICENSE.md', pkg + '/LICENSE.md')
+    }
     fs.copyFileSync('.npmignore', pkg + '/.npmignore')
   }
 

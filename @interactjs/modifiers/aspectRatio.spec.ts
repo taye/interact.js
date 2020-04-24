@@ -1,9 +1,10 @@
-import aspectRatio, { AspectRatioOptions } from './aspectRatio'
-import modifiersBase from './base'
-import restrictSize from './restrict/size'
 import test from '@interactjs/_dev/test/test'
 import resize from '@interactjs/actions/resize'
 import * as helpers from '@interactjs/core/tests/_helpers'
+
+import aspectRatio, { AspectRatioOptions } from './aspectRatio'
+import modifiersBase from './base'
+import restrictSize from './restrict/size'
 
 const { ltrbwh } = helpers
 

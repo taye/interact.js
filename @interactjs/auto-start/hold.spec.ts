@@ -1,6 +1,8 @@
-import hold from './hold'
+
 import test from '@interactjs/_dev/test/test'
 import * as helpers from '@interactjs/core/tests/_helpers'
+
+import hold from './hold'
 
 test('autoStart/hold', t => {
   const { scope } = helpers.testEnv({ plugins: [hold] })

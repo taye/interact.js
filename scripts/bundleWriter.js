@@ -1,7 +1,9 @@
 const fs = require('fs')
 const path = require('path')
+
 const mkdirp = require('mkdirp')
 const uglify = require('uglify-js')
+
 const bundleHeader = require('./bundleHeader')
 const replacer = require('./replacer')
 

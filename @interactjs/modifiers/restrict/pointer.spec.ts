@@ -1,6 +1,8 @@
-import { restrict } from '../restrict/pointer'
+
 import test from '@interactjs/_dev/test/test'
 import * as helpers from '@interactjs/core/tests/_helpers'
+
+import { restrict } from '../restrict/pointer'
 
 test('restrict larger than restriction', t => {
   const edges = { left: 0, top: 0, right: 200, bottom: 200 }

@@ -1,5 +1,6 @@
-import * as helpers from './tests/_helpers'
 import test from '@interactjs/_dev/test/test'
+
+import * as helpers from './tests/_helpers'
 
 test('scope', t => {
   const {

@@ -1,10 +1,12 @@
-import * as helpers from '../../core/tests/_helpers'
-import * as rectUtils from '../../utils/rect'
-import modifiersBase from '../base'
-import restrictSize from './size'
 import test from '@interactjs/_dev/test/test'
 import resize from '@interactjs/actions/resize'
 import extend from '@interactjs/utils/extend'
+
+import * as helpers from '../../core/tests/_helpers'
+import * as rectUtils from '../../utils/rect'
+import modifiersBase from '../base'
+
+import restrictSize from './size'
 
 test('restrictSize', t => {
   const rect = rectUtils.xywhToTlbr({ left: 0, top: 0, right: 200, bottom: 300 })

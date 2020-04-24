@@ -1,10 +1,12 @@
 // This module allows snapping of the size of targets during resize
 // interactions.
 
-import { makeModifier, ModifierArg } from '../base'
-import { snap, SnapOptions, SnapState } from './pointer'
 import extend from '@interactjs/utils/extend'
 import * as is from '@interactjs/utils/is'
+
+import { makeModifier, ModifierArg } from '../base'
+
+import { snap, SnapOptions, SnapState } from './pointer'
 
 export type SnapSizeOptions = Pick<
 SnapOptions,

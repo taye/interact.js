@@ -1,9 +1,12 @@
-import drag from '../drag'
-import DropEvent from './DropEvent'
+
 import InteractEvent from '@interactjs/core/InteractEvent'
 import Interactable from '@interactjs/core/Interactable'
 import Scope from '@interactjs/core/scope'
 import * as utils from '@interactjs/utils/index'
+
+import drag from '../drag'
+
+import DropEvent from './DropEvent'
 
 export interface DropzoneMethod {
   (options: Interact.DropzoneOptions | boolean): Interact.Interactable

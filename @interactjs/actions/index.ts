@@ -1,8 +1,9 @@
+import Scope from '@interactjs/core/scope'
+
 import drag from './drag'
 import drop from './drop/index'
 import gesture from './gesture'
 import resize from './resize'
-import Scope from '@interactjs/core/scope'
 
 export default {
   id: 'actions',

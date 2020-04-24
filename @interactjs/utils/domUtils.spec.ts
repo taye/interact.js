@@ -1,7 +1,8 @@
-import domObjects from './domObjects'
-import { indexOfDeepestElement } from './domUtils'
 import { JSDOM } from '@interactjs/_dev/test/domator'
 import test from '@interactjs/_dev/test/test'
+
+import domObjects from './domObjects'
+import { indexOfDeepestElement } from './domUtils'
 
 test('utils/domUtils/indexOfDeepestElement', t => {
   const doc1: Document = new JSDOM(`<div id="topDiv">

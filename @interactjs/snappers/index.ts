@@ -1,5 +1,6 @@
-import * as allSnappers from './all'
 import extend from '@interactjs/utils/extend'
+
+import * as allSnappers from './all'
 
 declare module '@interactjs/core/InteractStatic' {
   interface InteractStatic {

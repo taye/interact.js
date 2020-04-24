@@ -1,10 +1,11 @@
 /** @module interact */
 
+import browser from '@interactjs/utils/browser'
+import * as utils from '@interactjs/utils/index'
+
 import Interactable from './Interactable'
 import { Options } from './defaultOptions'
 import { isNonNativeEvent } from './scope'
-import browser from '@interactjs/utils/browser'
-import * as utils from '@interactjs/utils/index'
 
 export interface InteractStatic {
   (target: Interact.Target, options?: Options): Interactable

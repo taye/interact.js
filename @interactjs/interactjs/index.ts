@@ -1,13 +1,10 @@
 import '@interactjs/types'
 
 import actions from '@interactjs/actions'
-
 import arrange from '@interactjs/arrange'
 import autoScroll from '@interactjs/auto-scroll'
 import autoStart from '@interactjs/auto-start'
-
 import clone from '@interactjs/clone'
-
 import components from '@interactjs/components'
 import interactablePreventDefault from '@interactjs/core/interactablePreventDefault'
 import devTools from '@interactjs/dev-tools'
@@ -19,7 +16,6 @@ import multiTarget from '@interactjs/multi-target'
 import offset from '@interactjs/offset'
 import pointerEvents from '@interactjs/pointer-events'
 import reflow from '@interactjs/reflow'
-
 import * as displace from '@interactjs/utils/displace'
 import { exchange } from '@interactjs/utils/exchange'
 import * as pointerUtils from '@interactjs/utils/pointerUtils'

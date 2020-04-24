@@ -1,9 +1,11 @@
-import modifiersBase from '../base'
-import snap from '../snap/pointer'
+
 import test from '@interactjs/_dev/test/test'
 import drag from '@interactjs/actions/drag'
 import * as helpers from '@interactjs/core/tests/_helpers'
 import extend from '@interactjs/utils/extend'
+
+import modifiersBase from '../base'
+import snap from '../snap/pointer'
 
 test('modifiers/snap', t => {
   const rect = helpers.ltrbwh(0, 0, 100, 100, 100, 100)

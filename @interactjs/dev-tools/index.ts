@@ -1,11 +1,13 @@
 /* eslint-disable no-console */
 /* global process */
-import visualizer from './visualizer'
+
 import domObjects from '@interactjs/utils/domObjects'
 import { parentNode } from '@interactjs/utils/domUtils'
 import extend from '@interactjs/utils/extend'
 import * as is from '@interactjs/utils/is'
 import win from '@interactjs/utils/window'
+
+import visualizer from './visualizer'
 
 declare module '@interactjs/core/scope' {
   interface Scope {

@@ -9,7 +9,6 @@ import rubberband from './rubberband'
 import snapEdges from './snap/edges'
 import snap from './snap/pointer'
 import snapSize from './snap/size'
-
 import spring from './spring'
 import transform from './transform'
 

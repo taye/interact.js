@@ -1,4 +1,5 @@
 const path = require('path')
+
 const { getBabelrc } = require('./utils')
 
 process.env.NODE_PATH = `${process.env.NODE_PATH || ''}:${path.resolve(__dirname, '..', 'node_modules')}`

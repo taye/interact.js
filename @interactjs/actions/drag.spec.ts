@@ -1,8 +1,10 @@
-import drag from './drag'
+
 import test from '@interactjs/_dev/test/test'
 import * as helpers from '@interactjs/core/tests/_helpers'
 import { extend } from '@interactjs/utils'
 import * as pointerUtils from '@interactjs/utils/pointerUtils'
+
+import drag from './drag'
 
 test('drag action init', t => {
   const scope = helpers.mockScope()

@@ -1,5 +1,6 @@
-import { makeModifier, ModifierArg, ModifierState } from '../base'
 import * as utils from '@interactjs/utils/index'
+
+import { makeModifier, ModifierArg, ModifierState } from '../base'
 
 export interface Offset {
   x: number

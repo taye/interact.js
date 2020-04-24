@@ -49,7 +49,7 @@ const cli = new CLIEngine({
 const sources = argv._.length ? argv._ : getSources()
 const report = cli.executeOnFiles(sources)
 const errors = CLIEngine.getErrorResults(report.results)
-const formatted = cli.getFormatter('table')(errors)
+const formatted = cli.getFormatter('stylish')(errors)
 
 if (errors.length) {
   console.error(formatted)

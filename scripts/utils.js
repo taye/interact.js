@@ -1,6 +1,7 @@
 const fs = require('fs')
 const path = require('path')
 const { promisify } = require('util')
+
 const glob = promisify(require('glob'))
 const resolveSync = require('resolve').sync
 
@@ -80,9 +81,9 @@ function getModuleDirectories () {
   ]
 }
 
-async function getPackages () {
-  const packageJsonPaths = await glob('{@interactjs/*,interactjs}/package.json', { ignore: commonIgnoreGlobs })
-  const packageDirs = packageJsonPaths.map(getPackageDir)
+async function getPackages (options) {
+  const packageJsonPaths = await glob('{@interactjs/*,interactjs}/package.json', { ignore: commonIgnoreGlobs, ...options })
+  const packageDirs = packageJsonPaths.map(p => path.join(p, '..'))
 
   return [...new Set(packageDirs)]
 }
@@ -221,8 +222,7 @@ function getPackageDir (filename) {
     packageDir = path.dirname(packageDir)
 
     if (packageDir === path.sep) {
-      packageDir = process.cwd()
-      break
+      throw new Error(`Couldn't find a package for ${filename}`)
     }
   }
 

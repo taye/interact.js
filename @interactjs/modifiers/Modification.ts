@@ -1,7 +1,9 @@
-import { Modifier, ModifierArg, ModifierState } from './base'
+
 import clone from '@interactjs/utils/clone'
 import extend from '@interactjs/utils/extend'
 import * as rectUtils from '@interactjs/utils/rect'
+
+import { Modifier, ModifierArg, ModifierState } from './base'
 
 export interface ModificationResult {
   delta: Interact.Point

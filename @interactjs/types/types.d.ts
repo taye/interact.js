@@ -17,7 +17,6 @@ import * as defaults from '@interactjs/core/defaultOptions'
 import * as scope from '@interactjs/core/scope'
 import * as snap from '@interactjs/modifiers/snap/pointer'
 import { PointerEvent as _PointerEvent } from '@interactjs/pointer-events/PointerEvent'
-
 // import module augmentations
 import '@interactjs/auto-scroll'
 import '@interactjs/auto-start'
@@ -32,9 +31,9 @@ import '@interactjs/pointer-events/base'
 import '@interactjs/pointer-events/interactableTargets'
 import '@interactjs/reflow'
 import '@interactjs/snappers'
-
 import SymbolTree from '@interactjs/symbol-tree'
 import _ElementState from '@interactjs/utils/ElementState'
+
 import _NativePointerEventType from './NativePointerEventType'
 
 declare namespace Interact {

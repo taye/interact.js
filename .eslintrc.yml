@@ -40,7 +40,12 @@ rules:
   no-var: error
   import/no-extraneous-dependencies: [error, { devDependencies: false }]
   import/no-named-as-default: off
-  import/order: [error, { alphabetize: { order: asc } }]
+  import/order: [error, {
+    alphabetize: { order: asc },
+    newlines-between: always,
+    groups: [builtin, external, internal, parent, index, sibling],
+    pathGroups: [{ pattern: '@interactjs/**', group: internal }],
+  }]
   prefer-arrow-callback: [error, { allowNamedFunctions: true }]
   prefer-const: error
   standard/array-bracket-even-spacing: off

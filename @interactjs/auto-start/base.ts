@@ -1,5 +1,6 @@
-import InteractableMethods from './InteractableMethods'
 import * as utils from '@interactjs/utils/index'
+
+import InteractableMethods from './InteractableMethods'
 
 declare module '@interactjs/core/InteractStatic' {
   interface InteractStatic {
