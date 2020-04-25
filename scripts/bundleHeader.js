@@ -1,25 +1,25 @@
-const fs = require('fs')
+const path = require('path')
 
 const combineSourceMap = require('combine-source-map')
 
-module.exports = function combine (options) {
-  const headerContent = (options.replacer || (s => s))(options.headerContent ||
-    fs.readFileSync(options.headerFilename).toString())
+const { getRelativeToRoot } = require('./utils')
 
+module.exports = function combine (options) {
+  const headerContent = options.content || ''
   const { destDir, filename } = options
   const combiner = combineSourceMap.create()
   const combinedCode = headerContent + options.code
   const offset = { line: newlinesIn(headerContent) }
 
   combiner.addFile({
-    sourceFile: options.headerFilename,
+    sourceFile: '_header.js',
     source: headerContent,
   }, { line: 1 })
 
   if (options.map) {
     combiner._addExistingMap('', combinedCode, options.map, offset)
   }
-  else {
+  else if (headerContent) {
     combiner.addFile({
       sourceFile: '',
       source: combinedCode,
@@ -28,6 +28,19 @@ module.exports = function combine (options) {
 
   const newMap = combiner.generator.toJSON()
   newMap.file = filename
+
+  newMap.sources = newMap.sources.map(source => {
+    const absolute = path.join(process.cwd(), source)
+    try {
+      const {
+        result,
+      } = getRelativeToRoot(absolute, [process.cwd(), path.join(__dirname, '..')], '')
+
+      return result
+    } catch {
+      return source
+    }
+  })
 
   return {
     destDir,

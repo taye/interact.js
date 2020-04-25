@@ -243,7 +243,7 @@ function getRelativeToRoot (filename, moduleDirectory, prefix = '/') {
     moduleDirectory,
   )
 
-  if (!ret) {
+  if (!ret.result) {
     throw new Error(`Couldn't find module ${filename} in ${moduleDirectory.join(' or')}.`)
   }
 

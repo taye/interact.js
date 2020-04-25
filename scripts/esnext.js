@@ -7,8 +7,8 @@ const glob = require('glob')
 const mkdirp = require('mkdirp')
 const PQueue = require('p-queue').default
 const temp = require('temp').track()
-const Terser = require('terser')
 
+const minify = require('./minify')
 const {
   getSources,
   getBabelOptions,
@@ -31,23 +31,7 @@ const OUTPUT_VERSIONS = [
     extension: '.min.js',
     nodeEnv: 'production',
     async post (result) {
-      const { code, map, error } = Terser.minify(result.code, {
-        module: true,
-        sourceMap: { content: result.map },
-        mangle: {
-          module: true,
-        },
-        compress: {
-          ecma: 8,
-          unsafe: true,
-          unsafe_Function: true,
-          unsafe_arrows: true,
-          unsafe_methods: true,
-        },
-        output: {
-          beautify: false,
-        },
-      })
+      const { code, map, error } = minify(result)
 
       if (error) {
         throw error
@@ -65,7 +49,7 @@ const queue = new PQueue({ concurrency: os.cpus().length })
 
 async function generate ({
   sources,
-  shim = () => {},
+  shim,
   babelOptions = getBabelOptions(),
   filter,
   moduleDirectory = getModuleDirectories(),
@@ -135,16 +119,20 @@ async function generate ({
   function _generate (changedSources) {
     for (const sourceFilename of changedSources) {
       queue.add(async () => {
-        const shimResult = await shim(sourceFilename)
+        const shimResult = shim && await shim(sourceFilename)
         const moduleName = getModuleName(sourceFilename)
         const rootRelativeModuleName = getRelativeToRoot(moduleName, moduleDirectory).result
         const outModuleName = path.join(outDir, rootRelativeModuleName)
 
         if (shimResult) {
           await mkdirp(path.dirname(outModuleName))
+
           return Promise.all(OUTPUT_VERSIONS.map(
-            ({ extension }) => fs.writeFile(`${outModuleName}${extension}`, shimResult)),
-          )
+            ({ extension }) => Promise.all([
+              fs.writeFile(`${outModuleName}${extension}`, shimResult.code),
+              shimResult.map && fs.writeFile(`${outModuleName}${extension}.map`, JSON.stringify(shimResult.map)),
+            ]),
+          ))
         }
 
         const sourceCode = (await fs.readFile(sourceFilename)).toString()

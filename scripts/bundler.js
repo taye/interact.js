@@ -12,27 +12,20 @@ require('module')._initPaths()
 
 module.exports = function (options) {
   const browserify = require('browserify')
-  const writer = options.writer || require('./bundleWriter')
-
-  const plugins = (() => {
-    if (options.watch) {
-      return [
-        require('watchify'),
-        require('errorify'),
-      ]
-    }
-
-    return process.env.NODE_ENV === 'production'
+  const plugins = (options.watch)
+    ? [
+      require('watchify'),
+      require('errorify'),
+    ]
+    : process.env.NODE_ENV === 'production'
       ? [
         require('browser-pack-flat/plugin'),
-        require('common-shakeify'),
       ]
       : []
-  })()
 
   const babelrc = getBabelrc()
 
-  const b = browserify(options.entries, {
+  const b = browserify(options.entry, {
     extensions: ['.ts', '.tsx'],
     debug: true,
 
@@ -55,13 +48,11 @@ module.exports = function (options) {
 
     plugin: plugins,
 
-    cache: {},
+    cache: options.watch ? {} : null,
     packageCache: {},
   }).exclude('jsdom')
 
   if (options.watch) {
-    const generateEsnext = require('./esnext')
-
     b.on('update', ids => {
       ids = ids.filter(id => !/\.js$/.test(id))
 
@@ -69,15 +60,8 @@ module.exports = function (options) {
 
       console.log(ids)
       update(ids)
-      generateEsnext({
-        sources: ids.filter(id => /\.tsx?/.test(id)).map(id => path.resolve(id)),
-      })
     })
     b.on('log', msg => console.log(msg))
-
-    generateEsnext()
-  }
-  else {
   }
 
   function update (ids) {
@@ -87,11 +71,15 @@ module.exports = function (options) {
       }, ''))
     }
 
-    writer({
-      ...options,
-      bundleStream: b.bundle(),
+    let bundleCode = ''
+
+    return new Promise((resolve, reject) => {
+      b.bundle()
+        .on('data', chunk => { bundleCode += chunk })
+        .on('end', () => resolve(bundleCode))
+        .on('error', reject)
     })
   }
 
-  update()
+  return update()
 }

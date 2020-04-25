@@ -15,7 +15,6 @@ for (const arg of args) {
   }
 }
 
-debugger
 require('../scripts/esnext')({
   sources: fileArgs.length ? fileArgs : undefined,
   watch,

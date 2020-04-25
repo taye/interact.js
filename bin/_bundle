@@ -1,22 +1,24 @@
 #!/usr/bin/env node
 const path = require('path')
-
-process.env.NODE_PATH = `${process.env.NODE_PATH || ''}:${path.resolve(__dirname, '..', 'node_modules')}`
-require('module').Module._initPaths()
+const headers = require('../scripts/headers')
+const writer = require('../scripts/bundleWriter')
+const { getPackageDir, resolveImport } = require('../scripts/utils')
 
 const bundler = require('../scripts/bundler')
 
+const entryPkgDir = path.join(process.cwd(), 'interactjs')
+
+const options = {
+  headers,
+  entry: path.join(entryPkgDir, 'index.ts'),
+  destDir: path.join(entryPkgDir, 'dist'),
+  standalone: 'interact',
+  name: 'interact',
+}
+
 process.stdout.write('Bundling...')
 
-process.on('beforeExit', () => {
+bundler(options).then(async code => {
+  await writer(code, options)
   console.log(' done.')
-})
-
-bundler({
-  entries: './interactjs/index.ts',
-  standalone: 'interact',
-  destDir: './interactjs/dist',
-  name: 'interact',
-  headerFile: require.resolve('../scripts/header.js'),
-  minHeaderFile: require.resolve('../scripts/minHeader.js'),
 })

@@ -14,9 +14,9 @@
   "scripts": {
     "bootstrap": "npx yarn install --pure-lockfile --prefer-offline",
     "start": "yarn esnext --serve",
-    "bundle": "NODE_ENV=production bin/_bundle",
+    "bundle": "NODE_ENV=production _bundle",
     "esnext": "_add_use_modules && _esnext",
-    "build": "_clean && yarn docs && yarn bundle && _add_use_modules && tsc -b -f && _esnext",
+    "build": "yarn docs && yarn bundle && _add_use_modules && tsc -b -f && _esnext",
     "docs": "node jsdoc/index.js",
     "lint": "_lint --fail-on-error",
     "test": "_test",
@@ -28,6 +28,7 @@
   "dependencies": {
     "@babel/core": "latest",
     "@babel/plugin-proposal-class-properties": "latest",
+    "@babel/plugin-proposal-optional-catch-binding": "^7.8.3",
     "@babel/plugin-transform-modules-commonjs": "latest",
     "@babel/plugin-transform-runtime": "latest",
     "@babel/preset-env": "latest",
@@ -49,7 +50,6 @@
     "browserify": "latest",
     "chokidar": "latest",
     "combine-source-map": "latest",
-    "common-shakeify": "latest",
     "domator": "latest",
     "errorify": "latest",
     "eslint": "latest",
@@ -82,7 +82,6 @@
     "ts-node": "latest",
     "tslint": "latest",
     "typescript": "3.6",
-    "uglify-js": "latest",
     "watchify": "latest",
     "yargs": "latest",
     "yarn": "latest"

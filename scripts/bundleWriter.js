@@ -2,24 +2,19 @@ const fs = require('fs')
 const path = require('path')
 
 const mkdirp = require('mkdirp')
-const uglify = require('uglify-js')
 
 const bundleHeader = require('./bundleHeader')
-const replacer = require('./replacer')
+const minify = require('./minify')
 
-const pwd = process.env.PWD
-
-module.exports = function bundleProcessor ({
+module.exports = function bundleWriter (bundleCode, {
   bundleStream,
   headerFile,
   minHeaderFile,
   destDir,
   name,
+  headers = {},
+  writeMin = true,
 }) {
-  mkdirp(destDir)
-
-  let streamCode = ''
-
   const filenames = {
     raw   : `${name}.js`,
     rawMap: `${name}.js.map`,
@@ -27,44 +22,38 @@ module.exports = function bundleProcessor ({
     minMap: `${name}.min.js.map`,
   }
 
-  bundleStream.on('data', chunk => { streamCode += chunk })
-  bundleStream.on('end', () => {
-    const raw = bundleHeader(getHeaderOpts(headerFile, filenames.raw, streamCode))
-    write(raw)
+  const raw = bundleHeader(getHeaderOpts(headers.raw, filenames.raw, bundleCode))
+  const rawWritePromise = write(raw)
 
-    const minifiedResult = uglify.minify(raw.code, {
-      sourceMap: {
-        content: raw.map,
-        url: `${filenames.min}.map`,
-        includeSources: true,
-      },
-    })
+  if (!writeMin) { return }
 
-    const headerOpts = getHeaderOpts(minHeaderFile, filenames.min, minifiedResult.code, JSON.parse(minifiedResult.map))
-    const min = bundleHeader(headerOpts)
+  const minifiedResult = minify(raw)
+  const headerOpts = getHeaderOpts(headers.min, filenames.min, minifiedResult.code, JSON.parse(minifiedResult.map))
+  const min = bundleHeader(headerOpts)
 
-    write(min)
-  })
+  return Promise.all([rawWritePromise, write(min)])
 
-  function getHeaderOpts (headerFilename, filename, code, map) {
+  function getHeaderOpts (content, filename, code, map) {
     return {
       destDir,
       filename,
       code,
       map,
-      headerFilename,
-      replacer: input => replacer(input),
+      content,
     }
   }
 }
 
 function write ({ destDir, filename, code, map }) {
-  map.sources = map.sources.map(source => path.relative(pwd, source))
+  map.sources = map.sources.map(source => path.relative(process.cwd(), source))
   map.file = filename
 
   const codeFilename = path.join(destDir, filename)
-  const codeStream = fs.createWriteStream(codeFilename)
 
-  codeStream.end(code)
-  fs.createWriteStream(`${codeFilename}.map`).end(JSON.stringify(map))
+  mkdirp(path.dirname(codeFilename))
+
+  return Promise.all([
+    fs.promises.writeFile(codeFilename, code),
+    fs.promises.writeFile(`${codeFilename}.map`, JSON.stringify(map)),
+  ])
 }

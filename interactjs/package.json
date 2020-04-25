@@ -6,7 +6,6 @@
     "url": "https://github.com/taye/interact.js.git"
   },
   "main": "dist/interact.min.js",
-  "browser": "dist/interact.min.js",
   "description": "Drag and drop, resizing and multi-touch gestures with inertia and snapping for modern browsers (and also IE9+)",
   "homepage": "https://interactjs.io",
   "authors": [
