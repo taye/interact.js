@@ -10,9 +10,6 @@
     "@interactjs/modifiers": "1.9.10",
     "@interactjs/utils": "1.9.10"
   },
-  "devDependencies": {
-    "@interactjs/actions": "1.9.10"
-  },
   "optionalDependencies": {
     "@interactjs/interact": "1.9.10"
   },

@@ -4,7 +4,6 @@
   "license": "MIT",
   "dependencies": {
     "@interactjs/core": "1.9.10",
-    "@interactjs/types": "1.9.10",
     "@interactjs/utils": "1.9.10"
   },
   "publishConfig": {

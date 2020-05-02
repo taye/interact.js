@@ -1,4 +1,3 @@
-import '@interactjs/types/index'
 import Scope from '@interactjs/core/scope'
 
 const scope = new Scope()
