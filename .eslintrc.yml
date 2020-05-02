@@ -33,6 +33,7 @@ rules:
   no-caller: error
   no-console: off
   no-empty: off
+  no-multiple-empty-lines: [error, { max: 1, maxBOF: 0, maxEOF: 0 }]
   no-multi-spaces: off
   no-prototype-builtins: off
   no-shadow: error

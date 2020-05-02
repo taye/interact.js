@@ -5,7 +5,6 @@ import arrange from '@interactjs/arrange'
 import autoScroll from '@interactjs/auto-scroll'
 import autoStart from '@interactjs/auto-start'
 import clone from '@interactjs/clone'
-import components from '@interactjs/components'
 import interactablePreventDefault from '@interactjs/core/interactablePreventDefault'
 import devTools from '@interactjs/dev-tools'
 import feedback from '@interactjs/feedback'
@@ -15,21 +14,19 @@ import modifiers from '@interactjs/modifiers/index'
 import multiTarget from '@interactjs/multi-target'
 import offset from '@interactjs/offset'
 import pointerEvents from '@interactjs/pointer-events'
+import reactComponents from '@interactjs/react'
 import reflow from '@interactjs/reflow'
 import * as displace from '@interactjs/utils/displace'
 import { exchange } from '@interactjs/utils/exchange'
 import * as pointerUtils from '@interactjs/utils/pointerUtils'
-import * as vueComponents from '@interactjs/vue'
+import vueComponents from '@interactjs/vue'
 
 declare module '@interactjs/core/InteractStatic' {
-  interface InteractStatic {
+  export interface InteractStatic {
     __utils: {
       exchange: typeof exchange
       displace: typeof displace
       pointer: typeof pointerUtils
-    }
-    vue: {
-      components: typeof vueComponents
     }
   }
 }
@@ -69,11 +66,9 @@ interact.use(reflow)
 
 interact.use(feedback)
 
-interact.use(components)
+interact.use(vueComponents)
 
-interact.vue = {
-  components: vueComponents,
-}
+interact.use(reactComponents)
 
 interact.__utils = {
   exchange,
@@ -87,3 +82,10 @@ if (process.env.NODE_ENV !== 'production') {
 }
 
 export default interact
+
+if (typeof module === 'object' && !!module) {
+  try { module.exports = interact }
+  catch {}
+}
+
+(interact as any).default = interact

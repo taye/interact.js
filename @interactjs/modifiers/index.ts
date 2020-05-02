@@ -4,7 +4,7 @@ import all from './all'
 import base from './base'
 
 declare module '@interactjs/core/InteractStatic' {
-  interface InteractStatic {
+  export interface InteractStatic {
     modifiers: typeof all
   }
 }

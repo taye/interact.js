@@ -38,7 +38,6 @@
   },
   "license": "MIT",
   "dependencies": {
-    "@interactjs/interactjs": "1.9.10",
     "@interactjs/types": "1.9.10"
   }
 }

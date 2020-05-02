@@ -1,4 +1,3 @@
-
 import test from '@interactjs/_dev/test/test'
 import drag from '@interactjs/actions/drag'
 import * as helpers from '@interactjs/core/tests/_helpers'

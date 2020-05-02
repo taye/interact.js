@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-parameter-properties */
 export class PointerInfo {
   id: number
   pointer: Interact.PointerType

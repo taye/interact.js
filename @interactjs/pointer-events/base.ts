@@ -1,4 +1,3 @@
-
 import Eventable from '@interactjs/core/Eventable'
 import Interaction from '@interactjs/core/Interaction'
 import { PerActionDefaults } from '@interactjs/core/defaultOptions'

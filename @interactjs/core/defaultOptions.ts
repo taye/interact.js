@@ -1,5 +1,3 @@
-// tslint:disable no-empty-interface
-
 export interface Defaults {
   base: BaseDefaults
   perAction: PerActionDefaults

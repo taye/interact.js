@@ -1,5 +1,3 @@
-// tslint:disable variable-name
-
 import isWindow from './isWindow'
 import win from './window'
 
@@ -27,6 +25,7 @@ export const string = (thing: any): thing is string =>
 export const element = (thing: any): thing is Interact.Element => {
   if (!thing || (typeof thing !== 'object')) { return false }
 
+  // eslint-disable-next-line import/no-named-as-default-member
   const _window = win.getWindow(thing) || win.window
 
   return (/object|function/.test(typeof _window.Element)

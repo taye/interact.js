@@ -55,6 +55,7 @@ async function generate ({
   moduleDirectory = getModuleDirectories(),
   serve = false,
   watch = false,
+  serverOptions,
   outDir = serve ? temp.mkdirSync('ijs-serve') : process.cwd(),
 } = {}) {
   sources = sources || await getSources()
@@ -110,6 +111,7 @@ async function generate ({
     open: false,
     server: outDir,
     serveStatic: [process.cwd()],
+    ...serverOptions,
   })
 
   sync.pause()

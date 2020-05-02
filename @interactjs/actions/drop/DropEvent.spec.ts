@@ -1,4 +1,3 @@
-
 import test from '@interactjs/_dev/test/test'
 import InteractEvent from '@interactjs/core/InteractEvent'
 import * as utils from '@interactjs/utils/index'

@@ -1,5 +1,3 @@
-/* eslint-disable */
-
 /**
  * @module modifiers/aspectRatio
  *
@@ -19,9 +17,9 @@
 
 import extend from '@interactjs/utils/extend'
 import { addEdges } from '@interactjs/utils/rect'
-import { Modifier, ModifierModule, ModifierState } from './base'
+
 import Modification from './Modification'
-import { makeModifier } from './base'
+import { Modifier, ModifierModule, ModifierState, makeModifier } from './base'
 
 export interface AspectRatioOptions {
   ratio?: number | 'preserve'

@@ -1,4 +1,3 @@
-
 import InteractEvent from '@interactjs/core/InteractEvent'
 import Interactable from '@interactjs/core/Interactable'
 import Scope from '@interactjs/core/scope'

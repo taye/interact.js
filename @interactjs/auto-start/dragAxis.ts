@@ -1,4 +1,3 @@
-
 import { parentNode } from '@interactjs/utils/domUtils'
 import * as is from '@interactjs/utils/is'
 

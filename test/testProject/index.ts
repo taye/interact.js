@@ -1,6 +1,5 @@
 /* eslint-disable import/no-extraneous-dependencies */
-import interact from '@interactjs/interactjs/index'
-import '@interactjs/types'
+import interact from 'interactjs'
 
 // Interactables
 interact(document.body)
@@ -54,7 +53,7 @@ interact('.drag-and-resize')
   })
 
 // Selector context
-const myList: HTMLElement | SVGElement = document.querySelector('#my-list')
+const myList = document.querySelector('#my-list') as HTMLElement | SVGElement
 
 interact('li', {
   context: myList,
@@ -172,7 +171,7 @@ interact.dynamicDrop()
 interact.dynamicDrop(false)
 
 // Events
-function listener (event) {
+function listener (event: Interact.InteractEvent) {
   const { type, pageX, pageY } = event
   alert({ type, pageX, pageY })
 }

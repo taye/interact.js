@@ -1,7 +1,9 @@
 #!/usr/bin/env node
 const fs = require('fs')
+const glob = require('util').promisify(require('glob'))
 const path = require('path')
 const shell = require('shelljs')
+
 const { getPackages } = require('../scripts/utils')
 
 const cwd = process.cwd()
@@ -71,7 +73,9 @@ function clean () {
 
 async function runBuild () {
   // copy README to interactjs package
-  fs.copyFileSync(`${cwd}/README.md`, 'interactjs/README.md')
+  for (const p of await glob('{@interactjs/,}interactjs')) {
+    fs.copyFileSync(`${cwd}/README.md`, `${p}/README.md`)
+  }
 
   // copy license file and npmignore to all packages
   for (const pkg of packages) {

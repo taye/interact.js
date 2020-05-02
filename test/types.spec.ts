@@ -1,17 +1,21 @@
 import path from 'path'
-import test from '@interactjs/_dev/test/test'
+
 import * as shelljs from 'shelljs'
 import temp from 'temp'
+
+import test from '@interactjs/_dev/test/test'
 
 test('typings', async t => {
   const tempDir = temp.track().mkdirSync('testProject')
 
   t.doesNotThrow(
     () => {
-      shelljs.exec(`tsc -p . --outDir ${path.join(tempDir, 'node_modules')}`)
+      const modulesDir = path.join(tempDir, 'node_modules')
+
+      shelljs.exec(`tsc -p tsconfig.json --outDir ${modulesDir}`)
+      shelljs.cp('-R', path.join(process.cwd(), '@interactjs', 'types', '{typings.d.ts,package.json}'), path.join(modulesDir, '@interactjs', 'types'))
       shelljs.cp('-R', path.join(process.cwd(), 'test', 'testProject', '*'), tempDir)
-      shelljs.cp('-R', path.join('@interactjs', 'types', '*.ts'), path.join(tempDir, 'node_modules', '@interactjs', 'types'))
-      shelljs.exec(`tsc -p ${tempDir}`)
+      shelljs.exec('tsc -b', { cwd: tempDir })
 
       const error = shelljs.error()
 

@@ -4,7 +4,7 @@ import hold from './hold'
 
 export default {
   id: 'auto-start',
-  install (scope) {
+  install (scope: Interact.Scope) {
     scope.usePlugin(autoStart)
     scope.usePlugin(hold)
     scope.usePlugin(dragAxis)

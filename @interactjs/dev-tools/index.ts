@@ -1,6 +1,4 @@
 /* eslint-disable no-console */
-/* global process */
-
 import domObjects from '@interactjs/utils/domObjects'
 import { parentNode } from '@interactjs/utils/domUtils'
 import extend from '@interactjs/utils/extend'
@@ -16,7 +14,7 @@ declare module '@interactjs/core/scope' {
 }
 
 declare module '@interactjs/core/InteractStatic' {
-  interface InteractStatic {
+  export interface InteractStatic {
     visializer: typeof visualizer
   }
 }
@@ -29,7 +27,7 @@ declare module '@interactjs/core/defaultOptions' {
 
 declare module '@interactjs/core/Interactable' {
   interface Interactable {
-    devTools?: Interact.OptionMethod<DevToolsOptions>
+    devTools: Interact.OptionMethod<DevToolsOptions>
   }
 }
 
@@ -62,6 +60,7 @@ const links = {
   boxSizing: 'https://developer.mozilla.org/en-US/docs/Web/CSS/box-sizing',
 }
 
+// eslint-disable-next-line no-undef
 const isProduction = process.env.NODE_ENV === 'production'
 
 // eslint-disable-next-line no-restricted-syntax

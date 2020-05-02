@@ -1,4 +1,3 @@
-
 import clone from '@interactjs/utils/clone'
 import extend from '@interactjs/utils/extend'
 import * as rectUtils from '@interactjs/utils/rect'

@@ -3,7 +3,7 @@ import Scope from '@interactjs/core/scope'
 
 const scope = new Scope()
 
-const interact = scope.interactStatic
+const interact: import('@interactjs/core/InteractStatic').default = scope.interactStatic
 
 export default interact
 

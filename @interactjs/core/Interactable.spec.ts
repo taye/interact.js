@@ -1,4 +1,3 @@
-
 import d from '@interactjs/_dev/test/domator'
 import test from '@interactjs/_dev/test/test'
 import drag from '@interactjs/actions/drag'

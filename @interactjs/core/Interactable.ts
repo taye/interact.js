@@ -1,4 +1,3 @@
-
 import * as arr from '@interactjs/utils/arr'
 import browser from '@interactjs/utils/browser'
 import clone from '@interactjs/utils/clone'

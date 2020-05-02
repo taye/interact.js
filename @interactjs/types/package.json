@@ -2,7 +2,8 @@
   "name": "@interactjs/types",
   "version": "1.9.10",
   "license": "MIT",
-  "dependencies": {
+  "typings": "typings.d.ts",
+  "devDependencies": {
     "@interactjs/actions": "1.9.10",
     "@interactjs/arrange": "1.9.10",
     "@interactjs/auto-scroll": "1.9.10",

@@ -81,7 +81,7 @@ export default class Scope {
     phaselessTypes: {},
   }
 
-  interactStatic = new InteractStatic(this)
+  interactStatic: any = new InteractStatic(this)
   InteractEvent = InteractEvent
   Interactable!: typeof InteractableBase
   interactables = new InteractableSet(this)
