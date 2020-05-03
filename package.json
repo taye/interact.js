@@ -81,7 +81,7 @@
     "terser": "latest",
     "ts-node": "latest",
     "tslint": "latest",
-    "typescript": "3.6",
+    "typescript": "latest",
     "watchify": "latest",
     "yargs": "latest",
     "yarn": "latest"

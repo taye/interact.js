@@ -14,6 +14,22 @@ export interface PhaseMap {
   end: true
 }
 
+// defined outside of class definition to avoid assignment of undefined during
+// construction
+export interface InteractEvent {
+  pageX: number
+  pageY: number
+
+  clientX: number
+  clientY: number
+
+  dx: number
+  dy: number
+
+  velocityX: number
+  velocityY: number
+}
+
 export class InteractEvent<
   T extends Interact.ActionName = never,
   P extends EventPhase = EventPhase,
@@ -131,26 +147,6 @@ export class InteractEvent<
     this.swipe = (ending || phase === 'inertiastart') ? this.getSwipe() : null
   }
 
-  get pageX () { return this.page.x }
-  set pageX (value) { this.page.x = value }
-  get pageY () { return this.page.y }
-  set pageY (value) { this.page.y = value }
-
-  get clientX () { return this.client.x }
-  set clientX (value) { this.client.x = value }
-  get clientY () { return this.client.y }
-  set clientY (value) { this.client.y = value }
-
-  get dx () { return this.delta.x }
-  set dx (value) { this.delta.x = value }
-  get dy () { return this.delta.y }
-  set dy (value) { this.delta.y = value }
-
-  get velocityX () { return this.velocity.x }
-  set velocityX (value) { this.velocity.x = value }
-  get velocityY () { return this.velocity.y }
-  set velocityY (value) { this.velocity.y = value }
-
   getSwipe () {
     const interaction = this._interaction
 
@@ -202,5 +198,22 @@ export class InteractEvent<
     this.propagationStopped = true
   }
 }
+
+// getters and setters defined here to support typescript 3.6 and below which
+// don't support getter and setters in .d.ts files
+Object.defineProperties(InteractEvent.prototype, {
+  pageX: { get () { return this.page.x }, set (value) { this.page.x = value } },
+  pageY: { get () { return this.page.y }, set (value) { this.page.y = value } },
+
+  clientX: { get () { return this.client.x }, set (value) { this.client.x = value } },
+  clientY: { get () { return this.client.y }, set (value) { this.client.y = value } },
+
+  dx: { get () { return this.delta.x }, set (value) { this.delta.x = value } },
+  dy: { get () { return this.delta.y }, set (value) { this.delta.y = value } },
+
+  velocityX: { get () { return this.velocity.x }, set (value) { this.velocity.x = value } },
+  velocityY: { get () { return this.velocity.y }, set (value) { this.velocity.y = value } },
+
+})
 
 export default InteractEvent

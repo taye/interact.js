@@ -76,7 +76,7 @@ declare module '@interactjs/core/scope' {
       down: boolean
     }>
     'interactions:remove-pointer': PointerArgProps
-    'interactions:blur'
+    'interactions:blur': { interaction: Interaction, event: Event, type: 'blur' }
     'interactions:before-action-start': Omit<DoAnyPhaseArg, 'iEvent'>
     'interactions:action-start': DoAnyPhaseArg
     'interactions:after-action-start': DoAnyPhaseArg
@@ -153,7 +153,7 @@ export class Interaction<T extends ActionName = ActionName> {
 
   simulation = null
 
-  get pointerMoveTolerance () {
+  /** @internal */ get pointerMoveTolerance () {
     return 1
   }
 
@@ -201,7 +201,7 @@ export class Interaction<T extends ActionName = ActionName> {
 
     for (const key in _ProxyMethods) {
       Object.defineProperty(this._proxy, key, {
-        value: (...args) => that[key](...args),
+        value: (...args: any[]) => that[key](...args),
       })
     }
 

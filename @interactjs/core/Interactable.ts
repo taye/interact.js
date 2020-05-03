@@ -15,7 +15,7 @@ type IgnoreValue = string | Interact.Element | boolean
 
 /** */
 export class Interactable implements Partial<Eventable> {
-  protected get _defaults (): Defaults {
+  /** @internal */ get _defaults (): Defaults {
     return {
       base: {},
       perAction: {},

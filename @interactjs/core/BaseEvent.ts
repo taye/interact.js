@@ -8,10 +8,6 @@ export class BaseEvent<T extends Interact.ActionName = any> {
   immediatePropagationStopped = false
   propagationStopped = false
 
-  get interaction (): Interact.InteractionProxy<T> {
-    return this._interaction._proxy
-  }
-
   constructor (interaction: Interact.Interaction) {
     this._interaction = interaction
   }
@@ -32,5 +28,18 @@ export class BaseEvent<T extends Interact.ActionName = any> {
     this.immediatePropagationStopped = this.propagationStopped = true
   }
 }
+
+// defined outside of class definition to avoid assignment of undefined during
+// construction
+export interface BaseEvent<T extends Interact.ActionName = any> {
+  interaction: Interact.InteractionProxy<T>
+}
+
+// getters and setters defined here to support typescript 3.6 and below which
+// don't support getter and setters in .d.ts files
+Object.defineProperty(BaseEvent.prototype, 'interaction', {
+  get (this: BaseEvent) { return this._interaction._proxy },
+  set (this: BaseEvent) {},
+})
 
 export default BaseEvent
