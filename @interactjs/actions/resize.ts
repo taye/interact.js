@@ -218,7 +218,7 @@ function checkResizeEdge (
     const height = is.number(rect.height) ? rect.height : rect.bottom - rect.top
 
     // don't use margin greater than half the relevent dimension
-    margin = Math.min(margin, (name === 'left' || name === 'right' ? width : height) / 2)
+    margin = Math.min(margin, Math.abs((name === 'left' || name === 'right' ? width : height) / 2))
 
     if (width < 0) {
       if      (name === 'left')  { name = 'right' }

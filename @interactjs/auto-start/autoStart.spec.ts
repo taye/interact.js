@@ -31,13 +31,13 @@ test('autoStart', t => {
 
   t.deepEqual(
     interaction.rect,
-    rect as any,
+    { ...rect, width: rect.right - rect.left, height: rect.bottom - rect.top },
     'set interaction.rect',
   )
 
   t.equal(element.style.cursor, 'move', 'sets drag cursor')
 
-  let checkerArgs
+  let checkerArgs: any[]
 
   interactable.draggable({
     cursorChecker (...args) {
