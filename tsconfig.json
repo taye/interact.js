@@ -1,31 +1,31 @@
 {
   "compilerOptions": {
-    "target": "esnext",                       /* Specify ECMAScript target version: 'ES3' (default), 'ES5', 'ES2015', 'ES2016', 'ES2017', or 'ESNEXT'. */
-    "module": "esnext",                       /* Specify module code generation: 'none', 'commonjs', 'amd', 'system', 'umd', 'es2015', or 'ESNext'. */
-    "lib": [                                  /* Specify library files to be included in the compilation:  */
+    "target": "esnext",
+    "module": "esnext",
+    "lib": [
       "esnext",
-      "dom",
+      "dom"
     ],
-    "allowJs": false,                         /* Allow javascript files to be compiled. */
-    "declaration": true,                      /* Generates corresponding '.d.ts' file. */
-    "declarationMap": false,                  /* Generates a sourcemap for each corresponding '.d.ts' file. */
+    "allowJs": false,
+    "declaration": true,
+    "declarationMap": false,
     "emitDeclarationOnly": true,
     "esModuleInterop": true,
 
-    "strict": false,                          /* Enable all strict type-checking options. */
-    "noUnusedLocals": true,                   /* Report errors on unused locals. */
-    "noUnusedParameters": true,               /* Report errors on unused parameters. */
-    "noImplicitReturns": true,                /* Report error when not all code paths in function return a value. */
-    "noFallthroughCasesInSwitch": true,       /* Report errors for fallthrough cases in switch statement. */
+    "strict": false,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
 
-    "moduleResolution": "node",               /* Specify module resolution strategy: 'node' (Node.js) or 'classic' (TypeScript pre-1.6). */
-    "inlineSourceMap": true,                  /* Emit a single file with source maps instead of having a separate file. */
-    "inlineSources": true,                    /* Emit the source alongside the sourcemaps within a single file; requires '--inlineSourceMap' or '--sourceMap' to be set. */
+    "moduleResolution": "node",
+    "inlineSourceMap": true,
+    "inlineSources": true,
 
     "baseUrl": ".",
     "paths": {
       "@interactjs/_dev/*": ["./*"]
     },
     "stripInternal": true
-  },
+  }
 }
