@@ -1,7 +1,7 @@
 import * as arr from '@interactjs/utils/arr'
 import * as domUtils from '@interactjs/utils/domUtils'
 import extend from '@interactjs/utils/extend'
-import * as is from '@interactjs/utils/is'
+import is from '@interactjs/utils/is'
 import pExtend from '@interactjs/utils/pointerExtend'
 import * as pointerUtils from '@interactjs/utils/pointerUtils'
 

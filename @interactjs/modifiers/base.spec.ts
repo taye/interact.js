@@ -1,6 +1,7 @@
 import test from '@interactjs/_dev/test/test'
 import * as helpers from '@interactjs/core/tests/_helpers'
-import * as utils from '@interactjs/utils/index'
+import extend from '@interactjs/utils/extend'
+import is from '@interactjs/utils/is'
 
 import modifiersBase from './base'
 
@@ -14,7 +15,7 @@ test('modifiers/base', t => {
     event,
   } = helpers.testEnv({ plugins: [modifiersBase] })
 
-  t.ok(utils.is.object(interaction.modification), 'modifiers prop is added new Interaction')
+  t.ok(is.object(interaction.modification), 'modifiers prop is added new Interaction')
 
   coords.client = coords.page
 
@@ -28,7 +29,7 @@ test('modifiers/base', t => {
   interactable.rectChecker(() => ({ top: 0, left: 0, bottom: 50, right: 50 }))
   interactable.on('teststart testmove testend', e => firedEvents.push(e))
 
-  utils.extend(coords.page, startCoords)
+  extend(coords.page, startCoords)
   interaction.pointerDown(event, event, element)
 
   ;(interactable.options as any).test = {
@@ -68,7 +69,7 @@ test('modifiers/base', t => {
     startCoords,
     'interaction.coords.cur are restored after action start phase')
 
-  utils.extend(coords.page, moveCoords)
+  extend(coords.page, moveCoords)
   interaction.pointerMove(event, event, element)
 
   t.deepEqual(
@@ -106,7 +107,7 @@ test('modifiers/base', t => {
     methods: doubleModifier,
   })
 
-  utils.extend(coords.page, startCoords)
+  extend(coords.page, startCoords)
   interaction.pointerDown(event, event, element)
   interaction.start(testAction, interactable, element)
 
@@ -125,7 +126,7 @@ test('modifiers/base', t => {
     { x: 100, y: 200 },
     'interaction.coords.start are not modified without options.setStart')
 
-  utils.extend(coords.page, moveCoords)
+  extend(coords.page, moveCoords)
   interaction.pointerMove(event, event, element)
 
   t.deepEqual(

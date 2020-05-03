@@ -2,7 +2,7 @@ import { Interaction } from '@interactjs/core/Interaction'
 import Scope from '@interactjs/core/scope'
 import * as dom from '@interactjs/utils/domUtils'
 import extend from '@interactjs/utils/extend'
-import * as is from '@interactjs/utils/is'
+import is from '@interactjs/utils/is'
 
 export type EdgeName = 'top' | 'left' | 'bottom' | 'right'
 

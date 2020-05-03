@@ -1,0 +1,15 @@
+#!/usr/bin/env node
+require('../scripts/addPluginIndexes')([
+  'actions/plugin',
+  'actions/drag/plugin',
+  'actions/drop/plugin',
+  'actions/resize/plugin',
+  'actions/gesture/plugin',
+  'auto-scroll/plugin',
+  'auto-start/plugin',
+  'dev-tools/plugin',
+  'inertia/plugin',
+  'modifiers/plugin',
+  'pointer-events/plugin',
+  'reflow/plugin',
+])

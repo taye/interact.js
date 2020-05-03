@@ -1,6 +1,6 @@
 import { closest, getElementRect, parentNode } from './domUtils'
 import extend from './extend'
-import * as is from './is'
+import is from './is'
 
 export function getStringOptionResult (value: any, target: Interact.HasGetRect, element) {
   if (value === 'parent') { return parentNode(element) }

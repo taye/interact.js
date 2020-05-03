@@ -1,5 +1,11 @@
+/* eslint-disable import/no-named-as-default-member */
+import browser from '@interactjs/utils/browser'
+import clone from '@interactjs/utils/clone'
 import domObjects from '@interactjs/utils/domObjects'
-import * as utils from '@interactjs/utils/index'
+import extend from '@interactjs/utils/extend'
+import raf from '@interactjs/utils/raf'
+
+import win from '../utils/window'
 
 import Eventable from './Eventable'
 import InteractEvent, { PhaseMap } from './InteractEvent'
@@ -31,12 +37,6 @@ interface DocSignalArg {
   options?: { [index: string]: any }
 }
 
-const {
-  win,
-  browser,
-  raf,
-} = utils
-
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface ActionMap { // tslint:disable-line no-empty-interface
 }
@@ -67,8 +67,7 @@ export default class Scope {
   }> = []
 
   browser = browser
-  utils = utils
-  defaults = utils.clone(defaults) as typeof defaults
+  defaults = clone(defaults) as typeof defaults
   Eventable = Eventable
   actions: Actions = {
     map: {},
@@ -201,7 +200,7 @@ export default class Scope {
 
     const window = win.getWindow(doc)
 
-    options = options ? utils.extend({}, options) : {}
+    options = options ? extend({}, options) : {}
 
     this.documents.push({ doc, options })
     this.events.documents.push(doc)

@@ -88,7 +88,7 @@ async function runBuild () {
   }
 
   // create @interactjs/**/use/* modules
-  shell.exec('_add_use_modules')
+  shell.exec('_add_plugin_indexes')
 
   // generate esnext .js modules
   shell.exec('_esnext')

@@ -10,9 +10,3 @@ export default {
     scope.usePlugin(dragAxis)
   },
 }
-
-export {
-  autoStart,
-  hold,
-  dragAxis,
-}

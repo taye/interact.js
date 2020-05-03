@@ -1,5 +1,5 @@
 import extend from './extend'
-import * as is from './is'
+import is from './is'
 
 export interface NormalizedListeners {
   [type: string]: Interact.Listener[]

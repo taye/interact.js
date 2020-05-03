@@ -1,9 +1,14 @@
 import InteractEvent from '@interactjs/core/InteractEvent'
 import Interactable from '@interactjs/core/Interactable'
 import Scope from '@interactjs/core/scope'
-import * as utils from '@interactjs/utils/index'
+import * as domUtils from '@interactjs/utils/domUtils'
+import extend from '@interactjs/utils/extend'
+import getOriginXY from '@interactjs/utils/getOriginXY'
+import is from '@interactjs/utils/is'
+import normalizeListeners from '@interactjs/utils/normalizeListeners'
+import * as pointerUtils from '@interactjs/utils/pointerUtils'
 
-import drag from '../drag'
+import drag from '../drag/plugin'
 
 import DropEvent from './DropEvent'
 
@@ -163,7 +168,7 @@ function install (scope: Scope) {
    * @return {boolean | interact} The current setting or interact
    */
   interact.dynamicDrop = function (newValue?: boolean) {
-    if (utils.is.bool(newValue)) {
+    if (is.bool(newValue)) {
       // if (dragging && scope.dynamicDrop !== newValue && !newValue) {
       //  calcRects(dropzones)
       // }
@@ -175,7 +180,7 @@ function install (scope: Scope) {
     return scope.dynamicDrop
   }
 
-  utils.extend(actions.phaselessTypes, {
+  extend(actions.phaselessTypes, {
     dragenter: true,
     dragleave: true,
     dropactivate: true,
@@ -200,17 +205,17 @@ function collectDrops ({ interactables }, draggableElement) {
     const accept = dropzone.options.drop.accept
 
     // test the draggable draggableElement against the dropzone's accept setting
-    if ((utils.is.element(accept) && accept !== draggableElement) ||
-        (utils.is.string(accept) &&
-        !utils.dom.matchesSelector(draggableElement, accept)) ||
-        (utils.is.func(accept) && !accept({ dropzone, draggableElement }))) {
+    if ((is.element(accept) && accept !== draggableElement) ||
+        (is.string(accept) &&
+        !domUtils.matchesSelector(draggableElement, accept)) ||
+        (is.func(accept) && !accept({ dropzone, draggableElement }))) {
       continue
     }
 
     // query for new elements if necessary
-    const dropElements = utils.is.string(dropzone.target)
+    const dropElements = is.string(dropzone.target)
       ? dropzone._context.querySelectorAll(dropzone.target)
-      : utils.is.array(dropzone.target) ? dropzone.target : [dropzone.target]
+      : is.array(dropzone.target) ? dropzone.target : [dropzone.target]
 
     for (const dropzoneElement of dropElements) {
       if (dropzoneElement !== draggableElement) {
@@ -262,7 +267,7 @@ function getDrop ({ dropState, interactable: draggable, element: dragElement }: 
   }
 
   // get the most appropriate dropzone based on DOM depth and order
-  const dropIndex = utils.dom.indexOfDeepestElement(validDrops)
+  const dropIndex = domUtils.indexOfDeepestElement(validDrops)
 
   return dropState.activeDrops[dropIndex] || null
 }
@@ -376,11 +381,11 @@ function onEventCreated ({ interaction, iEvent, event }: Interact.DoPhaseArg<'dr
 function dropzoneMethod (interactable: Interact.Interactable): Interact.DropzoneOptions
 function dropzoneMethod (interactable: Interact.Interactable, options: Interact.DropzoneOptions | boolean)
 function dropzoneMethod (interactable: Interact.Interactable, options?: Interact.DropzoneOptions | boolean) {
-  if (utils.is.object(options)) {
+  if (is.object(options)) {
     interactable.options.drop.enabled = options.enabled !== false
 
     if (options.listeners) {
-      const normalized = utils.normalizeListeners(options.listeners)
+      const normalized = normalizeListeners(options.listeners)
       // rename 'drop' to '' as it will be prefixed with 'drop'
       const corrected = Object.keys(normalized).reduce((acc, type) => {
         const correctedType = /^(enter|leave)/.test(type)
@@ -399,17 +404,17 @@ function dropzoneMethod (interactable: Interact.Interactable, options?: Interact
       interactable.options.drop.listeners = corrected
     }
 
-    if (utils.is.func(options.ondrop)) { interactable.on('drop', options.ondrop) }
-    if (utils.is.func(options.ondropactivate)) { interactable.on('dropactivate', options.ondropactivate) }
-    if (utils.is.func(options.ondropdeactivate)) { interactable.on('dropdeactivate', options.ondropdeactivate) }
-    if (utils.is.func(options.ondragenter)) { interactable.on('dragenter', options.ondragenter) }
-    if (utils.is.func(options.ondragleave)) { interactable.on('dragleave', options.ondragleave) }
-    if (utils.is.func(options.ondropmove)) { interactable.on('dropmove', options.ondropmove) }
+    if (is.func(options.ondrop)) { interactable.on('drop', options.ondrop) }
+    if (is.func(options.ondropactivate)) { interactable.on('dropactivate', options.ondropactivate) }
+    if (is.func(options.ondropdeactivate)) { interactable.on('dropdeactivate', options.ondropdeactivate) }
+    if (is.func(options.ondragenter)) { interactable.on('dragenter', options.ondragenter) }
+    if (is.func(options.ondragleave)) { interactable.on('dragleave', options.ondragleave) }
+    if (is.func(options.ondropmove)) { interactable.on('dropmove', options.ondropmove) }
 
     if (/^(pointer|center)$/.test(options.overlap as string)) {
       interactable.options.drop.overlap = options.overlap
     }
-    else if (utils.is.number(options.overlap)) {
+    else if (is.number(options.overlap)) {
       interactable.options.drop.overlap = Math.max(Math.min(1, options.overlap), 0)
     }
     if ('accept' in options) {
@@ -422,7 +427,7 @@ function dropzoneMethod (interactable: Interact.Interactable, options?: Interact
     return interactable
   }
 
-  if (utils.is.bool(options)) {
+  if (is.bool(options)) {
     interactable.options.drop.enabled = options
 
     return interactable
@@ -453,8 +458,8 @@ function dropCheckMethod (
   const dropOverlap = interactable.options.drop.overlap
 
   if (dropOverlap === 'pointer') {
-    const origin = utils.getOriginXY(draggable, draggableElement, 'drag')
-    const page = utils.pointer.getPageXY(dragEvent)
+    const origin = getOriginXY(draggable, draggableElement, 'drag')
+    const page = pointerUtils.getPageXY(dragEvent)
 
     page.x += origin.x
     page.y += origin.y
@@ -474,7 +479,7 @@ function dropCheckMethod (
     dropped = cx >= rect.left && cx <= rect.right && cy >= rect.top && cy <= rect.bottom
   }
 
-  if (dragRect && utils.is.number(dropOverlap)) {
+  if (dragRect && is.number(dropOverlap)) {
     const overlapArea  = (Math.max(0, Math.min(rect.right, dragRect.right) - Math.max(rect.left, dragRect.left)) *
                           Math.max(0, Math.min(rect.bottom, dragRect.bottom) - Math.max(rect.top, dragRect.top)))
 

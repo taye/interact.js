@@ -1,5 +1,5 @@
 import extend from '@interactjs/utils/extend'
-import * as is from '@interactjs/utils/is'
+import is from '@interactjs/utils/is'
 import * as rectUtils from '@interactjs/utils/rect'
 
 import { makeModifier, ModifierArg, ModifierModule, ModifierState } from '../base'

@@ -1,9 +1,9 @@
 import Scope from '@interactjs/core/scope'
 
-import drag from './drag'
-import drop from './drop/index'
-import gesture from './gesture'
-import resize from './resize'
+import drag from './drag/plugin'
+import drop from './drop/plugin'
+import gesture from './gesture/plugin'
+import resize from './resize/plugin'
 
 export default {
   id: 'actions',
@@ -13,11 +13,4 @@ export default {
     scope.usePlugin(drag)
     scope.usePlugin(drop)
   },
-}
-
-export {
-  gesture,
-  resize,
-  drag,
-  drop,
 }

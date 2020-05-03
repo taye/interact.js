@@ -1,5 +1,5 @@
 import * as domUtils from '@interactjs/utils/domUtils'
-import * as is from '@interactjs/utils/is'
+import is from '@interactjs/utils/is'
 import raf from '@interactjs/utils/raf'
 import { getStringOptionResult } from '@interactjs/utils/rect'
 import { getWindow } from '@interactjs/utils/window'

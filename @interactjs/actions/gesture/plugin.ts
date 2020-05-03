@@ -1,5 +1,5 @@
-import * as utils from '@interactjs/utils/index'
-
+import is from '@interactjs/utils/is'
+import * as pointerUtils from '@interactjs/utils/pointerUtils'
 export type GesturableMethod = Interact.ActionMethod<Interact.GesturableOptions>
 
 declare module '@interactjs/core/Interaction' {
@@ -78,7 +78,7 @@ function install (scope: Interact.Scope) {
    * target of gesture events, or this Interactable
    */
   Interactable.prototype.gesturable = function (this: Interact.Interactable, options: Interact.GesturableOptions | boolean) {
-    if (utils.is.object(options)) {
+    if (is.object(options)) {
       this.options.gesture.enabled = options.enabled !== false
       this.setPerAction('gesture', options)
       this.setOnEvents('gesture', options)
@@ -86,7 +86,7 @@ function install (scope: Interact.Scope) {
       return this
     }
 
-    if (utils.is.bool(options)) {
+    if (is.bool(options)) {
       this.options.gesture.enabled = options
 
       return this
@@ -112,11 +112,11 @@ function updateGestureProps ({ interaction, iEvent, phase }: GestureSignalArg) {
   iEvent.touches = [pointers[0], pointers[1]]
 
   if (starting) {
-    iEvent.distance = utils.pointer.touchDistance(pointers, deltaSource)
-    iEvent.box      = utils.pointer.touchBBox(pointers)
+    iEvent.distance = pointerUtils.touchDistance(pointers, deltaSource)
+    iEvent.box      = pointerUtils.touchBBox(pointers)
     iEvent.scale    = 1
     iEvent.ds       = 0
-    iEvent.angle    = utils.pointer.touchAngle(pointers, deltaSource)
+    iEvent.angle    = pointerUtils.touchAngle(pointers, deltaSource)
     iEvent.da       = 0
 
     interaction.gesture.startDistance = iEvent.distance
@@ -133,10 +133,10 @@ function updateGestureProps ({ interaction, iEvent, phase }: GestureSignalArg) {
     iEvent.da       = 0
   }
   else {
-    iEvent.distance = utils.pointer.touchDistance(pointers, deltaSource)
-    iEvent.box      = utils.pointer.touchBBox(pointers)
+    iEvent.distance = pointerUtils.touchDistance(pointers, deltaSource)
+    iEvent.box      = pointerUtils.touchBBox(pointers)
     iEvent.scale    = iEvent.distance / interaction.gesture.startDistance
-    iEvent.angle    = utils.pointer.touchAngle(pointers, deltaSource)
+    iEvent.angle    = pointerUtils.touchAngle(pointers, deltaSource)
 
     iEvent.ds = iEvent.scale - interaction.gesture.scale
     iEvent.da = iEvent.angle - interaction.gesture.angle
@@ -145,7 +145,7 @@ function updateGestureProps ({ interaction, iEvent, phase }: GestureSignalArg) {
   interaction.gesture.distance = iEvent.distance
   interaction.gesture.angle = iEvent.angle
 
-  if (utils.is.number(iEvent.scale) &&
+  if (is.number(iEvent.scale) &&
       iEvent.scale !== Infinity &&
       !isNaN(iEvent.scale)) {
     interaction.gesture.scale = iEvent.scale

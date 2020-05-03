@@ -1,9 +1,9 @@
 import Modification from '@interactjs/modifiers/Modification'
 import * as modifiers from '@interactjs/modifiers/base'
-import offset from '@interactjs/offset/index'
+import offset from '@interactjs/offset/plugin'
 import * as dom from '@interactjs/utils/domUtils'
 import hypot from '@interactjs/utils/hypot'
-import * as is from '@interactjs/utils/is'
+import is from '@interactjs/utils/is'
 import { copyCoords } from '@interactjs/utils/pointerUtils'
 import raf from '@interactjs/utils/raf'
 

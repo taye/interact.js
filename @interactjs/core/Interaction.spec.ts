@@ -1,6 +1,6 @@
 import test from '@interactjs/_dev/test/test'
-import drag from '@interactjs/actions/drag'
-import drop from '@interactjs/actions/drop'
+import drag from '@interactjs/actions/drag/plugin'
+import drop from '@interactjs/actions/drop/plugin'
 import autoStart from '@interactjs/auto-start/base'
 import extend from '@interactjs/utils/extend'
 import * as pointerUtils from '@interactjs/utils/pointerUtils'
@@ -81,7 +81,7 @@ test('Interaction.getPointerIndex', t => {
   interaction.pointers = [2, 4, 5, 0, -1].map(id => ({ id })) as any
 
   interaction.pointers.forEach(({ id }, index) => {
-    t.equal(interaction.getPointerIndex({ pointerId: id }), index)
+    t.equal(interaction.getPointerIndex({ pointerId: id } as any), index)
   })
 
   t.end()

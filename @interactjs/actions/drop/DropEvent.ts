@@ -16,7 +16,7 @@ class DropEvent extends BaseEvent {
   /**
    * Class of events fired on dropzones during drags with acceptable targets.
    */
-  constructor (dropState: import('./').DropState, dragEvent: InteractEvent<'drag'>, type: string) {
+  constructor (dropState: import('./plugin').DropState, dragEvent: InteractEvent<'drag'>, type: string) {
     super(dragEvent._interaction)
 
     const { element, dropzone } = type === 'dragleave'

@@ -1,5 +1,5 @@
 import { parentNode } from '@interactjs/utils/domUtils'
-import * as is from '@interactjs/utils/is'
+import is from '@interactjs/utils/is'
 
 import autoStart from './base'
 

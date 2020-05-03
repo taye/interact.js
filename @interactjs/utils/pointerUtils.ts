@@ -2,7 +2,7 @@ import browser from './browser'
 import dom from './domObjects'
 import * as domUtils from './domUtils'
 import hypot from './hypot'
-import * as is from './is'
+import is from './is'
 import pointerExtend from './pointerExtend'
 
 export function copyCoords (dest: Interact.CoordsSetMember, src: Interact.CoordsSetMember) {

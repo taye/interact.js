@@ -1,9 +1,9 @@
 import test from '@interactjs/_dev/test/test'
-import drag from '@interactjs/actions/drag'
+import drag from '@interactjs/actions/drag/plugin'
 import * as helpers from '@interactjs/core/tests/_helpers'
 import extend from '@interactjs/utils/extend'
 
-import inertia from './index'
+import inertia from './plugin'
 
 test('inertia', t => {
   const {

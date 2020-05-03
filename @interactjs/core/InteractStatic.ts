@@ -1,6 +1,9 @@
 /** @module interact */
 import browser from '@interactjs/utils/browser'
-import * as utils from '@interactjs/utils/index'
+import * as domUtils from '@interactjs/utils/domUtils'
+import extend from '@interactjs/utils/extend'
+import is from '@interactjs/utils/is'
+import * as pointerUtils from '@interactjs/utils/pointerUtils'
 
 import Interactable from './Interactable'
 import { Options } from './defaultOptions'
@@ -12,15 +15,15 @@ export interface InteractStatic {
 
 export class InteractStatic {
   // expose the functions used to calculate multi-touch properties
-  getPointerAverage  = utils.pointer.pointerAverage
-  getTouchBBox = utils.pointer.touchBBox
-  getTouchDistance = utils.pointer.touchDistance
-  getTouchAngle = utils.pointer.touchAngle
+  getPointerAverage  = pointerUtils.pointerAverage
+  getTouchBBox = pointerUtils.touchBBox
+  getTouchDistance = pointerUtils.touchDistance
+  getTouchAngle = pointerUtils.touchAngle
 
-  getElementRect = utils.dom.getElementRect
-  getElementClientRect = utils.dom.getElementClientRect
-  matchesSelector = utils.dom.matchesSelector
-  closest = utils.dom.closest
+  getElementRect = domUtils.getElementRect
+  getElementClientRect = domUtils.getElementClientRect
+  matchesSelector = domUtils.matchesSelector
+  closest = domUtils.closest
 
   globalEvents: any = {}
 
@@ -76,7 +79,7 @@ export class InteractStatic {
       interact[key] = prototype[key]
     }
 
-    utils.extend(interact as any, this)
+    extend(interact as any, this)
     interact.constructor = this.constructor
     this.interact = interact
 
@@ -124,11 +127,11 @@ export class InteractStatic {
    * @return {object} interact
    */
   on (type: string | Interact.EventTypes, listener: Interact.ListenersArg, options?: object) {
-    if (utils.is.string(type) && type.search(' ') !== -1) {
+    if (is.string(type) && type.search(' ') !== -1) {
       type = type.trim().split(/ +/)
     }
 
-    if (utils.is.array(type)) {
+    if (is.array(type)) {
       for (const eventType of (type as any[])) {
         this.on(eventType, listener, options)
       }
@@ -136,7 +139,7 @@ export class InteractStatic {
       return this
     }
 
-    if (utils.is.object(type)) {
+    if (is.object(type)) {
       for (const prop in type) {
         this.on(prop, (type as any)[prop], listener)
       }
@@ -175,11 +178,11 @@ export class InteractStatic {
    * @return {object} interact
    */
   off (type: Interact.EventTypes, listener: any, options?: object) {
-    if (utils.is.string(type) && type.search(' ') !== -1) {
+    if (is.string(type) && type.search(' ') !== -1) {
       type = type.trim().split(/ +/)
     }
 
-    if (utils.is.array(type)) {
+    if (is.array(type)) {
       for (const eventType of type) {
         this.off(eventType, listener, options)
       }
@@ -187,7 +190,7 @@ export class InteractStatic {
       return this
     }
 
-    if (utils.is.object(type)) {
+    if (is.object(type)) {
       for (const prop in type) {
         this.off(prop, type[prop], listener)
       }
@@ -257,7 +260,7 @@ export class InteractStatic {
    * @return {interact | number}
    */
   pointerMoveTolerance (newValue?: number) {
-    if (utils.is.number(newValue)) {
+    if (is.number(newValue)) {
       this.scope.interactions.pointerMoveTolerance = newValue
 
       return this

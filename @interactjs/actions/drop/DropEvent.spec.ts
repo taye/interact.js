@@ -1,11 +1,11 @@
 import test from '@interactjs/_dev/test/test'
 import InteractEvent from '@interactjs/core/InteractEvent'
-import * as utils from '@interactjs/utils/index'
+import extend from '@interactjs/utils/extend'
 
 import DropEvent from '../drop/DropEvent'
 
-const dz1: any = { target: 'dz1', fire (event) { this.fired = event } }
-const dz2: any = { target: 'dz2', fire (event) { this.fired = event } }
+const dz1: any = { target: 'dz1', fire (event: any) { this.fired = event } }
+const dz2: any = { target: 'dz2', fire (event: any) { this.fired = event } }
 const el1: any = Symbol('el1')
 const el2: any = Symbol('el2')
 const interactable: any = Symbol('interactable')
@@ -20,7 +20,7 @@ test('DropEvent constructor', t => {
     timeStamp: 10,
   }) as InteractEvent
 
-  utils.extend(interaction.dropState, {
+  extend(interaction.dropState, {
     activeDrops: [
       { dropzone: dz1, element: el1 },
       { dropzone: dz2, element: el2 },
@@ -54,7 +54,7 @@ test('DropEvent.reject()', t => {
     timeStamp: 10,
   }) as InteractEvent
 
-  utils.extend(interaction.dropState, {
+  extend(interaction.dropState, {
     activeDrops: [
       { dropzone: dz1, element: el1 },
       { dropzone: dz2, element: el2 },
@@ -85,7 +85,7 @@ test('DropEvent.reject()', t => {
     { dropzone: null, element: null },
     'dropState.cur dropzone and element are set to null after rejecting dropactivate')
 
-  utils.extend(interaction.dropState, {
+  extend(interaction.dropState, {
     cur : { dropzone: dz1, element: el1 },
     prev: { dropzone: null, element: null },
     events: {},

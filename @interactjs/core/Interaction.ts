@@ -1,4 +1,9 @@
-import * as utils from '@interactjs/utils/index'
+import * as arr from '@interactjs/utils/arr'
+import extend from '@interactjs/utils/extend'
+import hypot from '@interactjs/utils/hypot'
+import { warnOnce, copyAction } from '@interactjs/utils/misc'
+import * as pointerUtils from '@interactjs/utils/pointerUtils'
+import * as rectUtils from '@interactjs/utils/rect'
 
 import InteractEvent, { EventPhase } from './InteractEvent'
 import Interactable from './Interactable'
@@ -160,7 +165,7 @@ export class Interaction<T extends ActionName = ActionName> {
   /**
    * @alias Interaction.prototype.move
    */
-  doMove = utils.warnOnce(
+  doMove = warnOnce(
     function (this: Interaction, signalArg: any) {
       this.move(signalArg)
     },
@@ -168,15 +173,15 @@ export class Interaction<T extends ActionName = ActionName> {
 
   coords: Interact.CoordsSet = {
     // Starting InteractEvent pointer coordinates
-    start: utils.pointer.newCoords(),
+    start: pointerUtils.newCoords(),
     // Previous native pointer move event coordinates
-    prev: utils.pointer.newCoords(),
+    prev: pointerUtils.newCoords(),
     // current native pointer move event coordinates
-    cur: utils.pointer.newCoords(),
+    cur: pointerUtils.newCoords(),
     // Change in coordinates and time of the pointer
-    delta: utils.pointer.newCoords(),
+    delta: pointerUtils.newCoords(),
     // pointer velocity
-    velocity: utils.pointer.newCoords(),
+    velocity: pointerUtils.newCoords(),
   }
 
   readonly _id: number = idCounter++
@@ -262,13 +267,13 @@ export class Interaction<T extends ActionName = ActionName> {
       return false
     }
 
-    utils.copyAction(this.prepared, action)
+    copyAction(this.prepared, action)
 
     this.interactable = interactable
     this.element      = element
     this.rect         = interactable.getRect(element)
     this.edges        = this.prepared.edges
-      ? utils.extend({}, this.prepared.edges)
+      ? extend({}, this.prepared.edges)
       : { left: true, right: true, top: true, bottom: true }
     this._stopped     = false
     this._interacting = this._doPhase({
@@ -290,15 +295,15 @@ export class Interaction<T extends ActionName = ActionName> {
                            this.coords.cur.client.x === this.coords.prev.client.x &&
                            this.coords.cur.client.y === this.coords.prev.client.y)
 
-    let dx
-    let dy
+    let dx: number
+    let dy: number
 
     // register movement greater than pointerMoveTolerance
     if (this.pointerIsDown && !this.pointerWasMoved) {
       dx = this.coords.cur.client.x - this.coords.start.client.x
       dy = this.coords.cur.client.y - this.coords.start.client.y
 
-      this.pointerWasMoved = utils.hypot(dx, dy) > this.pointerMoveTolerance
+      this.pointerWasMoved = hypot(dx, dy) > this.pointerMoveTolerance
     }
 
     const pointerIndex = this.getPointerIndex(pointer)
@@ -317,7 +322,7 @@ export class Interaction<T extends ActionName = ActionName> {
 
     if (!duplicateMove) {
       // set pointer coordinate, time changes and velocity
-      utils.pointer.setCoordVelocity(this.coords.velocity, this.coords.delta)
+      pointerUtils.setCoordVelocity(this.coords.velocity, this.coords.delta)
     }
 
     this._scopeFire('interactions:move', signalArg)
@@ -330,7 +335,7 @@ export class Interaction<T extends ActionName = ActionName> {
       }
 
       if (this.pointerWasMoved) {
-        utils.pointer.copyCoords(this.coords.prev, this.coords.cur)
+        pointerUtils.copyCoords(this.coords.prev, this.coords.cur)
       }
     }
   }
@@ -353,12 +358,12 @@ export class Interaction<T extends ActionName = ActionName> {
    * snap/restrict has been changed and you want a movement with the new
    * settings.
    */
-  move (signalArg?) {
+  move (signalArg?: any) {
     if (!signalArg || !signalArg.event) {
-      utils.pointer.setZeroCoords(this.coords.delta)
+      pointerUtils.setZeroCoords(this.coords.delta)
     }
 
-    signalArg = utils.extend({
+    signalArg = extend({
       pointer: this._latestPointer.pointer,
       event: this._latestPointer.event,
       eventTarget: this._latestPointer.eventTarget,
@@ -399,8 +404,8 @@ export class Interaction<T extends ActionName = ActionName> {
     this.removePointer(pointer, event)
   }
 
-  documentBlur (event) {
-    this.end(event)
+  documentBlur (event: Event) {
+    this.end(event as any)
     this._scopeFire('interactions:blur', { event, type: 'blur', interaction: this })
   }
 
@@ -423,7 +428,7 @@ export class Interaction<T extends ActionName = ActionName> {
   end (event?: Interact.PointerEventType) {
     this._ending = true
     event = event || this._latestPointer.event
-    let endPhaseResult
+    let endPhaseResult: boolean
 
     if (this.interacting()) {
       endPhaseResult = this._doPhase({
@@ -459,21 +464,21 @@ export class Interaction<T extends ActionName = ActionName> {
     this.prepared.name = this.prevEvent = null
   }
 
-  getPointerIndex (pointer) {
-    const pointerId = utils.pointer.getPointerId(pointer)
+  getPointerIndex (pointer: Interact.PointerType) {
+    const pointerId = pointerUtils.getPointerId(pointer)
 
     // mouse and pen interactions may have only one pointer
     return (this.pointerType === 'mouse' || this.pointerType === 'pen')
       ? this.pointers.length - 1
-      : utils.arr.findIndex(this.pointers, curPointer => curPointer.id === pointerId)
+      : arr.findIndex(this.pointers, curPointer => curPointer.id === pointerId)
   }
 
-  getPointerInfo (pointer) {
+  getPointerInfo (pointer: any) {
     return this.pointers[this.getPointerIndex(pointer)]
   }
 
   updatePointer (pointer: Interact.PointerType, event: Interact.PointerEventType, eventTarget: Interact.EventTarget, down?: boolean) {
-    const id = utils.pointer.getPointerId(pointer)
+    const id = pointerUtils.getPointerId(pointer)
     let pointerIndex = this.getPointerIndex(pointer)
     let pointerInfo = this.pointers[pointerIndex]
 
@@ -497,19 +502,19 @@ export class Interaction<T extends ActionName = ActionName> {
       pointerInfo.pointer = pointer
     }
 
-    utils.pointer.setCoords(this.coords.cur, this.pointers.map(p => p.pointer), this._now())
-    utils.pointer.setCoordDeltas(this.coords.delta, this.coords.prev, this.coords.cur)
+    pointerUtils.setCoords(this.coords.cur, this.pointers.map(p => p.pointer), this._now())
+    pointerUtils.setCoordDeltas(this.coords.delta, this.coords.prev, this.coords.cur)
 
     if (down) {
       this.pointerIsDown = true
 
       pointerInfo.downTime = this.coords.cur.timeStamp
       pointerInfo.downTarget = eventTarget
-      utils.pointer.pointerExtend(this.downPointer, pointer)
+      pointerUtils.pointerExtend(this.downPointer, pointer)
 
       if (!this.interacting()) {
-        utils.pointer.copyCoords(this.coords.start, this.coords.cur)
-        utils.pointer.copyCoords(this.coords.prev, this.coords.cur)
+        pointerUtils.copyCoords(this.coords.start, this.coords.cur)
+        pointerUtils.copyCoords(this.coords.prev, this.coords.cur)
 
         this.downEvent = event
         this.pointerWasMoved = false
@@ -580,7 +585,7 @@ export class Interaction<T extends ActionName = ActionName> {
 
     if (rect && phase === 'move') {
       // update the rect changes due to pointer move
-      utils.rect.addEdges(this.edges, rect, this.coords.delta[this.interactable.options.deltaSource])
+      rectUtils.addEdges(this.edges, rect, this.coords.delta[this.interactable.options.deltaSource])
 
       rect.width = rect.right - rect.left
       rect.height = rect.bottom - rect.top

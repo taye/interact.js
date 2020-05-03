@@ -3,7 +3,7 @@ import browser from '@interactjs/utils/browser'
 import clone from '@interactjs/utils/clone'
 import { getElementRect, matchesUpTo, nodeContains, trySelector } from '@interactjs/utils/domUtils'
 import extend from '@interactjs/utils/extend'
-import * as is from '@interactjs/utils/is'
+import is from '@interactjs/utils/is'
 import normalizeListeners from '@interactjs/utils/normalizeListeners'
 import { getWindow } from '@interactjs/utils/window'
 

@@ -1,4 +1,7 @@
-import * as utils from '@interactjs/utils/index'
+import * as domUtils from '@interactjs/utils/domUtils'
+import extend from '@interactjs/utils/extend'
+import is from '@interactjs/utils/is'
+import { copyAction } from '@interactjs/utils/misc'
 
 import InteractableMethods from './InteractableMethods'
 
@@ -68,7 +71,7 @@ function install (scope: Interact.Scope) {
   defaults.base.actionChecker = null
   defaults.base.styleCursor = true
 
-  utils.extend(defaults.perAction, {
+  extend(defaults.perAction, {
     manualStart: false,
     max: Infinity,
     maxPerElement: 1,
@@ -91,7 +94,7 @@ function install (scope: Interact.Scope) {
    *
    * @param {number} [newValue] Any number. newValue <= 0 means no interactions.
    */
-  interact.maxInteractions = newValue => maxInteractions(newValue, scope)
+  interact.maxInteractions = (newValue: number) => maxInteractions(newValue, scope)
 
   scope.autoStart = {
     // Allow this many interactions to happen simultaneously
@@ -223,7 +226,7 @@ function getActionInfo (
     matchElements.push(element)
   }
 
-  while (utils.is.element(element)) {
+  while (is.element(element)) {
     matches = []
     matchElements = []
 
@@ -236,7 +239,7 @@ function getActionInfo (
       return actionInfo
     }
 
-    element = utils.dom.parentNode(element) as Interact.Element
+    element = domUtils.parentNode(element) as Interact.Element
   }
 
   return { action: null, interactable: null, element: null }
@@ -255,7 +258,7 @@ function prepare (
 
   interaction.interactable = interactable
   interaction.element = element
-  utils.copyAction(interaction.prepared, action)
+  copyAction(interaction.prepared, action)
 
   interaction.rect = interactable && action.name
     ? interactable.getRect(element)
@@ -315,7 +318,7 @@ function withinInteractionLimit<T extends Interact.ActionName> (
 }
 
 function maxInteractions (newValue: any, scope: Interact.Scope) {
-  if (utils.is.number(newValue)) {
+  if (is.number(newValue)) {
     scope.autoStart.maxInteractions = newValue
 
     return this
@@ -353,7 +356,7 @@ function setInteractionCursor<T extends Interact.ActionName> (interaction: Inter
   if (prepared.name) {
     const cursorChecker: Interact.CursorChecker = interactable.options[prepared.name].cursorChecker
 
-    if (utils.is.func(cursorChecker)) {
+    if (is.func(cursorChecker)) {
       cursor = cursorChecker(prepared, interactable, element, interaction._interacting)
     }
     else {

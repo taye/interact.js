@@ -1,5 +1,5 @@
 import domObjects from './domObjects'
-import * as is from './is'
+import is from './is'
 import win from './window'
 
 const browser = {

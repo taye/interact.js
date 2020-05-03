@@ -1,5 +1,5 @@
 import test from '@interactjs/_dev/test/test'
-import resize from '@interactjs/actions/resize'
+import resize from '@interactjs/actions/resize/plugin'
 import extend from '@interactjs/utils/extend'
 
 import * as helpers from '../../core/tests/_helpers'
@@ -50,8 +50,8 @@ test('restrictSize', t => {
   t.deepEqual(latestEvent.page, { x: 140, y: 250 }, 'outside min')
 
   // min and max function restrictions
-  let minFuncArgs
-  let maxFuncArgs
+  let minFuncArgs: any[]
+  let maxFuncArgs: any[]
 
   options.min = (...args: any[]) => {
     minFuncArgs = args

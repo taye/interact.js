@@ -1,4 +1,8 @@
-import * as utils from '@interactjs/utils/index'
+import extend from '@interactjs/utils/extend'
+import getOriginXY from '@interactjs/utils/getOriginXY'
+import hypot from '@interactjs/utils/hypot'
+import is from '@interactjs/utils/is'
+import { resolveRectLike, rectToXY } from '@interactjs/utils/rect'
 
 import { makeModifier, ModifierArg, ModifierState } from '../base'
 
@@ -61,9 +65,9 @@ function start (arg: ModifierArg<SnapState>) {
     }
   }
   else  {
-    const offsetRect = utils.rect.resolveRectLike(options.offset as any, interactable, element, [interaction])
+    const offsetRect = resolveRectLike(options.offset as any, interactable, element, [interaction])
 
-    snapOffset = utils.rect.rectToXY(offsetRect) || { x: 0, y: 0 }
+    snapOffset = rectToXY(offsetRect) || { x: 0, y: 0 }
     snapOffset.x += origin.x
     snapOffset.y += origin.y
   }
@@ -77,7 +81,7 @@ function start (arg: ModifierArg<SnapState>) {
       x: startOffset.left - (rect.width  * relativePoint.x) + snapOffset.x,
       y: startOffset.top  - (rect.height * relativePoint.y) + snapOffset.y,
     }))
-    : [utils.extend({
+    : [extend({
       index: 0,
       relativePoint: null,
     }, snapOffset)]
@@ -87,8 +91,8 @@ function set (arg: ModifierArg<SnapState>) {
   const { interaction, coords, state } = arg
   const { options, offsets } = state
 
-  const origin = utils.getOriginXY(interaction.interactable, interaction.element, interaction.prepared.name)
-  const page = utils.extend({}, coords)
+  const origin = getOriginXY(interaction.interactable, interaction.element, interaction.prepared.name)
+  const page = extend({}, coords)
   const targets = []
 
   if (!options.offsetWithOrigin) {
@@ -102,9 +106,9 @@ function set (arg: ModifierArg<SnapState>) {
 
     for (let index = 0, len = options.targets.length; index < len; index++) {
       const snapTarget = options.targets[index]
-      let target
+      let target: SnapPosition
 
-      if (utils.is.func(snapTarget)) {
+      if (is.func(snapTarget)) {
         target = snapTarget(relativeX, relativeY, interaction, offset, index)
       }
       else {
@@ -114,10 +118,10 @@ function set (arg: ModifierArg<SnapState>) {
       if (!target) { continue }
 
       targets.push({
-        x: (utils.is.number(target.x) ? target.x : relativeX) + offset.x,
-        y: (utils.is.number(target.y) ? target.y : relativeY) + offset.y,
+        x: (is.number(target.x) ? target.x : relativeX) + offset.x,
+        y: (is.number(target.y) ? target.y : relativeY) + offset.y,
 
-        range: utils.is.number(target.range) ? target.range : options.range,
+        range: is.number(target.range) ? target.range : options.range,
         source: snapTarget,
         index,
         offset,
@@ -137,7 +141,7 @@ function set (arg: ModifierArg<SnapState>) {
     const range = target.range
     const dx = target.x - page.x
     const dy = target.y - page.y
-    const distance = utils.hypot(dx, dy)
+    const distance = hypot(dx, dy)
     let inRange = distance <= range
 
     // Infinite targets count as being out of range
@@ -177,10 +181,10 @@ function set (arg: ModifierArg<SnapState>) {
 
 function getOrigin (arg: Partial<ModifierArg<SnapState>>) {
   const { element } = arg.interaction
-  const optionsOrigin = utils.rect.rectToXY(
-    utils.rect.resolveRectLike(arg.state.options.origin as any, null, null, [element]),
+  const optionsOrigin = rectToXY(
+    resolveRectLike(arg.state.options.origin as any, null, null, [element]),
   )
-  const origin = optionsOrigin || utils.getOriginXY(
+  const origin = optionsOrigin || getOriginXY(
     arg.interactable,
     element,
     arg.interaction.prepared.name,

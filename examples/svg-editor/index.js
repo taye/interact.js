@@ -1,9 +1,9 @@
-import '../../@interactjs/actions/use/index.js'
-import '../../@interactjs/modifiers/use/index.js'
-import '../../@interactjs/inertia/use/index.js'
-import '../../@interactjs/auto-start/use/index.js'
+import '../../@interactjs/actions/index.js'
+import '../../@interactjs/modifiers/index.js'
+import '../../@interactjs/inertia/index.js'
+import '../../@interactjs/auto-start/index.js'
 
-import '../../@interactjs/dev-tools/use/index.js'
+import '../../@interactjs/dev-tools/index.js'
 
 import interact from '../../@interactjs/interact/index.js'
 

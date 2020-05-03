@@ -4,8 +4,9 @@ cc-test-reporter
 .nyc_output
 **/*.d.ts
 **/*.d.ts.map
-!@interactjs/types/types.d.ts
-@interactjs/*/use/**/*.ts
+!@interactjs/types/typings.d.ts
+@interactjs/**/index.ts
+!@interactjs/{types,interact,interactjs}/index.ts
 *interactjs/**/*.js
 *interactjs/**/*.js.map
 **/node_modules

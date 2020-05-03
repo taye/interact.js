@@ -8,15 +8,15 @@ module.exports = plugins => {
     const [scopePath] = modulePath.split('/')
     const packagePath = path.join('@interactjs', scopePath)
     const pluginPath = path.join('@interactjs', modulePath)
-    const dest = `${path.join(packagePath, 'use', path.relative(packagePath, pluginPath))}.ts`
+    const dest = path.join(packagePath, path.dirname(path.relative(packagePath, pluginPath)), 'index.ts')
     const destDir = path.dirname(dest)
-    const importPath = path.relative(destDir, pluginPath)
 
-    mkdirp.sync(destDir)
+    await mkdirp(destDir)
 
     await fs.writeFile(dest, `
+      /* eslint-disable import/order, no-console, eol-last */
       import interact, { init } from '@interactjs/interact'
-      import plugin from '${importPath}'
+      import plugin from '${pluginPath}'
 
       if (typeof window === 'object' && !!window) {
         init(window)
@@ -25,8 +25,7 @@ module.exports = plugins => {
       // eslint-disable-next-line no-undef
       if ((process.env.NODE_ENV !== 'production' || process.env.INTERACTJS_ESNEXT) && !(interact as any).__warnedUseImport) {
         (interact as any).__warnedUseImport = true
-        // eslint-disable-next-line no-console
-        console.warn('[interact.js] The "@interactjs/*/use" packages are not quite stable yet. Use them with caution.')
+        console.warn('[interact.js] The "@interactjs/*/index" packages are not quite stable yet. Use them with caution.')
       }
 
       interact.use(plugin)

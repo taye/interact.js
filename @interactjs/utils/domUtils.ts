@@ -1,6 +1,6 @@
 import browser from './browser'
 import domObjects from './domObjects'
-import * as is from './is'
+import is from './is'
 import win, { getWindow } from './window'
 
 export function nodeContains (parent: Node | Interact.EventTarget, child: Node | Interact.EventTarget) {

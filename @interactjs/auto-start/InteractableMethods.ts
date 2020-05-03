@@ -1,5 +1,5 @@
-import { warnOnce } from '@interactjs/utils/index'
-import * as is from '@interactjs/utils/is'
+import is from '@interactjs/utils/is'
+import { warnOnce } from '@interactjs/utils/misc'
 
 declare module '@interactjs/core/Interactable' {
   interface Interactable {

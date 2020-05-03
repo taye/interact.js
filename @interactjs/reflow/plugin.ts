@@ -1,7 +1,11 @@
 import Interactable from '@interactjs/core/Interactable'
 import { ActionProps, Interaction } from '@interactjs/core/Interaction'
 import Scope from '@interactjs/core/scope'
-import { arr, extend, is, pointer as pointerUtils, rect as rectUtils, win } from '@interactjs/utils/index'
+import * as arr from '@interactjs/utils/arr'
+import extend from '@interactjs/utils/extend'
+import is from '@interactjs/utils/is'
+import * as pointerUtils from '@interactjs/utils/pointerUtils'
+import { tlbrToXywh } from '@interactjs/utils/rect'
 
 declare module '@interactjs/core/Interactable' {
   interface Interactable {
@@ -59,7 +63,7 @@ function reflow<T extends Interact.ActionName> (interactable: Interactable, acti
     : [interactable.target]) as Interact.Element[]
 
   // tslint:disable-next-line variable-name
-  const Promise = (win.window as any).Promise
+  const Promise = (scope.window as any).Promise
   const promises: Array<Promise<null>> | null = Promise ? [] : null
 
   for (const element of elements) {
@@ -87,7 +91,7 @@ function reflow<T extends Interact.ActionName> (interactable: Interactable, acti
       }
     }
     else {
-      const xywh = rectUtils.tlbrToXywh(rect)
+      const xywh = tlbrToXywh(rect)
       const coords = {
         page     : { x: xywh.x, y: xywh.y },
         client   : { x: xywh.x, y: xywh.y },
@@ -124,8 +128,9 @@ function startReflow<T extends Interact.ActionName> (scope: Scope, interactable:
 
   interaction._doPhase(signalArg)
 
-  const reflowPromise = (win.window as unknown as any).Promise
-    ? new (win.window as unknown as any).Promise((resolve: any) => {
+  const Promise: PromiseConstructor = (scope.window as unknown as any).Promise
+  const reflowPromise = Promise
+    ? new Promise<null>(resolve => {
       interaction._reflowResolve = resolve
     })
     : null

@@ -1,7 +1,8 @@
-import { doc } from '@interactjs/_dev/test/domator'
 /* eslint-disable no-restricted-syntax */
-import * as utils from '@interactjs/utils/index'
-import { MockCoords } from '@interactjs/utils/pointerUtils'
+import { doc } from '@interactjs/_dev/test/domator'
+import extend from '@interactjs/utils/extend'
+import is from '@interactjs/utils/is'
+import * as pointerUtils from '@interactjs/utils/pointerUtils'
 
 import Scope from '../scope'
 
@@ -15,7 +16,7 @@ export function uniqueProps (obj: any) {
   for (const prop in obj) {
     if (!obj.hasOwnProperty(prop)) { continue }
 
-    if (utils.is.object(obj)) {
+    if (is.object(obj)) {
       uniqueProps(obj[prop])
     }
     else {
@@ -70,7 +71,7 @@ export function mockScope (options = {} as any) {
 
   const scope = new Scope().init(window)
 
-  utils.extend(scope.actions.phaselessTypes, { teststart: true, testmove: true, testend: true })
+  extend(scope.actions.phaselessTypes, { teststart: true, testmove: true, testend: true })
 
   return scope
 }
@@ -106,10 +107,10 @@ export function testEnv<T extends Interact.Target = HTMLElement> ({
 
   const interaction = scope.interactions.new({})
   const interactable = scope.interactables.new(target)
-  const coords = utils.pointer.newCoords() as MockCoords
+  const coords: pointerUtils.MockCoords = pointerUtils.newCoords()
 
   coords.target = target
-  const event = utils.pointer.coordsToEvent(coords)
+  const event = pointerUtils.coordsToEvent(coords)
 
   interactable.rectChecker(() => ({ ...rect }))
 

@@ -2,7 +2,7 @@
 // interactions.
 
 import extend from '@interactjs/utils/extend'
-import * as is from '@interactjs/utils/is'
+import is from '@interactjs/utils/is'
 
 import { makeModifier, ModifierArg } from '../base'
 

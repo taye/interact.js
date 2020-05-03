@@ -1,10 +1,5 @@
-// Type definitions for interact.js
-// Project: http://interactjs.io/
-// Definitions by: Gaspard Bucher <feature-space.com>
-//                  Taye Adeyemi <taye.me>
-
-import * as gesture from '@interactjs/actions/gesture'
-import * as resize from '@interactjs/actions/resize'
+import * as gesture from '@interactjs/actions/gesture/plugin'
+import * as resize from '@interactjs/actions/resize/plugin'
 import * as iEvent from '@interactjs/core/InteractEvent'
 import _Interactable from '@interactjs/core/Interactable'
 import _InteractableSet from '@interactjs/core/InteractableSet'
@@ -15,23 +10,23 @@ import * as snap from '@interactjs/modifiers/snap/pointer'
 import { PointerEvent as _PointerEvent } from '@interactjs/pointer-events/PointerEvent'
 
 // import module augmentations
-import '@interactjs/actions/drag'
-import '@interactjs/actions/drop'
-import '@interactjs/arrange'
-import '@interactjs/auto-scroll'
-import '@interactjs/auto-start'
+import '@interactjs/actions/drag/plugin'
+import '@interactjs/actions/drop/plugin'
+import '@interactjs/arrange/plugin'
+import '@interactjs/auto-scroll/plugin'
 import '@interactjs/auto-start/InteractableMethods'
+import '@interactjs/auto-start/base'
+import '@interactjs/auto-start/plugin'
 import '@interactjs/core/events'
 import '@interactjs/core/interactablePreventDefault'
 import '@interactjs/core/interactions'
-import '@interactjs/dev-tools'
-import '@interactjs/inertia'
-import '@interactjs/modifiers'
+import '@interactjs/dev-tools/plugin'
+import '@interactjs/inertia/plugin'
+import '@interactjs/modifiers/plugin'
 import '@interactjs/pointer-events/base'
 import '@interactjs/pointer-events/interactableTargets'
-import '@interactjs/reflow'
-import '@interactjs/snappers'
-import '@interactjs/symbol-tree'
+import '@interactjs/reflow/plugin'
+import '@interactjs/snappers/plugin'
 
 import _NativePointerEventType from './NativePointerEventType'
 

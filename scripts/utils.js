@@ -8,10 +8,10 @@ const resolveSync = require('resolve').sync
 const sourcesGlob = '{,@}interactjs/**/**/*{.ts,.tsx}'
 const lintSourcesGlob = `{${sourcesGlob},{scripts,examples}/**/*.js,bin/**/*}`
 const commonIgnoreGlobs = ['**/node_modules/**', '**/*_*', '**/*.d.ts', '**/dist/**', 'examples/js/**']
-const lintIgnoreGlobs = [...commonIgnoreGlobs, '**/@interactjs/*/use/**']
+const lintIgnoreGlobs = [...commonIgnoreGlobs]
 const sourcesIgnoreGlobs = [...commonIgnoreGlobs, '**/*.spec.ts']
-const builtFilesGlob = '{{**/dist/**,{,@}interactjs/**/**/*.js{,.map}},@interactjs/*/use/**}'
-const builtFilesIgnoreGlobs = ['**/node_modules/**']
+const builtFilesGlob = '{{**/dist/**,{,@}interactjs/**/**/*.js{,.map}},@interactjs/**/index.ts}'
+const builtFilesIgnoreGlobs = ['**/node_modules/**', '@interactjs/{types,interact,interactjs}/index.ts']
 
 const getSources = ({ cwd = process.cwd(), ...options } = {}) => glob(
   sourcesGlob,

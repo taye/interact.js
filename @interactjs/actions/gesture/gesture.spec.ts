@@ -1,9 +1,9 @@
 import test from '@interactjs/_dev/test/test'
 import * as helpers from '@interactjs/core/tests/_helpers'
-import * as utils from '@interactjs/utils/index'
+import extend from '@interactjs/utils/extend'
 import { coordsToEvent, newCoords } from '@interactjs/utils/pointerUtils'
 
-import gesture from './gesture'
+import gesture from './plugin'
 
 function getGestureProps (event: Interact.GestureEvent) {
   return helpers.getProps(event, ['type', 'angle', 'distance', 'scale', 'ds', 'da'])
@@ -47,8 +47,8 @@ test('Interactable.gesturable method', t => {
   interaction.pointerType = 'touch'
 
   // 0 --> 1
-  utils.extend(coords.page, { x: 0, y: 0 })
-  utils.extend(event2.coords.page, { x: 100, y: 0 })
+  extend(coords.page, { x: 0, y: 0 })
+  extend(event2.coords.page, { x: 100, y: 0 })
 
   const checkArg = {
     action: null,
@@ -97,7 +97,7 @@ test('Interactable.gesturable method', t => {
   // |
   // v
   // 1
-  utils.extend(event2.coords.page, { x: 0, y: 50 })
+  extend(event2.coords.page, { x: 0, y: 50 })
   interaction.pointerMove(event2, event2, element)
 
   t.deepEqual(
@@ -124,7 +124,7 @@ test('Interactable.gesturable method', t => {
     'move event properties are correct')
 
   // 1 <-- 0
-  utils.extend(coords.page, { x: 50, y: 50 })
+  extend(coords.page, { x: 50, y: 50 })
   move()
 
   t.deepEqual(
@@ -180,7 +180,7 @@ test('Interactable.gesturable method', t => {
   // v
   // 1
   interaction.pointerDown(event2, event2, element)
-  utils.extend(coords.page, { x: 0, y: -150 })
+  extend(coords.page, { x: 0, y: -150 })
   checkArg.action = null
   scope.fire('auto-start:check', checkArg)
   interaction.pointerMove(event2, event2, element)

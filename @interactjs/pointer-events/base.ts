@@ -2,7 +2,9 @@ import Eventable from '@interactjs/core/Eventable'
 import Interaction from '@interactjs/core/Interaction'
 import { PerActionDefaults } from '@interactjs/core/defaultOptions'
 import Scope from '@interactjs/core/scope'
-import * as utils from '@interactjs/utils/index'
+import * as domUtils from '@interactjs/utils/domUtils'
+import extend from '@interactjs/utils/extend'
+import getOriginXY from '@interactjs/utils/getOriginXY'
 
 import PointerEvent from './PointerEvent'
 
@@ -80,7 +82,7 @@ const defaults: PointerEventOptions = {
   origin      : { x: 0, y: 0 },
 }
 
-const pointerEvents = {
+const pointerEvents: Interact.Plugin = {
   id: 'pointer-events/base',
   install,
   listeners: {
@@ -157,7 +159,7 @@ function fire<T extends string> (
       (pointerEvent as any)[prop] = target.props[prop]
     }
 
-    const origin = utils.getOriginXY(target.eventable, target.node)
+    const origin = getOriginXY(target.eventable, target.node)
 
     pointerEvent._subtractOrigin(origin)
     pointerEvent.eventable = target.eventable
@@ -213,7 +215,7 @@ function collectEventTargets<T extends string> ({ interaction, pointer, event, e
     return []
   }
 
-  const path = utils.dom.getPath(eventTarget as Interact.Element | Document)
+  const path = domUtils.getPath(eventTarget as Interact.Element | Document)
   const signalArg = {
     interaction,
     pointer,
@@ -281,7 +283,7 @@ function moveAndClearHold (
 
 function downAndStartHold ({ interaction, pointer, event, eventTarget, pointerIndex }: Interact.SignalArgs['interactions:down'], scope: Interact.Scope) {
   const timer = interaction.pointers[pointerIndex].hold
-  const path = utils.dom.getPath(eventTarget as Interact.Element | Document)
+  const path = domUtils.getPath(eventTarget as Interact.Element | Document)
   const signalArg = {
     interaction,
     pointer,
@@ -332,7 +334,7 @@ function tapAfterUp ({ interaction, pointer, event, eventTarget }: Interact.Sign
 function install (scope: Scope) {
   scope.pointerEvents = pointerEvents
   scope.defaults.actions.pointerEvents = pointerEvents.defaults
-  utils.extend(scope.actions.phaselessTypes, pointerEvents.types)
+  extend(scope.actions.phaselessTypes, pointerEvents.types)
 }
 
 export default pointerEvents
