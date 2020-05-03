@@ -5,6 +5,7 @@ import { getElementRect, matchesUpTo, nodeContains, trySelector } from '@interac
 import extend from '@interactjs/utils/extend'
 import * as is from '@interactjs/utils/is'
 import normalizeListeners from '@interactjs/utils/normalizeListeners'
+import { tlbrToXywh } from '@interactjs/utils/rect'
 import { getWindow } from '@interactjs/utils/window'
 
 import Eventable from './Eventable'
@@ -31,6 +32,8 @@ export class Interactable implements Partial<Eventable> {
   readonly _win: Window
   readonly _doc: Document
   readonly _scopeEvents: Interact.Scope['events']
+
+  /** @internal */ _rectChecker?: typeof Interactable.prototype.getRect
 
   /** */
   constructor (target: Interact.Target, options: any, defaultContext: Document | Interact.Element, scopeEvents: Interact.Scope['events']) {
@@ -133,13 +136,16 @@ export class Interactable implements Partial<Eventable> {
    */
   rectChecker (checker: (element: Interact.Element) => any) {
     if (is.func(checker)) {
-      this.getRect = checker
+      this._rectChecker = checker
+
+      this.getRect = element => tlbrToXywh(this._rectChecker(element))
 
       return this
     }
 
     if (checker === null) {
       delete this.getRect
+      delete this._rectChecker
 
       return this
     }
