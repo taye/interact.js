@@ -1,7 +1,4 @@
-// require('ts-node/register')
-
 const path = require('path')
-const babelRegister = require('@babel/register').default
 
 let babelrc
 
@@ -16,5 +13,8 @@ const babelConfig = {
   extensions: ['.ts', '.tsx', '.js', '.jsx'],
   ...babelrc,
 }
+
+// require after .babelrc to avoid node circular dependency warnings
+const babelRegister = require('@babel/register').default
 
 babelRegister(babelConfig)
