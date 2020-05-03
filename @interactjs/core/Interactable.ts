@@ -5,7 +5,6 @@ import { getElementRect, matchesUpTo, nodeContains, trySelector } from '@interac
 import extend from '@interactjs/utils/extend'
 import * as is from '@interactjs/utils/is'
 import normalizeListeners from '@interactjs/utils/normalizeListeners'
-import { tlbrToXywh } from '@interactjs/utils/rect'
 import { getWindow } from '@interactjs/utils/window'
 
 import Eventable from './Eventable'
@@ -138,7 +137,16 @@ export class Interactable implements Partial<Eventable> {
     if (is.func(checker)) {
       this._rectChecker = checker
 
-      this.getRect = element => tlbrToXywh(this._rectChecker(element))
+      this.getRect = element => {
+        const rect = extend({}, this._rectChecker(element))
+
+        if (!('width' in rect)) {
+          rect.width = rect.right - rect.left
+          rect.height = rect.bottom - rect.top
+        }
+
+        return rect
+      }
 
       return this
     }
