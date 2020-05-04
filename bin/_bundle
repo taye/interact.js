@@ -3,22 +3,32 @@ const path = require('path')
 const headers = require('../scripts/headers')
 const writer = require('../scripts/bundleWriter')
 const { getPackageDir, resolveImport } = require('../scripts/utils')
-
 const bundler = require('../scripts/bundler')
 
-const entryPkgDir = path.join(process.cwd(), 'interactjs')
+const [
+  ,,
+  entry = 'interactjs',
+  standalone = 'interact',
+  name = standalone,
+] = process.argv
+const entryPkgDir = path.join(process.cwd(), entry)
 
 const options = {
   headers,
   entry: path.join(entryPkgDir, 'index.ts'),
   destDir: path.join(entryPkgDir, 'dist'),
-  standalone: 'interact',
-  name: 'interact',
+  standalone,
+  name,
 }
 
 process.stdout.write('Bundling...')
 
-bundler(options).then(async code => {
-  await writer(code, options)
-  console.log(' done.')
-})
+bundler(options)
+  .then(async code => {
+    await writer(code, options)
+    console.log(' done.')
+  })
+  .catch(error => {
+    console.error(error)
+    process.exit(1)
+  })

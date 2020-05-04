@@ -1,6 +1,6 @@
 const path = require('path')
 
-const { getBabelrc } = require('./utils')
+const { getModuleDirectories, getBabelrc, extendBabelOptions } = require('./utils')
 
 process.env.NODE_PATH = `${process.env.NODE_PATH || ''}:${path.resolve(__dirname, '..', 'node_modules')}`
 require('module').Module._initPaths()
@@ -23,33 +23,31 @@ module.exports = function (options) {
       ]
       : []
 
-  const babelrc = getBabelrc()
+  const babelrc = extendBabelOptions({
+    babelrc: false,
+    sourceType: 'module',
+    global: true,
+    extensions: [
+      '.ts',
+      '.tsx',
+      '.js',
+      '.jsx',
+    ],
+  }, getBabelrc())
 
   const b = browserify(options.entry, {
-    extensions: ['.ts', '.tsx'],
     debug: true,
-
+    bare: true,
     standalone: options.standalone,
-
     transform: [
-      [require('babelify'), {
-        babelrc: false,
-        sourceType: 'module',
-        global: true,
-        ...babelrc,
-        extensions: [
-          '.ts',
-          '.tsx',
-          '.js',
-          '.jsx',
-        ],
-      }],
+      [require('babelify'), babelrc],
     ],
-
     plugin: plugins,
-
-    cache: options.watch ? {} : null,
-    packageCache: {},
+    extensions: ['.ts', '.tsx'],
+    paths: getModuleDirectories(),
+    ...options.watch
+      ? { cache: {}, packageCache: {} }
+      : {},
   }).exclude('jsdom')
 
   if (options.watch) {

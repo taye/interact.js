@@ -44,13 +44,13 @@ module.exports = function bundleWriter (bundleCode, {
   }
 }
 
-function write ({ destDir, filename, code, map }) {
+async function write ({ destDir, filename, code, map }) {
   map.sources = map.sources.map(source => path.relative(process.cwd(), source))
   map.file = filename
 
   const codeFilename = path.join(destDir, filename)
 
-  mkdirp(path.dirname(codeFilename))
+  await mkdirp(path.dirname(codeFilename))
 
   return Promise.all([
     fs.promises.writeFile(codeFilename, code),

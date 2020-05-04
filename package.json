@@ -43,7 +43,6 @@
     "@typescript-eslint/parser": "latest",
     "babel-eslint": "latest",
     "babel-plugin-istanbul": "latest",
-    "babel-plugin-transform-inline-environment-variables": "latest",
     "babelify": "latest",
     "browser-pack-flat": "latest",
     "browser-sync": "latest",

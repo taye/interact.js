@@ -1,3 +1,5 @@
+const { transformInlineEnvironmentVariables } = require('./scripts/utils')
+
 module.exports = {
   presets: [
     ...process.env.NODE_ENV === 'test'
@@ -16,6 +18,7 @@ module.exports = {
         require('@babel/plugin-proposal-class-properties').default,
         require('@babel/plugin-transform-modules-commonjs').default,
         require('@babel/plugin-proposal-optional-catch-binding').default,
+        transformInlineEnvironmentVariables,
       ]
       : [
         require('@babel/plugin-proposal-optional-catch-binding').default,
@@ -24,9 +27,7 @@ module.exports = {
           regenerator: false,
         }],
         require('@babel/plugin-proposal-class-properties'),
-        [require('babel-plugin-transform-inline-environment-variables'), {
-          include: ['NODE_ENV', 'npm_package_version'],
-        }],
+        [transformInlineEnvironmentVariables, { env: { NODE_ENV: 'development' } }],
       ],
 
   ignore: [/\/node_modules\/(?!@interactjs\/)/],
