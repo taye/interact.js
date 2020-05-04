@@ -1,9 +1,9 @@
 import test from '@interactjs/_dev/test/test'
 import resize from '@interactjs/actions/resize/plugin'
+import * as helpers from '@interactjs/core/tests/_helpers'
 import extend from '@interactjs/utils/extend'
+import * as rectUtils from '@interactjs/utils/rect'
 
-import * as helpers from '../../core/tests/_helpers'
-import * as rectUtils from '../../utils/rect'
 import modifiersBase from '../base'
 
 import restrictSize from './size'

@@ -1,5 +1,6 @@
+import * as pointerUtils from '@interactjs/utils/pointerUtils'
+
 import BaseEvent from '../core/BaseEvent'
-import * as pointerUtils from '../utils/pointerUtils'
 
 export default class PointerEvent<T extends string = any> extends BaseEvent {
   type: T

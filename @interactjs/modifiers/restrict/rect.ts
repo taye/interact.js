@@ -1,4 +1,5 @@
-import extend from '../../utils/extend'
+import extend from '@interactjs/utils/extend'
+
 import { makeModifier } from '../base'
 
 import { restrict } from './pointer'
