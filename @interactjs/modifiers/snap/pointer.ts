@@ -24,7 +24,7 @@ export interface SnapPosition {
 export type SnapFunction = (
   x: number,
   y: number,
-  interaction: Interact.Interaction,
+  interaction: Interact.InteractionProxy,
   offset: Offset,
   index: number
 ) => SnapPosition
@@ -109,7 +109,7 @@ function set (arg: ModifierArg<SnapState>) {
       let target: SnapPosition
 
       if (is.func(snapTarget)) {
-        target = snapTarget(relativeX, relativeY, interaction, offset, index)
+        target = snapTarget(relativeX, relativeY, interaction._proxy, offset, index)
       }
       else {
         target = snapTarget
