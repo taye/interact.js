@@ -2,7 +2,11 @@
 const path = require('path')
 const getVersion = require('../scripts/getVersion')
 
-const [,, cwd] = process.argv
+let [,, cwd, versionChange, prereleaseId] = process.argv
+
+if (cwd === undefined || !cwd.startsWith('/')) {
+  [cwd, versionChange, prereleaseId] = [process.cwd(), cwd, versionChange]
+}
 
 const depFields = [
   'dependencies',
