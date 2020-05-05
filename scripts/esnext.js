@@ -150,7 +150,10 @@ async function generate ({
               [transformImportsToRelative, { extension, moduleDirectory }],
             ],
           }, babelOptions)
-          const result = await babel.transformFromAst(ast, sourceCode, finalBabelOptions)
+          const result = {
+            ...await babel.transformFromAst(ast, sourceCode, finalBabelOptions),
+            modern: true,
+          }
 
           const { code, map } = version.post ? await version.post(result) : result
           const jsFilename = `${outModuleName}${extension}`

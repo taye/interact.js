@@ -29,7 +29,7 @@ module.exports = function bundleWriter (bundleCode, {
 
   if (!writeMin) { return }
 
-  const minifiedResult = minify(raw, { NODE_ENV: 'production' })
+  const minifiedResult = minify({ ...raw, env: { NODE_ENV: 'production' } })
   const headerOpts = getHeaderOpts(headers.min, filenames.min, minifiedResult.code, JSON.parse(minifiedResult.map))
   const min = bundleHeader(headerOpts)
 
