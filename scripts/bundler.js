@@ -37,7 +37,6 @@ module.exports = function (options) {
 
   const b = browserify(options.entry, {
     debug: true,
-    bare: true,
     standalone: options.standalone,
     transform: [
       [require('babelify'), babelrc],
@@ -48,6 +47,7 @@ module.exports = function (options) {
     ...options.watch
       ? { cache: {}, packageCache: {} }
       : {},
+    ...options.browserify,
   }).exclude('jsdom')
 
   if (options.watch) {

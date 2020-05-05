@@ -19,6 +19,9 @@ const options = {
   destDir: path.join(entryPkgDir, 'dist'),
   standalone,
   name,
+  browserify: {
+    bare: true,
+  }
 }
 
 process.stdout.write('Bundling...')
