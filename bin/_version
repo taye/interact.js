@@ -2,6 +2,8 @@
 const path = require('path')
 const getVersion = require('../scripts/getVersion')
 
+const [,, cwd] = process.argv
+
 const depFields = [
   'dependencies',
   'peerDependencies',
@@ -9,7 +11,7 @@ const depFields = [
   'optionalDependencies',
 ]
 
-let newVersion
+let currentVersion
 
 if (!module.parent) {
   const semver = require('semver')
@@ -17,33 +19,33 @@ if (!module.parent) {
   const glob = require('glob')
 
   const [,, versionChange, prereleaseId] = process.argv
-  const oldVersion = getVersion()
+  const previousVersion = getVersion(cwd)
 
   if (versionChange) {
     if (/^(major|minor|patch|premajor|preminor|prepatch|prerelease)$/.test(versionChange)) {
-      newVersion = semver.inc(oldVersion, versionChange, prereleaseId)
+      currentVersion = semver.inc(previousVersion, versionChange, prereleaseId)
     }
     else {
-      newVersion = semver.clean(versionChange)
+      currentVersion = semver.clean(versionChange)
 
-      if (newVersion === null) {
-        throw Error(`Invalid version change "${oldVersion}" -> "${versionChange}"`)
+      if (currentVersion === null) {
+        throw Error(`Invalid version change "${previousVersion}" -> "${versionChange}"`)
       }
     }
 
     const versionTable = []
 
-    for (const file of ['package.json', ...glob.sync('{@interactjs/*,interactjs}/package.json')]) {
+    for (const file of ['package.json', ...glob.sync('{@interactjs/*,interactjs}/package.json', { cwd })]) {
       const pkg = require(path.resolve(file))
 
-      versionTable.push({ package: pkg.name, old: pkg.version, new: newVersion })
+      versionTable.push({ package: pkg.name, old: pkg.version, new: currentVersion })
 
-      pkg.version = newVersion
+      pkg.version = currentVersion
 
       for (const deps of depFields.map(f => pkg[f]).filter(Boolean)) {
         for (const name of Object.keys(deps).filter(n => /@?interactjs\//.test(n))) {
-          if (deps[name] === oldVersion) {
-            deps[name] = newVersion
+          if (deps[name] === previousVersion) {
+            deps[name] = currentVersion
           } else {
             console.warn(`${file}: not updating "${name}" from "${deps[name]}"`)
           }
@@ -57,8 +59,8 @@ if (!module.parent) {
   }
   // if this was run with no arguments, get the current version
   else {
-    newVersion = oldVersion
+    currentVersion = previousVersion
   }
 
-  console.log(newVersion)
+  console.log(currentVersion)
 }
