@@ -1,3 +1,11 @@
+## v1.9.11
+
+ - fixed issue with missing width/height on rectChecker result
+ - fixed resize checker with negative sizes
+ - moved generated plugin use modules to @interactjs/*/{use/,}*/index.ts (#800)
+ - changed snap function args to provide interaction proxy
+ - restored dev-tools helpers in development bundle
+
 ## v1.9.10
 
  - fixed issue with uninitialized scope in non browser env #803

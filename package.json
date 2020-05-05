@@ -1,6 +1,6 @@
 {
   "name": "@interactjs/_dev",
-  "version": "1.9.10",
+  "version": "1.9.11",
   "private": true,
   "license": "MIT",
   "workspaces": [

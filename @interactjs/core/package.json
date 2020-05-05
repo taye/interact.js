@@ -1,9 +1,9 @@
 {
   "name": "@interactjs/core",
-  "version": "1.9.10",
+  "version": "1.9.11",
   "license": "MIT",
   "peerDependencies": {
-    "@interactjs/utils": "1.9.10"
+    "@interactjs/utils": "1.9.11"
   },
   "publishConfig": {
     "access": "public"
