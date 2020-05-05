@@ -1,6 +1,6 @@
 {
   "name": "@interactjs/clone",
-  "version": "1.9.11",
+  "version": "1.9.12",
   "license": "MIT",
   "publishConfig": {
     "access": "public"

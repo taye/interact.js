@@ -1,3 +1,7 @@
+## v1.9.12
+
+ - fixed regression breaking commonjs imports withotu .default
+
 ## v1.9.11
 
  - fixed issue with missing width/height on rectChecker result
