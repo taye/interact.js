@@ -1,0 +1,16 @@
+{
+	"version": 3,
+	"sources": [
+		"hypot.ts"
+	],
+	"names": [
+		"x",
+		"y",
+		"Math",
+		"sqrt"
+	],
+	"mappings": "cAAA,CAAgBA,EAAWC,IAAeC,KAAKC,KAAKH,EAAIA,EAAIC,EAAIA",
+	"sourcesContent": [
+		"export default (x: number, y: number) =>  Math.sqrt(x * x + y * y)\n"
+	]
+}
