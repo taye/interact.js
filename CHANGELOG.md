@@ -1,3 +1,7 @@
+## v1.9.13
+
+ - fixed regression breaking es5 compatibility of .min.js bundle (#814)
+
 ## v1.9.12
 
  - fixed regression breaking commonjs imports withotu .default
