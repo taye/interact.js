@@ -1,0 +1,11 @@
+{
+	"version": 3,
+	"sources": [
+		"displace.ts"
+	],
+	"names": [],
+	"mappings": "cAAe",
+	"sourcesContent": [
+		"export default {}\n"
+	]
+}

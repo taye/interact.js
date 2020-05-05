@@ -1,0 +1,468 @@
+import * as pointerUtils from '@interactjs/utils/pointerUtils';
+import Scope from '../scope';
+export declare function unique(): number;
+export declare function uniqueProps(obj: any): void;
+export declare function newCoordsSet(n?: number): {
+    start: {
+        page: {
+            x: number;
+            y: number;
+        };
+        client: {
+            x: number;
+            y: number;
+        };
+        timeStamp: number;
+    };
+    cur: {
+        page: {
+            x: number;
+            y: number;
+        };
+        client: {
+            x: number;
+            y: number;
+        };
+        timeStamp: number;
+    };
+    prev: {
+        page: {
+            x: number;
+            y: number;
+        };
+        client: {
+            x: number;
+            y: number;
+        };
+        timeStamp: number;
+    };
+    delta: {
+        page: {
+            x: number;
+            y: number;
+        };
+        client: {
+            x: number;
+            y: number;
+        };
+        timeStamp: number;
+    };
+    velocity: {
+        page: {
+            x: number;
+            y: number;
+        };
+        client: {
+            x: number;
+            y: number;
+        };
+        timeStamp: number;
+    };
+};
+export declare function newPointer(n?: number): import("../../types").PointerType;
+export declare function mockScope(options?: any): Scope;
+export declare function getProps<T extends {
+    [key: string]: any;
+}, K extends keyof T>(src: T, props: readonly K[]): Pick<T, K>;
+export declare function testEnv<T extends Interact.Target = HTMLElement>({ plugins, target, rect, }?: {
+    plugins?: Interact.Plugin[];
+    target?: T;
+    rect?: Interact.Rect;
+}): {
+    scope: Scope;
+    interaction: import("@interactjs/core/Interaction").Interaction<"resize" | "drag" | "drop" | "gesture">;
+    target: T;
+    interactable: import("@interactjs/core/Interactable").Interactable;
+    coords: pointerUtils.MockCoords;
+    event: ({
+        coords: pointerUtils.MockCoords;
+        readonly page: any;
+        readonly client: any;
+        readonly timeStamp: any;
+        readonly pageX: any;
+        readonly pageY: any;
+        readonly clientX: any;
+        readonly clientY: any;
+        readonly pointerId: any;
+        readonly target: any;
+        readonly type: any;
+        readonly pointerType: any;
+        readonly buttons: any;
+        preventDefault(): void;
+    } & MouseEvent) | ({
+        coords: pointerUtils.MockCoords;
+        readonly page: any;
+        readonly client: any;
+        readonly timeStamp: any;
+        readonly pageX: any;
+        readonly pageY: any;
+        readonly clientX: any;
+        readonly clientY: any;
+        readonly pointerId: any;
+        readonly target: any;
+        readonly type: any;
+        readonly pointerType: any;
+        readonly buttons: any;
+        preventDefault(): void;
+    } & MouseEvent & PointerEvent) | ({
+        coords: pointerUtils.MockCoords;
+        readonly page: any;
+        readonly client: any;
+        readonly timeStamp: any;
+        readonly pageX: any;
+        readonly pageY: any;
+        readonly clientX: any;
+        readonly clientY: any;
+        readonly pointerId: any;
+        readonly target: any;
+        readonly type: any;
+        readonly pointerType: any;
+        readonly buttons: any;
+        preventDefault(): void;
+    } & MouseEvent & import("../../types").PointerEvent<any>) | ({
+        coords: pointerUtils.MockCoords;
+        readonly page: any;
+        readonly client: any;
+        readonly timeStamp: any;
+        readonly pageX: any;
+        readonly pageY: any;
+        readonly clientX: any;
+        readonly clientY: any;
+        readonly pointerId: any;
+        readonly target: any;
+        readonly type: any;
+        readonly pointerType: any;
+        readonly buttons: any;
+        preventDefault(): void;
+    } & MouseEvent & import("../../types").InteractEvent<never, "end" | "resume" | "start" | "move" | "inertiastart" | "reflow">) | ({
+        coords: pointerUtils.MockCoords;
+        readonly page: any;
+        readonly client: any;
+        readonly timeStamp: any;
+        readonly pageX: any;
+        readonly pageY: any;
+        readonly clientX: any;
+        readonly clientY: any;
+        readonly pointerId: any;
+        readonly target: any;
+        readonly type: any;
+        readonly pointerType: any;
+        readonly buttons: any;
+        preventDefault(): void;
+    } & MouseEvent & TouchEvent) | ({
+        coords: pointerUtils.MockCoords;
+        readonly page: any;
+        readonly client: any;
+        readonly timeStamp: any;
+        readonly pageX: any;
+        readonly pageY: any;
+        readonly clientX: any;
+        readonly clientY: any;
+        readonly pointerId: any;
+        readonly target: any;
+        readonly type: any;
+        readonly pointerType: any;
+        readonly buttons: any;
+        preventDefault(): void;
+    } & Touch & MouseEvent) | ({
+        coords: pointerUtils.MockCoords;
+        readonly page: any;
+        readonly client: any;
+        readonly timeStamp: any;
+        readonly pageX: any;
+        readonly pageY: any;
+        readonly clientX: any;
+        readonly clientY: any;
+        readonly pointerId: any;
+        readonly target: any;
+        readonly type: any;
+        readonly pointerType: any;
+        readonly buttons: any;
+        preventDefault(): void;
+    } & Touch & PointerEvent) | ({
+        coords: pointerUtils.MockCoords;
+        readonly page: any;
+        readonly client: any;
+        readonly timeStamp: any;
+        readonly pageX: any;
+        readonly pageY: any;
+        readonly clientX: any;
+        readonly clientY: any;
+        readonly pointerId: any;
+        readonly target: any;
+        readonly type: any;
+        readonly pointerType: any;
+        readonly buttons: any;
+        preventDefault(): void;
+    } & Touch & import("../../types").PointerEvent<any>) | ({
+        coords: pointerUtils.MockCoords;
+        readonly page: any;
+        readonly client: any;
+        readonly timeStamp: any;
+        readonly pageX: any;
+        readonly pageY: any;
+        readonly clientX: any;
+        readonly clientY: any;
+        readonly pointerId: any;
+        readonly target: any;
+        readonly type: any;
+        readonly pointerType: any;
+        readonly buttons: any;
+        preventDefault(): void;
+    } & Touch & import("../../types").InteractEvent<never, "end" | "resume" | "start" | "move" | "inertiastart" | "reflow">) | ({
+        coords: pointerUtils.MockCoords;
+        readonly page: any;
+        readonly client: any;
+        readonly timeStamp: any;
+        readonly pageX: any;
+        readonly pageY: any;
+        readonly clientX: any;
+        readonly clientY: any;
+        readonly pointerId: any;
+        readonly target: any;
+        readonly type: any;
+        readonly pointerType: any;
+        readonly buttons: any;
+        preventDefault(): void;
+    } & Touch & TouchEvent) | ({
+        coords: pointerUtils.MockCoords;
+        readonly page: any;
+        readonly client: any;
+        readonly timeStamp: any;
+        readonly pageX: any;
+        readonly pageY: any;
+        readonly clientX: any;
+        readonly clientY: any;
+        readonly pointerId: any;
+        readonly target: any;
+        readonly type: any;
+        readonly pointerType: any;
+        readonly buttons: any;
+        preventDefault(): void;
+    } & PointerEvent & MouseEvent) | ({
+        coords: pointerUtils.MockCoords;
+        readonly page: any;
+        readonly client: any;
+        readonly timeStamp: any;
+        readonly pageX: any;
+        readonly pageY: any;
+        readonly clientX: any;
+        readonly clientY: any;
+        readonly pointerId: any;
+        readonly target: any;
+        readonly type: any;
+        readonly pointerType: any;
+        readonly buttons: any;
+        preventDefault(): void;
+    } & PointerEvent) | ({
+        coords: pointerUtils.MockCoords;
+        readonly page: any;
+        readonly client: any;
+        readonly timeStamp: any;
+        readonly pageX: any;
+        readonly pageY: any;
+        readonly clientX: any;
+        readonly clientY: any;
+        readonly pointerId: any;
+        readonly target: any;
+        readonly type: any;
+        readonly pointerType: any;
+        readonly buttons: any;
+        preventDefault(): void;
+    } & PointerEvent & import("../../types").PointerEvent<any>) | ({
+        coords: pointerUtils.MockCoords;
+        readonly page: any;
+        readonly client: any;
+        readonly timeStamp: any;
+        readonly pageX: any;
+        readonly pageY: any;
+        readonly clientX: any;
+        readonly clientY: any;
+        readonly pointerId: any;
+        readonly target: any;
+        readonly type: any;
+        readonly pointerType: any;
+        readonly buttons: any;
+        preventDefault(): void;
+    } & PointerEvent & import("../../types").InteractEvent<never, "end" | "resume" | "start" | "move" | "inertiastart" | "reflow">) | ({
+        coords: pointerUtils.MockCoords;
+        readonly page: any;
+        readonly client: any;
+        readonly timeStamp: any;
+        readonly pageX: any;
+        readonly pageY: any;
+        readonly clientX: any;
+        readonly clientY: any;
+        readonly pointerId: any;
+        readonly target: any;
+        readonly type: any;
+        readonly pointerType: any;
+        readonly buttons: any;
+        preventDefault(): void;
+    } & PointerEvent & TouchEvent) | ({
+        coords: pointerUtils.MockCoords;
+        readonly page: any;
+        readonly client: any;
+        readonly timeStamp: any;
+        readonly pageX: any;
+        readonly pageY: any;
+        readonly clientX: any;
+        readonly clientY: any;
+        readonly pointerId: any;
+        readonly target: any;
+        readonly type: any;
+        readonly pointerType: any;
+        readonly buttons: any;
+        preventDefault(): void;
+    } & import("../../types").PointerEvent<any> & MouseEvent) | ({
+        coords: pointerUtils.MockCoords;
+        readonly page: any;
+        readonly client: any;
+        readonly timeStamp: any;
+        readonly pageX: any;
+        readonly pageY: any;
+        readonly clientX: any;
+        readonly clientY: any;
+        readonly pointerId: any;
+        readonly target: any;
+        readonly type: any;
+        readonly pointerType: any;
+        readonly buttons: any;
+        preventDefault(): void;
+    } & import("../../types").PointerEvent<any> & PointerEvent) | ({
+        coords: pointerUtils.MockCoords;
+        readonly page: any;
+        readonly client: any;
+        readonly timeStamp: any;
+        readonly pageX: any;
+        readonly pageY: any;
+        readonly clientX: any;
+        readonly clientY: any;
+        readonly pointerId: any;
+        readonly target: any;
+        readonly type: any;
+        readonly pointerType: any;
+        readonly buttons: any;
+        preventDefault(): void;
+    } & import("../../types").PointerEvent<any>) | ({
+        coords: pointerUtils.MockCoords;
+        readonly page: any;
+        readonly client: any;
+        readonly timeStamp: any;
+        readonly pageX: any;
+        readonly pageY: any;
+        readonly clientX: any;
+        readonly clientY: any;
+        readonly pointerId: any;
+        readonly target: any;
+        readonly type: any;
+        readonly pointerType: any;
+        readonly buttons: any;
+        preventDefault(): void;
+    } & import("../../types").PointerEvent<any> & import("../../types").InteractEvent<never, "end" | "resume" | "start" | "move" | "inertiastart" | "reflow">) | ({
+        coords: pointerUtils.MockCoords;
+        readonly page: any;
+        readonly client: any;
+        readonly timeStamp: any;
+        readonly pageX: any;
+        readonly pageY: any;
+        readonly clientX: any;
+        readonly clientY: any;
+        readonly pointerId: any;
+        readonly target: any;
+        readonly type: any;
+        readonly pointerType: any;
+        readonly buttons: any;
+        preventDefault(): void;
+    } & import("../../types").PointerEvent<any> & TouchEvent) | ({
+        coords: pointerUtils.MockCoords;
+        readonly page: any;
+        readonly client: any;
+        readonly timeStamp: any;
+        readonly pageX: any;
+        readonly pageY: any;
+        readonly clientX: any;
+        readonly clientY: any;
+        readonly pointerId: any;
+        readonly target: any;
+        readonly type: any;
+        readonly pointerType: any;
+        readonly buttons: any;
+        preventDefault(): void;
+    } & import("../../types").InteractEvent<never, "end" | "resume" | "start" | "move" | "inertiastart" | "reflow"> & MouseEvent) | ({
+        coords: pointerUtils.MockCoords;
+        readonly page: any;
+        readonly client: any;
+        readonly timeStamp: any;
+        readonly pageX: any;
+        readonly pageY: any;
+        readonly clientX: any;
+        readonly clientY: any;
+        readonly pointerId: any;
+        readonly target: any;
+        readonly type: any;
+        readonly pointerType: any;
+        readonly buttons: any;
+        preventDefault(): void;
+    } & import("../../types").InteractEvent<never, "end" | "resume" | "start" | "move" | "inertiastart" | "reflow"> & PointerEvent) | ({
+        coords: pointerUtils.MockCoords;
+        readonly page: any;
+        readonly client: any;
+        readonly timeStamp: any;
+        readonly pageX: any;
+        readonly pageY: any;
+        readonly clientX: any;
+        readonly clientY: any;
+        readonly pointerId: any;
+        readonly target: any;
+        readonly type: any;
+        readonly pointerType: any;
+        readonly buttons: any;
+        preventDefault(): void;
+    } & import("../../types").InteractEvent<never, "end" | "resume" | "start" | "move" | "inertiastart" | "reflow"> & import("../../types").PointerEvent<any>) | ({
+        coords: pointerUtils.MockCoords;
+        readonly page: any;
+        readonly client: any;
+        readonly timeStamp: any;
+        readonly pageX: any;
+        readonly pageY: any;
+        readonly clientX: any;
+        readonly clientY: any;
+        readonly pointerId: any;
+        readonly target: any;
+        readonly type: any;
+        readonly pointerType: any;
+        readonly buttons: any;
+        preventDefault(): void;
+    } & import("../../types").InteractEvent<never, "end" | "resume" | "start" | "move" | "inertiastart" | "reflow">) | ({
+        coords: pointerUtils.MockCoords;
+        readonly page: any;
+        readonly client: any;
+        readonly timeStamp: any;
+        readonly pageX: any;
+        readonly pageY: any;
+        readonly clientX: any;
+        readonly clientY: any;
+        readonly pointerId: any;
+        readonly target: any;
+        readonly type: any;
+        readonly pointerType: any;
+        readonly buttons: any;
+        preventDefault(): void;
+    } & import("../../types").InteractEvent<never, "end" | "resume" | "start" | "move" | "inertiastart" | "reflow"> & TouchEvent);
+    interact: any;
+    start: (action: import("../../types").ActionProps<any>) => boolean;
+    stop: () => void;
+    down: () => void;
+    move: (force?: boolean) => void;
+    up: () => void;
+};
+export declare function timeout(n: number): Promise<unknown>;
+export declare function ltrbwh(left: number, top: number, right: number, bottom: number, width: number, height: number): {
+    left: number;
+    top: number;
+    right: number;
+    bottom: number;
+    width: number;
+    height: number;
+};

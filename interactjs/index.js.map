@@ -1,0 +1,13 @@
+{
+	"version": 3,
+	"sources": [
+		"index.ts"
+	],
+	"names": [
+		"interact"
+	],
+	"mappings": "AAAA,OAAO,+BAAP;AACA,OAAOA,QAAP,MAAqB,oCAArB;AAEA,eAAeA,QAAf",
+	"sourcesContent": [
+		"import '@interactjs/types'\nimport interact from '@interactjs/interactjs/index'\n\nexport default interact\n"
+	]
+}
