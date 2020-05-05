@@ -1,6 +1,6 @@
 const Terser = require('terser')
 
-module.exports = ({ code, map }) => Terser.minify(code, {
+module.exports = ({ code, map }, env = {}) => Terser.minify(code, {
   module: true,
   sourceMap: { content: map },
   mangle: {
@@ -12,6 +12,10 @@ module.exports = ({ code, map }) => Terser.minify(code, {
     unsafe_Function: true,
     unsafe_arrows: true,
     unsafe_methods: true,
+    global_defs: Object.entries(env).reduce((acc, [name, value]) => {
+      acc[`process.env.${name}`] = value
+      return acc
+    }, {}),
   },
   output: {
     beautify: false,

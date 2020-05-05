@@ -1,10 +1,12 @@
 const fs = require('fs')
 const path = require('path')
 
+const babel = require('@babel/core')
 const mkdirp = require('mkdirp')
 
 const bundleHeader = require('./bundleHeader')
 const minify = require('./minify')
+const { transformInlineEnvironmentVariables } = require('./utils')
 
 module.exports = function bundleWriter (bundleCode, {
   bundleStream,
@@ -23,11 +25,11 @@ module.exports = function bundleWriter (bundleCode, {
   }
 
   const raw = bundleHeader(getHeaderOpts(headers.raw, filenames.raw, bundleCode))
-  const rawWritePromise = write(raw)
+  const rawWritePromise = write(raw, { NODE_ENV: 'development' })
 
   if (!writeMin) { return }
 
-  const minifiedResult = minify(raw)
+  const minifiedResult = minify(raw, { NODE_ENV: 'production' })
   const headerOpts = getHeaderOpts(headers.min, filenames.min, minifiedResult.code, JSON.parse(minifiedResult.map))
   const min = bundleHeader(headerOpts)
 
@@ -44,7 +46,14 @@ module.exports = function bundleWriter (bundleCode, {
   }
 }
 
-async function write ({ destDir, filename, code, map }) {
+async function write ({ destDir, filename, code, map }, env) {
+  if (env) {
+    ({ code, map } = await babel.transformAsync(
+      code,
+      { filename, inputSourceMap: map, plugins: [[transformInlineEnvironmentVariables, { env }]] },
+    ))
+  }
+
   map.sources = map.sources.map(source => path.relative(process.cwd(), source))
   map.file = filename
 

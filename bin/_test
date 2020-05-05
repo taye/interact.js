@@ -24,7 +24,7 @@ report=0
 ENTRY_FILE=${ENTRY_FILE:-$ROOT/test/all.ts}
 EXEC_ARGS=${EXEC_ARGS:="--require $ROOT/test/babel-register"}
 
-NODE_ENV=test $TEST_RUNNER $TEST_RUNNER_ARGS \
+$TEST_RUNNER $TEST_RUNNER_ARGS \
   $EXEC_COMMAND \
   $EXEC_ARGS \
   $ENTRY_FILE $@ |
