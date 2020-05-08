@@ -1,5 +1,3 @@
-import '@interactjs/types'
-
 import actions from '@interactjs/actions/plugin'
 import arrange from '@interactjs/arrange/plugin'
 import autoScroll from '@interactjs/auto-scroll/plugin'

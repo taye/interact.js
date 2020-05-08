@@ -23,7 +23,6 @@
     "@interactjs/pointer-events": "1.9.13",
     "@interactjs/react": "1.9.13",
     "@interactjs/reflow": "1.9.13",
-    "@interactjs/types": "1.9.13",
     "@interactjs/utils": "1.9.13",
     "@interactjs/vue": "1.9.13"
   },
