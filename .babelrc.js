@@ -14,7 +14,9 @@ module.exports = {
       ? [
         require('./scripts/babelTransformForOfArray'),
         require('@babel/plugin-proposal-class-properties').default,
-        require('@babel/plugin-transform-modules-commonjs').default,
+        [require('@babel/plugin-transform-modules-commonjs').default, {
+          noInterop: true,
+        }],
         require('@babel/plugin-proposal-optional-catch-binding').default,
         [require('@babel/plugin-transform-runtime').default, {
           helpers: false,
