@@ -39,6 +39,7 @@ export type Context = Document | Element
 export type EventTarget = Window | Document | Element
 export type Target = EventTarget | string
 export type Plugin = scope.Plugin
+export type Actions = scope.Actions
 export type ActionProps<T extends scope.ActionName = any> = interaction.ActionProps<T>
 export type Interactable = _Interactable
 /** @internal */ export type InteractableSet = _InteractableSet

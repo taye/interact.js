@@ -7,7 +7,7 @@ import * as pointerUtils from '@interactjs/utils/pointerUtils'
 
 import Interactable from './Interactable'
 import { Options } from './defaultOptions'
-import { isNonNativeEvent } from './scope'
+import isNonNativeEvent from './isNonNativeEvent'
 
 export interface InteractStatic {
   (target: Interact.Target, options?: Options): Interactable

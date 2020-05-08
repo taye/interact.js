@@ -8,8 +8,8 @@ import normalizeListeners from '@interactjs/utils/normalizeListeners'
 import { getWindow } from '@interactjs/utils/window'
 
 import Eventable from './Eventable'
-import { ActionDefaults, Defaults, Options } from './defaultOptions'
-import { Actions, isNonNativeEvent } from './scope'
+import type { ActionDefaults, Defaults, Options } from './defaultOptions'
+import isNonNativeEvent from './isNonNativeEvent'
 
 type IgnoreValue = string | Interact.Element | boolean
 
@@ -24,7 +24,7 @@ export class Interactable implements Partial<Eventable> {
   }
 
   readonly options!: Required<Options>
-  readonly _actions: Actions
+  readonly _actions: Interact.Actions
   readonly target: Interact.Target
   readonly events = new Eventable()
   readonly _context: Interact.Context

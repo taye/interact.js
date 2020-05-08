@@ -6,7 +6,6 @@ import * as pointerUtils from '@interactjs/utils/pointerUtils'
 import InteractionBase from './Interaction'
 import interactablePreventDefault from './interactablePreventDefault'
 import finder, { SearchDetails } from './interactionFinder'
-import Scope from './scope'
 
 declare module '@interactjs/core/scope' {
   interface Scope {
@@ -36,7 +35,7 @@ const methodNames = [
   'updatePointer', 'removePointer', 'windowBlur',
 ]
 
-function install (scope: Scope) {
+function install (scope: Interact.Scope) {
   const listeners = {} as any
 
   for (const method of methodNames) {
@@ -96,7 +95,7 @@ function install (scope: Scope) {
   scope.interactions = {
     // all active and idle interactions
     list: [],
-    new<T extends Interact.ActionName> (options: { pointerType?: string, scopeFire?: Scope['fire'] }) {
+    new<T extends Interact.ActionName> (options: { pointerType?: string, scopeFire?: Interact.Scope['fire'] }) {
       options.scopeFire = (name, arg) => scope.fire(name, arg)
 
       const interaction = new scope.Interaction<T>(options as Required<typeof options>)
