@@ -1,3 +1,7 @@
+## v1.9.14
+
+ - fixed regression breaking typescript builds (#816)
+
 ## v1.9.13
 
  - fixed regression breaking es5 compatibility of .min.js bundle (#814)

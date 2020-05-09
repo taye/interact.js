@@ -1,16 +1,16 @@
 {
   "name": "@interactjs/modifiers",
-  "version": "1.9.13",
+  "version": "1.9.14",
   "license": "MIT",
   "dependencies": {
-    "@interactjs/snappers": "1.9.13"
+    "@interactjs/snappers": "1.9.14"
   },
   "peerDependencies": {
-    "@interactjs/core": "1.9.13",
-    "@interactjs/utils": "1.9.13"
+    "@interactjs/core": "1.9.14",
+    "@interactjs/utils": "1.9.14"
   },
   "optionalDependencies": {
-    "@interactjs/interact": "1.9.13"
+    "@interactjs/interact": "1.9.14"
   },
   "publishConfig": {
     "access": "public"

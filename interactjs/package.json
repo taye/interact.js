@@ -1,6 +1,6 @@
 {
   "name": "interactjs",
-  "version": "1.9.13",
+  "version": "1.9.14",
   "repository": {
     "type": "git",
     "url": "https://github.com/taye/interact.js.git"
@@ -38,6 +38,6 @@
   },
   "license": "MIT",
   "dependencies": {
-    "@interactjs/types": "1.9.13"
+    "@interactjs/types": "1.9.14"
   }
 }
