@@ -94,7 +94,7 @@ async function runBuild () {
   shell.exec('_esnext')
 
   // bundle interactjs, generate docs, transpile modules, generate declaration files
-  shell.exec('yarn build')
+  shell.exec('npm run build')
 }
 
 function commitAndTag () {

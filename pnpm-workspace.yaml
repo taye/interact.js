@@ -1,0 +1,4 @@
+packages:
+  - '.'
+  - '@interactjs/*'
+  - 'interactjs'

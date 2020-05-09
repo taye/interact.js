@@ -3,27 +3,21 @@
   "version": "1.9.14",
   "private": true,
   "license": "MIT",
-  "workspaces": [
-    ".",
-    "./@interactjs/*",
-    "./interactjs"
-  ],
   "directories": {
     "bin": "./bin"
   },
   "scripts": {
-    "bootstrap": "npx yarn install --pure-lockfile --prefer-offline",
-    "start": "yarn esnext --serve",
+    "bootstrap": "npx pnpm install",
+    "start": "pnpm run esnext --serve",
     "bundle": "NODE_ENV=production _bundle",
     "esnext": "_add_plugin_indexes && _esnext",
-    "build": "yarn docs && yarn bundle && _add_plugin_indexes && tsc -b -f && _esnext",
+    "build": "pnpm run docs && pnpm run bundle && _add_plugin_indexes && tsc -b -f && _esnext",
     "docs": "node jsdoc/index.js",
     "lint": "_lint --fail-on-error",
     "test": "_test",
-    "test:debug": "TEST_RUNNER=nodemon TEST_RUNNER_ARGS='-x node --inspect' yarn test",
+    "test:debug": "TEST_RUNNER=nodemon TEST_RUNNER_ARGS='-x node --inspect' pnpm test",
     "tsc_lint_test": "_add_plugin_indexes && tsc -b -f && tsc -b --clean && _lint --fail-on-error && _test",
-    "dev-link": "yarn link; for p in @interactjs/*; do yarn --cwd $p link; done",
-    "dev-unlink": "yarn unlink; for p in @interactjs/*; do yarn --cwd $p unlink; done"
+    "postinstall": "cd node_modules/.bin && ln -sf ../../bin/* ."
   },
   "dependencies": {
     "@babel/core": "latest",
@@ -35,6 +29,29 @@
     "@babel/preset-typescript": "latest",
     "@babel/register": "latest",
     "@babel/runtime": "latest",
+    "@interactjs/_dev": "link:./",
+    "@interactjs/actions": "*",
+    "@interactjs/arrange": "*",
+    "@interactjs/auto-scroll": "*",
+    "@interactjs/auto-start": "*",
+    "@interactjs/clone": "*",
+    "@interactjs/core": "*",
+    "@interactjs/dev-tools": "*",
+    "@interactjs/feedback": "*",
+    "@interactjs/iframes": "*",
+    "@interactjs/inertia": "*",
+    "@interactjs/interact": "*",
+    "@interactjs/interactjs": "*",
+    "@interactjs/modifiers": "*",
+    "@interactjs/multi-target": "*",
+    "@interactjs/offset": "*",
+    "@interactjs/pointer-events": "*",
+    "@interactjs/react": "*",
+    "@interactjs/reflow": "*",
+    "@interactjs/snappers": "*",
+    "@interactjs/types": "*",
+    "@interactjs/utils": "*",
+    "@interactjs/vue": "*",
     "@types/node": "latest",
     "@types/shelljs": "latest",
     "@types/tape": "latest",
@@ -66,7 +83,6 @@
     "jsdoc-babel": "latest",
     "jsdoc-stale": "github:taye/jsdoc-stale#master",
     "jsdom": "latest",
-    "lerna": "latest",
     "mkdirp": "latest",
     "nodemon": "latest",
     "nyc": "latest",
@@ -75,20 +91,19 @@
     "semver": "latest",
     "shelljs": "latest",
     "tap-spec": "latest",
-    "tape": "latest",
+    "tape": "4",
     "temp": "latest",
     "terser": "latest",
     "ts-node": "latest",
     "tslint": "latest",
     "typescript": "latest",
     "watchify": "latest",
-    "yargs": "latest",
-    "yarn": "latest"
+    "yargs": "latest"
   },
   "husky": {
     "hooks": {
-      "pre-commit": "yarn lint --fail-on-error",
-      "pre-push": "yarn tsc_lint_test"
+      "pre-commit": "pnpx _lint --fail-on-error",
+      "pre-push": "pnpm run tsc_lint_test"
     }
   }
 }
