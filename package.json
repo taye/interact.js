@@ -16,8 +16,7 @@
     "lint": "_lint --fail-on-error",
     "test": "_test",
     "test:debug": "TEST_RUNNER=nodemon TEST_RUNNER_ARGS='-x node --inspect' pnpm test",
-    "tsc_lint_test": "_add_plugin_indexes && tsc -b -f && tsc -b --clean && _lint --fail-on-error && _test",
-    "postinstall": "cd node_modules/.bin && ln -sf ../../bin/* ."
+    "tsc_lint_test": "_add_plugin_indexes && tsc -b -f && tsc -b --clean && _lint --fail-on-error && _test"
   },
   "dependencies": {
     "@babel/core": "latest",
