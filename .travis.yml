@@ -5,6 +5,10 @@ env:
   global:
     - CC_TEST_REPORTER_ID=9c6558805c8a00ef83371f4dcd82bfc765d2eac147a7442164f8cc1b401d43de
 
+cache:
+  directories:
+    - /home/travis/.pnpm-store
+
 language: node_js
 node_js:
   - "node"

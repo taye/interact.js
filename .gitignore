@@ -2,6 +2,7 @@ dist
 coverage
 cc-test-reporter
 .nyc_output
+.pnpm-store
 **/*.d.ts
 **/*.d.ts.map
 !@interactjs/types/typings.d.ts

@@ -11,28 +11,6 @@ importers:
       '@babel/register': 7.9.0_@babel+core@7.9.6
       '@babel/runtime': 7.9.6
       '@interactjs/_dev': 'link:'
-      '@interactjs/actions': 'link:@interactjs/actions'
-      '@interactjs/arrange': 'link:@interactjs/arrange'
-      '@interactjs/auto-scroll': 'link:@interactjs/auto-scroll'
-      '@interactjs/auto-start': 'link:@interactjs/auto-start'
-      '@interactjs/clone': 'link:@interactjs/clone'
-      '@interactjs/core': 'link:@interactjs/core'
-      '@interactjs/dev-tools': 'link:@interactjs/dev-tools'
-      '@interactjs/feedback': 'link:@interactjs/feedback'
-      '@interactjs/iframes': 'link:@interactjs/iframes'
-      '@interactjs/inertia': 'link:@interactjs/inertia'
-      '@interactjs/interact': 'link:@interactjs/interact'
-      '@interactjs/interactjs': 'link:@interactjs/interactjs'
-      '@interactjs/modifiers': 'link:@interactjs/modifiers'
-      '@interactjs/multi-target': 'link:@interactjs/multi-target'
-      '@interactjs/offset': 'link:@interactjs/offset'
-      '@interactjs/pointer-events': 'link:@interactjs/pointer-events'
-      '@interactjs/react': 'link:@interactjs/react'
-      '@interactjs/reflow': 'link:@interactjs/reflow'
-      '@interactjs/snappers': 'link:@interactjs/snappers'
-      '@interactjs/types': 'link:@interactjs/types'
-      '@interactjs/utils': 'link:@interactjs/utils'
-      '@interactjs/vue': 'link:@interactjs/vue'
       '@types/node': 13.13.5
       '@types/shelljs': 0.8.7
       '@types/tape': 4.13.0
@@ -91,28 +69,6 @@ importers:
       '@babel/register': latest
       '@babel/runtime': latest
       '@interactjs/_dev': 'link:./'
-      '@interactjs/actions': '*'
-      '@interactjs/arrange': '*'
-      '@interactjs/auto-scroll': '*'
-      '@interactjs/auto-start': '*'
-      '@interactjs/clone': '*'
-      '@interactjs/core': '*'
-      '@interactjs/dev-tools': '*'
-      '@interactjs/feedback': '*'
-      '@interactjs/iframes': '*'
-      '@interactjs/inertia': '*'
-      '@interactjs/interact': '*'
-      '@interactjs/interactjs': '*'
-      '@interactjs/modifiers': '*'
-      '@interactjs/multi-target': '*'
-      '@interactjs/offset': '*'
-      '@interactjs/pointer-events': '*'
-      '@interactjs/react': '*'
-      '@interactjs/reflow': '*'
-      '@interactjs/snappers': '*'
-      '@interactjs/types': '*'
-      '@interactjs/utils': '*'
-      '@interactjs/vue': '*'
       '@types/node': latest
       '@types/shelljs': latest
       '@types/tape': latest
