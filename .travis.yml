@@ -13,6 +13,7 @@ language: node_js
 node_js:
   - "node"
 install:
+  - npm i -g pnpm
   - npm run bootstrap
 before_script:
   - curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
