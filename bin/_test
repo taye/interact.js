@@ -26,7 +26,7 @@ EXEC_ARGS=${EXEC_ARGS:="--require $ROOT/test/babel-register"}
 
 $TEST_RUNNER $TEST_RUNNER_ARGS \
   $EXEC_COMMAND \
-  $EXEC_ARGS \
+  $EXEC_ARGS --unhandled-rejections=strict \
   $ENTRY_FILE $@ |
   tap-spec
 
