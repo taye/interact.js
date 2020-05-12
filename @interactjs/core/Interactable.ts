@@ -8,7 +8,7 @@ import normalizeListeners from '@interactjs/utils/normalizeListeners'
 import { getWindow } from '@interactjs/utils/window'
 
 import Eventable from './Eventable'
-import type { ActionDefaults, Defaults, Options } from './defaultOptions'
+import { ActionDefaults, Defaults, Options } from './defaultOptions'
 import isNonNativeEvent from './isNonNativeEvent'
 
 type IgnoreValue = string | Interact.Element | boolean
