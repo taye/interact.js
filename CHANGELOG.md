@@ -1,3 +1,7 @@
+## v1.9.16
+
+ - fixed missing types for interactjs package
+
 ## v1.9.15
 
  - fixed missing types for interactjs package

@@ -164,19 +164,19 @@ importers:
     optionalDependencies:
       '@interactjs/interact': 'link:../interact'
     specifiers:
-      '@interactjs/interact': 1.9.15
+      '@interactjs/interact': 1.9.17
   '@interactjs/arrange':
     specifiers: {}
   '@interactjs/auto-scroll':
     optionalDependencies:
       '@interactjs/interact': 'link:../interact'
     specifiers:
-      '@interactjs/interact': 1.9.15
+      '@interactjs/interact': 1.9.17
   '@interactjs/auto-start':
     optionalDependencies:
       '@interactjs/interact': 'link:../interact'
     specifiers:
-      '@interactjs/interact': 1.9.15
+      '@interactjs/interact': 1.9.17
   '@interactjs/clone':
     specifiers: {}
   '@interactjs/core':
@@ -187,8 +187,8 @@ importers:
     optionalDependencies:
       '@interactjs/interact': 'link:../interact'
     specifiers:
-      '@interactjs/interact': 1.9.15
-      '@interactjs/utils': 1.9.15
+      '@interactjs/interact': 1.9.17
+      '@interactjs/utils': 1.9.17
   '@interactjs/feedback':
     specifiers: {}
   '@interactjs/iframes':
@@ -199,15 +199,15 @@ importers:
     optionalDependencies:
       '@interactjs/interact': 'link:../interact'
     specifiers:
-      '@interactjs/interact': 1.9.15
-      '@interactjs/offset': 1.9.15
+      '@interactjs/interact': 1.9.17
+      '@interactjs/offset': 1.9.17
   '@interactjs/interact':
     dependencies:
       '@interactjs/core': 'link:../core'
       '@interactjs/utils': 'link:../utils'
     specifiers:
-      '@interactjs/core': 1.9.15
-      '@interactjs/utils': 1.9.15
+      '@interactjs/core': 1.9.17
+      '@interactjs/utils': 1.9.17
   '@interactjs/interactjs':
     dependencies:
       '@interactjs/actions': 'link:../actions'
@@ -229,44 +229,44 @@ importers:
       '@interactjs/utils': 'link:../utils'
       '@interactjs/vue': 'link:../vue'
     specifiers:
-      '@interactjs/actions': 1.9.15
-      '@interactjs/arrange': 1.9.15
-      '@interactjs/auto-scroll': 1.9.15
-      '@interactjs/auto-start': 1.9.15
-      '@interactjs/clone': 1.9.15
-      '@interactjs/core': 1.9.15
-      '@interactjs/dev-tools': 1.9.15
-      '@interactjs/feedback': 1.9.15
-      '@interactjs/inertia': 1.9.15
-      '@interactjs/interact': 1.9.15
-      '@interactjs/modifiers': 1.9.15
-      '@interactjs/multi-target': 1.9.15
-      '@interactjs/offset': 1.9.15
-      '@interactjs/pointer-events': 1.9.15
-      '@interactjs/react': 1.9.15
-      '@interactjs/reflow': 1.9.15
-      '@interactjs/utils': 1.9.15
-      '@interactjs/vue': 1.9.15
+      '@interactjs/actions': 1.9.17
+      '@interactjs/arrange': 1.9.17
+      '@interactjs/auto-scroll': 1.9.17
+      '@interactjs/auto-start': 1.9.17
+      '@interactjs/clone': 1.9.17
+      '@interactjs/core': 1.9.17
+      '@interactjs/dev-tools': 1.9.17
+      '@interactjs/feedback': 1.9.17
+      '@interactjs/inertia': 1.9.17
+      '@interactjs/interact': 1.9.17
+      '@interactjs/modifiers': 1.9.17
+      '@interactjs/multi-target': 1.9.17
+      '@interactjs/offset': 1.9.17
+      '@interactjs/pointer-events': 1.9.17
+      '@interactjs/react': 1.9.17
+      '@interactjs/reflow': 1.9.17
+      '@interactjs/utils': 1.9.17
+      '@interactjs/vue': 1.9.17
   '@interactjs/modifiers':
     dependencies:
       '@interactjs/snappers': 'link:../snappers'
     optionalDependencies:
       '@interactjs/interact': 'link:../interact'
     specifiers:
-      '@interactjs/interact': 1.9.15
-      '@interactjs/snappers': 1.9.15
+      '@interactjs/interact': 1.9.17
+      '@interactjs/snappers': 1.9.17
   '@interactjs/multi-target':
     specifiers: {}
   '@interactjs/offset':
     optionalDependencies:
       '@interactjs/interact': 'link:../interact'
     specifiers:
-      '@interactjs/interact': 1.9.15
+      '@interactjs/interact': 1.9.17
   '@interactjs/pointer-events':
     optionalDependencies:
       '@interactjs/interact': 'link:../interact'
     specifiers:
-      '@interactjs/interact': 1.9.15
+      '@interactjs/interact': 1.9.17
   '@interactjs/react':
     specifiers: {}
   '@interactjs/reflow':
@@ -275,7 +275,7 @@ importers:
     optionalDependencies:
       '@interactjs/interact': 'link:../interact'
     specifiers:
-      '@interactjs/interact': 1.9.15
+      '@interactjs/interact': 1.9.17
       promise-polyfill: latest
   '@interactjs/snappers':
     specifiers: {}
@@ -296,20 +296,20 @@ importers:
       '@interactjs/snappers': 'link:../snappers'
       '@interactjs/utils': 'link:../utils'
     specifiers:
-      '@interactjs/actions': 1.9.15
-      '@interactjs/arrange': 1.9.15
-      '@interactjs/auto-scroll': 1.9.15
-      '@interactjs/auto-start': 1.9.15
-      '@interactjs/core': 1.9.15
-      '@interactjs/dev-tools': 1.9.15
-      '@interactjs/inertia': 1.9.15
-      '@interactjs/interact': 1.9.15
-      '@interactjs/interactjs': 1.9.15
-      '@interactjs/modifiers': 1.9.15
-      '@interactjs/pointer-events': 1.9.15
-      '@interactjs/reflow': 1.9.15
-      '@interactjs/snappers': 1.9.15
-      '@interactjs/utils': 1.9.15
+      '@interactjs/actions': 1.9.17
+      '@interactjs/arrange': 1.9.17
+      '@interactjs/auto-scroll': 1.9.17
+      '@interactjs/auto-start': 1.9.17
+      '@interactjs/core': 1.9.17
+      '@interactjs/dev-tools': 1.9.17
+      '@interactjs/inertia': 1.9.17
+      '@interactjs/interact': 1.9.17
+      '@interactjs/interactjs': 1.9.17
+      '@interactjs/modifiers': 1.9.17
+      '@interactjs/pointer-events': 1.9.17
+      '@interactjs/reflow': 1.9.17
+      '@interactjs/snappers': 1.9.17
+      '@interactjs/utils': 1.9.17
   '@interactjs/utils':
     specifiers: {}
   '@interactjs/vue':
@@ -318,7 +318,7 @@ importers:
     dependencies:
       '@interactjs/types': 'link:../@interactjs/types'
     specifiers:
-      '@interactjs/types': 1.9.15
+      '@interactjs/types': 1.9.17
 lockfileVersion: 5.1
 packages:
   /@babel/code-frame/7.8.3:
