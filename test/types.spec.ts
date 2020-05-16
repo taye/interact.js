@@ -1,9 +1,10 @@
 import path from 'path'
 
-import test from '@interactjs/_dev/test/test'
 import mkdirp from 'mkdirp'
 import * as shell from 'shelljs'
 import temp from 'temp'
+
+import test from '@interactjs/_dev/test/test'
 
 shell.config.verbose = true
 shell.config.fatal = true
