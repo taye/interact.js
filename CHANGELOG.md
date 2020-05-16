@@ -1,5 +1,9 @@
 ## v1.9.15
 
+ - fixed missing types for interactjs package
+
+## v1.9.15
+
  - fixed further regression breaking typescript builds (#816)
 
 ## v1.9.14
