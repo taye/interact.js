@@ -1,0 +1,28 @@
+{
+	"version": 3,
+	"sources": [
+		"domObjects.ts"
+	],
+	"names": [
+		"domObjects",
+		"init",
+		"window",
+		"win",
+		"document",
+		"DocumentFragment",
+		"blank",
+		"SVGElement",
+		"SVGSVGElement",
+		"SVGElementInstance",
+		"Element",
+		"HTMLElement",
+		"Event",
+		"Touch",
+		"PointerEvent",
+		"MSPointerEvent"
+	],
+	"mappings": "AAAA,MAAMA,EAaN,CACEC,KAiBaC,GACb,MAAMC,EAAMD,EAEZF,EAAWI,SAAqBD,EAAIC,SACpCJ,EAAWK,iBAAqBF,EAAIE,kBAAsBC,EAC1DN,EAAWO,WAAqBJ,EAAII,YAAsBD,EAC1DN,EAAWQ,cAAqBL,EAAIK,eAAsBF,EAC1DN,EAAWS,mBAAqBN,EAAIM,oBAAsBH,EAC1DN,EAAWU,QAAqBP,EAAIO,SAAsBJ,EAC1DN,EAAWW,YAAqBR,EAAIQ,aAAsBX,EAAWU,QAErEV,EAAWY,MAAeT,EAAIS,MAC9BZ,EAAWa,MAAeV,EAAIU,OAASP,EACvCN,EAAWc,aAAgBX,EAAIW,cAAgBX,EAAIY,gBA7BnDX,SAAU,KACVC,iBAAkB,KAClBE,WAAY,KACZC,cAAe,KACfC,mBAAoB,KACpBC,QAAS,KACTC,YAAa,KACbC,MAAO,KACPC,MAAO,KACPC,aAAc,MAGhB,SAASR,oBAEMN",
+	"sourcesContent": [
+		"const domObjects: {\n  init: any\n  document: Document\n  DocumentFragment: typeof DocumentFragment\n  SVGElement: typeof SVGElement\n  SVGSVGElement: typeof SVGSVGElement\n  SVGElementInstance: any\n  Element: typeof Element\n  HTMLElement: typeof HTMLElement\n  Event: typeof Event\n  Touch: typeof Touch\n  PointerEvent: typeof PointerEvent\n} =\n{\n  init,\n  document: null,\n  DocumentFragment: null,\n  SVGElement: null,\n  SVGSVGElement: null,\n  SVGElementInstance: null,\n  Element: null,\n  HTMLElement: null,\n  Event: null,\n  Touch: null,\n  PointerEvent: null,\n}\n\nfunction blank () {}\n\nexport default domObjects\n\nfunction init (window: Window) {\n  const win = window as any\n\n  domObjects.document           = win.document\n  domObjects.DocumentFragment   = win.DocumentFragment   || blank\n  domObjects.SVGElement         = win.SVGElement         || blank\n  domObjects.SVGSVGElement      = win.SVGSVGElement      || blank\n  domObjects.SVGElementInstance = win.SVGElementInstance || blank\n  domObjects.Element            = win.Element            || blank\n  domObjects.HTMLElement        = win.HTMLElement        || domObjects.Element\n\n  domObjects.Event        = win.Event\n  domObjects.Touch        = win.Touch || blank\n  domObjects.PointerEvent = (win.PointerEvent || win.MSPointerEvent)\n}\n"
+	]
+}
