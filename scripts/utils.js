@@ -94,6 +94,9 @@ function transformImportsToRelative () {
   const fixImportSource = ({ node: { source } }, { opts, filename }) => {
     if (!source || (opts.ignore && opts.ignore(filename))) { return }
 
+    // ignore non-relative non @interactjs/* imports
+    if (!/^(\.{1-2}|(@interactjs))\//.test(source.value)) { return }
+
     const {
       moduleDirectory,
       extension = '.js',
@@ -145,6 +148,9 @@ function transformImportsToAbsolute () {
 
   const fixImportSource = ({ node: { source } }, { opts, filename }) => {
     if (!source || (opts.ignore && opts.ignore(filename, source.value))) { return }
+
+    // ignore non-relative non @interactjs/* imports
+    if (!/^(\.|(@interactjs\/))/.test(source.value)) { return }
 
     const {
       moduleDirectory,

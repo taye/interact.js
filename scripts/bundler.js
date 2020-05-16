@@ -35,8 +35,9 @@ module.exports = function (options) {
     ],
   }, getBabelrc())
 
-  const b = browserify(options.entry, {
+  const b = browserify({
     debug: true,
+    bare: true,
     standalone: options.standalone,
     transform: [
       [require('babelify'), babelrc],
@@ -48,7 +49,14 @@ module.exports = function (options) {
       ? { cache: {}, packageCache: {} }
       : {},
     ...options.browserify,
-  }).exclude('jsdom')
+  })
+
+  b.add(options.entry)
+
+  b.on('error', error => {
+    console.error(error)
+    process.exit(1)
+  })
 
   if (options.watch) {
     b.on('update', ids => {
