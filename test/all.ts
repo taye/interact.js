@@ -1,7 +1,8 @@
-import '../@interactjs/types/index'
+import '@interactjs/types'
+
+import path from 'path'
 
 import glob from 'glob'
-import path from 'path'
 
 const globOptions = {
   ignore: ['**/node_modules/**', '**/_*', '**/_*/**'],

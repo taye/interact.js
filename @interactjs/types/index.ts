@@ -1,3 +1,4 @@
+/* eslint-disable import/no-extraneous-dependencies */
 import * as gesture from '@interactjs/actions/gesture/plugin'
 import * as resize from '@interactjs/actions/resize/plugin'
 import * as iEvent from '@interactjs/core/InteractEvent'
@@ -18,6 +19,7 @@ import '@interactjs/auto-start/InteractableMethods'
 import '@interactjs/auto-start/base'
 import '@interactjs/auto-start/plugin'
 import '@interactjs/core/events'
+import '@interactjs/interact/index'
 import '@interactjs/core/interactablePreventDefault'
 import '@interactjs/core/interactions'
 import '@interactjs/dev-tools/plugin'

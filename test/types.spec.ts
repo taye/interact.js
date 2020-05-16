@@ -1,23 +1,30 @@
 import path from 'path'
 
-import * as shelljs from 'shelljs'
+import test from '@interactjs/_dev/test/test'
+import mkdirp from 'mkdirp'
+import * as shell from 'shelljs'
 import temp from 'temp'
 
-import test from '@interactjs/_dev/test/test'
+shell.config.verbose = true
+shell.config.fatal = true
 
 test('typings', async t => {
   const tempDir = temp.track().mkdirSync('testProject')
+  const modulesDir = path.join(tempDir, 'node_modules')
+  const tempTypesDir = path.join(modulesDir, '@interactjs', 'types')
+  const interactDir = path.join(modulesDir, 'interactjs')
+
+  await mkdirp(interactDir)
 
   t.doesNotThrow(
     () => {
-      const modulesDir = path.join(tempDir, 'node_modules')
+      shell.exec(`_types ${modulesDir}`)
+      shell.cp('interactjs/{*.d.ts,package.json}', interactDir)
+      shell.cp('@interactjs/types/{*.d.ts,package.json}', tempTypesDir)
+      shell.cp('-R', path.join(process.cwd(), 'test', 'testProject', '*'), tempDir)
+      shell.exec('tsc -b', { cwd: tempDir })
 
-      shelljs.exec(`tsc -p tsconfig.json --outDir ${modulesDir}`)
-      shelljs.cp('-R', path.join(process.cwd(), '@interactjs', 'types', '{typings.d.ts,package.json}'), path.join(modulesDir, '@interactjs', 'types'))
-      shelljs.cp('-R', path.join(process.cwd(), 'test', 'testProject', '*'), tempDir)
-      shelljs.exec('tsc -b', { cwd: tempDir })
-
-      const error = shelljs.error()
+      const error = shell.error()
 
       if (error) {
         throw error
@@ -26,6 +33,5 @@ test('typings', async t => {
     'dependent typescript project compiles successfuly',
   )
 
-  shelljs.rm('-R', tempDir)
   t.end()
 })

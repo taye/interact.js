@@ -11,6 +11,27 @@ importers:
       '@babel/register': 7.9.0_@babel+core@7.9.6
       '@babel/runtime': 7.9.6
       '@interactjs/_dev': 'link:'
+      '@interactjs/actions': 'link:@interactjs/actions'
+      '@interactjs/arrange': 'link:@interactjs/arrange'
+      '@interactjs/auto-scroll': 'link:@interactjs/auto-scroll'
+      '@interactjs/auto-start': 'link:@interactjs/auto-start'
+      '@interactjs/clone': 'link:@interactjs/clone'
+      '@interactjs/core': 'link:@interactjs/core'
+      '@interactjs/dev-tools': 'link:@interactjs/dev-tools'
+      '@interactjs/feedback': 'link:@interactjs/feedback'
+      '@interactjs/inertia': 'link:@interactjs/inertia'
+      '@interactjs/interact': 'link:@interactjs/interact'
+      '@interactjs/interactjs': 'link:@interactjs/interactjs'
+      '@interactjs/modifiers': 'link:@interactjs/modifiers'
+      '@interactjs/multi-target': 'link:@interactjs/multi-target'
+      '@interactjs/offset': 'link:@interactjs/offset'
+      '@interactjs/pointer-events': 'link:@interactjs/pointer-events'
+      '@interactjs/react': 'link:@interactjs/react'
+      '@interactjs/reflow': 'link:@interactjs/reflow'
+      '@interactjs/snappers': 'link:@interactjs/snappers'
+      '@interactjs/types': 'link:@interactjs/types'
+      '@interactjs/utils': 'link:@interactjs/utils'
+      '@interactjs/vue': 'link:@interactjs/vue'
       '@types/node': 13.13.5
       '@types/shelljs': 0.8.7
       '@types/tape': 4.13.0
@@ -25,6 +46,7 @@ importers:
       browserify: 16.5.1
       chokidar: 3.4.0
       combine-source-map: 0.8.0
+      del: 5.1.0
       domator: 2.0.0
       errorify: 0.3.1
       eslint: 7.0.0
@@ -69,6 +91,27 @@ importers:
       '@babel/register': latest
       '@babel/runtime': latest
       '@interactjs/_dev': 'link:./'
+      '@interactjs/actions': '*'
+      '@interactjs/arrange': '*'
+      '@interactjs/auto-scroll': '*'
+      '@interactjs/auto-start': '*'
+      '@interactjs/clone': '*'
+      '@interactjs/core': '*'
+      '@interactjs/dev-tools': '*'
+      '@interactjs/feedback': '*'
+      '@interactjs/inertia': '*'
+      '@interactjs/interact': '*'
+      '@interactjs/interactjs': '*'
+      '@interactjs/modifiers': '*'
+      '@interactjs/multi-target': '*'
+      '@interactjs/offset': '*'
+      '@interactjs/pointer-events': '*'
+      '@interactjs/react': '*'
+      '@interactjs/reflow': '*'
+      '@interactjs/snappers': '*'
+      '@interactjs/types': '*'
+      '@interactjs/utils': '*'
+      '@interactjs/vue': '*'
       '@types/node': latest
       '@types/shelljs': latest
       '@types/tape': latest
@@ -83,6 +126,7 @@ importers:
       browserify: latest
       chokidar: latest
       combine-source-map: latest
+      del: ^5.1.0
       domator: latest
       errorify: latest
       eslint: latest
@@ -236,7 +280,7 @@ importers:
   '@interactjs/snappers':
     specifiers: {}
   '@interactjs/types':
-    dependencies:
+    devDependencies:
       '@interactjs/actions': 'link:../actions'
       '@interactjs/arrange': 'link:../arrange'
       '@interactjs/auto-scroll': 'link:../auto-scroll'
@@ -1197,6 +1241,30 @@ packages:
       node: '>=8'
     resolution:
       integrity: sha512-tsAQNx32a8CoFhjhijUIhI4kccIAgmGhy8LZMZgGfmXcpMbPRUqn5LWmgRttILi6yeGmBJd2xsPkFMs0PzgPCw==
+  /@nodelib/fs.scandir/2.1.3:
+    dependencies:
+      '@nodelib/fs.stat': 2.0.3
+      run-parallel: 1.1.9
+    dev: false
+    engines:
+      node: '>= 8'
+    resolution:
+      integrity: sha512-eGmwYQn3gxo4r7jdQnkrrN6bY478C3P+a/y72IJukF8LjB6ZHeB3c+Ehacj3sYeSmUXGlnA67/PmbM9CVwL7Dw==
+  /@nodelib/fs.stat/2.0.3:
+    dev: false
+    engines:
+      node: '>= 8'
+    resolution:
+      integrity: sha512-bQBFruR2TAwoevBEd/NWMoAAtNGzTRgdrqnYCc7dhzfoNvqPzLyqlEQnzZ3kVnNrSp25iyxE00/3h2fqGAGArA==
+  /@nodelib/fs.walk/1.2.4:
+    dependencies:
+      '@nodelib/fs.scandir': 2.1.3
+      fastq: 1.8.0
+    dev: false
+    engines:
+      node: '>= 8'
+    resolution:
+      integrity: sha512-1V9XOY4rDW0rehzbrcqAmHnz8e7SKvX27gh8Gt2WgB0+pdzdiLV83p72kZPU+jvMbS1qU5mauP2iOvO8rhmurQ==
   /@sindresorhus/is/0.14.0:
     dev: false
     engines:
@@ -1590,6 +1658,12 @@ packages:
       node: '>= 0.4'
     resolution:
       integrity: sha512-c2VXaCHl7zPsvpkFsw4nxvFie4fh1ur9bpcgsVkIjqn0H/Xwdg+7fv3n2r/isyS8EBj5b06M9kHyZuIr4El6WQ==
+  /array-union/2.1.0:
+    dev: false
+    engines:
+      node: '>=8'
+    resolution:
+      integrity: sha512-HGyxoOTYUyCM6stUe6EJgnd4EoewAI7zMdfqO+kGjnlZmBDz/cR5pf8r/cR4Wq60sL/p0IkcjUEEPwS3GFrIyw==
   /array-unique/0.3.2:
     dev: false
     engines:
@@ -2879,6 +2953,21 @@ packages:
     dev: false
     resolution:
       integrity: sha1-yY2bzvdWdBiOEQlpFRGZ45sfppM=
+  /del/5.1.0:
+    dependencies:
+      globby: 10.0.2
+      graceful-fs: 4.2.4
+      is-glob: 4.0.1
+      is-path-cwd: 2.2.0
+      is-path-inside: 3.0.2
+      p-map: 3.0.0
+      rimraf: 3.0.2
+      slash: 3.0.0
+    dev: false
+    engines:
+      node: '>=8'
+    resolution:
+      integrity: sha512-wH9xOVHnczo9jN2IW68BabcecVPxacIA3g/7z6vhSU/4stOKQzeCRK0yD0A24WiAAUJmmVpWqrERcTxnLo3AnA==
   /delayed-stream/1.0.0:
     dev: false
     engines:
@@ -2948,6 +3037,14 @@ packages:
     dev: false
     resolution:
       integrity: sha512-kqag/Nl+f3GwyK25fhUMYj81BUOrZ9IuJsjIcDE5icNM9FJHAVm3VcUDxdLPoQtTuUylWm6ZIknYJwwaPxsUzg==
+  /dir-glob/3.0.1:
+    dependencies:
+      path-type: 4.0.0
+    dev: false
+    engines:
+      node: '>=8'
+    resolution:
+      integrity: sha512-WkrWp9GR4KXfKGYzOLmTuGVi1UWFfws377n9cc55/tb6DuqyF6pcQ5AbiHEshaDpY9v6oaSr2XCDidGmMwdzIA==
   /doctrine/1.5.0:
     dependencies:
       esutils: 2.0.3
@@ -3647,6 +3744,19 @@ packages:
     dev: false
     resolution:
       integrity: sha512-8UEa58QDLauDNfpbrX55Q9jrGHThw2ZMdOky5Gl1CDtVeJDPVrG4Jxx1N8jw2gkWaff5UUuX1KJd+9zGe2B+ZA==
+  /fast-glob/3.2.2:
+    dependencies:
+      '@nodelib/fs.stat': 2.0.3
+      '@nodelib/fs.walk': 1.2.4
+      glob-parent: 5.1.1
+      merge2: 1.3.0
+      micromatch: 4.0.2
+      picomatch: 2.2.2
+    dev: false
+    engines:
+      node: '>=8'
+    resolution:
+      integrity: sha512-UDV82o4uQyljznxwMxyVRJgZZt3O5wENYojjzbaGEGZgeOxkLFf+V4cnUD+krzb2F72E18RhamkMZ7AdeggF7A==
   /fast-json-stable-stringify/2.1.0:
     dev: false
     resolution:
@@ -3659,6 +3769,12 @@ packages:
     dev: false
     resolution:
       integrity: sha512-Utm6CdzT+6xsDk2m8S6uL8VHxNwI6Jub+e9NYTcAms28T84pTa25GJQV9j0CY0N1rM8hK4x6grpF2BQf+2qwVA==
+  /fastq/1.8.0:
+    dependencies:
+      reusify: 1.0.4
+    dev: false
+    resolution:
+      integrity: sha512-SMIZoZdLh/fgofivvIkmknUXyPnvxRE3DhtZ5Me3Mrsk5gyPL42F0xr51TdRXskBxHfMp+07bcYzfsYEsSQA9Q==
   /figures/1.7.0:
     dependencies:
       escape-string-regexp: 1.0.5
@@ -4074,6 +4190,21 @@ packages:
     dev: false
     resolution:
       integrity: sha512-LeguVWaxgHN0MNbWC6YljNMzHkrCny9fzjmEUdnF1kQ7wATFD1RHFRqA1qxaX2tgxGENlcxjOflopBwj3YZiXA==
+  /globby/10.0.2:
+    dependencies:
+      '@types/glob': 7.1.1
+      array-union: 2.1.0
+      dir-glob: 3.0.1
+      fast-glob: 3.2.2
+      glob: 7.1.6
+      ignore: 5.1.4
+      merge2: 1.3.0
+      slash: 3.0.0
+    dev: false
+    engines:
+      node: '>=8'
+    resolution:
+      integrity: sha512-7dUi7RvCoT/xast/o/dLN53oqND4yk0nsHkhRgn9w65C4PofCLOoJ39iSOg+qVDdWQPIEj+eszMHQ+aLVwwQSg==
   /globrex/0.1.2:
     dev: false
     resolution:
@@ -4721,6 +4852,12 @@ packages:
       node: '>=8'
     resolution:
       integrity: sha512-drqDG3cbczxxEJRoOXcOjtdp1J/lyp1mNn0xaznRs8+muBhgQcrnbspox5X5fOw0HnMnbfDzvnEMEtqDEJEo8w==
+  /is-path-cwd/2.2.0:
+    dev: false
+    engines:
+      node: '>=6'
+    resolution:
+      integrity: sha512-w942bTcih8fdJPJmQHFzkS76NEP8Kzzvmw92cXsazb8intwLqPibPPdXf4ANdKV3rYMuuQYGIWtvz9JilB3NFQ==
   /is-path-inside/3.0.2:
     dev: false
     engines:
@@ -5390,6 +5527,12 @@ packages:
     dev: false
     resolution:
       integrity: sha1-pd5GU42uhNQRTMXqArR3KmNGcB8=
+  /merge2/1.3.0:
+    dev: false
+    engines:
+      node: '>= 6'
+    resolution:
+      integrity: sha512-2j4DAdlBOkiSZIsaXk4mTE3sRS02yBHAtfy127xRV3bQUFqXkjHCHLW6Scv7DwNRbIWNHH8zpnz9zMaKXIdvYw==
   /methods/1.1.2:
     dev: false
     engines:
@@ -5416,6 +5559,15 @@ packages:
       node: '>=0.10.0'
     resolution:
       integrity: sha512-MWikgl9n9M3w+bpsY3He8L+w9eF9338xRl8IAO5viDizwSzziFEyUzo2xrrloB64ADbTf8uA8vRqqttDTOmccg==
+  /micromatch/4.0.2:
+    dependencies:
+      braces: 3.0.2
+      picomatch: 2.2.2
+    dev: false
+    engines:
+      node: '>=8'
+    resolution:
+      integrity: sha512-y7FpHSbMUMoyPbYUSzO6PaZ6FyRnQOpHuKwbo1G+Knck95XVU4QAiKdGEnj5wwoS7PlOgthX/09u5iFJ+aYf5Q==
   /miller-rabin/4.0.1:
     dependencies:
       bn.js: 4.11.8
@@ -6926,6 +7078,13 @@ packages:
       node: '>=0.12'
     resolution:
       integrity: sha512-TTlYpa+OL+vMMNG24xSlQGEJ3B/RzEfUlLct7b5G/ytav+wPrplCpVMFuwzXbkecJrb6IYo1iFb0S9v37754mg==
+  /reusify/1.0.4:
+    dev: false
+    engines:
+      iojs: '>=1.0.0'
+      node: '>=0.10.0'
+    resolution:
+      integrity: sha512-U9nH88a3fc/ekCF1l0/UP1IosiuIjyTh7hBvXVMHYgVcfGvt897Xguj2UOLDeI5BG2m7/uwyaLVT6fbtCwTyzw==
   /rimraf/2.6.3:
     dependencies:
       glob: 7.1.6
@@ -6960,6 +7119,10 @@ packages:
       node: '>=0.12.0'
     resolution:
       integrity: sha512-tvVnVv01b8c1RrA6Ep7JkStj85Guv/YrMcwqYQnwjsAS2cTmmPGBBjAjpCW7RrSodNSoE2/qg9O4bceNvUuDgQ==
+  /run-parallel/1.1.9:
+    dev: false
+    resolution:
+      integrity: sha512-DEqnSRTDw/Tc3FXf49zedI638Z9onwUotBMiUFKmrO2sdFKIbXamXGQ3Axd4qgphxKB4kw/qP1w5kTxnfU1B9Q==
   /rx/4.1.0:
     dev: false
     resolution:

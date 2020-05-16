@@ -1,0 +1,29 @@
+{
+  "include": [
+    "@interactjs/**/*.ts",
+    "interactjs/index.ts"
+  ],
+  "exclude": [
+    "**/*.spec.ts"
+  ],
+  "compilerOptions": {
+    "target": "esnext",
+    "module": "esnext",
+    "lib": [
+      "esnext",
+      "dom"
+    ],
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+
+    "declaration": true,
+    "declarationMap": false,
+    "emitDeclarationOnly": true,
+    "stripInternal": true,
+
+    "strict": false,
+
+    "rootDir": ".",
+    "outFile": "@interactjs/types/index.d.ts"
+  }
+}

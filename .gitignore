@@ -3,9 +3,12 @@ coverage
 cc-test-reporter
 .nyc_output
 .pnpm-store
+.npm-debug.log
+.pnpm-debug.log
 **/*.d.ts
 **/*.d.ts.map
 !@interactjs/types/typings.d.ts
+!interactjs/index.d.ts
 @interactjs/**/index.ts
 !@interactjs/{types,interact,interactjs}/index.ts
 *interactjs/**/*.js

@@ -1,5 +1,5 @@
 *.ts
-!*.d.ts
+!@interactjs/types/*.d.ts
 *.spec.ts
 *.spec.js
 dist/docs

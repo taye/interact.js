@@ -1,0 +1,81 @@
+#!/usr/bin/env node
+/*
+ * `tsc` doesn't seem to like trying to bundle types multiple packages under a
+ * scope into a single file while also using a global namespace defined with
+ *
+ * ```typescript
+ * // @scope/types/typings.d.ts
+ * import * as TheNamespace from './index'
+ * export as namespace TheNamespace
+ * export = TheNamespace
+ * ```
+ *
+ * So here is some trickery to make it work:
+ *
+ *  1. Make a second types.tsconfig.json which excludes all unwanted .ts files and
+ *     use that config for generating types, while the main tsconfig.json will
+ *     be used for development.
+ *
+ *  2. Run `tsc -p types.tsconfig.json --outFile /tmp/blahBlah.d.ts` to generate a
+ *     temporary definitions file. In this case, the file contains references
+ *     to the global Namespace which will be defined in the types file, but not
+ *     accessible inside it.
+ *
+ *  3. Read the contents of the temporary definition file and replace
+ *     references to `TheNamespace` with
+ *     `import("@scope/types/index")`
+ *
+ *  4. Write the replaced output to the target `.d.ts` file
+ *
+ * For this to work The "typings" field of the "@scope/types" package.json must
+ * be set to "typings.d.ts", and there must be no "path" alias set for any of
+ * the packages.  If a path is set, then imports to types from other packages
+ * will be changed to relative imports which can't be resolved.
+ */
+const fs = require('fs')
+const path = require('path')
+
+const del = require('del')
+const glob = require('util').promisify(require('glob'))
+const mkdirp = require('mkdirp')
+const shell = require('shelljs')
+const temp = require('temp').track()
+
+shell.config.verbose = true
+shell.config.fatal = true
+
+const typesDir = '@interactjs/types'
+const [,, modulesDir = '.'] = process.argv
+
+;(async () => {
+  const outBasename = 'index.d.ts'
+  const tempFile = temp.track().path('ijs-types') + '.d.ts'
+  const outFile = path.join(modulesDir, typesDir, outBasename)
+
+  await Promise.all([
+    del(path.join(typesDir, outBasename)),
+    del(tempFile).catch(() => {}),
+  ])
+
+  shell.exec(`tsc -p types.tsconfig.json --outFile ${tempFile}`)
+
+  await mkdirp(path.dirname(outFile))
+
+  const readStream = fs.createReadStream(tempFile)
+  const writeStream = fs.createWriteStream(outFile)
+
+  readStream.on('data', data => {
+    const namespaceReplaced = data
+      .toString()
+      .replace(/\bInteract\./g, 'import("@interactjs/types/index").')
+
+    writeStream.write(namespaceReplaced)
+  })
+
+  await new Promise((reject, resolve) => {
+    readStream.on('end', () => writeStream.end())
+  })
+})().catch(error => {
+  console.error(error)
+  process.exit(1)
+})

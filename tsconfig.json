@@ -1,4 +1,7 @@
 {
+  "exclude": [
+    "test/testProject"
+  ],
   "compilerOptions": {
     "target": "esnext",
     "module": "esnext",
@@ -6,11 +9,11 @@
       "esnext",
       "dom"
     ],
-    "allowJs": false,
-    "declaration": true,
-    "declarationMap": false,
-    "emitDeclarationOnly": true,
+    "moduleResolution": "node",
     "esModuleInterop": true,
+
+    "allowJs": false,
+    "noEmit": true,
 
     "strict": false,
     "noUnusedLocals": true,
@@ -18,14 +21,10 @@
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
 
-    "moduleResolution": "node",
-    "inlineSourceMap": true,
-    "inlineSources": true,
-
     "baseUrl": ".",
     "paths": {
-      "@interactjs/_dev/*": ["./*"]
-    },
-    "stripInternal": true
+      "@interactjs/_dev/*": ["./*"],
+      "@interactjs/*": ["./@interactjs/*"]
+    }
   }
 }
