@@ -1,0 +1,13 @@
+{
+	"version": 3,
+	"sources": [
+		"transform.ts"
+	],
+	"names": [
+		"default"
+	],
+	"mappings": "AAAA,SAASA,OAAT,QAAwB,QAAxB",
+	"sourcesContent": [
+		"export { default } from './noop'\n"
+	]
+}
