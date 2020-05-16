@@ -7,7 +7,7 @@
     "bin": "./bin"
   },
   "scripts": {
-    "bootstrap": "npx pnpm install --recursive",
+    "bootstrap": "npx pnpm install --prefer-ofline --recursive",
     "start": "pnpm run esnext -- --serve",
     "bundle": "NODE_ENV=production _bundle",
     "esnext": "_add_plugin_indexes && _esnext",
