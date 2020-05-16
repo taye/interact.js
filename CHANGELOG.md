@@ -1,3 +1,7 @@
+## v1.9.15
+
+ - fixed further regression breaking typescript builds (#816)
+
 ## v1.9.14
 
  - fixed regression breaking typescript builds (#816)
