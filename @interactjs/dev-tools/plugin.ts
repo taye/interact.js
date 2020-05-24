@@ -1,4 +1,5 @@
 /* eslint-disable no-console */
+import * as Interact from '@interactjs/types/index'
 import domObjects from '@interactjs/utils/domObjects'
 import { parentNode } from '@interactjs/utils/domUtils'
 import extend from '@interactjs/utils/extend'

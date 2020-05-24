@@ -1,3 +1,5 @@
+import * as Interact from '@interactjs/types/index'
+
 import extend from './extend'
 import is from './is'
 

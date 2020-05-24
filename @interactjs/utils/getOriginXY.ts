@@ -1,3 +1,5 @@
+import * as Interact from '@interactjs/types/index'
+
 import { rectToXY, resolveRectLike } from './rect'
 
 export default function (

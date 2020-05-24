@@ -1,4 +1,4 @@
-/* eslint-disable import/no-named-as-default-member */
+import * as Interact from '@interactjs/types/index'
 import browser from '@interactjs/utils/browser'
 import clone from '@interactjs/utils/clone'
 import domObjects from '@interactjs/utils/domObjects'

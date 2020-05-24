@@ -1,3 +1,5 @@
+import * as Interact from '@interactjs/types/index'
+
 export class BaseEvent<T extends Interact.ActionName = any> {
   type: string
   target: EventTarget

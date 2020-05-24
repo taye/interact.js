@@ -1,3 +1,4 @@
+import * as Interact from '@interactjs/types/index'
 import extend from '@interactjs/utils/extend'
 import * as rectUtils from '@interactjs/utils/rect'
 

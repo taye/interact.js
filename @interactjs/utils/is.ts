@@ -1,3 +1,5 @@
+import * as Interact from '@interactjs/types/index'
+
 import isWindow from './isWindow'
 import win from './window'
 

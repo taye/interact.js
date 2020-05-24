@@ -1,5 +1,6 @@
 import { Interaction } from '@interactjs/core/Interaction'
 import Scope from '@interactjs/core/scope'
+import * as Interact from '@interactjs/types/index'
 import * as dom from '@interactjs/utils/domUtils'
 import extend from '@interactjs/utils/extend'
 import is from '@interactjs/utils/is'

@@ -1,6 +1,7 @@
 import InteractEvent from '@interactjs/core/InteractEvent'
 import Interactable from '@interactjs/core/Interactable'
 import Scope from '@interactjs/core/scope'
+import * as Interact from '@interactjs/types/index'
 import * as domUtils from '@interactjs/utils/domUtils'
 import extend from '@interactjs/utils/extend'
 import getOriginXY from '@interactjs/utils/getOriginXY'

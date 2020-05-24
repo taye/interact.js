@@ -1,3 +1,4 @@
+import * as Interact from '@interactjs/types/index'
 import { parentNode } from '@interactjs/utils/domUtils'
 import is from '@interactjs/utils/is'
 

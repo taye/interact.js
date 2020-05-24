@@ -1,3 +1,5 @@
+import * as Interact from '@interactjs/types/index'
+
 import win from './window'
 
 export function warnOnce<T> (this: T, method: (...args: any[]) => any, message: string) {

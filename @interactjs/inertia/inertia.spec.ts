@@ -1,6 +1,7 @@
 import test from '@interactjs/_dev/test/test'
 import drag from '@interactjs/actions/drag/plugin'
 import * as helpers from '@interactjs/core/tests/_helpers'
+import * as Interact from '@interactjs/types/index'
 import extend from '@interactjs/utils/extend'
 
 import inertia from './plugin'

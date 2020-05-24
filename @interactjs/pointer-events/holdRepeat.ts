@@ -1,4 +1,5 @@
 import { ListenerMap } from '@interactjs/core/scope'
+import * as Interact from '@interactjs/types/index'
 
 import PointerEvent from './PointerEvent'
 import basePlugin from './base'

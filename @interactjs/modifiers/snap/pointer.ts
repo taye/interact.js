@@ -1,3 +1,4 @@
+import * as Interact from '@interactjs/types/index'
 import extend from '@interactjs/utils/extend'
 import getOriginXY from '@interactjs/utils/getOriginXY'
 import hypot from '@interactjs/utils/hypot'

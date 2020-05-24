@@ -1,6 +1,7 @@
 import Interactable from '@interactjs/core/Interactable'
 import { ActionProps, Interaction } from '@interactjs/core/Interaction'
 import Scope from '@interactjs/core/scope'
+import * as Interact from '@interactjs/types/index'
 import * as arr from '@interactjs/utils/arr'
 import extend from '@interactjs/utils/extend'
 import is from '@interactjs/utils/is'

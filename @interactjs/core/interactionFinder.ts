@@ -1,3 +1,4 @@
+import * as Interact from '@interactjs/types/index'
 import * as dom from '@interactjs/utils/domUtils'
 
 export interface SearchDetails {

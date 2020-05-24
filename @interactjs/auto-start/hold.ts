@@ -1,3 +1,5 @@
+import * as Interact from '@interactjs/types/index'
+
 import basePlugin from './base'
 
 declare module '@interactjs/core/defaultOptions' {

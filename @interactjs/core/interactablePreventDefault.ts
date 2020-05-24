@@ -1,3 +1,4 @@
+import * as Interact from '@interactjs/types/index'
 import { matchesSelector, nodeContains } from '@interactjs/utils/domUtils'
 import is from '@interactjs/utils/is'
 import { getWindow } from '@interactjs/utils/window'

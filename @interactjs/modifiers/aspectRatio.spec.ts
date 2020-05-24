@@ -1,6 +1,7 @@
 import test from '@interactjs/_dev/test/test'
 import resize from '@interactjs/actions/resize/plugin'
 import * as helpers from '@interactjs/core/tests/_helpers'
+import * as Interact from '@interactjs/types/index'
 
 import aspectRatio, { AspectRatioOptions } from './aspectRatio'
 import modifiersBase from './base'

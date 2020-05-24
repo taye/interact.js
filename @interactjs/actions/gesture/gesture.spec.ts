@@ -1,5 +1,6 @@
 import test from '@interactjs/_dev/test/test'
 import * as helpers from '@interactjs/core/tests/_helpers'
+import * as Interact from '@interactjs/types/index'
 import extend from '@interactjs/utils/extend'
 import { coordsToEvent, newCoords } from '@interactjs/utils/pointerUtils'
 

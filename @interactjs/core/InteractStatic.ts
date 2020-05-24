@@ -1,4 +1,5 @@
 /** @module interact */
+import * as Interact from '@interactjs/types/index'
 import browser from '@interactjs/utils/browser'
 import * as domUtils from '@interactjs/utils/domUtils'
 import extend from '@interactjs/utils/extend'

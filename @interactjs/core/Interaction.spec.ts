@@ -2,6 +2,7 @@ import test from '@interactjs/_dev/test/test'
 import drag from '@interactjs/actions/drag/plugin'
 import drop from '@interactjs/actions/drop/plugin'
 import autoStart from '@interactjs/auto-start/base'
+import * as Interact from '@interactjs/types/index'
 import extend from '@interactjs/utils/extend'
 import * as pointerUtils from '@interactjs/utils/pointerUtils'
 

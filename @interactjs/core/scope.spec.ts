@@ -1,4 +1,5 @@
 import test from '@interactjs/_dev/test/test'
+import * as Interact from '@interactjs/types/index'
 
 import * as helpers from './tests/_helpers'
 

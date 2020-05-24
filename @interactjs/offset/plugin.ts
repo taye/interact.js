@@ -1,4 +1,5 @@
 import { _ProxyMethods } from '@interactjs/core/Interaction'
+import * as Interact from '@interactjs/types/index'
 import * as rectUtils from '@interactjs/utils/rect'
 
 declare module '@interactjs/core/Interaction' {

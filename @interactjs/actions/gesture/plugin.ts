@@ -1,3 +1,4 @@
+import * as Interact from '@interactjs/types/index'
 import is from '@interactjs/utils/is'
 import * as pointerUtils from '@interactjs/utils/pointerUtils'
 export type GesturableMethod = Interact.ActionMethod<Interact.GesturableOptions>

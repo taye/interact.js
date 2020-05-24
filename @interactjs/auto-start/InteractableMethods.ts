@@ -1,3 +1,4 @@
+import * as Interact from '@interactjs/types/index'
 import is from '@interactjs/utils/is'
 import { warnOnce } from '@interactjs/utils/misc'
 

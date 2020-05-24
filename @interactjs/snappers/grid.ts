@@ -1,3 +1,5 @@
+import * as Interact from '@interactjs/types/index'
+
 export type GridOptions = (Partial<Interact.Rect> | Interact.Point) & {
   range?: number
   limits?: Interact.Rect

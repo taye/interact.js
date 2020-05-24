@@ -1,3 +1,5 @@
+import * as Interact from '@interactjs/types/index'
+
 export default function isNonNativeEvent (type: string, actions: Interact.Actions) {
   if (actions.phaselessTypes[type]) { return true }
 

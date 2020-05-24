@@ -1,4 +1,5 @@
 import Scope from '@interactjs/core/scope'
+import * as Interact from '@interactjs/types/index'
 import extend from '@interactjs/utils/extend'
 
 type Interactable = import ('@interactjs/core/Interactable').default

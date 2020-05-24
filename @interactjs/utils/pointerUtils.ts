@@ -1,3 +1,5 @@
+import * as Interact from '@interactjs/types/index'
+
 import browser from './browser'
 import dom from './domObjects'
 import * as domUtils from './domUtils'

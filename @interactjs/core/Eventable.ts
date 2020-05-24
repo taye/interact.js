@@ -1,3 +1,4 @@
+import * as Interact from '@interactjs/types/index'
 import * as arr from '@interactjs/utils/arr'
 import extend from '@interactjs/utils/extend'
 import normalize, { NormalizedListeners } from '@interactjs/utils/normalizeListeners'

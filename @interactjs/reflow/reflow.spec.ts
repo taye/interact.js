@@ -2,6 +2,7 @@ import PromisePolyfill from 'promise-polyfill'
 
 import test from '@interactjs/_dev/test/test'
 import * as helpers from '@interactjs/core/tests/_helpers'
+import * as Interact from '@interactjs/types/index'
 
 import reflow from './plugin'
 

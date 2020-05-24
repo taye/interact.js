@@ -1,3 +1,5 @@
+import * as Interact from '@interactjs/types/index'
+
 import Modification from './Modification'
 
 declare module '@interactjs/core/Interaction' {

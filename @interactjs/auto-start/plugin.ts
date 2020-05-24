@@ -1,3 +1,5 @@
+import * as Interact from '@interactjs/types/index'
+
 import autoStart from './base'
 import dragAxis from './dragAxis'
 import hold from './hold'

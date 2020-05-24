@@ -1,3 +1,5 @@
+import * as Interact from '@interactjs/types/index'
+
 export interface Defaults {
   base: BaseDefaults
   perAction: PerActionDefaults

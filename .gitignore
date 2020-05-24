@@ -8,7 +8,6 @@ cc-test-reporter
 yarn-error.log
 **/*.d.ts
 **/*.d.ts.map
-!@interactjs/types/typings.d.ts
 !interactjs/index.d.ts
 @interactjs/**/index.ts
 !@interactjs/{types,interact,interactjs}/index.ts

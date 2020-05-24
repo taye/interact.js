@@ -1,3 +1,4 @@
+import * as Interact from '@interactjs/types/index'
 import * as domUtils from '@interactjs/utils/domUtils'
 import is from '@interactjs/utils/is'
 import raf from '@interactjs/utils/raf'

@@ -1,6 +1,7 @@
 import Modification from '@interactjs/modifiers/Modification'
 import * as modifiers from '@interactjs/modifiers/base'
 import offset from '@interactjs/offset/plugin'
+import * as Interact from '@interactjs/types/index'
 import * as dom from '@interactjs/utils/domUtils'
 import hypot from '@interactjs/utils/hypot'
 import is from '@interactjs/utils/is'

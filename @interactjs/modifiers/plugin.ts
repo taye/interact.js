@@ -1,4 +1,5 @@
 import snappers from '@interactjs/snappers/plugin'
+import * as Interact from '@interactjs/types/index'
 
 import all from './all'
 import base from './base'

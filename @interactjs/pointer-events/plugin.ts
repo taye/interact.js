@@ -1,3 +1,5 @@
+import * as Interact from '@interactjs/types/index'
+
 import * as pointerEvents from './base'
 import holdRepeat from './holdRepeat'
 import interactableTargets from './interactableTargets'

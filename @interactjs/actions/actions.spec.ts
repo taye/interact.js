@@ -1,5 +1,6 @@
 import test from '@interactjs/_dev/test/test'
 import * as helpers from '@interactjs/core/tests/_helpers'
+import * as Interact from '@interactjs/types/index'
 import * as pointerUtils from '@interactjs/utils/pointerUtils'
 
 import actions from './plugin'

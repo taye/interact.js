@@ -1,3 +1,5 @@
+import * as Interact from '@interactjs/types/index'
+
 export class PointerInfo {
   id: number
   pointer: Interact.PointerType
