@@ -5,7 +5,7 @@ export function warnOnce<T> (this: T, method: (...args: any[]) => any, message: 
 
   return function (this: T) {
     if (!warned) {
-      win.window.console.warn(message)
+      (win.window as any).console.warn(message)
       warned = true
     }
 

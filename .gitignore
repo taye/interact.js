@@ -5,6 +5,7 @@ cc-test-reporter
 .pnpm-store
 .npm-debug.log
 .pnpm-debug.log
+yarn-error.log
 **/*.d.ts
 **/*.d.ts.map
 !@interactjs/types/typings.d.ts

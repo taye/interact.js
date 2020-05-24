@@ -138,7 +138,8 @@ const checks: Check[] = [
 ]
 
 function hasStyle (element: HTMLElement, prop: keyof CSSStyleDeclaration, styleRe: RegExp) {
-  return styleRe.test(element.style[prop] || win.window.getComputedStyle(element)[prop])
+  const value = element.style[prop] || win.window.getComputedStyle(element)[prop]
+  return styleRe.test((value || '').toString())
 }
 
 function parentHasStyle (element: Interact.Element, prop: keyof CSSStyleDeclaration, styleRe: RegExp) {

@@ -7,15 +7,13 @@ env:
 
 cache:
   directories:
-    - /home/travis/.pnpm-store
+    - /home/travis/.cache/yarn
 
 language: node_js
 node_js:
   - "node"
 install:
-  - npm i -g pnpm
   - npm run bootstrap
-  - git checkout -- pnpm-lock.yaml
 before_script:
   - curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
   - chmod +x ./cc-test-reporter

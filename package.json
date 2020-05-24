@@ -7,17 +7,17 @@
     "bin": "./bin"
   },
   "scripts": {
-    "bootstrap": "npx pnpm install --recursive",
-    "start": "pnpm run esnext -- --serve",
+    "bootstrap": "npx yarn install --prefer-offline --pure-lockfile",
+    "start": "yarn esnext -- --serve",
     "bundle": "NODE_ENV=production _bundle",
     "esnext": "_add_plugin_indexes && _esnext",
-    "build": "pnpm run docs && pnpm run bundle && _add_plugin_indexes && _types && _esnext",
+    "build": "yarn docs && yarn bundle && _add_plugin_indexes && _types && _esnext",
     "docs": "node jsdoc/index.js",
     "lint": "_lint --fail-on-error",
     "test": "_test",
-    "test:debug": "TEST_RUNNER=nodemon TEST_RUNNER_ARGS='-x node --inspect' pnpm test",
+    "test:debug": "TEST_RUNNER=nodemon TEST_RUNNER_ARGS='-x node --inspect' yarn test",
     "tsc_lint_test": "_add_plugin_indexes && tsc -b -f && _lint --fail-on-error && _test",
-    "postinstall": "cd node_modules/.bin && ln -sf ../../bin/* ."
+    "postinstall": "bin/_link"
   },
   "dependencies": {
     "@babel/core": "latest",
@@ -30,27 +30,6 @@
     "@babel/register": "latest",
     "@babel/runtime": "latest",
     "@interactjs/_dev": "link:./",
-    "@interactjs/actions": "*",
-    "@interactjs/arrange": "*",
-    "@interactjs/auto-scroll": "*",
-    "@interactjs/auto-start": "*",
-    "@interactjs/clone": "*",
-    "@interactjs/core": "*",
-    "@interactjs/dev-tools": "*",
-    "@interactjs/feedback": "*",
-    "@interactjs/inertia": "*",
-    "@interactjs/interact": "*",
-    "@interactjs/interactjs": "*",
-    "@interactjs/modifiers": "*",
-    "@interactjs/multi-target": "*",
-    "@interactjs/offset": "*",
-    "@interactjs/pointer-events": "*",
-    "@interactjs/react": "*",
-    "@interactjs/reflow": "*",
-    "@interactjs/snappers": "*",
-    "@interactjs/types": "*",
-    "@interactjs/utils": "*",
-    "@interactjs/vue": "*",
     "@types/node": "latest",
     "@types/shelljs": "latest",
     "@types/tape": "latest",
@@ -68,7 +47,7 @@
     "del": "^5.1.0",
     "domator": "latest",
     "errorify": "latest",
-    "eslint": "latest",
+    "eslint": "6",
     "eslint-config-standard": "latest",
     "eslint-import-resolver-typescript": "latest",
     "eslint-plugin-import": "latest",
@@ -87,6 +66,7 @@
     "nodemon": "latest",
     "nyc": "latest",
     "p-queue": "latest",
+    "promise-polyfill": "latest",
     "resolve": "latest",
     "semver": "latest",
     "shelljs": "latest",
@@ -102,8 +82,8 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "pnpx _lint --fail-on-error",
-      "pre-push": "pnpm run tsc_lint_test"
+      "pre-commit": "_lint --fail-on-error",
+      "pre-push": "yarn tsc_lint_test"
     }
   }
 }

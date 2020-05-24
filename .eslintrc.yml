@@ -55,7 +55,6 @@ rules:
   '@typescript-eslint/array-type': [error, { default: 'array-simple' }]
   '@typescript-eslint/explicit-member-accessibility': off
   '@typescript-eslint/indent': [error, 2]
-  '@typescript-eslint/interface-name-prefix': [error, 'never']
   '@typescript-eslint/member-accessibility': off
   '@typescript-eslint/member-delimiter-style': [error, { singleline: { delimiter: 'comma' }, multiline: { delimiter: 'none' } }]
   '@typescript-eslint/no-empty-interface': error
