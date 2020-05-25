@@ -1,0 +1,11 @@
+{
+	"version": 3,
+	"sources": [
+		"plugin.ts"
+	],
+	"names": [],
+	"mappings": "AAAA,eAAe,EAAf",
+	"sourcesContent": [
+		"export default {}\n"
+	]
+}
