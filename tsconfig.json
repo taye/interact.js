@@ -24,7 +24,7 @@
     "baseUrl": ".",
     "paths": {
       "@interactjs/_dev/*": ["./*"],
-      "@interactjs/*": ["./@interactjs/*"]
+      "@interactjs/*": ["./packages/@interactjs/*"]
     }
   }
 }

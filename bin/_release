@@ -73,7 +73,7 @@ function clean () {
 
 async function runBuild () {
   // copy README to interactjs package
-  for (const p of await glob('{@interactjs/,}interactjs')) {
+  for (const p of await glob('packages/{@interactjs/,}interactjs')) {
     fs.copyFileSync(`${cwd}/README.md`, `${p}/README.md`)
   }
 
@@ -100,7 +100,7 @@ async function runBuild () {
 function commitAndTag () {
   // commit and add new version tag
   shell.exec('git add --all .')
-  shell.exec('git add --force interactjs @interactjs')
+  shell.exec('git add --force packages')
   shell.exec('git reset **/node_modules')
   shell.exec(`git commit -m ${gitTag}`)
   shell.exec(`git tag ${gitTag}`)

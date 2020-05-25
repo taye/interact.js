@@ -20,8 +20,8 @@ test('typings', async t => {
   t.doesNotThrow(
     () => {
       shell.exec(`_types ${modulesDir}`)
-      shell.cp('interactjs/{*.d.ts,package.json}', interactDir)
-      shell.cp('@interactjs/types/{*.d.ts,package.json}', tempTypesDir)
+      shell.cp('packages/interactjs/{*.d.ts,package.json}', interactDir)
+      shell.cp('packages/@interactjs/types/{*.d.ts,package.json}', tempTypesDir)
       shell.cp('-R', path.join(process.cwd(), 'test', 'testProject', '*'), tempDir)
       shell.exec('tsc -b', { cwd: tempDir })
 

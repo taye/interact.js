@@ -40,7 +40,6 @@ rules:
   no-useless-constructor: off
   no-var: error
   import/no-extraneous-dependencies: [error, { devDependencies: false }]
-  import/no-named-as-default: off
   import/order: [error, {
     alphabetize: { order: asc },
     newlines-between: always,

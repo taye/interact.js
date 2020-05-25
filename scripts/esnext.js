@@ -46,6 +46,7 @@ const OUTPUT_VERSIONS = [
 ]
 
 const queue = new PQueue({ concurrency: os.cpus().length })
+const packagesDir = path.join(process.cwd(), 'packages')
 
 async function generate ({
   sources,
@@ -56,7 +57,7 @@ async function generate ({
   serve = false,
   watch = false,
   serverOptions,
-  outDir = serve ? temp.mkdirSync('ijs-serve') : process.cwd(),
+  outDir = serve ? temp.mkdirSync('ijs-serve') : packagesDir,
 } = {}) {
   sources = sources || await getSources()
   watch = watch || serve
@@ -110,7 +111,7 @@ async function generate ({
     port: 8081,
     open: false,
     server: outDir,
-    serveStatic: [process.cwd()],
+    serveStatic: [packagesDir, process.cwd()],
     ...serverOptions,
   })
 

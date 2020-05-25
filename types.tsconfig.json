@@ -1,7 +1,6 @@
 {
   "include": [
-    "@interactjs/**/*.ts",
-    "interactjs/index.ts"
+    "packages"
   ],
   "exclude": [
     "**/*.spec.ts"
@@ -23,7 +22,7 @@
 
     "strict": false,
 
-    "rootDir": ".",
-    "outFile": "@interactjs/types/index.d.ts"
+    "rootDir": "packages",
+    "outFile": "packages/@interactjs/types/index.d.ts"
   }
 }

@@ -5,7 +5,7 @@
   "functions": 58,
   "lines": 64,
   "include": [
-    "@interactjs/**/*.{t,j}s{,x}"
+    "packages/@interactjs/**/*.{t,j}s{,x}"
   ],
   "exclude": [
     "**/*.spec.ts",

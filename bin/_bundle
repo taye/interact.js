@@ -7,7 +7,7 @@ const bundler = require('../scripts/bundler')
 
 const [
   ,,
-  entry = 'interactjs',
+  entry = 'packages/interactjs',
   standalone = 'interact',
   name = standalone,
 ] = process.argv

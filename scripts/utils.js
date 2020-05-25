@@ -5,13 +5,13 @@ const { promisify } = require('util')
 const glob = promisify(require('glob'))
 const resolveSync = require('resolve').sync
 
-const sourcesGlob = '{,@}interactjs/**/**/*{.ts,.tsx}'
-const lintSourcesGlob = `{${sourcesGlob},{scripts,examples}/**/*.js,bin/**/*}`
+const sourcesGlob = 'packages/{,@}interactjs/**/**/*{.ts,.tsx}'
+const lintSourcesGlob = `{${sourcesGlob},{scripts,examples,jsdoc}/**/*.js,bin/**/*}`
 const commonIgnoreGlobs = ['**/node_modules/**', '**/*_*', '**/*.d.ts', '**/dist/**', 'examples/js/**']
 const lintIgnoreGlobs = [...commonIgnoreGlobs]
 const sourcesIgnoreGlobs = [...commonIgnoreGlobs, '**/*.spec.ts']
-const builtFilesGlob = '{{**/dist/**,{,@}interactjs/**/**/*.js{,.map}},@interactjs/**/index.ts}'
-const builtFilesIgnoreGlobs = ['**/node_modules/**', '@interactjs/{types,interact,interactjs}/index.ts']
+const builtFilesGlob = '{{**/dist/**,packages/{,@}interactjs/**/**/*.js{,.map}},packages/@interactjs/**/index.ts}'
+const builtFilesIgnoreGlobs = ['**/node_modules/**', 'packages/@interactjs/{types,interact,interactjs}/index.ts']
 
 const getSources = ({ cwd = process.cwd(), ...options } = {}) => glob(
   sourcesGlob,
@@ -75,14 +75,14 @@ function getModuleName (tsName) {
 
 function getModuleDirectories () {
   return [
-    process.cwd(),
+    path.join(process.cwd(), 'packages'),
     path.join(process.cwd(), 'node_modules'),
-    path.join(__dirname, '..'),
+    path.join(__dirname, '..', 'packages'),
   ]
 }
 
 async function getPackages (options) {
-  const packageJsonPaths = await glob('{@interactjs/*,interactjs}/package.json', { ignore: commonIgnoreGlobs, ...options })
+  const packageJsonPaths = await glob('packages/{@interactjs/*,interactjs}/package.json', { ignore: commonIgnoreGlobs, ...options })
   const packageDirs = packageJsonPaths.map(p => path.join(p, '..'))
 
   return [...new Set(packageDirs)]

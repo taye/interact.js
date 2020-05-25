@@ -1,5 +1,7 @@
 const path = require('path')
+
 const glob = require('glob')
+
 const { sourcesGlob, sourcesIgnoreGlobs } = require('../scripts/utils')
 
 const root = path.join(__dirname, '..')
@@ -15,7 +17,7 @@ module.exports = {
   },
 
   opts: {
-    destination: `${root}/interactjs/dist/api/`,
+    destination: `${root}/packages/interactjs/dist/api/`,
     recurse: true,
   },
 

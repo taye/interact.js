@@ -10,13 +10,13 @@ rm $modules_scope_dir/* 2> /dev/null
 ln -sf $ROOT $modules_scope_dir/_dev
 
 # link all scoped packages from CWD
-for package in $(cd @interactjs && ls -d *); do
-  ln -sf ../../@interactjs/$package $modules_scope_dir
+for package in $(cd packages/@interactjs && ls -d *); do
+  ln -sf ../../packages/@interactjs/$package $modules_scope_dir
 done
 
 # link all packages from this repo
-for package in $(cd $ROOT/@interactjs && ls -d *); do
-  ln -sf $ROOT/@interactjs/$package $modules_scope_dir
+for package in $(cd $ROOT/packages/@interactjs && ls -d *); do
+  ln -sf $ROOT/packages/@interactjs/$package $modules_scope_dir
 done
 
 # link all bins from this repo and from CWD

@@ -9,8 +9,10 @@ yarn-error.log
 **/*.d.ts
 **/*.d.ts.map
 !interactjs/index.d.ts
-@interactjs/**/index.ts
-!@interactjs/{types,interact,interactjs}/index.ts
+packages/@interactjs/**/index.ts
+!packages/@interactjs/types/index.ts
+!packages/@interactjs/interact/index.ts
+!packages/@interactjs/interactjs/index.ts
 *interactjs/**/*.js
 *interactjs/**/*.js.map
 **/node_modules

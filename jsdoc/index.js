@@ -1,6 +1,7 @@
 #!/usr/bin/env node
-const fs = require('fs-extra')
 const path = require('path')
+
+const fs = require('fs-extra')
 const mkdirp = require('mkdirp')
 
 const confPath = require.resolve('./jsdoc.conf')
