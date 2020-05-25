@@ -1,13 +1,13 @@
 {
   "name": "@interactjs/pointer-events",
-  "version": "1.9.17",
+  "version": "1.9.18",
   "license": "MIT",
   "peerDependencies": {
-    "@interactjs/core": "1.9.17",
-    "@interactjs/utils": "1.9.17"
+    "@interactjs/core": "1.9.18",
+    "@interactjs/utils": "1.9.18"
   },
   "optionalDependencies": {
-    "@interactjs/interact": "1.9.17"
+    "@interactjs/interact": "1.9.18"
   },
   "publishConfig": {
     "access": "public"
