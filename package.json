@@ -7,7 +7,7 @@
     "bin": "./bin"
   },
   "scripts": {
-    "bootstrap": "npx yarn install --prefer-offline --pure-lockfile",
+    "bootstrap": "yarn install --prefer-offline --pure-lockfile",
     "start": "yarn esnext -- --serve",
     "bundle": "NODE_ENV=production _bundle",
     "esnext": "_add_plugin_indexes && _esnext",
