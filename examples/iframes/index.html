@@ -3,12 +3,12 @@
 
 <iframe src="middle.html" style="border: solid 2px black"></iframe>
 
-<script src="index.js"></script>
+<script type="module" src="index.js"></script>
 <script>
 document.querySelector('iframe').onload = function (event) {
-    window.interact = frames[0].interact;
+  window.interact = frames[0].interact;
 
-    setInteractables();
+  window.setInteractables();
 };
 </script>
 

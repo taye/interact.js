@@ -88,19 +88,22 @@ async function getPackages (options) {
   return [...new Set(packageDirs)]
 }
 
+function shouldIgnoreImport (sourceValue, filename, moduleDirectory) {
+  return !/^(\.{1-2}|(@interactjs))\//.test(sourceValue) &&
+    !moduleDirectory.some(d => filename.startsWith(d))
+}
+
 function transformImportsToRelative () {
   const resolve = require('resolve')
 
   const fixImportSource = ({ node: { source } }, { opts, filename }) => {
     if (!source || (opts.ignore && opts.ignore(filename))) { return }
 
-    // ignore non-relative non @interactjs/* imports
-    if (!/^(\.{1-2}|(@interactjs))\//.test(source.value)) { return }
+    const { moduleDirectory } = opts
 
-    const {
-      moduleDirectory,
-      extension = '.js',
-    } = opts
+    if (shouldIgnoreImport(source.value, filename, moduleDirectory)) { return }
+
+    const { extension = '.js' } = opts
 
     const basedir = path.dirname(getRelativeToRoot(filename, moduleDirectory).result)
     let resolvedImport = ''
@@ -149,14 +152,11 @@ function transformImportsToAbsolute () {
   const fixImportSource = ({ node: { source } }, { opts, filename }) => {
     if (!source || (opts.ignore && opts.ignore(filename, source.value))) { return }
 
-    // ignore non-relative non @interactjs/* imports
-    if (!/^(\.|(@interactjs\/))/.test(source.value)) { return }
+    const { moduleDirectory } = opts
 
-    const {
-      moduleDirectory,
-      extension = '',
-      prefix,
-    } = opts
+    if (shouldIgnoreImport(source.value, filename, moduleDirectory)) { return }
+
+    const { extension = '', prefix } = opts
     const basedir = path.dirname(filename)
 
     let resolvedImport = ''

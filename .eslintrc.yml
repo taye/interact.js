@@ -67,11 +67,15 @@ overrides:
       array-bracket-spacing: off
       import/no-extraneous-dependencies: off
   -
-    files: '*.ts'
+    files: '*.ts{,x}'
     rules:
       arrow-parens: [error, 'as-needed']
       no-unused-vars: off
       no-use-before-define: off
+  -
+    files: '**/examples/**/*.js'
+    rules:
+      import/no-absolute-path: off
 
 settings:
   import/resolver:

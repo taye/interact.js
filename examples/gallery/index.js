@@ -1,4 +1,5 @@
-import interact from '../../interactjs/index.js'
+/* eslint-disable import/no-absolute-path */
+import interact from '/@interactjs/interactjs/index.js'
 
 /*
 * This demo is very broken!

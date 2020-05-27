@@ -52,110 +52,91 @@ export function matchesSelector (element: Interact.Element, selector: string) {
   return element[browser.prefixedMatchesSelector](selector)
 }
 
-const getParent = el => el.parentNode ? el.parentNode : el.host
+const getParent = (el: Node | Document | ShadowRoot) => el.parentNode || (el as ShadowRoot).host
 
 // Test for the element that's "above" all other qualifiers
 export function indexOfDeepestElement (elements: Interact.Element[] | NodeListOf<Element>) {
-  let deepestZoneParents = []
-  let deepestZone = elements[0]
-  let index = deepestZone ? 0 : -1
-  let i
-  let n
+  let deepestNodeParents: Node[] = []
+  let deepestNodeIndex: number
 
-  for (i = 1; i < elements.length; i++) {
-    const dropzone = elements[i]
+  for (let i = 0; i < elements.length; i++) {
+    const currentNode = elements[i]
+    const deepestNode: Node = elements[deepestNodeIndex]
 
-    // an element might belong to multiple selector dropzones
-    if (!dropzone || dropzone === deepestZone) {
+    // node may appear in elements array multiple times
+    if (!currentNode || i === deepestNodeIndex) {
       continue
     }
 
-    if (!deepestZone) {
-      deepestZone = dropzone
-      index = i
+    if (!deepestNode) {
+      deepestNodeIndex = i
       continue
     }
 
-    // check if the deepest or current are document.documentElement or document.rootElement
-    // - if the current dropzone is, do nothing and continue
-    if (dropzone.parentNode === dropzone.ownerDocument) {
+    const currentNodeParent = getParent(currentNode)
+    const deepestNodeParent = getParent(deepestNode)
+
+    // check if the deepest or current are document.documentElement/rootElement
+    // - if the current node is, do nothing and continue
+    if (currentNodeParent === currentNode.ownerDocument) {
       continue
     }
-    // - if deepest is, update with the current dropzone and continue to next
-    else if (deepestZone.parentNode === dropzone.ownerDocument) {
-      deepestZone = dropzone
-      index = i
+    // - if deepest is, update with the current node and continue to next
+    else if (deepestNodeParent === currentNode.ownerDocument) {
+      deepestNodeIndex = i
       continue
     }
 
     // compare zIndex of siblings
-    if (dropzone.parentNode === deepestZone.parentNode) {
-      const deepestZIndex = parseInt(getWindow(deepestZone).getComputedStyle(deepestZone).zIndex, 10) || 0
-      const dropzoneZIndex = parseInt(getWindow(dropzone).getComputedStyle(dropzone).zIndex, 10) || 0
-
-      if (dropzoneZIndex >= deepestZIndex) {
-        deepestZone = dropzone
-        index = i
+    if (currentNodeParent === deepestNodeParent) {
+      if (zIndexIsHigherThan(currentNode, deepestNode)) {
+        deepestNodeIndex = i
       }
 
       continue
     }
 
-    // populate the ancestry array for the latest deepest dropzone
-    if (!deepestZoneParents.length) {
-      let parent = deepestZone
-      let parentParent
+    // populate the ancestry array for the latest deepest node
+    deepestNodeParents = deepestNodeParents.length ? deepestNodeParents : getNodeParents(deepestNode)
 
-      while ((parentParent = getParent(parent)) && parentParent !== parent.ownerDocument) {
-        deepestZoneParents.unshift(parent)
-        parent = parentParent
-      }
-    }
+    let ancestryStart: Node
 
-    let parent
-
-    // if this element is an svg element and the current deepest is an
-    // HTMLElement
-    if (deepestZone instanceof domObjects.HTMLElement &&
-        dropzone instanceof domObjects.SVGElement &&
-        !(dropzone instanceof domObjects.SVGSVGElement)) {
-      if (dropzone === deepestZone.parentNode) {
+    // if the deepest node is an HTMLElement and the current node is a non root svg element
+    if (deepestNode instanceof domObjects.HTMLElement &&
+      currentNode instanceof domObjects.SVGElement &&
+      !(currentNode instanceof domObjects.SVGSVGElement)
+    ) {
+      // TODO: is this check necessary? Was this for HTML elements embedded in SVG?
+      if (currentNode === deepestNodeParent) {
         continue
       }
 
-      parent = dropzone.ownerSVGElement
+      ancestryStart = currentNode.ownerSVGElement
     }
     else {
-      parent = dropzone
+      ancestryStart = currentNode
     }
 
-    const dropzoneParents = []
+    const currentNodeParents = getNodeParents(ancestryStart, deepestNode.ownerDocument)
+    let commonIndex = 0
 
-    while (parent.parentNode !== parent.ownerDocument) {
-      dropzoneParents.unshift(parent)
-      parent = getParent(parent)
-    }
-
-    n = 0
-
-    // get (position of last common ancestor) + 1
-    while (dropzoneParents[n] && dropzoneParents[n] === deepestZoneParents[n]) {
-      n++
+    // get (position of closest common ancestor) + 1
+    while (currentNodeParents[commonIndex] && currentNodeParents[commonIndex] === deepestNodeParents[commonIndex]) {
+      commonIndex++
     }
 
     const parents = [
-      dropzoneParents[n - 1],
-      dropzoneParents[n],
-      deepestZoneParents[n],
+      currentNodeParents[commonIndex - 1],
+      currentNodeParents[commonIndex],
+      deepestNodeParents[commonIndex],
     ]
 
     let child = parents[0].lastChild
 
     while (child) {
       if (child === parents[1]) {
-        deepestZone = dropzone
-        index = i
-        deepestZoneParents = dropzoneParents
+        deepestNodeIndex = i
+        deepestNodeParents = currentNodeParents
 
         break
       }
@@ -167,7 +148,27 @@ export function indexOfDeepestElement (elements: Interact.Element[] | NodeListOf
     }
   }
 
-  return index
+  return deepestNodeIndex
+}
+
+function getNodeParents (node: Node, limit?: Node) {
+  const parents: Node[] = []
+  let parent: Node = node
+  let parentParent: Node
+
+  while ((parentParent = getParent(parent)) && parent !== limit && parentParent !== parent.ownerDocument) {
+    parents.unshift(parent)
+    parent = parentParent
+  }
+
+  return parents
+}
+
+function zIndexIsHigherThan (higherNode: Node, lowerNode: Node) {
+  const higherIndex = parseInt(getWindow(higherNode).getComputedStyle(higherNode).zIndex, 10) || 0
+  const lowerIndex = parseInt(getWindow(lowerNode).getComputedStyle(lowerNode).zIndex, 10) || 0
+
+  return higherIndex >= lowerIndex
 }
 
 export function matchesUpTo (element: Interact.Element, selector: string, limit: Node) {
@@ -241,7 +242,7 @@ export function getPath (node: Node | Document) {
   return path
 }
 
-export function trySelector (value) {
+export function trySelector (value: Interact.Target) {
   if (!is.string(value)) { return false }
 
   // an exception will be raised if it is invalid
