@@ -1,4 +1,5 @@
 /* eslint-disable import/no-extraneous-dependencies */
+import * as dropEvent from '@interactjs/actions/drop/DropEvent'
 import * as gesture from '@interactjs/actions/gesture/plugin'
 import * as resize from '@interactjs/actions/resize/plugin'
 import * as iEvent from '@interactjs/core/InteractEvent'
@@ -63,6 +64,7 @@ export type DoPhaseArg<T extends ActionName, P extends EventPhase> = interaction
 export type DoAnyPhaseArg = interaction.DoAnyPhaseArg
 
 export type DragEvent = InteractEvent<'drag'>
+export type DropEvent = dropEvent.DropEvent
 export type ResizeEvent = resize.ResizeEvent
 export type GestureEvent = gesture.GestureEvent
 export type PointerEvent<T extends string = any> = _PointerEvent<T>
