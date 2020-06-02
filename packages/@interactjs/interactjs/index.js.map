@@ -1,0 +1,38 @@
+{
+	"version": 3,
+	"sources": [
+		"index.ts"
+	],
+	"names": [
+		"actions",
+		"arrange",
+		"autoScroll",
+		"autoStart",
+		"clone",
+		"interactablePreventDefault",
+		"devTools",
+		"feedback",
+		"inertia",
+		"interact",
+		"modifiers",
+		"multiTarget",
+		"offset",
+		"pointerEvents",
+		"reactComponents",
+		"reflow",
+		"displace",
+		"exchange",
+		"pointerUtils",
+		"vueComponents",
+		"use",
+		"__utils",
+		"pointer",
+		"module",
+		"exports",
+		"default"
+	],
+	"mappings": "AAAA,OAAOA,OAAP,MAAoB,sBAApB;AACA,OAAOC,OAAP,MAAoB,sBAApB;AACA,OAAOC,UAAP,MAAuB,0BAAvB;AACA,OAAOC,SAAP,MAAsB,yBAAtB;AACA,OAAOC,KAAP,MAAkB,oBAAlB;AACA,OAAOC,0BAAP,MAAuC,uCAAvC;AACA,OAAOC,QAAP,MAAqB,wBAArB;AACA,OAAOC,QAAP,MAAqB,uBAArB;AACA,OAAOC,OAAP,MAAoB,sBAApB;AACA,OAAOC,QAAP,MAAqB,sBAArB;AACA,OAAOC,SAAP,MAAsB,wBAAtB;AACA,OAAOC,WAAP,MAAwB,2BAAxB;AACA,OAAOC,MAAP,MAAmB,qBAAnB;AACA,OAAOC,aAAP,MAA0B,6BAA1B;AACA,OAAOC,eAAP,MAA4B,oBAA5B;AACA,OAAOC,MAAP,MAAmB,qBAAnB;AACA,OAAO,KAAKC,QAAZ,MAA0B,sBAA1B;AACA,SAASC,QAAT,QAAyB,sBAAzB;AACA,OAAO,KAAKC,YAAZ,MAA8B,0BAA9B;AACA,OAAOC,aAAP,MAA0B,kBAA1B;AAYAV,QAAQ,CAACW,GAAT,CAAaT,WAAb;AAEAF,QAAQ,CAACW,GAAT,CAAaf,0BAAb;AAEAI,QAAQ,CAACW,GAAT,CAAaR,MAAb,E,CAEA;;AACAH,QAAQ,CAACW,GAAT,CAAahB,KAAb,E,CAEA;;AACAK,QAAQ,CAACW,GAAT,CAAanB,OAAb,E,CAEA;;AACAQ,QAAQ,CAACW,GAAT,CAAaP,aAAb,E,CAEA;;AACAJ,QAAQ,CAACW,GAAT,CAAaZ,OAAb,E,CAEA;;AACAC,QAAQ,CAACW,GAAT,CAAaV,SAAb,E,CAEA;;AACAD,QAAQ,CAACW,GAAT,CAAajB,SAAb,E,CAEA;;AACAM,QAAQ,CAACW,GAAT,CAAapB,OAAb,E,CAEA;;AACAS,QAAQ,CAACW,GAAT,CAAalB,UAAb,E,CAEA;;AACAO,QAAQ,CAACW,GAAT,CAAaL,MAAb;AAEAN,QAAQ,CAACW,GAAT,CAAab,QAAb;AAEAE,QAAQ,CAACW,GAAT,CAAaD,aAAb;AAEAV,QAAQ,CAACW,GAAT,CAAaN,eAAb;AAEAL,QAAQ,CAACY,OAAT,GAAmB;AACjBJ,EAAAA,QADiB;AAEjBD,EAAAA,QAFiB;AAGjBM,EAAAA,OAAO,EAAEJ;AAHQ,CAAnB,C,CAMA;;AACA,IAAI,kBAAyB,YAA7B,EAA2C;AACzCT,EAAAA,QAAQ,CAACW,GAAT,CAAad,QAAb;AACD;;AAED,eAAeG,QAAf;;AAEA,IAAI,OAAOc,MAAP,KAAkB,QAAlB,IAA8B,CAAC,CAACA,MAApC,EAA4C;AAC1C,MAAI;AAAEA,IAAAA,MAAM,CAACC,OAAP,GAAiBf,QAAjB;AAA2B,GAAjC,CACA,MAAM,CAAE;AACT;;AAEAA,QAAD,CAAkBgB,OAAlB,GAA4BhB,QAA5B",
+	"sourcesContent": [
+		"import actions from '@interactjs/actions/plugin'\nimport arrange from '@interactjs/arrange/plugin'\nimport autoScroll from '@interactjs/auto-scroll/plugin'\nimport autoStart from '@interactjs/auto-start/plugin'\nimport clone from '@interactjs/clone/plugin'\nimport interactablePreventDefault from '@interactjs/core/interactablePreventDefault'\nimport devTools from '@interactjs/dev-tools/plugin'\nimport feedback from '@interactjs/feedback/plugin'\nimport inertia from '@interactjs/inertia/plugin'\nimport interact from '@interactjs/interact'\nimport modifiers from '@interactjs/modifiers/plugin'\nimport multiTarget from '@interactjs/multi-target/plugin'\nimport offset from '@interactjs/offset/plugin'\nimport pointerEvents from '@interactjs/pointer-events/plugin'\nimport reactComponents from '@interactjs/react/plugin'\nimport reflow from '@interactjs/reflow/plugin'\nimport * as displace from '@interactjs/utils/displace'\nimport { exchange } from '@interactjs/utils/exchange'\nimport * as pointerUtils from '@interactjs/utils/pointerUtils'\nimport vueComponents from '@interactjs/vue/plugin'\n\ndeclare module '@interactjs/core/interactStatic' {\n  export interface InteractStatic {\n    __utils: {\n      exchange: typeof exchange\n      displace: typeof displace\n      pointer: typeof pointerUtils\n    }\n  }\n}\n\ninteract.use(multiTarget)\n\ninteract.use(interactablePreventDefault)\n\ninteract.use(offset)\n\n// interaction element cloning\ninteract.use(clone)\n\n// sortable and swappable\ninteract.use(arrange)\n\n// pointerEvents\ninteract.use(pointerEvents)\n\n// inertia\ninteract.use(inertia)\n\n// snap, resize, etc.\ninteract.use(modifiers)\n\n// autoStart, hold\ninteract.use(autoStart)\n\n// drag and drop, resize, gesture\ninteract.use(actions)\n\n// autoScroll\ninteract.use(autoScroll)\n\n// reflow\ninteract.use(reflow)\n\ninteract.use(feedback)\n\ninteract.use(vueComponents)\n\ninteract.use(reactComponents)\n\ninteract.__utils = {\n  exchange,\n  displace,\n  pointer: pointerUtils,\n}\n\n// eslint-disable-next-line no-undef\nif (process.env.NODE_ENV !== 'production') {\n  interact.use(devTools)\n}\n\nexport default interact\n\nif (typeof module === 'object' && !!module) {\n  try { module.exports = interact }\n  catch {}\n}\n\n(interact as any).default = interact\n"
+	]
+}

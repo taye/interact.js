@@ -1,0 +1,35 @@
+{
+	"version": 3,
+	"sources": [
+		"is.ts"
+	],
+	"names": [
+		"isWindow",
+		"win",
+		"window",
+		"thing",
+		"docFrag",
+		"object",
+		"nodeType",
+		"func",
+		"number",
+		"bool",
+		"string",
+		"element",
+		"_window",
+		"getWindow",
+		"test",
+		"Element",
+		"nodeName",
+		"plainObject",
+		"constructor",
+		"toString",
+		"array",
+		"length",
+		"splice"
+	],
+	"mappings": "AAEA,OAAOA,QAAP,MAAqB,eAArB;AACA,OAAOC,GAAP,MAAgB,aAAhB;;AAEA,MAAMC,MAAM,GAAIC,KAAD,IACbA,KAAK,KAAKF,GAAG,CAACC,MAAd,IAAwBF,QAAQ,CAACG,KAAD,CADlC;;AAGA,MAAMC,OAAO,GAAID,KAAD,IACdE,MAAM,CAACF,KAAD,CAAN,IAAiBA,KAAK,CAACG,QAAN,KAAmB,EADtC;;AAGA,MAAMD,MAAM,GAAIF,KAAD,IACb,CAAC,CAACA,KAAF,IAAY,OAAOA,KAAP,KAAiB,QAD/B;;AAGA,MAAMI,IAAI,GAAIJ,KAAD,IACX,OAAOA,KAAP,KAAiB,UADnB;;AAGA,MAAMK,MAAM,GAAIL,KAAD,IACb,OAAOA,KAAP,KAAiB,QADnB;;AAGA,MAAMM,IAAI,GAAIN,KAAD,IACX,OAAOA,KAAP,KAAiB,SADnB;;AAGA,MAAMO,MAAM,GAAIP,KAAD,IACb,OAAOA,KAAP,KAAiB,QADnB;;AAGA,MAAMQ,OAAO,GAAIR,KAAD,IAA2C;AACzD,MAAI,CAACA,KAAD,IAAW,OAAOA,KAAP,KAAiB,QAAhC,EAA2C;AAAE,WAAO,KAAP;AAAc,GADF,CAGzD;;;AACA,QAAMS,OAAO,GAAGX,GAAG,CAACY,SAAJ,CAAcV,KAAd,KAAwBF,GAAG,CAACC,MAA5C;;AAEA,SAAQ,kBAAkBY,IAAlB,CAAuB,OAAOF,OAAO,CAACG,OAAtC,IACJZ,KAAK,YAAYS,OAAO,CAACG,OADrB,CAC6B;AAD7B,IAEJZ,KAAK,CAACG,QAAN,KAAmB,CAAnB,IAAwB,OAAOH,KAAK,CAACa,QAAb,KAA0B,QAFtD;AAGD,CATD;;AAWA,MAAMC,WAA0B,GAAId,KAAD,IACjCE,MAAM,CAACF,KAAD,CAAN,IACA,CAAC,CAACA,KAAK,CAACe,WADR,IAEA,oBAAoBJ,IAApB,CAAyBX,KAAK,CAACe,WAAN,CAAkBC,QAAlB,EAAzB,CAHF;;AAKA,MAAMC,KAAK,GAAuBjB,KAApB,IACXE,MAAM,CAACF,KAAD,CAAN,IACA,OAAOA,KAAK,CAACkB,MAAb,KAAwB,WADxB,IAEDd,IAAI,CAACJ,KAAK,CAACmB,MAAP,CAHN;;AAKA,eAAe;AACbpB,EAAAA,MADa;AAEbE,EAAAA,OAFa;AAGbC,EAAAA,MAHa;AAIbE,EAAAA,IAJa;AAKbC,EAAAA,MALa;AAMbC,EAAAA,IANa;AAObC,EAAAA,MAPa;AAQbC,EAAAA,OARa;AASbM,EAAAA,WATa;AAUbG,EAAAA;AAVa,CAAf",
+	"sourcesContent": [
+		"import * as Interact from '@interactjs/types/index'\n\nimport isWindow from './isWindow'\nimport win from './window'\n\nconst window = (thing: any): thing is Window =>\n  thing === win.window || isWindow(thing)\n\nconst docFrag = (thing: any): thing is DocumentFragment =>\n  object(thing) && thing.nodeType === 11\n\nconst object = (thing: any): thing is { [index: string]: any } =>\n  !!thing && (typeof thing === 'object')\n\nconst func = (thing: any): thing is (...args: any[]) => any =>\n  typeof thing === 'function'\n\nconst number = (thing: any): thing is number =>\n  typeof thing === 'number'\n\nconst bool = (thing: any): thing is boolean =>\n  typeof thing === 'boolean'\n\nconst string = (thing: any): thing is string =>\n  typeof thing === 'string'\n\nconst element = (thing: any): thing is Interact.Element => {\n  if (!thing || (typeof thing !== 'object')) { return false }\n\n  // eslint-disable-next-line import/no-named-as-default-member\n  const _window = win.getWindow(thing) || win.window\n\n  return (/object|function/.test(typeof _window.Element)\n    ? thing instanceof _window.Element // DOM2\n    : thing.nodeType === 1 && typeof thing.nodeName === 'string')\n}\n\nconst plainObject: typeof object = (thing: any): thing is { [index: string]: any } =>\n  object(thing) &&\n  !!thing.constructor &&\n  /function Object\\b/.test(thing.constructor.toString())\n\nconst array = <T extends unknown>(thing: any): thing is T[] =>\n  (object(thing) &&\n  (typeof thing.length !== 'undefined') &&\n  func(thing.splice))\n\nexport default {\n  window,\n  docFrag,\n  object,\n  func,\n  number,\n  bool,\n  string,\n  element,\n  plainObject,\n  array,\n}\n"
+	]
+}

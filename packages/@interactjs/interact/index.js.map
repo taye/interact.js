@@ -1,0 +1,19 @@
+{
+	"version": 3,
+	"sources": [
+		"index.ts"
+	],
+	"names": [
+		"Scope",
+		"scope",
+		"interact",
+		"interactStatic",
+		"init",
+		"win",
+		"window"
+	],
+	"mappings": "AAAA,SAASA,KAAT,QAAsB,kBAAtB;AAEA,MAAMC,KAAK,GAAG,IAAID,KAAJ,EAAd;AAEA,MAAME,QAAkE,GAAGD,KAAK,CAACE,cAAjF;AAEA,eAAeD,QAAf;AAEA,OAAO,MAAME,IAAI,GAAIC,GAAD,IAAiBJ,KAAK,CAACG,IAAN,CAAWC,GAAX,CAA9B;;AAEP,IAAI,OAAOC,MAAP,KAAkB,QAAlB,IAA8B,CAAC,CAACA,MAApC,EAA4C;AAC1CF,EAAAA,IAAI,CAACE,MAAD,CAAJ;AACD",
+	"sourcesContent": [
+		"import { Scope } from '@interactjs/core/scope'\n\nconst scope = new Scope()\n\nconst interact: import('@interactjs/core/interactStatic').InteractStatic = scope.interactStatic\n\nexport default interact\n\nexport const init = (win: Window) => scope.init(win)\n\nif (typeof window === 'object' && !!window) {\n  init(window)\n}\n"
+	]
+}

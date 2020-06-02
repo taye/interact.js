@@ -1,0 +1,32 @@
+{
+	"version": 3,
+	"sources": [
+		"BaseEvent.ts"
+	],
+	"names": [
+		"BaseEvent",
+		"constructor",
+		"interaction",
+		"type",
+		"target",
+		"currentTarget",
+		"interactable",
+		"_interaction",
+		"timeStamp",
+		"immediatePropagationStopped",
+		"propagationStopped",
+		"preventDefault",
+		"stopPropagation",
+		"stopImmediatePropagation",
+		"Object",
+		"defineProperty",
+		"prototype",
+		"get",
+		"_proxy",
+		"set"
+	],
+	"mappings": "AAEA,OAAO,MAAMA,SAAN,CAAqD;AAU1DC,EAAAA,WAAW,CAAEC,WAAF,EAAqC;AAAA,SAThDC,IASgD;AAAA,SARhDC,MAQgD;AAAA,SAPhDC,aAOgD;AAAA,SANhDC,YAMgD;AAAA,SALhDC,YAKgD;AAAA,SAJhDC,SAIgD;AAAA,SAHhDC,2BAGgD,GAHlB,KAGkB;AAAA,SAFhDC,kBAEgD,GAF3B,KAE2B;AAC9C,SAAKH,YAAL,GAAoBL,WAApB;AACD;;AAEDS,EAAAA,cAAc,GAAI,CAAE;AAEpB;;;;;AAGAC,EAAAA,eAAe,GAAI;AACjB,SAAKF,kBAAL,GAA0B,IAA1B;AACD;AAED;;;;;AAGAG,EAAAA,wBAAwB,GAAI;AAC1B,SAAKJ,2BAAL,GAAmC,KAAKC,kBAAL,GAA0B,IAA7D;AACD;;AA5ByD,C,CA+B5D;AACA;;AAKA;AACA;AACAI,MAAM,CAACC,cAAP,CAAsBf,SAAS,CAACgB,SAAhC,EAA2C,aAA3C,EAA0D;AACxDC,EAAAA,GAAG,GAAmB;AAAE,WAAO,KAAKV,YAAL,CAAkBW,MAAzB;AAAiC,GADD;;AAExDC,EAAAA,GAAG,GAAmB,CAAE;;AAFgC,CAA1D;AAKA,eAAenB,SAAf",
+	"sourcesContent": [
+		"import * as Interact from '@interactjs/types/index'\n\nexport class BaseEvent<T extends Interact.ActionName = any> {\n  type: string\n  target: EventTarget\n  currentTarget: EventTarget\n  interactable: Interact.Interactable\n  _interaction: Interact.Interaction<T>\n  timeStamp: any\n  immediatePropagationStopped = false\n  propagationStopped = false\n\n  constructor (interaction: Interact.Interaction) {\n    this._interaction = interaction\n  }\n\n  preventDefault () {}\n\n  /**\n   * Don't call any other listeners (even on the current target)\n   */\n  stopPropagation () {\n    this.propagationStopped = true\n  }\n\n  /**\n   * Don't call listeners on the remaining targets\n   */\n  stopImmediatePropagation () {\n    this.immediatePropagationStopped = this.propagationStopped = true\n  }\n}\n\n// defined outside of class definition to avoid assignment of undefined during\n// construction\nexport interface BaseEvent<T extends Interact.ActionName = any> {\n  interaction: Interact.InteractionProxy<T>\n}\n\n// getters and setters defined here to support typescript 3.6 and below which\n// don't support getter and setters in .d.ts files\nObject.defineProperty(BaseEvent.prototype, 'interaction', {\n  get (this: BaseEvent) { return this._interaction._proxy },\n  set (this: BaseEvent) {},\n})\n\nexport default BaseEvent\n"
+	]
+}

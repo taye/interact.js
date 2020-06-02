@@ -1,0 +1,28 @@
+{
+	"version": 3,
+	"sources": [
+		"misc.ts"
+	],
+	"names": [
+		"win",
+		"warnOnce",
+		"method",
+		"message",
+		"warned",
+		"window",
+		"console",
+		"warn",
+		"apply",
+		"arguments",
+		"copyAction",
+		"dest",
+		"src",
+		"name",
+		"axis",
+		"edges"
+	],
+	"mappings": "AAEA,OAAOA,GAAP,MAAgB,aAAhB;AAEA,OAAO,SAASC,QAAT,CAA+BC,MAA/B,EAAgEC,OAAhE,EAAiF;AACtF,MAAIC,MAAM,GAAG,KAAb;AAEA,SAAO,YAAmB;AACxB,QAAI,CAACA,MAAL,EAAa;AACVJ,MAAAA,GAAG,CAACK,MAAL,CAAoBC,OAApB,CAA4BC,IAA5B,CAAiCJ,OAAjC;AACAC,MAAAA,MAAM,GAAG,IAAT;AACD;;AAED,WAAOF,MAAM,CAACM,KAAP,CAAa,IAAb,EAAmBC,SAAnB,CAAP;AACD,GAPD;AAQD;AAED,OAAO,SAASC,UAAT,CAAqBC,IAArB,EAAiDC,GAAjD,EAA4E;AACjFD,EAAAA,IAAI,CAACE,IAAL,GAAaD,GAAG,CAACC,IAAjB;AACAF,EAAAA,IAAI,CAACG,IAAL,GAAaF,GAAG,CAACE,IAAjB;AACAH,EAAAA,IAAI,CAACI,KAAL,GAAaH,GAAG,CAACG,KAAjB;AAEA,SAAOJ,IAAP;AACD",
+	"sourcesContent": [
+		"import * as Interact from '@interactjs/types/index'\n\nimport win from './window'\n\nexport function warnOnce<T> (this: T, method: (...args: any[]) => any, message: string) {\n  let warned = false\n\n  return function (this: T) {\n    if (!warned) {\n      (win.window as any).console.warn(message)\n      warned = true\n    }\n\n    return method.apply(this, arguments)\n  }\n}\n\nexport function copyAction (dest: Interact.ActionProps, src: Interact.ActionProps) {\n  dest.name  = src.name\n  dest.axis  = src.axis\n  dest.edges = src.edges\n\n  return dest\n}\n"
+	]
+}

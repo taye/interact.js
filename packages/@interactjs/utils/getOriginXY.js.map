@@ -1,0 +1,24 @@
+{
+	"version": 3,
+	"sources": [
+		"getOriginXY.ts"
+	],
+	"names": [
+		"rectToXY",
+		"resolveRectLike",
+		"target",
+		"element",
+		"actionName",
+		"actionOptions",
+		"options",
+		"actionOrigin",
+		"origin",
+		"originRect",
+		"x",
+		"y"
+	],
+	"mappings": "AAEA,SAASA,QAAT,EAAmBC,eAAnB,QAA0C,WAA1C;AAEA,eAAe,UACbC,MADa,EAEbC,OAFa,EAGbC,UAHa,EAIb;AACA,QAAMC,aAAa,GAAIH,MAAM,CAACI,OAAR,CAAwBF,UAAxB,CAAtB;AACA,QAAMG,YAAY,GAAGF,aAAa,IAAIA,aAAa,CAACG,MAApD;AACA,QAAMA,MAAM,GAAGD,YAAY,IAAIL,MAAM,CAACI,OAAP,CAAeE,MAA9C;AAEA,QAAMC,UAAU,GAAGR,eAAe,CAACO,MAAD,EAASN,MAAT,EAAiBC,OAAjB,EAA0B,CAACD,MAAM,IAAIC,OAAX,CAA1B,CAAlC;AAEA,SAAOH,QAAQ,CAACS,UAAD,CAAR,IAAwB;AAAEC,IAAAA,CAAC,EAAE,CAAL;AAAQC,IAAAA,CAAC,EAAE;AAAX,GAA/B;AACD",
+	"sourcesContent": [
+		"import * as Interact from '@interactjs/types/index'\n\nimport { rectToXY, resolveRectLike } from './rect'\n\nexport default function (\n  target: Interact.HasGetRect & { options: Interact.PerActionDefaults },\n  element: Node,\n  actionName?: Interact.ActionName,\n) {\n  const actionOptions = (target.options as any)[actionName]\n  const actionOrigin = actionOptions && actionOptions.origin\n  const origin = actionOrigin || target.options.origin\n\n  const originRect = resolveRectLike(origin, target, element, [target && element])\n\n  return rectToXY(originRect) || { x: 0, y: 0 }\n}\n"
+	]
+}

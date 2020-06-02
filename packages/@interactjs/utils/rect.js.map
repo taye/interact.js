@@ -1,0 +1,42 @@
+{
+	"version": 3,
+	"sources": [
+		"rect.ts"
+	],
+	"names": [
+		"closest",
+		"getElementRect",
+		"parentNode",
+		"extend",
+		"is",
+		"getStringOptionResult",
+		"value",
+		"target",
+		"element",
+		"getRect",
+		"resolveRectLike",
+		"functionArgs",
+		"returnValue",
+		"string",
+		"func",
+		"rectToXY",
+		"rect",
+		"x",
+		"left",
+		"y",
+		"top",
+		"xywhToTlbr",
+		"right",
+		"width",
+		"bottom",
+		"height",
+		"tlbrToXywh",
+		"addEdges",
+		"edges",
+		"delta"
+	],
+	"mappings": "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",
+	"sourcesContent": [
+		"import * as Interact from '@interactjs/types/index'\n\nimport { closest, getElementRect, parentNode } from './domUtils'\nimport extend from './extend'\nimport is from './is'\n\nexport function getStringOptionResult (value: any, target: Interact.HasGetRect, element) {\n  if (value === 'parent') { return parentNode(element) }\n\n  if (value === 'self') { return target.getRect(element) }\n\n  return closest(element, value)\n}\n\nexport function resolveRectLike<T extends any[]> (\n  value: Interact.RectResolvable<T>,\n  target?: Interact.HasGetRect,\n  element?: Node,\n  functionArgs?: T,\n) {\n  let returnValue: any = value\n  if (is.string(returnValue)) {\n    returnValue = getStringOptionResult(returnValue, target, element)\n  }\n  else if (is.func(returnValue)) {\n    returnValue = returnValue(...functionArgs)\n  }\n\n  if (is.element(returnValue)) {\n    returnValue = getElementRect(returnValue)\n  }\n\n  return returnValue as Interact.Rect\n}\n\nexport function rectToXY (rect) {\n  return  rect && {\n    x: 'x' in rect ? rect.x : rect.left,\n    y: 'y' in rect ? rect.y : rect.top,\n  }\n}\n\nexport function xywhToTlbr (rect) {\n  if (rect && !('left' in rect && 'top' in rect)) {\n    rect = extend({}, rect)\n\n    rect.left   = rect.x || 0\n    rect.top    = rect.y || 0\n    rect.right  = rect.right   || (rect.left + rect.width)\n    rect.bottom = rect.bottom  || (rect.top + rect.height)\n  }\n\n  return rect\n}\n\nexport function tlbrToXywh (rect) {\n  if (rect && !('x' in rect && 'y' in rect)) {\n    rect = extend({}, rect)\n\n    rect.x      = rect.left || 0\n    rect.y      = rect.top  || 0\n    rect.width  = rect.width  || ((rect.right || 0)  - rect.x)\n    rect.height = rect.height || ((rect.bottom || 0) - rect.y)\n  }\n\n  return rect\n}\n\nexport function addEdges (edges: Interact.EdgeOptions, rect: Interact.Rect, delta: Interact.Point) {\n  if (edges.left)   { rect.left   += delta.x }\n  if (edges.right)  { rect.right  += delta.x }\n  if (edges.top)    { rect.top    += delta.y }\n  if (edges.bottom) { rect.bottom += delta.y }\n\n  rect.width = rect.right - rect.left\n  rect.height = rect.bottom - rect.top\n}\n"
+	]
+}

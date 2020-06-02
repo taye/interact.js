@@ -1,0 +1,22 @@
+{
+	"version": 3,
+	"sources": [
+		"defaultOptions.ts"
+	],
+	"names": [
+		"defaults",
+		"base",
+		"preventDefault",
+		"deltaSource",
+		"perAction",
+		"enabled",
+		"origin",
+		"x",
+		"y",
+		"actions"
+	],
+	"mappings": "AAQA;AAsBA;AAIA,OAAO,MAAMA,QAAkB,GAAG;AAChCC,EAAAA,IAAI,EAAE;AACJC,IAAAA,cAAc,EAAE,MADZ;AAEJC,IAAAA,WAAW,EAAE;AAFT,GAD0B;AAMhCC,EAAAA,SAAS,EAAE;AACTC,IAAAA,OAAO,EAAE,KADA;AAETC,IAAAA,MAAM,EAAE;AAAEC,MAAAA,CAAC,EAAE,CAAL;AAAQC,MAAAA,CAAC,EAAE;AAAX;AAFC,GANqB;AAWhCC,EAAAA,OAAO,EAAE;AAXuB,CAA3B",
+	"sourcesContent": [
+		"import * as Interact from '@interactjs/types/index'\n\nexport interface Defaults {\n  base: BaseDefaults\n  perAction: PerActionDefaults\n  actions: ActionDefaults\n}\n\n// eslint-disable-next-line @typescript-eslint/no-empty-interface\nexport interface ActionDefaults {\n}\n\nexport interface BaseDefaults {\n  preventDefault?: 'auto' | 'never' | string\n  deltaSource?: 'page' | 'client'\n  context?: Node\n}\n\nexport interface PerActionDefaults {\n  enabled?: boolean\n  origin?: Interact.Point | string | Interact.Element\n  listeners?: Interact.Listeners\n  allowFrom?: string | Interact.Element\n  ignoreFrom?: string | Interact.Element\n}\n\nexport type Options = Partial<BaseDefaults> & Partial<PerActionDefaults> & {\n  [P in keyof ActionDefaults]?: Partial<ActionDefaults[P]>\n}\n\n// export interface Options extends BaseDefaults, PerActionDefaults {}\n\nexport interface OptionsArg extends BaseDefaults, Interact.OrBoolean<Partial<ActionDefaults>> {}\n\nexport const defaults: Defaults = {\n  base: {\n    preventDefault: 'auto',\n    deltaSource: 'page',\n  },\n\n  perAction: {\n    enabled: false,\n    origin: { x: 0, y: 0 },\n  },\n\n  actions: {} as ActionDefaults,\n}\n"
+	]
+}
