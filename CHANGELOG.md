@@ -1,3 +1,7 @@
+## v1.9.19
+
+ - exposed `DropEvent` type
+
 ## v1.9.18
 
  - fixed further issues with types
