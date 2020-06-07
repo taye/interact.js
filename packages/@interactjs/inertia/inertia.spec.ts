@@ -98,6 +98,8 @@ test('inertia', t => {
           modifierCallPhases.push(phase)
         },
       },
+      enable: null,
+      disable: null,
     }],
   })
 

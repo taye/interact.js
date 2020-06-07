@@ -276,8 +276,6 @@ export default class Modification {
     for (let index = 0; index < modifierList.length; index++) {
       const { options, methods, name } = modifierList[index]
 
-      if (options && options.enabled === false) { continue }
-
       this.states.push({
         options,
         methods,
@@ -366,9 +364,7 @@ function getModifierList (interaction) {
   const actionModifiers = actionOptions.modifiers
 
   if (actionModifiers && actionModifiers.length) {
-    return actionModifiers.filter(
-      modifier => !modifier.options || modifier.options.enabled !== false,
-    )
+    return actionModifiers
   }
 
   return ['snap', 'snapSize', 'snapEdges', 'restrict', 'restrictEdges', 'restrictSize']

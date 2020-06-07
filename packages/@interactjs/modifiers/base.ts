@@ -36,6 +36,8 @@ export interface Modifier<
     stop?: (arg: ModifierArg<State>) => void
   }
   name?: Name
+  enable: () => Modifier<Defaults, State, Name>
+  disable: () => Modifier<Defaults, State, Name>
 }
 
 export type ModifierState<
@@ -114,7 +116,19 @@ export function makeModifier<
       }
     }
 
-    const m: Modifier<Defaults, State, Name> = { options, methods, name }
+    const m: Modifier<Defaults, State, Name> = {
+      options,
+      methods,
+      name,
+      enable: () => {
+        options.enabled = true
+        return m
+      },
+      disable: () => {
+        options.enabled = false
+        return m
+      },
+    }
 
     return m
   }
