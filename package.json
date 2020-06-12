@@ -63,6 +63,7 @@
     "jsdoc-stale": "github:taye/jsdoc-stale#master",
     "jsdom": "latest",
     "mkdirp": "latest",
+    "node-sass": "latest",
     "nodemon": "latest",
     "nyc": "latest",
     "p-queue": "latest",

@@ -2,7 +2,9 @@
 ROOT=$(dirname $(dirname $(readlink -f $0)))
 
 modules_scope_dir=node_modules/@interactjs
-mkdir -p $modules_scope_dir
+modules_bin_dir=node_modules/.bin
+
+mkdir -p $modules_scope_dir $modules_bin_dir
 
 rm $modules_scope_dir/* 2> /dev/null
 

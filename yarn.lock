@@ -4546,10 +4546,9 @@ jsdoc-regex@^1.0.1:
 
 "jsdoc-stale@github:taye/jsdoc-stale#master":
   version "0.0.0"
-  resolved "https://codeload.github.com/taye/jsdoc-stale/tar.gz/30ee806b1abb51fa053fcf7524af50c252acee14"
+  resolved "https://codeload.github.com/taye/jsdoc-stale/tar.gz/551b9b8ad53ab6d4747fe1763c022ae9d09f0c7f"
   dependencies:
     bulma "^0.5.3"
-    node-sass "^4.11.0"
     superagent "^3.8.3"
     walk-sync "^0.3.4"
 
@@ -5270,7 +5269,7 @@ node-releases@^1.1.53:
   resolved "https://registry.yarnpkg.com/node-releases/-/node-releases-1.1.56.tgz#bc054a417d316e3adac90eafb7e1932802f28705"
   integrity sha512-EVo605FhWLygH8a64TjgpjyHYOihkxECwX1bHHr8tETJKWEiWS2YJjPbvsX2jFjnjTNEgBCmk9mLjKG1Mf11cw==
 
-node-sass@^4.11.0:
+node-sass@^4.14.1:
   version "4.14.1"
   resolved "https://registry.yarnpkg.com/node-sass/-/node-sass-4.14.1.tgz#99c87ec2efb7047ed638fb4c9db7f3a42e2217b5"
   integrity sha512-sjCuOlvGyCJS40R8BscF5vhVlQjNN069NtQ1gSxyK1u9iqvn6tf7O1R4GNowVZfiZUCRt5MmMs1xd+4V/7Yr0g==
