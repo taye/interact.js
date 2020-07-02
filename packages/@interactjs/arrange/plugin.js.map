@@ -1,0 +1,11 @@
+{
+	"version": 3,
+	"sources": [
+		"plugin.ts"
+	],
+	"names": [],
+	"mappings": "AAGA,eAAe,EAAf",
+	"sourcesContent": [
+		"export type ArrangeEvent = {}\nexport type ArrangeMode = {}\n\nexport default {}\n"
+	]
+}

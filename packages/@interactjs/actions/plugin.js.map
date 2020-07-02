@@ -1,0 +1,20 @@
+{
+	"version": 3,
+	"sources": [
+		"plugin.ts"
+	],
+	"names": [
+		"drag",
+		"drop",
+		"gesture",
+		"resize",
+		"id",
+		"install",
+		"scope",
+		"usePlugin"
+	],
+	"mappings": "AAEA,OAAOA,IAAP,MAAiB,kBAAjB;AACA,OAAOC,IAAP,MAAiB,kBAAjB;AACA,OAAOC,OAAP,MAAoB,qBAApB;AACA,OAAOC,MAAP,MAAmB,oBAAnB;AAEA,eAAe;AACbC,EAAAA,EAAE,EAAE,SADS;;AAEbC,EAAAA,OAAO,CAAEC,KAAF,EAAyB;AAC9BA,IAAAA,KAAK,CAACC,SAAN,CAAgBL,OAAhB;AACAI,IAAAA,KAAK,CAACC,SAAN,CAAgBJ,MAAhB;AACAG,IAAAA,KAAK,CAACC,SAAN,CAAgBP,IAAhB;AACAM,IAAAA,KAAK,CAACC,SAAN,CAAgBN,IAAhB;AACD;;AAPY,CAAf",
+	"sourcesContent": [
+		"import * as Interact from '@interactjs/types/index'\n\nimport drag from './drag/plugin'\nimport drop from './drop/plugin'\nimport gesture from './gesture/plugin'\nimport resize from './resize/plugin'\n\nexport default {\n  id: 'actions',\n  install (scope: Interact.Scope) {\n    scope.usePlugin(gesture)\n    scope.usePlugin(resize)\n    scope.usePlugin(drag)\n    scope.usePlugin(drop)\n  },\n}\n"
+	]
+}
