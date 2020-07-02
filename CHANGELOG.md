@@ -1,3 +1,7 @@
+## v1.9.20
+
+ - fixed ordering of plugins
+
 ## v1.9.19
 
  - exposed `DropEvent` type

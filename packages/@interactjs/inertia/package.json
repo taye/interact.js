@@ -1,17 +1,17 @@
 {
   "name": "@interactjs/inertia",
-  "version": "1.9.19",
+  "version": "1.9.20",
   "license": "MIT",
   "dependencies": {
-    "@interactjs/offset": "1.9.19"
+    "@interactjs/offset": "1.9.20"
   },
   "peerDependencies": {
-    "@interactjs/core": "1.9.19",
-    "@interactjs/modifiers": "1.9.19",
-    "@interactjs/utils": "1.9.19"
+    "@interactjs/core": "1.9.20",
+    "@interactjs/modifiers": "1.9.20",
+    "@interactjs/utils": "1.9.20"
   },
   "optionalDependencies": {
-    "@interactjs/interact": "1.9.19"
+    "@interactjs/interact": "1.9.20"
   },
   "publishConfig": {
     "access": "public"
