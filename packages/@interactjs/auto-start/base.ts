@@ -369,7 +369,7 @@ function setInteractionCursor<T extends Interact.ActionName> (interaction: Inter
 
 const autoStart: Interact.Plugin = {
   id: 'auto-start/base',
-  before: ['actions', 'actions/drag', 'actions/resize', 'actions/gesture'],
+  before: ['actions'],
   install,
   listeners: {
     'interactions:down': prepareOnDown,

@@ -179,13 +179,14 @@ export class Scope {
       const len = this.listenerMaps.length
       const before = plugin.before.reduce((acc, id) => {
         acc[id] = true
+        acc[pluginIdRoot(id)] = true
         return acc
       }, {})
 
       for (; index < len; index++) {
         const otherId = this.listenerMaps[index].id
 
-        if (before[otherId]) { break }
+        if (before[otherId] || before[pluginIdRoot(otherId)]) { break }
       }
 
       this.listenerMaps.splice(index, 0, { id: plugin.id, map: plugin.listeners })
@@ -266,4 +267,8 @@ export function initScope (scope: Scope, window: Window) {
   scope.usePlugin(events)
 
   return scope
+}
+
+function pluginIdRoot (id: string) {
+  return id && id.replace(/\/.*$/, '')
 }

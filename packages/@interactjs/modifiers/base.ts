@@ -182,7 +182,7 @@ const modifiersBase: Interact.Plugin = {
 
     'interactions:stop': arg => arg.interaction.modification.stop(arg),
   },
-  before: ['actions', 'action/drag', 'actions/resize', 'actions/gesture'],
+  before: ['actions'],
 }
 
 export default modifiersBase

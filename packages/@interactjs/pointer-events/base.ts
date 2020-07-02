@@ -85,6 +85,7 @@ const defaults: PointerEventOptions = {
 
 const pointerEvents: Interact.Plugin = {
   id: 'pointer-events/base',
+  before: ['inertia', 'modifiers', 'auto-start', 'actions'],
   install,
   listeners: {
     'interactions:new': addInteractionProps,
