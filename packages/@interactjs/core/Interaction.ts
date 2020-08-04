@@ -401,7 +401,6 @@ export class Interaction<T extends ActionName = ActionName> {
       this.end(event)
     }
 
-    this.pointerIsDown = false
     this.removePointer(pointer, event)
   }
 
@@ -554,6 +553,7 @@ export class Interaction<T extends ActionName = ActionName> {
     })
 
     this.pointers.splice(pointerIndex, 1)
+    this.pointerIsDown = false
   }
 
   _updateLatestPointer (pointer, event, eventTarget) {

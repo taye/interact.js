@@ -55,8 +55,9 @@ export default {
     },
 
     'interactions:move': ({ interaction, duplicate }) => {
-      if (interaction.pointerWasMoved && !duplicate) {
+      if (interaction.autoStartHoldTimer && interaction.pointerWasMoved && !duplicate) {
         clearTimeout(interaction.autoStartHoldTimer)
+        interaction.autoStartHoldTimer = null
       }
     },
 
