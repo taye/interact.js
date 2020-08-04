@@ -195,7 +195,7 @@ export class InertiaState {
       }
     }
 
-    this.timeout = raf.request(() => this.inertiaTick())
+    this.onNextFrame(() => this.inertiaTick())
   }
 
   startSmoothEnd () {
@@ -206,7 +206,13 @@ export class InertiaState {
       y: this.modification.result.delta.y,
     }
 
-    this.timeout = raf.request(() => this.smoothEndTick())
+    this.onNextFrame(() => this.smoothEndTick())
+  }
+
+  onNextFrame (tickFn: () => void) {
+    if (!this.active) { return }
+
+    this.timeout = raf.request(tickFn)
   }
 
   inertiaTick () {
@@ -242,7 +248,7 @@ export class InertiaState {
       interaction.offsetBy(delta)
       interaction.move()
 
-      this.timeout = raf.request(() => this.inertiaTick())
+      this.onNextFrame(() => this.inertiaTick())
     }
     else {
       interaction.offsetBy({
@@ -275,7 +281,7 @@ export class InertiaState {
       interaction.offsetBy(delta)
       interaction.move({ skipModifiers: this.modifierCount })
 
-      this.timeout = raf.request(() => this.smoothEndTick())
+      this.onNextFrame(() => this.smoothEndTick())
     }
     else {
       interaction.offsetBy({
