@@ -5,14 +5,14 @@ export class PointerInfo {
   pointer: Interact.PointerType
   event: Interact.PointerEventType
   downTime: number
-  downTarget: Interact.EventTarget
+  downTarget: Node
 
   constructor (
     id: number,
     pointer: Interact.PointerType,
     event: Interact.PointerEventType,
     downTime: number,
-    downTarget: Interact.EventTarget,
+    downTarget: Node,
   ) {
     this.id = id
     this.pointer = pointer

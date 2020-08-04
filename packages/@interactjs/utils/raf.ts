@@ -1,8 +1,8 @@
 let lastTime = 0
-let request
-let cancel
+let request: typeof requestAnimationFrame
+let cancel: typeof cancelAnimationFrame
 
-function init (window) {
+function init (window: Window) {
   request = window.requestAnimationFrame
   cancel = window.cancelAnimationFrame
 
@@ -15,12 +15,15 @@ function init (window) {
     }
   }
 
+  request = request && request.bind(window)
+  cancel = cancel && cancel.bind(window)
+
   if (!request) {
     request = callback => {
       const currTime = Date.now()
       const timeToCall = Math.max(0, 16 - (currTime - lastTime))
       // eslint-disable-next-line standard/no-callback-literal
-      const token = setTimeout(() => { callback(currTime + timeToCall) },
+      const token = window.setTimeout(() => { callback(currTime + timeToCall) },
         timeToCall)
 
       lastTime = currTime + timeToCall
@@ -32,7 +35,7 @@ function init (window) {
 }
 
 export default {
-  request: callback => request(callback),
-  cancel: token => cancel(token),
+  request: (callback: FrameRequestCallback) => request(callback),
+  cancel: (token: number) => cancel(token),
   init,
 }

@@ -58,7 +58,7 @@ declare module '@interactjs/core/scope' {
       interaction: Interaction
       pointer: Interact.PointerType | PointerEvent<any>
       event: Interact.PointerEventType | PointerEvent<any>
-      eventTarget: Interact.EventTarget
+      eventTarget: Node
       pointerEvent: PointerEvent<any>
       targets?: EventTargetList
       type: string
@@ -67,7 +67,7 @@ declare module '@interactjs/core/scope' {
       interaction: Interaction
       pointer: Interact.PointerType | PointerEvent<any>
       event: Interact.PointerEventType | PointerEvent<any>
-      eventTarget: Interact.EventTarget
+      eventTarget: Node
       targets?: EventTargetList
       type: string
       path: Node[]
@@ -124,7 +124,7 @@ function fire<T extends string> (
   arg: {
     pointer: Interact.PointerType | PointerEvent<any>
     event: Interact.PointerEventType | PointerEvent<any>
-    eventTarget: Interact.EventTarget
+    eventTarget: Node
     interaction: Interaction
     type: T
     targets?: EventTargetList
@@ -204,7 +204,7 @@ function collectEventTargets<T extends string> ({ interaction, pointer, event, e
   interaction: Interaction
   pointer: Interact.PointerType | PointerEvent<any>
   event: Interact.PointerEventType | PointerEvent<any>
-  eventTarget: Interact.EventTarget
+  eventTarget: Node
   type: T
 }, scope: Interact.Scope) {
   const pointerIndex = interaction.getPointerIndex(pointer)

@@ -49,10 +49,6 @@ export interface Actions {
   phaselessTypes: { [type: string]: true }
 }
 
-/**
- * plugin typedef
- * @typedef Plugin
- */
 export interface Plugin {
   [key: string]: any
   id?: string

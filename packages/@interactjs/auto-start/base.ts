@@ -162,7 +162,7 @@ function validateAction<T extends Interact.ActionName> (
   action: Interact.ActionProps<T>,
   interactable: Interact.Interactable,
   element: Interact.Element,
-  eventTarget: Interact.EventTarget,
+  eventTarget: Node,
   scope: Interact.Scope,
 ) {
   if (interactable.testIgnoreAllow(interactable.options[action.name], element, eventTarget) &&
@@ -180,7 +180,7 @@ function validateMatches (
   event: Interact.PointerEventType,
   matches: Interact.Interactable[],
   matchElements: Interact.Element[],
-  eventTarget: Interact.EventTarget,
+  eventTarget: Node,
   scope: Interact.Scope,
 ) {
   for (let i = 0, len = matches.length; i < len; i++) {
@@ -213,7 +213,7 @@ function getActionInfo (
   interaction: Interact.Interaction,
   pointer: Interact.PointerType,
   event: Interact.PointerEventType,
-  eventTarget: Interact.EventTarget,
+  eventTarget: Node,
   scope: Interact.Scope,
 ) {
   let matches: Interact.Interactable[] = []

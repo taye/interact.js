@@ -244,8 +244,8 @@ function install (scope: Interact.Scope) {
   return eventsMethods
 }
 
-export class FakeEvent implements Partial<Event> {
-  currentTarget: EventTarget
+class FakeEvent implements Partial<Event> {
+  currentTarget: Node
   originalEvent: Event
 
   constructor (originalEvent: Event) {

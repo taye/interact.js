@@ -41,7 +41,7 @@ export enum _ProxyMethods {
 export type PointerArgProps<T extends {} = {}> = {
   pointer: Interact.PointerType
   event: Interact.PointerEventType
-  eventTarget: Interact.EventTarget
+  eventTarget: Node
   pointerIndex: number
   pointerInfo: PointerInfo
   interaction: Interaction
@@ -214,7 +214,7 @@ export class Interaction<T extends ActionName = ActionName> {
     this._scopeFire('interactions:new', { interaction: this })
   }
 
-  pointerDown (pointer: Interact.PointerType, event: Interact.PointerEventType, eventTarget: Interact.EventTarget) {
+  pointerDown (pointer: Interact.PointerType, event: Interact.PointerEventType, eventTarget: Node) {
     const pointerIndex = this.updatePointer(pointer, event, eventTarget, true)
     const pointerInfo = this.pointers[pointerIndex]
 
@@ -258,9 +258,9 @@ export class Interaction<T extends ActionName = ActionName> {
    * @param {object} action   The action to be performed - drag, resize, etc.
    * @param {Interactable} target  The Interactable to target
    * @param {Element} element The DOM Element to target
-   * @return {object} interact
+   * @return {Boolean} Whether the interaction was successfully started
    */
-  start (action: StartAction, interactable: Interactable, element: Interact.Element) {
+  start (action: StartAction, interactable: Interactable, element: Interact.Element): boolean {
     if (this.interacting() ||
         !this.pointerIsDown ||
         this.pointers.length < (action.name === 'gesture' ? 2 : 1) ||
@@ -286,7 +286,7 @@ export class Interaction<T extends ActionName = ActionName> {
     return this._interacting
   }
 
-  pointerMove (pointer: Interact.PointerType, event: Interact.PointerEventType, eventTarget: Interact.EventTarget) {
+  pointerMove (pointer: Interact.PointerType, event: Interact.PointerEventType, eventTarget: Node) {
     if (!this.simulation && !(this.modification && this.modification.endResult)) {
       this.updatePointer(pointer, event, eventTarget, false)
     }
@@ -377,7 +377,7 @@ export class Interaction<T extends ActionName = ActionName> {
   }
 
   // End interact move events and stop auto-scroll unless simulation is running
-  pointerUp (pointer: Interact.PointerType, event: Interact.PointerEventType, eventTarget: Interact.EventTarget, curEventTarget: Interact.EventTarget) {
+  pointerUp (pointer: Interact.PointerType, event: Interact.PointerEventType, eventTarget: Node, curEventTarget: Interact.EventTarget) {
     let pointerIndex = this.getPointerIndex(pointer)
 
     if (pointerIndex === -1) {
@@ -478,7 +478,7 @@ export class Interaction<T extends ActionName = ActionName> {
     return this.pointers[this.getPointerIndex(pointer)]
   }
 
-  updatePointer (pointer: Interact.PointerType, event: Interact.PointerEventType, eventTarget: Interact.EventTarget, down?: boolean) {
+  updatePointer (pointer: Interact.PointerType, event: Interact.PointerEventType, eventTarget: Node, down?: boolean) {
     const id = pointerUtils.getPointerId(pointer)
     let pointerIndex = this.getPointerIndex(pointer)
     let pointerInfo = this.pointers[pointerIndex]

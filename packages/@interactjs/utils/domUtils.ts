@@ -5,7 +5,11 @@ import domObjects from './domObjects'
 import is from './is'
 import win, { getWindow } from './window'
 
-export function nodeContains (parent: Node | Interact.EventTarget, child: Node | Interact.EventTarget) {
+export function nodeContains (parent: Node, child: Node) {
+  if (parent.contains) {
+    return parent.contains(child as Node)
+  }
+
   while (child) {
     if (child === parent) {
       return true
@@ -188,9 +192,7 @@ export function matchesUpTo (element: Interact.Element, selector: string, limit:
 }
 
 export function getActualElement (element: Interact.Element) {
-  return (element instanceof domObjects.SVGElementInstance
-    ? (element as SVGElement).correspondingUseElement
-    : element)
+  return (element as SVGElement).correspondingUseElement || element
 }
 
 export function getScrollXY (relevantWindow) {

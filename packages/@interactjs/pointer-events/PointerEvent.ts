@@ -1,7 +1,7 @@
 import * as Interact from '@interactjs/types/index'
 import * as pointerUtils from '@interactjs/utils/pointerUtils'
 
-import BaseEvent from '../core/BaseEvent'
+import { BaseEvent } from '../core/BaseEvent'
 
 export default class PointerEvent<T extends string = any> extends BaseEvent {
   type: T
@@ -22,7 +22,7 @@ export default class PointerEvent<T extends string = any> extends BaseEvent {
     type: T,
     pointer: Interact.PointerType | PointerEvent<any>,
     event: Interact.PointerEventType,
-    eventTarget: Interact.EventTarget,
+    eventTarget: Node,
     interaction: Interact.Interaction,
     timeStamp: number,
   ) {

@@ -2,8 +2,8 @@ import * as Interact from '@interactjs/types/index'
 
 export class BaseEvent<T extends Interact.ActionName = any> {
   type: string
-  target: EventTarget
-  currentTarget: EventTarget
+  target: Node
+  currentTarget: Node
   interactable: Interact.Interactable
   _interaction: Interact.Interaction<T>
   timeStamp: any
