@@ -40,7 +40,7 @@ export class InteractableSet {
           ? this.selectorMap[target]
           : (target as any)[this.scope.id]
 
-        const targetIndex = targetMappings.findIndex(m => m.context === context)
+        const targetIndex = arr.findIndex(targetMappings, m => m.context === context)
         if (targetMappings[targetIndex]) {
         // Destroying mappingInfo's context and interactable
           targetMappings[targetIndex].context = null
