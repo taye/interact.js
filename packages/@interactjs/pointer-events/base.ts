@@ -257,20 +257,23 @@ function addHoldInfo ({ down, pointerInfo }: Interact.SignalArgs['interactions:u
 }
 
 function clearHold ({ interaction, pointerIndex }) {
-  if (interaction.pointers[pointerIndex].hold) {
-    clearTimeout(interaction.pointers[pointerIndex].hold.timeout)
+  const hold = interaction.pointers[pointerIndex].hold
+
+  if (hold && hold.timeout) {
+    clearTimeout(hold.timeout)
+    hold.timeout = null
   }
 }
 
 function moveAndClearHold (
-  { interaction, pointer, event, eventTarget, duplicate }: Interact.SignalArgs['interactions:move'],
+  arg: Interact.SignalArgs['interactions:move'],
   scope: Interact.Scope,
 ) {
-  const pointerIndex = interaction.getPointerIndex(pointer)
+  const { interaction, pointer, event, eventTarget, duplicate } = arg
 
   if (!duplicate && (!interaction.pointerIsDown || interaction.pointerWasMoved)) {
     if (interaction.pointerIsDown) {
-      clearTimeout(interaction.pointers[pointerIndex].hold.timeout)
+      clearHold(arg)
     }
 
     fire({
