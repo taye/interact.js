@@ -49,12 +49,12 @@ export function isNativePointer  (pointer: any) {
 }
 
 // Get specified X/Y coords for mouse or event.touches[0]
-export function getXY (type, pointer, xy) {
-  xy = xy || {}
+export function getXY (type: string, pointer: Interact.PointerType | Interact.InteractEvent, xy: Interact.Point) {
+  xy = xy || {} as Interact.Point
   type = type || 'page'
 
-  xy.x = pointer[type + 'X']
-  xy.y = pointer[type + 'Y']
+  xy.x = pointer[type + 'X' as keyof Interact.PointerType]
+  xy.y = pointer[type + 'Y' as keyof Interact.PointerType]
 
   return xy
 }
@@ -76,8 +76,8 @@ export function getPageXY (pointer: Interact.PointerType | Interact.InteractEven
   return page
 }
 
-export function getClientXY (pointer, client) {
-  client = client || {}
+export function getClientXY (pointer: Interact.PointerType, client: Interact.Point) {
+  client = client || {} as any
 
   if (browser.isOperaMobile && isNativePointer(pointer)) {
     // Opera Mobile handles the viewport and scrolling oddly
@@ -90,30 +90,23 @@ export function getClientXY (pointer, client) {
   return client
 }
 
-export function getPointerId (pointer) {
+export function getPointerId (pointer: { pointerId?: number, identifier?: number, type?: string }) {
   return is.number(pointer.pointerId) ? pointer.pointerId : pointer.identifier
 }
 
-export function setCoords (targetObj, pointers: any[], timeStamp: number) {
+export function setCoords (dest: Interact.CoordsSetMember, pointers: any[], timeStamp: number) {
   const pointer = (pointers.length > 1
     ? pointerAverage(pointers)
     : pointers[0])
 
-  const tmpXY = {} as { x: number, y: number }
+  getPageXY(pointer, dest.page)
+  getClientXY(pointer, dest.client)
 
-  getPageXY(pointer, tmpXY)
-  targetObj.page.x = tmpXY.x
-  targetObj.page.y = tmpXY.y
-
-  getClientXY(pointer, tmpXY)
-  targetObj.client.x = tmpXY.x
-  targetObj.client.y = tmpXY.y
-
-  targetObj.timeStamp = timeStamp
+  dest.timeStamp = timeStamp
 }
 
-export function getTouchPair (event) {
-  const touches = []
+export function getTouchPair (event: TouchEvent | Interact.PointerType[]) {
+  const touches: Interact.PointerType[] = []
 
   // array of touches is supplied
   if (is.array(event)) {
@@ -141,7 +134,7 @@ export function getTouchPair (event) {
   return touches
 }
 
-export function pointerAverage (pointers: PointerEvent[] | Event[]) {
+export function pointerAverage (pointers: Interact.PointerType[]) {
   const average = {
     pageX  : 0,
     pageY  : 0,
@@ -151,22 +144,22 @@ export function pointerAverage (pointers: PointerEvent[] | Event[]) {
     screenY: 0,
   }
 
+  type CoordKeys = keyof typeof average
+
   for (const pointer of pointers) {
     for (const prop in average) {
-      average[prop] += pointer[prop]
+      average[prop as CoordKeys] += pointer[prop as CoordKeys]
     }
   }
   for (const prop in average) {
-    average[prop] /= pointers.length
+    average[prop as CoordKeys] /= pointers.length
   }
 
   return average
 }
 
-export function touchBBox (event: Event | Array<(Interact.PointerType) | TouchEvent>) {
-  if (!(event as any).length &&
-      !((event as TouchEvent).touches &&
-        (event as TouchEvent).touches.length > 1)) {
+export function touchBBox (event: Interact.PointerType[]) {
+  if (!event.length) {
     return null
   }
 
@@ -188,9 +181,9 @@ export function touchBBox (event: Event | Array<(Interact.PointerType) | TouchEv
   }
 }
 
-export function touchDistance (event, deltaSource) {
-  const sourceX = deltaSource + 'X'
-  const sourceY = deltaSource + 'Y'
+export function touchDistance (event: Interact.PointerType[] | TouchEvent, deltaSource: string) {
+  const sourceX = deltaSource + 'X' as 'pageX'
+  const sourceY = deltaSource + 'Y' as 'pageY'
   const touches = getTouchPair(event)
 
   const dx = touches[0][sourceX] - touches[1][sourceX]
@@ -199,9 +192,9 @@ export function touchDistance (event, deltaSource) {
   return hypot(dx, dy)
 }
 
-export function touchAngle (event, deltaSource) {
-  const sourceX = deltaSource + 'X'
-  const sourceY = deltaSource + 'Y'
+export function touchAngle (event: Interact.PointerType[] | TouchEvent, deltaSource: string) {
+  const sourceX = deltaSource + 'X' as 'pageX'
+  const sourceY = deltaSource + 'Y' as 'pageY'
   const touches = getTouchPair(event)
   const dx = touches[1][sourceX] - touches[0][sourceX]
   const dy = touches[1][sourceY] - touches[0][sourceY]
@@ -210,7 +203,7 @@ export function touchAngle (event, deltaSource) {
   return  angle
 }
 
-export function getPointerType (pointer) {
+export function getPointerType (pointer: { pointerType?: string, identifier?: number, type?: string }) {
   return is.string(pointer.pointerType)
     ? pointer.pointerType
     : is.number(pointer.pointerType)
@@ -223,12 +216,14 @@ export function getPointerType (pointer) {
 }
 
 // [ event.target, event.currentTarget ]
-export function getEventTargets (event) {
-  const path = is.func(event.composedPath) ? event.composedPath() : event.path
+export function getEventTargets (event: Event) {
+  const path = is.func(event.composedPath)
+    ? event.composedPath() as Interact.Element[]
+    : (event as unknown as { path: Interact.Element[]}).path
 
   return [
-    domUtils.getActualElement(path ? path[0] : event.target),
-    domUtils.getActualElement(event.currentTarget),
+    domUtils.getActualElement(path ? path[0] : event.target as Interact.Element),
+    domUtils.getActualElement(event.currentTarget as Interact.Element),
   ]
 }
 

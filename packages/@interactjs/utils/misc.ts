@@ -1,13 +1,13 @@
 import * as Interact from '@interactjs/types/index'
 
-import win from './window'
+import { window } from './window'
 
 export function warnOnce<T> (this: T, method: (...args: any[]) => any, message: string) {
   let warned = false
 
   return function (this: T) {
     if (!warned) {
-      (win.window as any).console.warn(message)
+      (window as any).console.warn(message)
       warned = true
     }
 

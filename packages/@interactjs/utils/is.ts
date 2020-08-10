@@ -1,7 +1,7 @@
 import * as Interact from '@interactjs/types/index'
 
 import isWindow from './isWindow'
-import win from './window'
+import * as win from './window'
 
 const window = (thing: any): thing is Window =>
   thing === win.window || isWindow(thing)

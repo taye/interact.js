@@ -163,10 +163,10 @@ const autoScroll = {
       return
     }
 
-    let top
-    let right
-    let bottom
-    let left
+    let top: boolean
+    let right: boolean
+    let bottom: boolean
+    let left: boolean
 
     const { interactable, element } = interaction
     const actionName = interaction.prepared.name

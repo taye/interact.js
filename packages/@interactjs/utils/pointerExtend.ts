@@ -1,9 +1,4 @@
-export interface PointerExtend {
-  webkit: RegExp
-  [prefix: string]: RegExp
-}
-
-function pointerExtend (dest, source) {
+function pointerExtend<T> (dest: Partial<T>, source: T) {
   for (const prop in source) {
     const prefixedPropREs = pointerExtend.prefixedPropREs
     let deprecated = false
@@ -26,6 +21,6 @@ function pointerExtend (dest, source) {
 pointerExtend.prefixedPropREs = {
   webkit: /(Movement[XY]|Radius[XY]|RotationAngle|Force)$/,
   moz: /(Pressure)$/,
-}
+} as { [prefix: string]: RegExp }
 
 export default pointerExtend

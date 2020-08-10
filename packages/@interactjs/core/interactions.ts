@@ -131,8 +131,8 @@ function install (scope: Interact.Scope) {
   scope.usePlugin(interactablePreventDefault)
 }
 
-function doOnInteractions (method, scope) {
-  return function (event) {
+function doOnInteractions (method: string, scope: Interact.Scope) {
+  return function (event: Event) {
     const interactions = scope.interactions.list
 
     const pointerType = pointerUtils.getPointerType(event)
@@ -142,6 +142,7 @@ function doOnInteractions (method, scope) {
     if (/^touch/.test(event.type)) {
       scope.prevTouchTime = scope.now()
 
+      // @ts-expect-error
       for (const changedTouch of event.changedTouches) {
         const pointer = changedTouch
         const pointerId = pointerUtils.getPointerId(pointer)
@@ -183,8 +184,8 @@ function doOnInteractions (method, scope) {
 
       if (!invalidPointer) {
         const searchDetails = {
-          pointer: event,
-          pointerId: pointerUtils.getPointerId(event),
+          pointer: event as PointerEvent,
+          pointerId: pointerUtils.getPointerId(event as PointerEvent),
           pointerType,
           eventType: event.type,
           curEventTarget,

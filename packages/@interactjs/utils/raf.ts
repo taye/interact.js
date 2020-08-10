@@ -10,8 +10,9 @@ function init (window: Window) {
     const vendors = ['ms', 'moz', 'webkit', 'o']
 
     for (const vendor of vendors) {
-      request = window[`${vendor}RequestAnimationFrame`]
-      cancel = window[`${vendor}CancelAnimationFrame`] || window[`${vendor}CancelRequestAnimationFrame`]
+      request = window[`${vendor}RequestAnimationFrame` as 'requestAnimationFrame']
+      cancel = window[`${vendor}CancelAnimationFrame` as 'cancelAnimationFrame'] ||
+        window[`${vendor}CancelRequestAnimationFrame` as 'cancelAnimationFrame']
     }
   }
 

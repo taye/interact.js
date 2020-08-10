@@ -2,7 +2,7 @@ import * as Interact from '@interactjs/types/index'
 
 export class BaseEvent<T extends Interact.ActionName = any> {
   type: string
-  target: Node
+  target: EventTarget
   currentTarget: Node
   interactable: Interact.Interactable
   _interaction: Interact.Interaction<T>
@@ -43,5 +43,3 @@ Object.defineProperty(BaseEvent.prototype, 'interaction', {
   get (this: BaseEvent) { return this._interaction._proxy },
   set (this: BaseEvent) {},
 })
-
-export default BaseEvent

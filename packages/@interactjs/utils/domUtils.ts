@@ -3,7 +3,7 @@ import * as Interact from '@interactjs/types/index'
 import browser from './browser'
 import domObjects from './domObjects'
 import is from './is'
-import win, { getWindow } from './window'
+import * as win from './window'
 
 export function nodeContains (parent: Node, child: Node) {
   if (parent.contains) {
@@ -169,8 +169,8 @@ function getNodeParents (node: Node, limit?: Node) {
 }
 
 function zIndexIsHigherThan (higherNode: Node, lowerNode: Node) {
-  const higherIndex = parseInt(getWindow(higherNode).getComputedStyle(higherNode).zIndex, 10) || 0
-  const lowerIndex = parseInt(getWindow(lowerNode).getComputedStyle(lowerNode).zIndex, 10) || 0
+  const higherIndex = parseInt(win.getWindow(higherNode).getComputedStyle(higherNode).zIndex, 10) || 0
+  const lowerIndex = parseInt(win.getWindow(lowerNode).getComputedStyle(lowerNode).zIndex, 10) || 0
 
   return higherIndex >= lowerIndex
 }
@@ -195,7 +195,7 @@ export function getActualElement (element: Interact.Element) {
   return (element as SVGElement).correspondingUseElement || element
 }
 
-export function getScrollXY (relevantWindow) {
+export function getScrollXY (relevantWindow?: Window) {
   relevantWindow = relevantWindow || win.window
   return {
     x: relevantWindow.scrollX || relevantWindow.document.documentElement.scrollLeft,
@@ -203,7 +203,7 @@ export function getScrollXY (relevantWindow) {
   }
 }
 
-export function getElementClientRect (element: Interact.Element) {
+export function getElementClientRect (element: Interact.Element): Required<Interact.Rect> {
   const clientRect = (element instanceof domObjects.SVGElement
     ? element.getBoundingClientRect()
     : element.getClientRects()[0])

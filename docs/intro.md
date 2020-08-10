@@ -45,7 +45,7 @@ slider
     inertia: true,                    // start inertial movement if thrown
     modifiers: [
       interact.modifiers.restrict({
-        restriction: 'self'            // keep the drag coords within the element
+        restriction: 'self'           // keep the drag coords within the element
       })
     ]
   })
@@ -57,63 +57,6 @@ slider
     event.target.style.paddingLeft = (value * 100) + '%'
     event.target.setAttribute('data-value', value.toFixed(2))
   })
-```
-
-Installation
-============
-
-NPM
----
-
-```sh
-$ npm install --save interactjs
-```
-
-```js
-import interact from 'interactjs'
-
-// or if using commonjs or AMD
-const interact = require('interactjs')
-```
-
-If you're using [npm](https://docs.npmjs.com/about-npm/), install the package as
-a dependency with `npm install interactjs` then import or require the
-package in your JavaScript files.
-
-CDN
----
-
-```html
-<script src="https://cdn.jsdelivr.net/npm/interactjs/dist/interact.min.js"></script>
-<!-- or -->
-<script src="https://unpkg.com/interactjs/dist/interact.min.js"></script>
-```
-
-You can also use the [jsDelivr](https://www.jsdelivr.com/package/npm/interactjs)
-or [unpkg](https://unpkg.com/interactjs) CDNs by adding a `<script>` tag
-pointing to their servers.
-
-`interact` is exposed as a CommonJS module, an AMD module, or a global variable
-depending on what the environment supports.
-
-```sh
-# install just the type definitions
-$ npm install --save-dev @interactjs/types
-```
-
-If you're using the library only through a CDN and want the TypeScript type
-definitions for development, you can install the `@interactjs/types` package as
-a dev dependency.
-
-Ruby on Rails
--------------
-
-[Rails 5.1+](https://rubyonrails.org/) supports the [yarn](http://yarnpkg.com/)
-package manager, so you can add interact.js to you app by running `yarn add
-interactjs`. Then require the library with:
-
-```rb
-//= require interactjs/interact
 ```
 
 Drag, Resize and Gesture Actions
@@ -148,19 +91,19 @@ inertia configuration.
 | `speed`                 | The speed of the pointer                          |
 | `timeStamp`             | The time of creation of the event object          |
 
-<h2 class="title is-3"><router-link to="/docs/draggable">Draggable</router-link></h2>
+<h2 id="draggable" class="title is-3"><router-link to="/docs/draggable">Draggable</router-link></h2>
 
 <!-- TODO -->
  - for watching the pointer go down, move, then go back up
  - combined with dropzones
 
-<h2 class="title is-3"><router-link to="/docs/dropzone">Dropzone</router-link></h2>
+<h2 id="dropzone" class="title is-3"><router-link to="/docs/dropzone">Dropzone</router-link></h2>
 
 <!-- TODO -->
  - use this to define elements that other draggable elements can be moved into
  - doesn't actually re-parent the draggable elements; that's up to you
 
-<h2 class="title is-3"><router-link to="/docs/resizable">Resizable</router-link></h2>
+<h2 id="resizable" class="title is-3"><router-link to="/docs/resizable">Resizable</router-link></h2>
 
 <!-- TODO -->
  - for watching the size and position of an element while the pointer is used to
@@ -169,7 +112,7 @@ inertia configuration.
  - there are some modifiers that are specifically for resizing which change the
    way the element's edges and size are updated in response to the pointer
 
-<h2 class="title is-3"><router-link to="/docs/gesturable">Gesturable</router-link></h2>
+<h2 id="gesturable" class="title is-3"><router-link to="/docs/gesturable">Gesturable</router-link></h2>
 
 <!-- TODO -->
  - for 2-finger gestures

@@ -4,7 +4,7 @@ import clone from '@interactjs/utils/clone'
 import domObjects from '@interactjs/utils/domObjects'
 import extend from '@interactjs/utils/extend'
 import raf from '@interactjs/utils/raf'
-import win from '@interactjs/utils/window'
+import * as win from '@interactjs/utils/window'
 
 import { Eventable } from './Eventable'
 import { InteractEvent, PhaseMap } from './InteractEvent'

@@ -556,7 +556,7 @@ export class Interaction<T extends ActionName = ActionName> {
     this.pointerIsDown = false
   }
 
-  _updateLatestPointer (pointer, event, eventTarget) {
+  _updateLatestPointer (pointer: Interact.PointerType, event: Interact.PointerEventType, eventTarget: Node) {
     this._latestPointer.pointer = pointer
     this._latestPointer.event = event
     this._latestPointer.eventTarget = eventTarget

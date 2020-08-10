@@ -1,6 +1,6 @@
 import domObjects from './domObjects'
 import is from './is'
-import win from './window'
+import * as win from './window'
 
 const browser = {
   init,
@@ -10,7 +10,7 @@ const browser = {
   isIOS: null as boolean,
   isIe9: null as boolean,
   isOperaMobile: null as boolean,
-  prefixedMatchesSelector: null as string,
+  prefixedMatchesSelector: null as 'matches',
   pEventTypes: null as {
     up: string
     down: string
@@ -47,7 +47,7 @@ function init (window: any) {
     /Presto/.test(navigator.userAgent))
 
   // prefix matchesSelector
-  browser.prefixedMatchesSelector = 'matches' in Element.prototype
+  browser.prefixedMatchesSelector = ('matches' in Element.prototype
     ? 'matches'
     : 'webkitMatchesSelector' in Element.prototype
       ? 'webkitMatchesSelector'
@@ -55,7 +55,7 @@ function init (window: any) {
         ? 'mozMatchesSelector'
         : 'oMatchesSelector' in Element.prototype
           ? 'oMatchesSelector'
-          : 'msMatchesSelector'
+          : 'msMatchesSelector') as 'matches'
 
   browser.pEventTypes = (browser.supportsPointerEvent
     ? (domObjects.PointerEvent === window.MSPointerEvent

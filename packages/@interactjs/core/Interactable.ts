@@ -1,4 +1,5 @@
 /* eslint-disable no-dupe-class-members */
+import { ActionMap } from '@interactjs/core/scope'
 import * as Interact from '@interactjs/types/index'
 import * as arr from '@interactjs/utils/arr'
 import browser from '@interactjs/utils/browser'
@@ -171,7 +172,7 @@ export class Interactable implements Partial<Eventable> {
       (this.options[optionName] as any) = newValue
 
       for (const action in this._actions.map) {
-        (this.options[action][optionName] as any) = newValue
+        (this.options[action as keyof ActionMap] as any)[optionName] = newValue
       }
 
       return this
@@ -372,12 +373,12 @@ export class Interactable implements Partial<Eventable> {
       this.options[actionName] = {}
       this.setPerAction(actionName, extend(extend({}, defaults.perAction), defaults.actions[actionName]))
 
-      this[methodName](options[actionName])
+      ;(this as unknown as Interactable & { [key: string]: Interact.ActionMethod<unknown> })[methodName](options[actionName])
     }
 
     for (const setting in options) {
-      if (is.func(this[setting])) {
-        this[setting](options[setting])
+      if (is.func((this as any)[setting])) {
+        (this as any)[setting](options[setting as keyof typeof options])
       }
     }
 

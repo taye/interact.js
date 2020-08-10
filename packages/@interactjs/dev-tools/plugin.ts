@@ -4,7 +4,7 @@ import domObjects from '@interactjs/utils/domObjects'
 import { parentNode } from '@interactjs/utils/domUtils'
 import extend from '@interactjs/utils/extend'
 import is from '@interactjs/utils/is'
-import win from '@interactjs/utils/window'
+import * as win from '@interactjs/utils/window'
 
 import visualizer from './visualizer/plugin'
 

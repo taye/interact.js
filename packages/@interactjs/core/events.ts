@@ -204,11 +204,11 @@ function install (scope: Interact.Scope) {
 
   // bound to the interactable context when a DOM event
   // listener is added to a selector interactable
-  function delegateListener (event: Event, optionalArg?: any) {
+  function delegateListener (event: Event | FakeEvent, optionalArg?: any) {
     const options = getOptions(optionalArg)
-    const fakeEvent = new FakeEvent(event)
+    const fakeEvent = new FakeEvent(event as Event)
     const delegates = delegatedEvents[event.type]
-    const [eventTarget] = (pointerUtils.getEventTargets(event))
+    const [eventTarget] = (pointerUtils.getEventTargets(event as Event))
     let element: Node = eventTarget
 
     // climb up document tree looking for selector matches
@@ -236,7 +236,7 @@ function install (scope: Interact.Scope) {
     }
   }
 
-  function delegateUseCapture (event: Event) {
+  function delegateUseCapture (this: Interact.Element, event: Event | FakeEvent) {
     return delegateListener.call(this, event, true)
   }
 
@@ -247,6 +247,7 @@ function install (scope: Interact.Scope) {
 class FakeEvent implements Partial<Event> {
   currentTarget: Node
   originalEvent: Event
+  type: string
 
   constructor (originalEvent: Event) {
     this.originalEvent = originalEvent

@@ -3,8 +3,8 @@ import { ActionProps, Interaction } from '@interactjs/core/Interaction'
 import { Scope } from '@interactjs/core/scope'
 import * as Interact from '@interactjs/types/index'
 import * as arr from '@interactjs/utils/arr'
-import extend from '@interactjs/utils/extend'
 import is from '@interactjs/utils/is'
+import { copyAction } from '@interactjs/utils/misc'
 import * as pointerUtils from '@interactjs/utils/pointerUtils'
 import { tlbrToXywh } from '@interactjs/utils/rect'
 
@@ -53,7 +53,7 @@ export function install (scope: Scope) {
    * @param { string } action.name The name of the action
    * @returns { Promise } A promise that resolves to the `Interactable` when actions on all targets have ended
    */
-  Interactable.prototype.reflow = function (action) {
+  Interactable.prototype.reflow = function (action: ActionProps) {
     return reflow(this, action, scope)
   }
 }
@@ -123,18 +123,18 @@ function startReflow<T extends Interact.ActionName> (scope: Scope, interactable:
 
   interaction.interactable = interactable
   interaction.element = element
-  interaction.prepared = extend({}, action)
   interaction.prevEvent = event
   interaction.updatePointer(event, event, element, true)
 
+  copyAction(interaction.prepared, action)
   interaction._doPhase(signalArg)
 
-  const Promise: PromiseConstructor = (scope.window as unknown as any).Promise
+  const { Promise } = (scope.window as unknown as { Promise: PromiseConstructor })
   const reflowPromise = Promise
-    ? new Promise<null>(resolve => {
+    ? new Promise<undefined>(resolve => {
       interaction._reflowResolve = resolve
     })
-    : null
+    : undefined
 
   interaction._reflowPromise = reflowPromise
   interaction.start(action, interactable, element)
@@ -145,10 +145,10 @@ function startReflow<T extends Interact.ActionName> (scope: Scope, interactable:
   }
   else {
     interaction.stop()
+    interaction._reflowResolve()
   }
 
   interaction.removePointer(event, event)
-  interaction.pointerIsDown = false
 
   return reflowPromise
 }

@@ -1,16 +1,14 @@
 import isWindow from './isWindow'
 
-const win = {
-  realWindow: undefined as Window,
-  window: undefined as Window,
-  getWindow,
-  init,
-}
+export let realWindow = undefined as Window
+
+let win = undefined as Window
+export { win as window }
 
 export function init (window: Window & { wrap?: (...args: any[]) => any }) {
   // get wrapped window if using Shadow DOM polyfill
 
-  win.realWindow = window
+  realWindow = window
 
   // create a TextNode
   const el = window.document.createTextNode('')
@@ -23,14 +21,10 @@ export function init (window: Window & { wrap?: (...args: any[]) => any }) {
     window = window.wrap(window)
   }
 
-  win.window = window
+  win = window
 }
 
-if (typeof window === 'undefined') {
-  win.window     = undefined
-  win.realWindow = undefined
-}
-else {
+if (typeof window !== 'undefined' && !!window) {
   init(window)
 }
 
@@ -43,7 +37,3 @@ export function getWindow (node: any) {
 
   return rootNode.defaultView || win.window
 }
-
-win.init = init
-
-export default win

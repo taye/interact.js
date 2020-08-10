@@ -14,9 +14,3 @@ const plugin: Interact.Plugin = {
 }
 
 export default plugin
-
-export {
-  pointerEvents,
-  holdRepeat,
-  interactableTargets,
-}

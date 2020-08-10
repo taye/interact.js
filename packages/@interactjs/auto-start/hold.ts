@@ -26,7 +26,7 @@ function install (scope: Interact.Scope) {
   defaults.perAction.delay = 0
 }
 
-function getHoldDuration (interaction) {
+function getHoldDuration (interaction: Interact.Interaction) {
   const actionName = interaction.prepared && interaction.prepared.name
 
   if (!actionName) { return null }

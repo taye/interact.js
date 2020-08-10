@@ -1,6 +1,5 @@
 import { InteractEvent } from '@interactjs/core/InteractEvent'
 import { Interactable } from '@interactjs/core/Interactable'
-import { Scope } from '@interactjs/core/scope'
 import * as Interact from '@interactjs/types/index'
 import * as domUtils from '@interactjs/utils/domUtils'
 import extend from '@interactjs/utils/extend'
@@ -14,7 +13,7 @@ import drag from '../drag/plugin'
 import { DropEvent } from './DropEvent'
 
 export interface DropzoneMethod {
-  (options: Interact.DropzoneOptions | boolean): Interact.Interactable
+  (this: Interactable, options: Interact.DropzoneOptions | boolean): Interact.Interactable
   (): Interact.DropzoneOptions
 }
 
@@ -91,7 +90,7 @@ export interface DropState {
   activeDrops: ActiveDrop[]
 }
 
-function install (scope: Scope) {
+function install (scope: Interact.Scope) {
   const {
     actions,
     /** @lends module:interact */
@@ -141,11 +140,11 @@ function install (scope: Scope) {
    * is over this Interactable.
    *
    * @param {boolean | object | null} [options] The new options to be set.
-   * @return {boolean | Interactable} The current setting or this Interactable
+   * @return {object | Interactable} The current setting or this Interactable
    */
   Interactable.prototype.dropzone = function (this: Interact.Interactable, options?: Interact.DropzoneOptions | boolean) {
     return dropzoneMethod(this, options)
-  }
+  } as Interactable['dropzone']
 
   /**
    * ```js
@@ -252,7 +251,7 @@ function fireActivationEvents (activeDrops, event) {
 // return a new array of possible drops. getActiveDrops should always be
 // called when a drag has just started or a drag event happens while
 // dynamicDrop is true
-function getActiveDrops (scope: Scope, dragElement: Interact.Element) {
+function getActiveDrops (scope: Interact.Scope, dragElement: Interact.Element) {
   // get dropzones and their elements that could receive the draggable
   const activeDrops = collectDrops(scope, dragElement)
 
@@ -361,7 +360,7 @@ function fireDropEvents (interaction: Interact.Interaction, events) {
   dropState.prev.element = cur.element
 }
 
-function onEventCreated ({ interaction, iEvent, event }: Interact.DoPhaseArg<'drag', Interact.EventPhase>, scope) {
+function onEventCreated ({ interaction, iEvent, event }: Interact.DoPhaseArg<'drag', Interact.EventPhase>, scope: Interact.Scope) {
   if (iEvent.type !== 'dragmove' && iEvent.type !== 'dragend') { return }
 
   const { dropState } = interaction
@@ -386,7 +385,7 @@ function onEventCreated ({ interaction, iEvent, event }: Interact.DoPhaseArg<'dr
 }
 
 function dropzoneMethod (interactable: Interact.Interactable): Interact.DropzoneOptions
-function dropzoneMethod (interactable: Interact.Interactable, options: Interact.DropzoneOptions | boolean)
+function dropzoneMethod (interactable: Interact.Interactable, options: Interact.DropzoneOptions | boolean): Interact.Interactable
 function dropzoneMethod (interactable: Interact.Interactable, options?: Interact.DropzoneOptions | boolean) {
   if (is.object(options)) {
     interactable.options.drop.enabled = options.enabled !== false
