@@ -8,6 +8,14 @@ import { copyAction } from '@interactjs/utils/misc'
 import * as pointerUtils from '@interactjs/utils/pointerUtils'
 import { tlbrToXywh } from '@interactjs/utils/rect'
 
+declare module '@interactjs/core/scope' {
+  interface SignalArgs {
+    'interactions:before-action-reflow': Omit<Interact.DoAnyPhaseArg, 'iEvent'>
+    'interactions:action-reflow': Interact.DoAnyPhaseArg
+    'interactions:after-action-reflow': Interact.DoAnyPhaseArg
+  }
+}
+
 declare module '@interactjs/core/Interactable' {
   interface Interactable {
     reflow: (action: ActionProps) => ReturnType<typeof reflow>
@@ -125,6 +133,7 @@ function startReflow<T extends Interact.ActionName> (scope: Scope, interactable:
   interaction.element = element
   interaction.prevEvent = event
   interaction.updatePointer(event, event, element, true)
+  pointerUtils.setZeroCoords(interaction.coords.delta)
 
   copyAction(interaction.prepared, action)
   interaction._doPhase(signalArg)

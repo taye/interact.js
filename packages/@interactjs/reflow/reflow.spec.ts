@@ -23,7 +23,8 @@ test('reflow', t => {
     'reflow method is added to Interactable.prototype',
   )
 
-  const fired: any[] = []
+  const fired: Interact.InteractEvent[] = []
+  let beforeReflowDelta: Interact.Point
 
   interactable.fire = ((iEvent: any) => { fired.push(iEvent) }) as any
   (interactable.target as any) = {}
@@ -37,6 +38,9 @@ test('reflow', t => {
         x: rect.left + 100,
         y: rect.top - 50,
       }
+    },
+    'interactions:before-action-reflow': ({ interaction }) => {
+      beforeReflowDelta = { ...interaction.coords.delta.page }
     },
   })
 
@@ -61,6 +65,12 @@ test('reflow', t => {
   )
 
   const reflowMove = fired[2]
+
+  t.deepEqual(
+    beforeReflowDelta,
+    { x: 0, y: 0 },
+    'interaction delta is zero before-action-reflow',
+  )
 
   t.deepEqual(
     reflowMove.delta,
