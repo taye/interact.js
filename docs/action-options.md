@@ -2,6 +2,28 @@
 title: Action Options
 ---
 
+Drag, Resize and Gesture Actions
+================================
+
+The `Interactable` methods `draggable()`, `resizable()` and `gesturable()` are
+used to enable and configure actions for target elements. They all have some
+common options as well as some action-specific options and event properties.
+
+Drag, resizem and gesture interactions fire `InteractEvent`s which have the
+following properties common to all action types:
+
+| InteractEvent property  | Description                                       |
+| ----------------------- | --------------------------------------------------|
+| `target`                | The element that is being interacted with         |
+| `interactable`          | The Interactable that is being interacted with    |
+| `interaction`           | The Interaction that the event belongs to         |
+| `x0`, `y0`              | Page x and y coordinates of the starting event    |
+| `clientX0`, `clientY0`  | Client x and y coordinates of the starting event  |
+| `dx`, `dy`              | Change in coordinates of the mouse/touch          |
+| `velocityX`, `velocityY`| The Velocity of the pointer                       |
+| `speed`                 | The speed of the pointer                          |
+| `timeStamp`             | The time of creation of the event object          |
+
 Common Action Options
 =====================
 
@@ -30,6 +52,8 @@ If this is changed to `true` then drag, resize and gesture actions will have to
 be started with a call to [`Interaction#start`][interaction-start] as the usual
 `down`, `move`, `<action>start`... sequence will not start an action.
 
+See <router-link to="/docs/auto-start">auto-start</router-link>.
+
 `hold`
 ------
 
@@ -40,14 +64,21 @@ The action will start after the pointer is held down for the given number of mil
 
 Change inertia settings for drag, and resize. See [docs/inertia](<%= url_for '/docs/inertia' %>).
 
+`styleCursor`
+-------------
+
+If the <router-link to="/docs/auto-start">auto-start</router-link> feature is
+enabled, interact will style the cursor of draggable and resizable elements as
+you hover over them.
+
+```js
+interact(target).styleCursor(false)
+```
+
+To disable this for all actions, set the `styleCursor` option to `false`
+
 `cursorChecker`
 ---------------
-
-You can disable default cursors with `interact(target).styleCursor(false)`, but
-that will disable cursor styling for all actions. To disable or change the
-cursor for each action, you can set a `cursorChecker` function which takes info
-about the current interaction and returns the CSS cursor value to set on the
-target element.
 
 ```js
 interact(target)
@@ -67,6 +98,12 @@ interact(target)
     }
   })
 ```
+
+You can disable default cursors with `interact(target).styleCursor(false)`, but
+that will disable cursor styling for all actions. To disable or change the
+cursor for each action, you can set a `cursorChecker` function which takes info
+about the current interaction and returns the CSS cursor value to set on the
+target element.
 
 `autoScroll`
 ------------
@@ -120,12 +157,18 @@ This option available for drag, resize and gesture, as well as `pointerEvents`
 (down, move, hold, etc.). Using the `allowFrom` option, you may specify handles
 for each action separately and for all your pointerEvents listeners.
 
+<aside class="notice">
+The `allowFrom` elements <strong>must</strong> be children of the target
+interactable element.
+</aside>
+
 `ignoreFrom`
 ------------
 
 ```html
 <div id="movable-box">
-  <div id="undraggable-when-on-this-element" />
+  <p class="content">Selectable text</p>
+  <div no-pointer-event>Should not fire tap, hold, etc. events</div>
 </div>
 ```
 
@@ -142,15 +185,16 @@ interact(movable)
   .pointerEvents({
     ignoreFrom: '[no-pointer-event]',
   })
+  .on('tap', function (event) {
+  })
 ```
 
-Like `allowFrom`, `ignoreFrom` gives you the ability to avoid certain
-elements in your interactable element. Which is good when certain
-elements need to maintain default behavior when interacted with.
-
-For example, dragging around a text/contentEditable, by wrapping this
-object with a draggable element and ignoring the editable content you
-maintain the ability to highlight text without moving the element.
+The compliment to `allowFrom`, `ignoreFrom` lets you specify elements within
+your target with which to avoid starting actions.  This is useful when certain
+elements need to maintain default behavior when interacted with. For example,
+dragging around a text/contentEditable, by wrapping this object with a
+draggable element and ignoring the editable content you maintain the ability to
+highlight text without moving the element.
 
 `enabled`
 ---------
@@ -158,3 +202,5 @@ maintain the ability to highlight text without moving the element.
 Enable the action for the Interactable. If the options object has no `enabled`
 property or the property value is `true` then the action is enabled. If
 `enabled` is false, the action is disabled.
+
+[interaction-start]: /docs/auto-start
