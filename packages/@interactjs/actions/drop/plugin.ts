@@ -348,8 +348,8 @@ function fireDropEvents (interaction: Interact.Interaction, events) {
   } = dropState
 
   if (events.leave) { prev.dropzone.fire(events.leave) }
-  if (events.move) { cur.dropzone.fire(events.move) }
   if (events.enter) { cur.dropzone.fire(events.enter) }
+  if (events.move) { cur.dropzone.fire(events.move) }
   if (events.drop) { cur.dropzone.fire(events.drop) }
 
   if (events.deactivate) {
