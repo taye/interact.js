@@ -1,3 +1,11 @@
+## v1.9.21
+
+ - used findIndex polyfill to support 1E11 (#852)
+ - fixed issue where resize reflow increased element size (#817)
+ - fixed drop event order: fire `dropmove` after `dragenter` (#841) and final
+   drop events before `dragend` (#842)
+ - updated docs (#844) (#829)
+
 ## v1.9.20
 
  - fixed ordering of plugins

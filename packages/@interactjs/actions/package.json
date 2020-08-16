@@ -1,13 +1,13 @@
 {
   "name": "@interactjs/actions",
-  "version": "1.9.20",
+  "version": "1.9.21",
   "license": "MIT",
   "peerDependencies": {
-    "@interactjs/core": "1.9.20",
-    "@interactjs/utils": "1.9.20"
+    "@interactjs/core": "1.9.21",
+    "@interactjs/utils": "1.9.21"
   },
   "optionalDependencies": {
-    "@interactjs/interact": "1.9.20"
+    "@interactjs/interact": "1.9.21"
   },
   "publishConfig": {
     "access": "public"
