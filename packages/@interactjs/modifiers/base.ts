@@ -153,6 +153,7 @@ export function addEventModifiers ({ iEvent, interaction: { modification: { resu
 
 const modifiersBase: Interact.Plugin = {
   id: 'modifiers/base',
+  before: ['actions'],
   install: scope => {
     scope.defaults.perAction.modifiers = []
   },
@@ -182,7 +183,6 @@ const modifiersBase: Interact.Plugin = {
 
     'interactions:stop': arg => arg.interaction.modification.stop(arg),
   },
-  before: ['actions'],
 }
 
 export default modifiersBase

@@ -89,7 +89,7 @@ function hasPending (interaction) {
 
 const offset: Interact.Plugin = {
   id: 'offset',
-  before: ['modifiers'],
+  before: ['modifiers', 'pointer-events', 'actions', 'inertia'],
   install (scope) {
     scope.Interaction.prototype.offsetBy = offsetBy
   },

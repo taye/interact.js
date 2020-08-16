@@ -379,7 +379,7 @@ function getOptions ({ interactable, prepared }: Interact.Interaction) {
 
 const inertia: Interact.Plugin = {
   id: 'inertia',
-  before: ['modifiers'],
+  before: ['modifiers', 'actions'],
   install,
   listeners: {
     'interactions:new': ({ interaction }) => {
