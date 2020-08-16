@@ -540,11 +540,9 @@ const drop: Interact.Plugin = {
       }
     },
 
-    // FIXME proper signal types
     'interactions:action-move': onEventCreated,
-    'interactions:action-end': onEventCreated,
 
-    'interactions:after-action-move': function fireDropAfterMove ({ interaction, iEvent: dragEvent }: Interact.DoPhaseArg<'drag', Interact.EventPhase>, scope) {
+    'interactions:after-action-move': ({ interaction, iEvent: dragEvent }: Interact.DoPhaseArg<'drag', Interact.EventPhase>, scope) => {
       if (interaction.prepared.name !== 'drag') { return }
 
       fireDropEvents(interaction, interaction.dropState.events)
@@ -553,9 +551,12 @@ const drop: Interact.Plugin = {
       interaction.dropState.events = {}
     },
 
-    'interactions:after-action-end': ({ interaction, iEvent: dragEvent }: Interact.DoPhaseArg<'drag', Interact.EventPhase>, scope) => {
-      if (interaction.prepared.name !== 'drag') { return }
+    'interactions:action-end': (arg: Interact.DoPhaseArg<'drag', Interact.EventPhase>, scope) => {
+      if (arg.interaction.prepared.name !== 'drag') { return }
 
+      const { interaction, iEvent: dragEvent } = arg
+
+      onEventCreated(arg, scope)
       fireDropEvents(interaction, interaction.dropState.events)
       scope.fire('actions/drop:end', { interaction, dragEvent })
     },

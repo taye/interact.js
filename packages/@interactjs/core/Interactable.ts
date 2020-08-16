@@ -286,7 +286,7 @@ export class Interactable implements Partial<Eventable> {
    * Interactable
    * @return {Interactable} this Interactable
    */
-  fire (iEvent: object) {
+  fire (iEvent: { type: string, [index: string]: any }) {
     this.events.fire(iEvent)
 
     return this
