@@ -210,9 +210,9 @@ export class InertiaState {
   }
 
   onNextFrame (tickFn: () => void) {
-    if (!this.active) { return }
-
-    this.timeout = raf.request(tickFn)
+    this.timeout = raf.request(() => {
+      if (this.active) { tickFn() }
+    })
   }
 
   inertiaTick () {

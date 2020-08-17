@@ -46,7 +46,7 @@ test('inertia', t => {
 
   // test inertia without modifiers and with throw
   downStartMoveUp({ x: 100, y: 0, dt: 10 })
-  t.ok(state.active, 'thrown: inertia is activated')
+  t.ok(state.active && state.timeout, 'thrown: inertia is activated')
 
   interactable.draggable({ modifiers: [changeModifier as any] })
 
