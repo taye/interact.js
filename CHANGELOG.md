@@ -1,3 +1,8 @@
+## v1.9.22
+
+ - fixed inertia issue with arbitrary plugin order (#834)
+ - fixed inertia regression (#853)
+
 ## v1.9.21
 
  - used findIndex polyfill to support 1E11 (#852)
