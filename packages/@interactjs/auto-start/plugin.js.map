@@ -1,0 +1,19 @@
+{
+	"version": 3,
+	"sources": [
+		"plugin.ts"
+	],
+	"names": [
+		"autoStart",
+		"dragAxis",
+		"hold",
+		"id",
+		"install",
+		"scope",
+		"usePlugin"
+	],
+	"mappings": "AAEA,OAAOA,SAAP,MAAsB,WAAtB;AACA,OAAOC,QAAP,MAAqB,eAArB;AACA,OAAOC,IAAP,MAAiB,WAAjB;AAEA,eAAe;AACbC,EAAAA,EAAE,EAAE,YADS;;AAEbC,EAAAA,OAAO,CAAEC,KAAF,EAAyB;AAC9BA,IAAAA,KAAK,CAACC,SAAN,CAAgBN,SAAhB;AACAK,IAAAA,KAAK,CAACC,SAAN,CAAgBJ,IAAhB;AACAG,IAAAA,KAAK,CAACC,SAAN,CAAgBL,QAAhB;AACD;;AANY,CAAf",
+	"sourcesContent": [
+		"import * as Interact from '@interactjs/types/index'\n\nimport autoStart from './base'\nimport dragAxis from './dragAxis'\nimport hold from './hold'\n\nexport default {\n  id: 'auto-start',\n  install (scope: Interact.Scope) {\n    scope.usePlugin(autoStart)\n    scope.usePlugin(hold)\n    scope.usePlugin(dragAxis)\n  },\n}\n"
+	]
+}

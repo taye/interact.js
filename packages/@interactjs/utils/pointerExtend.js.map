@@ -1,0 +1,23 @@
+{
+	"version": 3,
+	"sources": [
+		"pointerExtend.ts"
+	],
+	"names": [
+		"pointerExtend",
+		"dest",
+		"source",
+		"prop",
+		"prefixedPropREs",
+		"deprecated",
+		"vendor",
+		"indexOf",
+		"test",
+		"webkit",
+		"moz"
+	],
+	"mappings": "AAAA,SAASA,aAAT,CAA2BC,IAA3B,EAA6CC,MAA7C,EAAwD;AACtD,OAAK,MAAMC,IAAX,IAAmBD,MAAnB,EAA2B;AACzB,UAAME,eAAe,GAAGJ,aAAa,CAACI,eAAtC;AACA,QAAIC,UAAU,GAAG,KAAjB,CAFyB,CAIzB;;AACA,SAAK,MAAMC,MAAX,IAAqBF,eAArB,EAAsC;AACpC,UAAID,IAAI,CAACI,OAAL,CAAaD,MAAb,MAAyB,CAAzB,IAA8BF,eAAe,CAACE,MAAD,CAAf,CAAwBE,IAAxB,CAA6BL,IAA7B,CAAlC,EAAsE;AACpEE,QAAAA,UAAU,GAAG,IAAb;AACA;AACD;AACF;;AAED,QAAI,CAACA,UAAD,IAAe,OAAOH,MAAM,CAACC,IAAD,CAAb,KAAwB,UAA3C,EAAuD;AACrDF,MAAAA,IAAI,CAACE,IAAD,CAAJ,GAAaD,MAAM,CAACC,IAAD,CAAnB;AACD;AACF;;AACD,SAAOF,IAAP;AACD;;AAEDD,aAAa,CAACI,eAAd,GAAgC;AAC9BK,EAAAA,MAAM,EAAE,gDADsB;AAE9BC,EAAAA,GAAG,EAAE;AAFyB,CAAhC;AAKA,eAAeV,aAAf",
+	"sourcesContent": [
+		"function pointerExtend<T> (dest: Partial<T>, source: T) {\n  for (const prop in source) {\n    const prefixedPropREs = pointerExtend.prefixedPropREs\n    let deprecated = false\n\n    // skip deprecated prefixed properties\n    for (const vendor in prefixedPropREs) {\n      if (prop.indexOf(vendor) === 0 && prefixedPropREs[vendor].test(prop)) {\n        deprecated = true\n        break\n      }\n    }\n\n    if (!deprecated && typeof source[prop] !== 'function') {\n      dest[prop] = source[prop]\n    }\n  }\n  return dest\n}\n\npointerExtend.prefixedPropREs = {\n  webkit: /(Movement[XY]|Radius[XY]|RotationAngle|Force)$/,\n  moz: /(Pressure)$/,\n} as { [prefix: string]: RegExp }\n\nexport default pointerExtend\n"
+	]
+}

@@ -1,0 +1,11 @@
+{
+	"version": 3,
+	"sources": [
+		"edgeTarget.ts"
+	],
+	"names": [],
+	"mappings": "AAAA,gBAAe,MAAM,CAAE,CAAvB",
+	"sourcesContent": [
+		"export default () => {}\n"
+	]
+}

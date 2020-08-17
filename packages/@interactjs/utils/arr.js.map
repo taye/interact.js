@@ -1,0 +1,28 @@
+{
+	"version": 3,
+	"sources": [
+		"arr.ts"
+	],
+	"names": [
+		"contains",
+		"array",
+		"target",
+		"indexOf",
+		"remove",
+		"splice",
+		"merge",
+		"source",
+		"item",
+		"push",
+		"from",
+		"findIndex",
+		"func",
+		"i",
+		"length",
+		"find"
+	],
+	"mappings": "AAEA,OAAO,MAAMA,QAAQ,GAAG,CAAIC,KAAJ,EAAgBC,MAAhB,KAA8BD,KAAK,CAACE,OAAN,CAAcD,MAAd,MAA0B,CAAC,CAA1E;AAEP,OAAO,MAAME,MAAM,GAAG,CAAIH,KAAJ,EAAgBC,MAAhB,KAA8BD,KAAK,CAACI,MAAN,CAAaJ,KAAK,CAACE,OAAN,CAAcD,MAAd,CAAb,EAAoC,CAApC,CAA7C;AAEP,OAAO,MAAMI,KAAK,GAAG,CAAOJ,MAAP,EAA6BK,MAA7B,KAA6C;AAChE,OAAK,MAAMC,IAAX,IAAmBD,MAAnB,EAA2B;AACzBL,IAAAA,MAAM,CAACO,IAAP,CAAYD,IAAZ;AACD;;AAED,SAAON,MAAP;AACD,CANM;AAQP,OAAO,MAAMQ,IAAI,GAAaH,MAAV,IAAmCD,KAAK,CAAC,EAAD,EAAYC,MAAZ,CAArD;AAEP,OAAO,MAAMI,SAAS,GAAG,CAAIV,KAAJ,EAAgBW,IAAhB,KAAoC;AAC3D,OAAK,IAAIC,CAAC,GAAG,CAAb,EAAgBA,CAAC,GAAGZ,KAAK,CAACa,MAA1B,EAAkCD,CAAC,EAAnC,EAAuC;AACrC,QAAID,IAAI,CAACX,KAAK,CAACY,CAAD,CAAN,EAAWA,CAAX,EAAcZ,KAAd,CAAR,EAA8B;AAC5B,aAAOY,CAAP;AACD;AACF;;AAED,SAAO,CAAC,CAAR;AACD,CARM;AAUP,OAAO,MAAME,IAAI,GAAG,CAAUd,KAAV,EAAsBW,IAAtB,KAA0CX,KAAK,CAACU,SAAS,CAACV,KAAD,EAAQW,IAAR,CAAV,CAA5D",
+	"sourcesContent": [
+		"type Filter<T> = (element: T, index: number, array: T[]) => boolean\n\nexport const contains = <T>(array: T[], target: T) => array.indexOf(target) !== -1\n\nexport const remove = <T>(array: T[], target: T) => array.splice(array.indexOf(target), 1)\n\nexport const merge = <T, U>(target: Array<T | U>, source: U[]) => {\n  for (const item of source) {\n    target.push(item)\n  }\n\n  return target\n}\n\nexport const from = <T = any>(source: ArrayLike<T>) => merge([] as T[], source as T[])\n\nexport const findIndex = <T>(array: T[], func: Filter<T>) => {\n  for (let i = 0; i < array.length; i++) {\n    if (func(array[i], i, array)) {\n      return i\n    }\n  }\n\n  return -1\n}\n\nexport const find = <T = any>(array: T[], func: Filter<T>) => array[findIndex(array, func)]\n"
+	]
+}

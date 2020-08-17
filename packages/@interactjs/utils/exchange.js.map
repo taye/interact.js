@@ -1,0 +1,13 @@
+{
+	"version": 3,
+	"sources": [
+		"exchange.ts"
+	],
+	"names": [
+		"exchange"
+	],
+	"mappings": "AAAA,OAAO,MAAMA,QAAQ,GAAG,EAAjB",
+	"sourcesContent": [
+		"export const exchange = {}\n"
+	]
+}
