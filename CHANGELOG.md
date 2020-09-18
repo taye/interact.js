@@ -1,3 +1,7 @@
+## Upcoming
+
+ - changed production files extension from '.min.js' to '.prod.js'
+
 ## v1.9.22
 
  - fixed inertia issue with arbitrary plugin order (#834)

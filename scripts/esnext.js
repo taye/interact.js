@@ -28,7 +28,7 @@ const OUTPUT_VERSIONS = [
   },
   // production
   {
-    extension: '.min.js',
+    extension: '.prod.js',
     nodeEnv: 'production',
     async post (result) {
       const { code, map, error } = minify(result)
