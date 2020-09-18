@@ -16,6 +16,7 @@ module.exports = ({ code, map, modern = false, env = {} }) => Terser.minify(code
       acc[`process.env.${name}`] = value
       return acc
     }, {}),
+    passes: 2,
   },
   output: {
     beautify: false,
