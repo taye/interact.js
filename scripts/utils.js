@@ -11,7 +11,7 @@ const commonIgnoreGlobs = ['**/node_modules/**', '**/*_*', '**/*.d.ts', '**/dist
 const lintIgnoreGlobs = [...commonIgnoreGlobs]
 const sourcesIgnoreGlobs = [...commonIgnoreGlobs, '**/*.spec.ts']
 const builtFilesGlob = '{{**/dist/**,packages/{,@}interactjs/**/**/*.js{,.map}},packages/@interactjs/**/index.ts}'
-const builtFilesIgnoreGlobs = ['**/node_modules/**', 'packages/@interactjs/{types,interact,interactjs}/index.ts']
+const builtFilesIgnoreGlobs = ['**/node_modules/**', 'packages/@interactjs/{dev-tools/babel-plugin-prod.js,{types,interact,interactjs}/index.ts}']
 
 const getSources = ({ cwd = process.cwd(), ...options } = {}) => glob(
   sourcesGlob,

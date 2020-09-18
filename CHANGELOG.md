@@ -1,6 +1,8 @@
 ## Upcoming
 
  - changed production files extension from '.min.js' to '.prod.js'
+ - added experimental `@interactjs/dev-tools/babel-plugin-prod` babel plugin to
+   change `@interactjs/*` imports to production versions
 
 ## v1.9.22
 
