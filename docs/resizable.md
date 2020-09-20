@@ -2,9 +2,6 @@
 title: Resizable
 ---
 
-Resizable
-=========
-
 ```javascript
 interact(target)
   .resizable({
@@ -79,8 +76,7 @@ Resize handle elements must be children of the resizable element. If you need
 the handles to be outside the target element, then you will need to use
 [`Interaction#start`](interaction-start).
 
-`invert`
---------
+### `invert`
 
 ```javascript
 interact(target).resizable({
@@ -98,8 +94,7 @@ to dimensions less than `0x0`. The possible values are:
  - `'reposition'` will keep the width/height positive by swapping the top and
  bottom edges and/or swapping the left and right edges
 
-Aspect ratio
-------------
+### Aspect ratio
 
 ```js
 interact(target).resizable({
@@ -131,8 +126,7 @@ same `resize.modifiers` array as the `aspectRatio` one.
 
 [Demo on Codepen][resize-codepen]
 
-`cursorChecker`
----------------
+### `cursorChecker`
 
 ```javascript
 interact(target).resizable({

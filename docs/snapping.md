@@ -2,9 +2,6 @@
 title: Snapping
 ---
 
-Snapping
-========
-
 interact.js has 3 snap modifiers available through the `interact.modifiers`
 object:
 
@@ -19,7 +16,7 @@ events will be snapped to the closest target of this array which is within
 range.
 
 `snap()`
-========
+--------
 
 The `snap` modifier changes the pointer coordinates to specified targets when
 they are within range.
@@ -41,8 +38,7 @@ yield intuitive results.
 `snap` targets have `x` and `y` number props and an optional `range` number
 property.
 
-`relativePoints`
-----------------
+### `relativePoints`
 
 ```javascript
 interact(element).draggable({
@@ -70,8 +66,7 @@ There are effectively `targets.length * max( relativePoints.length, 1 )` snap
 targets while snap calculations are done. Snap functions are called multiple
 times with the coordinates at each `relativePoint`.
 
-`offset`
---------
+### `offset`
 
 ```javascript
 interact(element1).draggable({
@@ -104,7 +99,7 @@ modifier. The value may be:
    element
 
 `snapSize()`
-============
+------------
 
 ```js
 interact(target).resizable({
@@ -127,7 +122,7 @@ The `snapSize` modifier snaps the *dimensions* of targets when resizing. A
 `range`.
 
 `snapEdges()`
-=============
+-------------
 
 ```js
 interact(target).resizable({
@@ -147,8 +142,7 @@ have either `x` and `y` number props to snap the left/right and top/bottom edges
 respectively, `top`, `left`, `width` and `height` number props to snap each edge
 and an optional `range`.
 
-`targets` option
-----------------
+### `targets` option
 
 The coordinates of action events are compared to the targets of the provided snap
 modifiers. If multiple targets are within range, the closest target is used.
@@ -184,8 +178,7 @@ If a target omits an axis or edge prop, then the corresponding axis will not be
 changed. For example, if a target is defined as `{ y: 100, range Infinity }`
 then the snapped movement will be horizontal at `(100, pointerEventPageX)`.
 
-Snap grids
-----------
+### Snap grids
 
 ```javascript
 var gridTarget = interact.createSnapGrid({
@@ -230,8 +223,7 @@ The properties of the grid are:
  - `limits` (optional): an object with `top`, `left`, `bottom` and `right` props
    to set the bounds of the grid
 
-`range`
--------
+### `range`
 
 ```javascript
 interact(element).draggable({
@@ -253,8 +245,7 @@ pointer must be from the target's coordinates for a snap to be possible.
 
 i.e. `inRange = distance <= range`.
 
-Event snap info
----------------
+### Event snap info
 
 ```js
 interact(target).draggable({

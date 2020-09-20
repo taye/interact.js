@@ -2,9 +2,6 @@
 title: Inertia
 ---
 
-Inertia
-=======
-
 ```javascript
 interact(target)
   .draggable({
@@ -28,7 +25,7 @@ If an action ends without inertia but is snapped or restricted with the
 to the snapped/restricted coords.
 
 Options
-=======
+-------
 
  - **`resistance`** is a number greater than zero which sets the rate at which
    the action slows down. Higher values slow it down more quickly.

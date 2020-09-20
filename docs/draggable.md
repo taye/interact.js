@@ -2,9 +2,6 @@
 title: Draggable
 ---
 
-Draggable
-=========
-
 ```html
 <div class="draggable"> Draggable Element </div>
 ```

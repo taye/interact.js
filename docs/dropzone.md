@@ -2,9 +2,6 @@
 title: Dropzone
 ---
 
-Dropzone
-========
-
 Dropzones define elements that draggable targets can be "dropped" into and which
 elements will be accepted. Like with drag events, drop events don't modify the
 DOM to re-parent elements. You will have to do this in your own event listeners

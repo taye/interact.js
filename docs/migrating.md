@@ -1,15 +1,12 @@
 ---
-title: Migrating from `v1.2`
+title: Migrating from v1.2
 ---
-
-# Migrating from `v1.2`
 
 The latest versions fix several bugs, allows setting more options on a
 per-action basis, add configuration options to `pointerEvents` and add several
 new methods and options. The [changelog][changelog] lists all the major changes.
 
-Per-action modifiers array
---------------------------
+### Per-action modifiers array
 
 Modifiers are now created with `interact.modifiers[modifierName](options)`
 methods. The return values returned by these methods go into the
@@ -38,19 +35,18 @@ interact(target)
   .on('dragmove', event => console.log(event.pageX, event.pageY))
 ```
 
-Improved resize snap and restrict
----------------------------------
+### Improved resize snap and restrict
 
 There are a few new snap and restrict modifiers for resize actions:
 
-<router-link to="/docs/restriction">Restrictions</router-link>:
+[Restrictions](/docs/restriction):
 
   - pointer coordinate-based `restrict`
   - element rect-based restriction `restrictRect`
   - element size-based `restrictSize` (resize only)
   - and element edge-based `restrictEdges` (resize only)
 
-<router-link to="/docs/snapping">Snapping</router-link>:
+[Snapping](/docs/snapping):
 
  - pointer coordinate-based `snap` which is best suited to drag actions,
  - `snapSize` which works only on resize actions and let's you set targets for
@@ -82,8 +78,7 @@ interact(target).resize({
 });
 ```
 
-Resize `aspectRatio` modifier
------------------------------
+### Resize `aspectRatio` modifier
 
 The resize `preserveAspectRatio` and `square` options have been replaced by an
 `aspectRatio` modifier which can cooperate with other modifiers.
@@ -113,8 +108,7 @@ interact(target).resizable({
 })
 ```
 
-Removed Methods
----------------
+### Removed Methods
 
 The methods in the table below were removed and replaced with action method
 options and modifier methods for the new modifiers array API:
@@ -128,8 +122,7 @@ options and modifier methods for the new modifiers array API:
 | `interactable.accept('.can-be-dropped')`                   | `interactable.dropzone({ accept: '.can-be-dropped' })`          |
 | `interact.margin(50)`                                      | `interactable.resizable({ margin: 50 })`                        |
 
-Action end event dx/dy
-----------------------
+### Action end event dx/dy
 
 The `dx` and `dy` fields on `dragend`, `resizeend` and `gestureend` events were
 formally the difference between the start and end coordinates. Now they are
@@ -145,15 +138,13 @@ interact(target).draggable({
 });
 ```
 
-Drop events
------------
+### Drop events
 
 `dragend` events are now fired *before* `drop` events. Use
 `dragendEvent.relatedTarget` to get the dropzone element if there will be a drop
 event.
 
-Mouse buttons
--------------
+### Mouse buttons
 
 By default, only the left mouse button can start actions. The `mouseButtons`
 action option can be used to change this.

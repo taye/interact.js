@@ -119,7 +119,6 @@ export interface InertiaOption {
   minSpeed?: number
   endSpeed?: number
   allowResume?: boolean
-  zeroResumeDelta?: boolean
   smoothEndDuration?: number
 }
 export type InertiaOptions = InertiaOption | boolean

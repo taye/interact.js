@@ -1,9 +1,9 @@
 ---
-title: InteractEvents
+title: Events
 ---
 
 InteractEvents
-==============
+--------------
 
 ``` javascript
 function listener (event) {
@@ -52,8 +52,7 @@ such as `pageX/Y`, `clientX/Y`, modifier keys etc. but also some properties
 providing information about the change in coordinates and event specific data.
 The table below displays all of these events.
 
-Common
-------
+### Common
 
 | Property                | Description                                       |
 | ----------------------- | --------------------------------------------------|
@@ -67,8 +66,7 @@ Common
 | `speed`                 | The speed of the pointer                          |
 | `timeStamp`             | The time of creation of the event object          |
 
-Drag
-----
+### Drag
 
 | Property                | Description                                       |
 | ----------------------- | --------------------------------------------------|
@@ -76,8 +74,7 @@ Drag
 | `dragEnter`             | The dropzone this Interactable was dragged over   |
 | `dragLeave`             | The dropzone this Interactable was dragged out of |
 
-Resize
-------
+### Resize
 
 | Property                | Description                                       |
 | ----------------------- | --------------------------------------------------|
@@ -85,8 +82,7 @@ Resize
 | `rect`                  | An object with the new dimensions of the target   |
 | `deltaRect`             | The change in dimensions since the previous event |
 
-Gesture
--------
+### Gesture
 
 | Property                | Description                                       |
 | ----------------------- | --------------------------------------------------|
@@ -101,7 +97,7 @@ In gesture events, page and client coordinates are the averages of touch
 coordinates and velocity is calculated from these averages.
 
 Drop Events
-===========
+-----------
 
 ```javascript
 interact(dropTarget)
@@ -134,7 +130,7 @@ The dropzone events are plain objects with the following properties:
 
 
 Pointer Events
-==============
+--------------
 
 ```javascript
 interact(target).on('hold', function (event) {
@@ -165,8 +161,7 @@ events roughly as the real `PointerEvent` interface does, specifically:
   in the <code>PointerEvent</code> interface.
 </aside>
 
-Configuring pointer events
---------------------------
+### Configuring pointer events
 
 ```javascript
 interact(target).pointerEvents({
@@ -183,8 +178,7 @@ between the related `down` and `up` events. For `doubletap` `dt` is the time
 between the two previous taps.  `dt` for `hold` events is the length of time
 that the pointer has been held down for (around 600ms).
 
-Fast click
-----------
+### Fast click
 
 ```javascript
 // fast click

@@ -2,14 +2,11 @@
 title: FAQ
 ---
 
-FAQ
-===
-
 This page contains questions and issues that are frequently raised on [Gitter
 chat][gitter] and [Github issues][gh-issues].
 
 Start action after hold
-=======================
+-----------------------
 
 Use the `hold` option which takes the number of milliseconds that the pointer
 must be held down for.
@@ -28,7 +25,7 @@ context menus, etc. have a look at the
 Github](https://github.com/taye/interact.js/issues/138).
 
 Clone target draggable
-======================
+----------------------
 
 ```html
 <div class="item"></div>
@@ -64,7 +61,7 @@ use [`Interaction#start`][interaction-start] to change the target of an
 interaction to any element that you create.
 
 Remove / destroy / release
-==========================
+--------------------------
 
 ```javascript
 interact(target)
@@ -84,7 +81,7 @@ To remove an Interactable, use `interact(target).unset()`. That should remove
 all event listeners and make interact.js forget completely about the target.
 
 Changing dropzones while dragging
-=================================
+---------------------------------
 
 ```javascript
 interact.dynamicDrop(true);
@@ -95,7 +92,7 @@ while dragging, you may need to change the [`dynamicDrop`][dynamic-drop] setting
 to true so that the dropzones rects are recalculated after every `dragmove`.
 
 Drag handle
-===========
+-----------
 
 
 ```html
@@ -117,7 +114,7 @@ setting option to allow an action to start only if the element matches a
 certain CSS selector or is a specific element.
 
 Prevent actions on child
-========================
+------------------------
 
 ```html
 <div class="resizable">
@@ -138,7 +135,7 @@ Use the `ignoreFrom` option to prevent actions from starting if the pointer
 went down on an element matching the given selector or HTMLElement.
 
 Revert / restore / undo drag position
-=====================================
+-------------------------------------
 
 There's no direct API to revert a dragged element to it's position before the
 drag. To do this, you must store the position at `dragstart` and change the
@@ -146,7 +143,7 @@ element's style so that it returns to the start position on `dragend`. You can
 use CSS transitions to animate change in position.
 
 Dragging scrolls instead
-========================
+------------------------
 
 ```css
 .draggable, .resizable, .gesturable {
@@ -160,7 +157,7 @@ To allow touch interactions without scrolling or zooming, use the [`touch-action
 property][touch-action].
 
 Dragging between iFrames
-=======================
+------------------------
 
 There is [limited support][iframe-pr] for using interact.js across iFrames. There are
 currently browser inconsistencies and other issues which have yet to be

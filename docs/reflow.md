@@ -2,9 +2,6 @@
 title: Reflow
 ---
 
-Reflow
-======
-
 ```js
 const interactable = interact(target)
 const drag = { name: drag, axis: 'x' }

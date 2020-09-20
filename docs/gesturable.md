@@ -2,9 +2,6 @@
 title: Gesturable
 ---
 
-Gesturable
-==========
-
 ```html
 <div id="rotate-area">
   <div id="angle-info">0&deg;</div>

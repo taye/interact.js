@@ -2,10 +2,10 @@
 title: "AutoStart (manualStart: false)"
 ---
 
-The <router-link to="/docs/#installation">pre-bundled</router-link> package
-includes the `auto-start` plugin which will start interactions when the pointer
-goes down and then moves on enabled target elements. You can disable this for an
-action by setting the `manualStart` option to `true`.
+The [pre-bundled](/docs/installation) package includes the `auto-start` plugin
+which will start interactions when the pointer goes down and then moves on
+enabled target elements. You can disable this for an action by setting the
+`manualStart` option to `true`.
 
 ```js
 interact(target)

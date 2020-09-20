@@ -2,9 +2,6 @@
 title: Action Options
 ---
 
-Drag, Resize and Gesture Actions
-================================
-
 The `Interactable` methods `draggable()`, `resizable()` and `gesturable()` are
 used to enable and configure actions for target elements. They all have some
 common options as well as some action-specific options and event properties.
@@ -25,51 +22,43 @@ following properties common to all action types:
 | `timeStamp`             | The time of creation of the event object          |
 
 Common Action Options
-=====================
+---------------------
 
 The Interactable methods `draggable`, `resizable` and `gesturable` take either
 `true` or `false` to simply allow/disallow the action or an object with
 properties to change certain settings.
 
-`max`
------
+### `max`
 
 `max` is used to limit the number of concurrent interactions that can target an
 interactable. By default, any number of interactions can target an
 interactable.
 
-`maxPerElement`
----------------
+### `maxPerElement`
 
 By default only 1 interaction can target the same interactable+element
 combination. If you want to allow multiple interactions on the same target
 element, set the `maxPerElement` property of your object to a value `>= 2`.
 
-`manualStart`
--------------
+### `manualStart`
 
 If this is changed to `true` then drag, resize and gesture actions will have to
 be started with a call to [`Interaction#start`][interaction-start] as the usual
-`down`, `move`, `<action>start`... sequence will not start an action.
+`down`, `move`, `<action>start`... sequence will not start an action. See
+[auto-start](/docs/auto-start).
 
-See <router-link to="/docs/auto-start">auto-start</router-link>.
-
-`hold`
-------
+### `hold`
 
 The action will start after the pointer is held down for the given number of milliseconds.
 
-`inertia`
----------
+### `inertia`
 
-Change inertia settings for drag, and resize. See [docs/inertia](<%= url_for '/docs/inertia' %>).
+Change inertia settings for drag, and resize. See [docs/inertia](/docs/inertia).
 
-`styleCursor`
--------------
+### `styleCursor`
 
-If the <router-link to="/docs/auto-start">auto-start</router-link> feature is
-enabled, interact will style the cursor of draggable and resizable elements as
-you hover over them.
+If the [auto-start](/docs/auto-start) feature is enabled, interact will style
+the cursor of draggable and resizable elements as you hover over them.
 
 ```js
 interact(target).styleCursor(false)
@@ -77,8 +66,7 @@ interact(target).styleCursor(false)
 
 To disable this for all actions, set the `styleCursor` option to `false`
 
-`cursorChecker`
----------------
+### `cursorChecker`
 
 ```js
 interact(target)
@@ -105,8 +93,7 @@ cursor for each action, you can set a `cursorChecker` function which takes info
 about the current interaction and returns the CSS cursor value to set on the
 target element.
 
-`autoScroll`
-------------
+### `autoScroll`
 
 ```javascript
 interact(element)
@@ -127,8 +114,7 @@ interact(element)
 Scroll a container (`window` or an HTMLElement) when a drag or resize move
 happens at the edge of the container.
 
-`allowFrom` (handle)
---------------------
+### `allowFrom` (handle)
 
 ```html
 <div class="movable-box">
@@ -162,8 +148,7 @@ The `allowFrom` elements <strong>must</strong> be children of the target
 interactable element.
 </aside>
 
-`ignoreFrom`
-------------
+### `ignoreFrom`
 
 ```html
 <div id="movable-box">
@@ -196,8 +181,7 @@ dragging around a text/contentEditable, by wrapping this object with a
 draggable element and ignoring the editable content you maintain the ability to
 highlight text without moving the element.
 
-`enabled`
----------
+### `enabled`
 
 Enable the action for the Interactable. If the options object has no `enabled`
 property or the property value is `true` then the action is enabled. If
