@@ -7,5 +7,9 @@
   },
   "publishConfig": {
     "access": "public"
-  }
+  },
+  "sideEffects": [
+    "**/index.js",
+    "**/index.prod.js"
+  ]
 }

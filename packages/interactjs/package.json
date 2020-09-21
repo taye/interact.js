@@ -1,12 +1,9 @@
 {
   "name": "interactjs",
   "version": "1.9.22",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/taye/interact.js.git"
-  },
   "main": "dist/interact.min.js",
   "typings": "index.d.ts",
+  "license": "MIT",
   "description": "Drag and drop, resizing and multi-touch gestures with inertia and snapping for modern browsers (and also IE9+)",
   "homepage": "https://interactjs.io",
   "authors": [
@@ -16,6 +13,10 @@
       "url": "https://taye.me"
     }
   ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/taye/interact.js.git"
+  },
   "keywords": [
     "interact.js",
     "draggable",
@@ -37,8 +38,11 @@
   "scripts": {
     "test": "cd ../; npm test"
   },
-  "license": "MIT",
   "dependencies": {
     "@interactjs/types": "1.9.22"
-  }
+  },
+  "sideEffects": [
+    "**/index.js",
+    "**/index.prod.js"
+  ]
 }

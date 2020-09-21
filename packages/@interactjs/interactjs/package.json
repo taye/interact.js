@@ -1,11 +1,11 @@
 {
   "name": "@interactjs/interactjs",
   "version": "1.9.22",
+  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/taye/interact.js.git"
   },
-  "license": "MIT",
   "dependencies": {
     "@interactjs/actions": "1.9.22",
     "@interactjs/arrange": "1.9.22",
@@ -28,5 +28,6 @@
   },
   "publishConfig": {
     "access": "public"
-  }
+  },
+  "sideEffects": false
 }
