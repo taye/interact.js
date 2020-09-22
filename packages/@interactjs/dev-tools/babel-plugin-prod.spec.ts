@@ -1,23 +1,23 @@
 /* global process */
-import path from 'path'
-
 import * as babel from '@babel/core'
+import proposalExportDefaultFrom from '@babel/plugin-proposal-export-default-from'
 
 import test from '@interactjs/_dev/test/test'
 
-import BabelPluginProd, { fixImportSource } from './babel-plugin-prod.js'
+import babelPluginProd, { fixImportSource } from './babel-plugin-prod.js'
 
 test('@dev-tools/prod/babel-plugin-prod', t => {
-  const cwd = process.cwd()
+  const filename = require.resolve('@interactjs/_dev/test/fixtures/babelPluginProject/index.js')
 
   const cases = [
-    { module: 'path', expected: 'path', message: 'non @interact/* package unchanged' },
-    { module: 'interact', expected: 'interact', message: 'unscioped interact import unchanged' },
-    { module: '@interactjs/NONEXISTENT_PACKAGE', expected: '@interactjs/NONEXISTENT_PACKAGE', message: 'import of missing package unchanged' },
-    { module: '@interactjs/actions/NONEXISTENT_MODULE', expected: '@interactjs/actions/NONEXISTENT_MODULE', message: 'import of missing module unchanged' },
-    { module: '@interactjs/interact', expected: '@interactjs/interact/index.prod', message: 'package main' },
-    { module: '@interactjs/actions/drag', expected: '@interactjs/actions/drag/index.prod', message: 'plugin index module' },
-    { module: '@interactjs/utils/extend', expected: '@interactjs/utils/extend.prod', message: 'non index package' },
+    { module: 'x', expected: 'x', message: 'non @interact/* package unchanged' },
+    { module: 'interact', expected: 'interact', message: 'unscoped interact import unchanged' },
+    { module: '@interactjs/NONEXISTENT_PACKAGE', expected: '@interactjs/NONEXISTENT_PACKAGE', message: 'missing package unchanged' },
+    { module: '@interactjs/a/NONEXISTENT_MODULE', expected: '@interactjs/a/NONEXISTENT_MODULE', message: 'import of missing module unchanged' },
+    { module: '@interactjs/a', expected: '@interactjs/a/package-main-file.prod', message: 'package main module' },
+    { module: '@interactjs/a/a', expected: '@interactjs/a/a.prod', message: 'package root-level non index module' },
+    { module: '@interactjs/a/b', expected: '@interactjs/a/b/index.prod', message: 'nested index module' },
+    { module: '@interactjs/a/b/b', expected: '@interactjs/a/b/b.prod', message: 'package nested non index module' },
   ]
 
   for (const { module, expected, message } of cases) {
@@ -25,7 +25,7 @@ test('@dev-tools/prod/babel-plugin-prod', t => {
 
     fixImportSource(
       { node: { source } },
-      { filename: path.join(cwd) },
+      { filename },
     )
 
     t.equal(source.value, expected, message)
@@ -34,19 +34,21 @@ test('@dev-tools/prod/babel-plugin-prod', t => {
   t.equal(
     babel.transform(
       [
-        'import "@interactjs/actions";',
-        'import interact from "@interactjs/interact";',
-        'export { default as interact } from "@interactjs/interact";',
-        'export * from "@interactjs/actions";',
+        'import "@interactjs/a/a";',
+        'import a, { b } from "@interactjs/a/a";',
+        'export b from "@interactjs/a/a";',
+        'export * from "@interactjs/a/a";',
       ].join('\n'),
-      { plugins: [BabelPluginProd] },
+      { babelrc: false, plugins: [babelPluginProd, proposalExportDefaultFrom], filename },
     ).code,
     [
-      'import "@interactjs/actions/index.prod";',
-      'import interact from "@interactjs/interact/index.prod";',
-      'export { default as interact } from "@interactjs/interact/index.prod";',
-      'export * from "@interactjs/actions/index.prod";',
+      'import "@interactjs/a/a.prod";',
+      'import a, { b } from "@interactjs/a/a.prod";',
+      'import _b from "@interactjs/a/a.prod";',
+      'export { _b as b };',
+      'export * from "@interactjs/a/a.prod";',
     ].join('\n'),
-    'transforms code when used in babel config')
+    'transforms code when used in babel config',
+  )
   t.end()
 })

@@ -17,4 +17,5 @@ packages/**/*.js
 packages/**/*.js.map
 !packages/@interactjs/dev-tools/babel-plugin-prod.js
 **/node_modules
+!test/fixtures/**/node_modules
 **/lerna-debug.log

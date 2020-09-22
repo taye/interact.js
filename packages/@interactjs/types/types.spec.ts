@@ -22,7 +22,7 @@ test('typings', async t => {
       shell.exec(`_types ${modulesDir}`)
       shell.cp('packages/interactjs/{*.d.ts,package.json}', interactDir)
       shell.cp('packages/@interactjs/types/{*.d.ts,package.json}', tempTypesDir)
-      shell.cp('-R', path.join(process.cwd(), 'test', 'testProject', '*'), tempDir)
+      shell.cp('-R', path.join(process.cwd(), 'test', 'fixtures', 'dependentTsProject', '*'), tempDir)
       shell.exec('tsc -b', { cwd: tempDir })
 
       const error = shell.error()

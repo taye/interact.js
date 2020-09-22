@@ -35,6 +35,7 @@ function babelPluginInteractjsProd () {
       ImportDeclaration: fixImportSource,
       ExportNamedDeclaration: fixImportSource,
       ExportAllDeclaration: fixImportSource,
+      ExportDefaultSpecifier: fixImportSource,
     },
   }
 }

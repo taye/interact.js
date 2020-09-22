@@ -20,6 +20,9 @@ rules:
 overrides:
   -
     files: '**/*.spec.ts'
+    env:
+      browser: true
+      node: true
     rules:
       no-restricted-syntax: off
       no-console: 0
