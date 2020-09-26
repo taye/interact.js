@@ -47,20 +47,15 @@ function install (scope: Interact.Scope) {
   }
 
   /**
-   * ```js
-   * interact(element, { ignoreFrom: document.getElementById('no-action') })
-   * // or
-   * interact(element).ignoreFrom('input, textarea, a')
-   * ```
-   * @deprecated
    * If the target of the `mousedown`, `pointerdown` or `touchstart` event or any
    * of it's parents match the given CSS selector or Element, no
    * drag/resize/gesture is started.
    *
+   * @deprecated
    * Don't use this method. Instead set the `ignoreFrom` option for each action
    * or for `pointerEvents`
    *
-   * @example
+   * ```js
    * interact(targett)
    *   .draggable({
    *     ignoreFrom: 'input, textarea, a[href]'',
@@ -68,6 +63,7 @@ function install (scope: Interact.Scope) {
    *   .pointerEvents({
    *     ignoreFrom: '[no-pointer]',
    *   })
+   * ```
    *
    * @param {string | Element | null} [newValue] a CSS selector string, an
    * Element or `null` to not ignore any elements
@@ -79,22 +75,23 @@ function install (scope: Interact.Scope) {
   }, 'Interactable.ignoreFrom() has been deprecated. Use Interactble.draggable({ignoreFrom: newValue}).')
 
   /**
-   * @deprecated
    *
    * A drag/resize/gesture is started only If the target of the `mousedown`,
    * `pointerdown` or `touchstart` event or any of it's parents match the given
    * CSS selector or Element.
    *
+   * @deprecated
    * Don't use this method. Instead set the `allowFrom` option for each action
    * or for `pointerEvents`
    *
-   * @example
+   * ```js
    * interact(targett)
    *   .resizable({
    *     allowFrom: '.resize-handle',
    *   .pointerEvents({
    *     allowFrom: '.handle',,
    *   })
+   * ```
    *
    * @param {string | Element | null} [newValue] a CSS selector string, an
    * Element or `null` to allow from any element
@@ -112,17 +109,17 @@ function install (scope: Interact.Scope) {
    *   .draggable(true)
    *   .actionChecker(function (pointer, event, action, interactable, element, interaction) {
    *
-   *   if (interact.matchesSelector(event.target, '.drag-handle')) {
-   *     // force drag with handle target
-   *     action.name = drag
-   *   }
-   *   else {
-   *     // resize from the top and right edges
-   *     action.name  = 'resize'
-   *     action.edges = { top: true, right: true }
-   *   }
+   *     if (interact.matchesSelector(event.target, '.drag-handle')) {
+   *       // force drag with handle target
+   *       action.name = drag
+   *     }
+   *     else {
+   *       // resize from the top and right edges
+   *       action.name  = 'resize'
+   *       action.edges = { top: true, right: true }
+   *     }
    *
-   *   return action
+   *     return action
    * })
    * ```
    *

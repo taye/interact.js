@@ -2,10 +2,10 @@
  * @module modifiers/snapEdges
  *
  * @description
- * This module allows snapping of the edges of targets during resize
+ * WOW> This module allows snapping of the edges of targets during resize
  * interactions.
  *
- * @example
+ * ```js
  * interact(target).resizable({
  *   snapEdges: {
  *     targets: [interact.snappers.grid({ x: 100, y: 50 })],
@@ -24,6 +24,7 @@
  *     ],
  *   },
  * })
+ * ```
  */
 
 import clone from '@interactjs/utils/clone'

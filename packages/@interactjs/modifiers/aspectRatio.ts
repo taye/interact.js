@@ -4,7 +4,7 @@
  * @description
  * This module forces elements to be resized with a specified dx/dy ratio.
  *
- * @example
+ * ```js
  * interact(target).resizable({
  *   modifiers: [
  *     interact.modifiers.snapSize({
@@ -13,6 +13,7 @@
  *     interact.aspectRatio({ ratio: 'preserve' }),
  *   ],
  * });
+ * ```
  */
 
 import * as Interact from '@interactjs/types/index'

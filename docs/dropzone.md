@@ -70,13 +70,15 @@ dragged element can be dropped into a dropzone.
 
 ```javascript
 interact(target).dropzone({
-  checker: function (dragEvent,         // related dragmove or dragend
-                     event,             // Touch, Pointer or Mouse Event
-                     dropped,           // bool default checker result
-                     dropzone,          // dropzone Interactable
-                     dropElement,       // dropzone element
-                     draggable,         // draggable Interactable
-                     draggableElement) {// draggable element
+  checker: function (
+    dragEvent,         // related dragmove or dragend
+    event,             // Touch, Pointer or Mouse Event
+    dropped,           // bool default checker result
+    dropzone,          // dropzone Interactable
+    dropzoneElement,   // dropzone element
+    draggable,         // draggable Interactable
+    draggableElement   // draggable element
+  ) {
 
     // only allow drops into empty dropzone elements
     return dropped && !dropElement.hasChildNodes();
