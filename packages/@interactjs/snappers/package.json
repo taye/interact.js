@@ -1,9 +1,9 @@
 {
   "name": "@interactjs/snappers",
-  "version": "1.9.22",
+  "version": "1.10.0",
   "license": "MIT",
   "peerDependencies": {
-    "@interactjs/utils": "1.9.22"
+    "@interactjs/utils": "1.10.0"
   },
   "publishConfig": {
     "access": "public"
