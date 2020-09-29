@@ -144,8 +144,8 @@ This option available for drag, resize and gesture, as well as `pointerEvents`
 for each action separately and for all your pointerEvents listeners.
 
 <aside class="notice">
-The `allowFrom` elements <strong>must</strong> be children of the target
-interactable element.
+The <code>allowFrom</code> elements <strong>must</strong> be children of the
+target interactable element.
 </aside>
 
 ### `ignoreFrom`

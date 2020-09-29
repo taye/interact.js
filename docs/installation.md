@@ -65,14 +65,11 @@ $ npm install --save @interactjs/interact \
 ```
 
 ```js
-// vendors.js
 import '@interactjs/auto-start'
 import '@interactjs/actions/drag'
 import '@interactjs/actions/resize'
 import '@interactjs/modifiers'
 import '@interactjs/dev-tools'
-
-// component.js
 import interact from '@interactjs/interact'
 
 interact('.item').draggable({
@@ -96,7 +93,7 @@ each feature you need:
 | `@interactjs/snappers`                  | Provides `interact.snappers.grid()` utility            |
 | [`@interactjs/inertia`](inertia)        | Drag and resize inertia-like throwing                  |
 | [`@interactjs/reflow`](reflow)          | `interactable.reflow(action)` method to trigger modifiers and event listeners |
-| `@interactjs/dev-tools`                 | Console warnings for common mistakes (optimized out when `NODE_ENV === 'production'`) |
+| `@interactjs/dev-tools`                 | Console warnings for common mistakes (optimized out when `NODE_ENV === 'production'`) and a babel plugin for [optimized production builds](/docs/tooling) |
 
 ### CDN streamlined
 
