@@ -1,3 +1,4 @@
+import type { ActionDefaults } from '@interactjs/core/defaultOptions'
 import * as Interact from '@interactjs/types/index'
 import * as arr from '@interactjs/utils/arr'
 import extend from '@interactjs/utils/extend'
@@ -11,14 +12,10 @@ import { Interactable } from './Interactable'
 import { PointerInfo } from './PointerInfo'
 import { ActionName } from './scope'
 
-export interface ActionProps<T extends ActionName = Interact.ActionName> {
+export interface ActionProps<T extends ActionName = never> {
   name: T
   axis?: 'x' | 'y' | 'xy'
   edges?: Interact.EdgeOptions
-}
-
-export interface StartAction extends ActionProps {
-  name: ActionName
 }
 
 export enum _ProxyValues {
@@ -44,7 +41,7 @@ export type PointerArgProps<T extends {} = {}> = {
   eventTarget: Node
   pointerIndex: number
   pointerInfo: PointerInfo
-  interaction: Interaction
+  interaction: Interaction<never>
 } & T
 
 export interface DoPhaseArg<T extends ActionName, P extends EventPhase> {
@@ -60,7 +57,7 @@ export type DoAnyPhaseArg = DoPhaseArg<ActionName, EventPhase>
 
 declare module '@interactjs/core/scope' {
   interface SignalArgs {
-    'interactions:new': { interaction: Interaction }
+    'interactions:new': { interaction: Interaction<ActionName> }
     'interactions:down': PointerArgProps<{
       type: 'down'
     }>
@@ -225,7 +222,7 @@ export class Interaction<T extends ActionName = ActionName> {
       pointerIndex,
       pointerInfo,
       type: 'down',
-      interaction: this,
+      interaction: this as unknown as Interact.Interaction<never>,
     })
   }
 
@@ -260,11 +257,11 @@ export class Interaction<T extends ActionName = ActionName> {
    * @param {Element} element The DOM Element to target
    * @return {Boolean} Whether the interaction was successfully started
    */
-  start (action: StartAction, interactable: Interactable, element: Interact.Element): boolean {
+  start<A extends ActionName> (action: ActionProps<A>, interactable: Interactable, element: Interact.Element): boolean {
     if (this.interacting() ||
         !this.pointerIsDown ||
         this.pointers.length < (action.name === 'gesture' ? 2 : 1) ||
-        !interactable.options[action.name].enabled) {
+        !interactable.options[action.name as keyof ActionDefaults].enabled) {
       return false
     }
 
@@ -318,7 +315,7 @@ export class Interaction<T extends ActionName = ActionName> {
       dx,
       dy,
       duplicate: duplicateMove,
-      interaction: this,
+      interaction: this as unknown as Interact.Interaction<never>,
     }
 
     if (!duplicateMove) {
@@ -394,7 +391,7 @@ export class Interaction<T extends ActionName = ActionName> {
       eventTarget,
       type: type as any,
       curEventTarget,
-      interaction: this,
+      interaction: this as unknown as Interact.Interaction<never>,
     })
 
     if (!this.simulation) {
@@ -530,7 +527,7 @@ export class Interaction<T extends ActionName = ActionName> {
       down,
       pointerInfo,
       pointerIndex,
-      interaction: this,
+      interaction: this as unknown as Interact.Interaction<never>,
     })
 
     return pointerIndex
@@ -549,7 +546,7 @@ export class Interaction<T extends ActionName = ActionName> {
       eventTarget: null,
       pointerIndex,
       pointerInfo,
-      interaction: this,
+      interaction: this as unknown as Interact.Interaction<never>,
     })
 
     this.pointers.splice(pointerIndex, 1)

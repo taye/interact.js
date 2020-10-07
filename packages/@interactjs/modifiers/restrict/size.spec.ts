@@ -20,7 +20,7 @@ test('restrictSize', t => {
     move,
   } = helpers.testEnv({ plugins: [modifiersBase, resize], rect })
   const edges = { left: true, top: true }
-  const action = { name: 'resize', edges }
+  const action: any = { name: 'resize', edges }
   const options = {
     min: { width:  60, height:  50 } as any,
     max: { width: 300, height: 350 } as any,

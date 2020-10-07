@@ -3,10 +3,7 @@ import * as arr from '@interactjs/utils/arr'
 import extend from '@interactjs/utils/extend'
 import normalize, { NormalizedListeners } from '@interactjs/utils/normalizeListeners'
 
-function fireUntilImmediateStopped<
-  T extends Interact.ActionName,
-  P extends Interact.EventPhase,
-> (event: Interact.InteractEvent<T, P>, listeners: Interact.Listener[]) {
+function fireUntilImmediateStopped (event: any, listeners: Interact.Listener[]) {
   for (const listener of listeners) {
     if (event.immediatePropagationStopped) { break }
 
@@ -25,7 +22,7 @@ export class Eventable {
     this.options = extend({}, options || {})
   }
 
-  fire (event: any) {
+  fire<T extends { type: string, propagationStopped?: boolean }> (event: T) {
     let listeners: Interact.Listener[]
     const global = this.global
 

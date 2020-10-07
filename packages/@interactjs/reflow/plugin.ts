@@ -18,7 +18,7 @@ declare module '@interactjs/core/scope' {
 
 declare module '@interactjs/core/Interactable' {
   interface Interactable {
-    reflow: (action: ActionProps) => ReturnType<typeof reflow>
+    reflow: <T extends Interact.ActionName>(action: ActionProps<T>) => ReturnType<typeof reflow>
   }
 }
 

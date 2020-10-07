@@ -20,7 +20,7 @@ test('PointerEvent constructor', t => {
   } as any
   const { interaction } = helpers.testEnv()
   const eventTarget = {} as Interact.Element
-  const pointerEvent = new PointerEvent(type, pointer, event, eventTarget, interaction, 0) as any
+  const pointerEvent = new PointerEvent(type, pointer, event, eventTarget, interaction as any, 0) as any
 
   t.equal(pointerEvent.testPointerProp, testPointerProp,
     'pointerEvent is extended form pointer')

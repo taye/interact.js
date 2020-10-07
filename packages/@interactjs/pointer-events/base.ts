@@ -55,7 +55,7 @@ declare module '@interactjs/core/scope' {
   interface SignalArgs {
     'pointerEvents:new': { pointerEvent: PointerEvent<any> }
     'pointerEvents:fired': {
-      interaction: Interaction
+      interaction: Interaction<never>
       pointer: Interact.PointerType | PointerEvent<any>
       event: Interact.PointerEventType | PointerEvent<any>
       eventTarget: Node
@@ -64,7 +64,7 @@ declare module '@interactjs/core/scope' {
       type: string
     }
     'pointerEvents:collect-targets': {
-      interaction: Interaction
+      interaction: Interaction<never>
       pointer: Interact.PointerType | PointerEvent<any>
       event: Interact.PointerEventType | PointerEvent<any>
       eventTarget: Node
@@ -125,7 +125,7 @@ function fire<T extends string> (
     pointer: Interact.PointerType | PointerEvent<any>
     event: Interact.PointerEventType | PointerEvent<any>
     eventTarget: Node
-    interaction: Interaction
+    interaction: Interaction<never>
     type: T
     targets?: EventTargetList
   },
@@ -201,7 +201,7 @@ function fire<T extends string> (
 }
 
 function collectEventTargets<T extends string> ({ interaction, pointer, event, eventTarget, type }: {
-  interaction: Interaction
+  interaction: Interaction<never>
   pointer: Interact.PointerType | PointerEvent<any>
   event: Interact.PointerEventType | PointerEvent<any>
   eventTarget: Node

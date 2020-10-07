@@ -1,13 +1,11 @@
 module.exports = {
   presets: [
-    ...process.env.NODE_ENV === 'test'
-      ? []
-      : [require('@babel/preset-env').default],
+    process.env.NODE_ENV !== 'test' && [require('@babel/preset-env').default, { loose: true }],
     [require('@babel/preset-typescript').default, {
       allExtensions: true,
       isTSX: true,
     }],
-  ],
+  ].filter(Boolean),
 
   plugins:
     process.env.NODE_ENV === 'production'
@@ -18,6 +16,7 @@ module.exports = {
           noInterop: true,
         }],
         require('@babel/plugin-proposal-optional-catch-binding').default,
+        [require('@babel/plugin-proposal-optional-chaining').default],
         [require('@babel/plugin-transform-runtime').default, {
           helpers: false,
           regenerator: false,

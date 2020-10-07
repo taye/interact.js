@@ -37,15 +37,13 @@ interface DocSignalArg {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
-export interface ActionMap { // tslint:disable-line no-empty-interface
-}
-
+export interface ActionMap {}
 export type ActionName = keyof ActionMap
 
 export interface Actions {
   map: ActionMap
   phases: PhaseMap
-  methodDict: { [P in ActionName]?: string }
+  methodDict: { [P in ActionName]?: keyof Interact.Interactable }
   phaselessTypes: { [type: string]: true }
 }
 

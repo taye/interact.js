@@ -286,7 +286,7 @@ export class Interactable implements Partial<Eventable> {
    * Interactable
    * @return {Interactable} this Interactable
    */
-  fire (iEvent: { type: string, [index: string]: any }) {
+  fire<E extends { type: string }> (iEvent: E) {
     this.events.fire(iEvent)
 
     return this
@@ -373,7 +373,7 @@ export class Interactable implements Partial<Eventable> {
       this.options[actionName] = {}
       this.setPerAction(actionName, extend(extend({}, defaults.perAction), defaults.actions[actionName]))
 
-      ;(this as unknown as Interactable & { [key: string]: Interact.ActionMethod<unknown> })[methodName](options[actionName])
+      ;(this[methodName] as Interact.ActionMethod<unknown>)(options[actionName])
     }
 
     for (const setting in options) {

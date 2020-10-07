@@ -106,7 +106,7 @@ export function testEnv<T extends Interact.Target = HTMLElement> ({
     (target as unknown as HTMLElement) = scope.document.body
   }
 
-  const interaction = scope.interactions.new({})
+  const interaction = scope.interactions.new<any | never>({})
   const interactable = scope.interactables.new(target)
   const coords: pointerUtils.MockCoords = pointerUtils.newCoords()
 

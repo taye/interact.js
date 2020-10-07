@@ -143,8 +143,8 @@ export function makeModifier<
 }
 
 export function addEventModifiers ({ iEvent, interaction: { modification: { result } } }: {
-  iEvent: Interact.InteractEvent<Interact.ActionName, Interact.EventPhase>
-  interaction: Interact.Interaction
+  iEvent: Interact.InteractEvent<any>
+  interaction: Interact.Interaction<any>
 }) {
   if (result) {
     iEvent.modifiers = result.eventProps

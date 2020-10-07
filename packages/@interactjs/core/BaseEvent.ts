@@ -1,6 +1,6 @@
 import * as Interact from '@interactjs/types/index'
 
-export class BaseEvent<T extends Interact.ActionName = any> {
+export class BaseEvent<T extends Interact.ActionName = never> {
   type: string
   target: EventTarget
   currentTarget: Node
@@ -10,7 +10,7 @@ export class BaseEvent<T extends Interact.ActionName = any> {
   immediatePropagationStopped = false
   propagationStopped = false
 
-  constructor (interaction: Interact.Interaction) {
+  constructor (interaction: Interact.Interaction<T>) {
     this._interaction = interaction
   }
 
@@ -33,7 +33,7 @@ export class BaseEvent<T extends Interact.ActionName = any> {
 
 // defined outside of class definition to avoid assignment of undefined during
 // construction
-export interface BaseEvent<T extends Interact.ActionName = any> {
+export interface BaseEvent<T extends Interact.ActionName> {
   interaction: Interact.InteractionProxy<T>
 }
 

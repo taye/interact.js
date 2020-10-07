@@ -66,7 +66,7 @@ declare module '@interactjs/core/interactStatic' {
 }
 
 interface DropSignalArg {
-  interaction: Interact.Interaction
+  interaction: Interact.Interaction<'drag'>
   dragEvent: Interact.DragEvent
 }
 

@@ -21,7 +21,7 @@ function beforeStart ({ interaction, eventTarget, dx, dy }: Interact.SignalArgs[
   // if the movement isn't in the startAxis of the interactable
   if (currentAxis !== 'xy' && startAxis !== 'xy' && startAxis !== currentAxis) {
     // cancel the prepared action
-    interaction.prepared.name = null
+    (interaction as Interact.Interaction<Interact.ActionName>).prepared.name = null
 
     // then try to get a drag from another ineractable
     let element = eventTarget as Interact.Element
@@ -50,7 +50,7 @@ function beforeStart ({ interaction, eventTarget, dx, dy }: Interact.SignalArgs[
       const interactable = scope.interactables.forEachMatch(element, getDraggable)
 
       if (interactable) {
-        interaction.prepared.name = 'drag'
+        (interaction as Interact.Interaction<Interact.ActionName>).prepared.name = 'drag'
         interaction.interactable = interactable
         interaction.element = element
         break

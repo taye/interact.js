@@ -70,7 +70,7 @@ export class InteractEvent<
 
   /** */
   constructor (
-    interaction: Interaction,
+    interaction: Interaction<T>,
     event: Interact.PointerEventType,
     actionName: T,
     phase: P,

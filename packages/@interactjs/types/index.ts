@@ -44,13 +44,13 @@ export type EventTarget = Window | Document | Element
 export type Target = EventTarget | string
 export type Plugin = scope.Plugin
 export type Actions = scope.Actions
-export type ActionProps<T extends scope.ActionName = any> = interaction.ActionProps<T>
+export type ActionProps<T extends scope.ActionName = ActionName> = interaction.ActionProps<T>
 export type Interactable = iable.Interactable
 /** @internal */ export type InteractableSet = iSet.InteractableSet
 export type Scope = scope.Scope
 /** @interanal */ export type InteractStatic = iStatic.InteractStatic
-export type Interaction<T extends scope.ActionName = any> = interaction.Interaction<T>
-export type InteractionProxy<T extends scope.ActionName = any> = interaction.InteractionProxy<T>
+export type Interaction<T extends scope.ActionName = ActionName> = interaction.Interaction<T>
+export type InteractionProxy<T extends scope.ActionName = ActionName> = interaction.InteractionProxy<T>
 export type PointerArgProps<T extends {} = {}> = interaction.PointerArgProps<T>
 export type InteractEvent<
   T extends keyof scope.ActionMap = never,
@@ -130,8 +130,8 @@ export interface EdgeOptions {
   right?: boolean | string | Element
 }
 
-export type CursorChecker<T extends ActionName = any> =
-  (action: ActionProps<T>, interactable: Interactable, element: Element, interacting: boolean) => string
+export type CursorChecker =
+  (action: ActionProps<ActionName>, interactable: Interactable, element: Element, interacting: boolean) => string
 
 export interface ActionMethod<T> {
   (this: Interactable): T

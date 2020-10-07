@@ -8,7 +8,7 @@
  * interact(target).resizable({
  *   modifiers: [
  *     interact.modifiers.snapSize({
- *       targets: [ interact.createSnapGrid({ x: 20, y: 20 }) ],
+ *       targets: [ interact.snappers.grid({ x: 20, y: 20 }) ],
  *     }),
  *     interact.aspectRatio({ ratio: 'preserve' }),
  *   ],

@@ -150,7 +150,7 @@ const autoScroll = {
   check (interactable: Interact.Interactable, actionName: Interact.ActionName) {
     const options = interactable.options
 
-    return options[actionName].autoScroll && options[actionName].autoScroll.enabled
+    return options[actionName].autoScroll?.enabled
   },
   onInteractionMove<T extends Interact.ActionName> ({ interaction, pointer }: { interaction: Interact.Interaction<T>, pointer: Interact.PointerType }) {
     if (!(interaction.interacting() &&

@@ -133,7 +133,7 @@ function startOnMove (arg: Interact.SignalArgs['interactions:move'], scope: Inte
   scope.fire('autoStart:before-start', arg)
 
   const { interactable } = interaction
-  const actionName = interaction.prepared.name
+  const actionName = (interaction as Interact.Interaction<Interact.ActionName>).prepared.name
 
   if (actionName && interactable) {
     // check manualStart and interaction limit
@@ -354,7 +354,7 @@ function setInteractionCursor<T extends Interact.ActionName> (interaction: Inter
   let cursor = ''
 
   if (prepared.name) {
-    const cursorChecker: Interact.CursorChecker = interactable.options[prepared.name].cursorChecker
+    const cursorChecker = interactable.options[prepared.name].cursorChecker
 
     if (is.func(cursorChecker)) {
       cursor = cursorChecker(prepared, interactable, element, interaction._interacting)

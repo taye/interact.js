@@ -3,7 +3,7 @@ import * as pointerUtils from '@interactjs/utils/pointerUtils'
 
 import { BaseEvent } from '../core/BaseEvent'
 
-export default class PointerEvent<T extends string = any> extends BaseEvent {
+export default class PointerEvent<T extends string = any> extends BaseEvent<never> {
   type: T
   originalEvent: Interact.PointerEventType
   pointerId: number
@@ -23,7 +23,7 @@ export default class PointerEvent<T extends string = any> extends BaseEvent {
     pointer: Interact.PointerType | PointerEvent<any>,
     event: Interact.PointerEventType,
     eventTarget: Node,
-    interaction: Interact.Interaction,
+    interaction: Interact.Interaction<never>,
     timeStamp: number,
   ) {
     super(interaction)
