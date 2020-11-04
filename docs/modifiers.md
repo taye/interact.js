@@ -42,4 +42,4 @@ with an action that has `inertia` enabled, the event coordinates will be
 smoothly moved from the up coords to the modified coords.
 
 interact.js comes with a vew different types of modifiers for
-[snapping](../snapping) and [restricting](../restriction) elements.
+[snapping](/docs/snapping) and [restricting](/docs/restriction) elements.
