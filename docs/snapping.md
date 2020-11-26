@@ -108,7 +108,7 @@ interact(target).resizable({
     interact.modifiers.snapSize({
       targets: [
         { width: 100 },
-        interact.createSnapGrid({ width: 100, height: 100 })
+        interact.snappers.grid({ width: 100, height: 100 })
       ]
     })
   ]
@@ -130,7 +130,7 @@ interact(target).resizable({
   modifiers: [
     interact.modifiers.snapEdges({
       targets: [
-        interact.createSnapGrid({ top: 100, left: 100 })
+        interact.snappers.grid({ top: 100, left: 100 })
       ]
     })
   ]
@@ -181,7 +181,7 @@ then the snapped movement will be horizontal at `(100, pointerEventPageX)`.
 ### Snap grids
 
 ```javascript
-var gridTarget = interact.createSnapGrid({
+var gridTarget = interact.snappers.grid({
   // can be a pair of x and y, left and top,
   // right and bottom, or width, and height
   x: 50,
@@ -209,7 +209,7 @@ interact(element).draggable({
 })
 ```
 
-You can use the `interact.createSnapGrid()` method to create a target that snaps
+You can use the `interact.snappers.grid()` method to create a target that snaps
 to a grid. The method takes an object describing a grid and returns a function
 that snaps to the corners of that grid.
 

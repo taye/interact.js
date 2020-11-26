@@ -92,4 +92,4 @@ import interact from '@interactjs/interact/index.prod'
 
 If you're not using babel, then you'll need to change your imports to include
 the `.prod` extension. For index files of directories you'll need to add the
-filename (eg. `@interact/actions -> @interactjs/actions/index.prod`).
+filename (eg. `@interactjs/actions -> @interactjs/actions/index.prod`).

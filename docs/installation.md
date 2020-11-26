@@ -2,14 +2,14 @@
 title: Installation
 ---
 
-interact.js offers two sets of packages that you can add to your project:
+interact.js offers two sets of free packages that you can add to your project:
 
  1. To get started quickly, you can use the package named `interactjs` on npm.
- This package contains all the features of the library already pre-bundled.
-  2. If you'd like to keep your JS payload small, there are npm packages under
- the `@interactjs/` scope which let you choose which features to include. These
- packages are distributed as ES6 modules and may need to be transpiled for older
- browsers.
+    This package contains all the features of the library already pre-bundled.
+ 2. If you'd like to keep your JS payload small, there are npm packages under
+    the `@interactjs/` scope which let you choose which features to include.
+    These packages are distributed as ES6 modules and may need to be transpiled
+    for older browsers.
 
 ### npm pre-bundled
 
@@ -93,7 +93,7 @@ each feature you need:
 | `@interactjs/snappers`                  | Provides `interact.snappers.grid()` utility            |
 | [`@interactjs/inertia`](inertia)        | Drag and resize inertia-like throwing                  |
 | [`@interactjs/reflow`](reflow)          | `interactable.reflow(action)` method to trigger modifiers and event listeners |
-| `@interactjs/dev-tools`                 | Console warnings for common mistakes (optimized out when `NODE_ENV === 'production'`) and a babel plugin for [optimized production builds](/docs/tooling) |
+| [`@interactjs/dev-tools`](tooling#interactjsdev-tools) | Console warnings for common mistakes (optimized out when `NODE_ENV === 'production'`) and a babel plugin for optimized production builds |
 
 ### CDN streamlined
 

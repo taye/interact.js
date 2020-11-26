@@ -61,7 +61,7 @@ interact(target).resize({
   // sizes at fixed grid points
   snapSize: {
     targets: [
-      interact.createSnapGrid({ x: 25, y: 25, range: Infinity })
+      interact.snappers.grid({ x: 25, y: 25, range: Infinity })
     ]
   },
 

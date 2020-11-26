@@ -143,10 +143,8 @@ This option available for drag, resize and gesture, as well as `pointerEvents`
 (down, move, hold, etc.). Using the `allowFrom` option, you may specify handles
 for each action separately and for all your pointerEvents listeners.
 
-<aside class="notice">
-The <code>allowFrom</code> elements <strong>must</strong> be children of the
-target interactable element.
-</aside>
+The `allowFrom` elements **must** be children of the target interactable
+element. {.notice .info}
 
 ### `ignoreFrom`
 

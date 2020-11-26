@@ -21,7 +21,7 @@ const snapGrid = {
   range: 10,
   offset: { x: 0, y: 0 },
 }
-const gridFunc = interact.createSnapGrid(snapGrid)
+const gridFunc = interact.snappers.grid(snapGrid)
 const anchors = [
   { x: 100, y: 100, range: 200 },
   { x: 600, y: 400, range: Infinity },

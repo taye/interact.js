@@ -5,9 +5,26 @@ title: Events
 InteractEvents
 --------------
 
+<LiveDemo :demoHtml="require('@/demos/events/actions.html')" :removeNext="3"/>
+
+```html
+<div>Drag, resize, or perform a multi-touch gesture</div>
+```
+
+```css
+.target {
+  display: inline-block;
+  min-height: 3rem;
+  background-color: #29e;
+  color: white;
+  padding: 1rem;
+  border-radius: 0.75rem;
+}
+```
+
 ``` javascript
 function listener (event) {
-  console.log(event.type, event.pageX, event.pageY)
+  event.target.textContent = `${event.type} at ${event.pageX}, ${event.pageY}`
 }
 
 interact(target)
@@ -40,12 +57,9 @@ interact(target).resizable({
  - Resizable: `resizestart`, `resizemove`, `resizeinertiastart`, `resizeend`
  - Gesturable: `gesturestart`, `gesturemove`, `gestureend`
 
-To respond to `InteractEvent`s, you must add listeners for the event types either
-directly on an interactable or globally for all events of those types on the
-`interact` object.
-
-The event object that was created is passed to these functions as the first and
-only parameter.
+To respond to `InteractEvent`s, you must add listeners for the event types on an
+interactable that's configured for that action. The event object that was
+created is passed to these functions as the first and only parameter.
 
 `InteractEvent` properties include the usual properties of mouse/touch events
 such as `pageX/Y`, `clientX/Y`, modifier keys etc. but also some properties
@@ -154,12 +168,10 @@ events roughly as the real `PointerEvent` interface does, specifically:
  - `event.pointerType` provides the pointer type
  - There are no simulated mouse events after touch events
 
-<aside class="notice">
-  The properties of the events may vary across browsers and devices depending on
-  which event interfaces are supported. For Example, a <code>down</code> event
-  from a <code>touchstart</code> will not provide tilt or pressure as specified
-  in the <code>PointerEvent</code> interface.
-</aside>
+The properties of the events may vary across browsers and devices depending on
+which event interfaces are supported. For Example, a `down` event from a
+`touchstart` will not provide tilt or pressure as specified in the
+`PointerEvent` interface. {.notice .info}
 
 ### Configuring pointer events
 

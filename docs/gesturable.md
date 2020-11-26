@@ -51,8 +51,6 @@ the following properties:
 | `ds`                    | The change in scale since the previous event      |
 | `box`                   | A box enclosing all touch points                  |
 
-<aside class="notice">
 Remember to use CSS `touch-action: none` to prevent the browser from panning
 when the user drags with a touch pointer, and `user-select: none` to disable
-text selection.
-</aside>
+text selection. {.notice .info}

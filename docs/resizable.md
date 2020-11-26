@@ -28,11 +28,7 @@ Resize events have `rect` and `deltaRect` properties. `rect` is updated on each
 Resizable options have an `edges` property which specifies the edges of the
 element which can be resized from (top, left, bottom or right).
 
-<aside class="notice">
-Remember to use CSS `touch-action: none` to prevent the browser from panning
-when the user drags with a touch pointer, and `user-select: none` to disable
-text selection.
-</aside>
+<LiveDemo :demoHtml="require('@/demos/resizable/basic.html')" :removeNext="2" />
 
 ```html
 <div data-x=0 data-y=0 class="resizable">
@@ -43,31 +39,34 @@ text selection.
   <div class="resize-bottom resize-right"></div>
 </div>
 ```
+
 ```js
 interact('.resizable')
   .resizable({
-    edges: {
-      top   : '.resize-top',
-      left  : '.resize-left',
-      bottom: '.resize-bottom',
-      right : '.resize-right'
-    },
-  })
-  .on('resizemove', event => {
-    let { x, y } = event.target.dataset
+    edges: { top: true, left: true, bottom: true, right: true },
+    listeners: {
+      move (event) {
+        let { x, y } = event.target.dataset
 
-    x = parseFloat(x) || 0
-    y = parseFloat(y) || 0
+        x = (parseFloat(x) || 0) + event.deltaRect.left
+        y = (parseFloat(y) || 0) + event.deltaRect.top
 
-    Object.assign(event.target.style, {
-      width: `${event.rect.width}px`,
-      height: `${event.rect.height}px`,
-      transform: `translate(${event.deltaRect.left}px, ${event.deltaRect.top}px)`
-    })
+        Object.assign(event.target.style, {
+          width: `${event.rect.width}px`,
+          height: `${event.rect.height}px`,
+          transform: `translate(${x}px, ${y}px)`
+        })
 
-    Object.assign(event.target.dataset, { x, y })
+        Object.assign(event.target.dataset, { x, y })
+      }
+    }
   })
 ```
+
+Remember to use CSS `touch-action: none` to prevent the browser from panning
+when the user drags with a touch pointer, `user-select: none` to disable
+text selection, and `box-sizing: border-box` if your elements have padding and
+borders which affect their width. {.notice .info}
 
 If you'd like an element to behave as a resize corner, let it match the
 selectors of two adjacent edges.
@@ -93,6 +92,8 @@ to dimensions less than `0x0`. The possible values are:
  - `'negate'` will allow the rect to have negative width/height
  - `'reposition'` will keep the width/height positive by swapping the top and
  bottom edges and/or swapping the left and right edges
+
+<LiveDemo :demoHtml="require('@/demos/resizable/invert.html')" />
 
 ### Aspect ratio
 
@@ -124,24 +125,4 @@ To guarantee that the aspect ratio options are respected by other modifiers,
 those modifiers must be in the `aspectRatio.modifiers` array option, **not** in the
 same `resize.modifiers` array as the `aspectRatio` one.
 
-[Demo on Codepen][resize-codepen]
-
-### `cursorChecker`
-
-```javascript
-interact(target).resizable({
-  edges: { bottom: true, right: true },
-  cursorChecker: (action, interactable, element, interacting) => {
-    if (action.edges.bottom && action.edges.right) {
-      return 'sw-resize'
-    }
-    // etc.
-  }
-})
-```
-
-You can tell interact.js which cursor to set on the target with a
-`cursorChecker` function.
-
 [interaction-start]: http://interactjs.io/api/#Interaction.start
-[resize-codepen]: http://codepen.io/taye/pen/LEpmOL
