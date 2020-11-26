@@ -41,7 +41,7 @@ declare module '@interactjs/core/defaultOptions' {
 
     // only allow left button by default
     // see https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/buttons#Return_value
-    mouseButtons?: 0 | 1 | 2 | 4 | 16
+    mouseButtons?: 0 | 1 | 2 | 4 | 8 | 16
   }
 }
 
