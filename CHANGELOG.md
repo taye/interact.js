@@ -1,3 +1,8 @@
+## v1.10.1
+
+ - fixed mouseButtons option typings (#865)
+ - removed plugin index module warnings
+
 ## v1.10.0
 
  - changed production files extension from '.min.js' to '.prod.js' (#857)
