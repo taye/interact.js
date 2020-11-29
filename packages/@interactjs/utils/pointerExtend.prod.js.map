@@ -1,0 +1,23 @@
+{
+	"version": 3,
+	"sources": [
+		"pointerExtend.ts"
+	],
+	"names": [
+		"pointerExtend",
+		"dest",
+		"source",
+		"prop",
+		"prefixedPropREs",
+		"deprecated",
+		"vendor",
+		"indexOf",
+		"test",
+		"webkit",
+		"moz"
+	],
+	"mappings": "AAAA,SAASA,EAAkBC,EAAkBC,GAC3C,IAAK,MAAMC,KAAQD,EAAQ,CACzB,MAAME,EAAkBJ,EAAcI,gBACtC,IAAIC,GAAa,EAGjB,IAAK,MAAMC,KAAUF,EACnB,GAA6B,IAAzBD,EAAKI,QAAQD,IAAiBF,EAAgBE,GAAQE,KAAKL,GAAO,CACpEE,GAAa,EACb,MAICA,GAAsC,mBAAjBH,EAAOC,KAC/BF,EAAKE,GAAQD,EAAOC,IAGxB,OAAOF,EAGTD,EAAcI,gBAAkB,CAC9BK,OAAQ,iDACRC,IAAK,8BAGQV",
+	"sourcesContent": [
+		"function pointerExtend<T> (dest: Partial<T>, source: T) {\n  for (const prop in source) {\n    const prefixedPropREs = pointerExtend.prefixedPropREs\n    let deprecated = false\n\n    // skip deprecated prefixed properties\n    for (const vendor in prefixedPropREs) {\n      if (prop.indexOf(vendor) === 0 && prefixedPropREs[vendor].test(prop)) {\n        deprecated = true\n        break\n      }\n    }\n\n    if (!deprecated && typeof source[prop] !== 'function') {\n      dest[prop] = source[prop]\n    }\n  }\n  return dest\n}\n\npointerExtend.prefixedPropREs = {\n  webkit: /(Movement[XY]|Radius[XY]|RotationAngle|Force)$/,\n  moz: /(Pressure)$/,\n} as { [prefix: string]: RegExp }\n\nexport default pointerExtend\n"
+	]
+}
