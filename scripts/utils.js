@@ -61,6 +61,8 @@ function getBabelOptions () {
     ],
     plugins: [
       [require('@babel/plugin-proposal-class-properties'), { loose: true }],
+      [require('@babel/plugin-proposal-optional-chaining').default, { loose: true }],
+      require('@babel/plugin-proposal-optional-catch-binding').default,
     ],
   }
 }

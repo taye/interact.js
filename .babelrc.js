@@ -16,7 +16,7 @@ module.exports = {
           noInterop: true,
         }],
         require('@babel/plugin-proposal-optional-catch-binding').default,
-        [require('@babel/plugin-proposal-optional-chaining').default],
+        [require('@babel/plugin-proposal-optional-chaining').default, { loose: true }],
         [require('@babel/plugin-transform-runtime').default, {
           helpers: false,
           regenerator: false,
