@@ -111,11 +111,12 @@ export function createInteractStatic (scope: Interact.Scope): Interact.InteractS
    *
    * @alias module:interact.isSet
    *
-   * @param {Element} element The Element being searched for
+   * @param {Interact.Target} target The Element or string being searched for
+   * @param {object} options
    * @return {boolean} Indicates if the element or CSS selector was previously
    * passed to interact
    */
-  interact.isSet = function (target, options) {
+  interact.isSet = function (target: Interact.Target, options?: { context?: Interact.Context }): boolean {
     return !!this.scope.interactables.get(target, options && options.context)
   }
 
