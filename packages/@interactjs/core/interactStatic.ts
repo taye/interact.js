@@ -5,6 +5,8 @@ import * as domUtils from '@interactjs/utils/domUtils'
 import is from '@interactjs/utils/is'
 import * as pointerUtils from '@interactjs/utils/pointerUtils'
 
+import { warnOnce } from '../utils/misc'
+
 import { Interactable } from './Interactable'
 import { Options } from './defaultOptions'
 import isNonNativeEvent from './isNonNativeEvent'
@@ -121,6 +123,7 @@ export function createInteractStatic (scope: Interact.Scope): Interact.InteractS
   }
 
   /**
+   * @deprecated
    * Add a global listener for an InteractEvent or adds a DOM event to `document`
    *
    * @alias module:interact.on
@@ -131,7 +134,7 @@ export function createInteractStatic (scope: Interact.Scope): Interact.InteractS
    * addEventListener
    * @return {object} interact
    */
-  interact.on = function (type: string | Interact.EventTypes, listener: Interact.ListenersArg, options?: object) {
+  interact.on = warnOnce(function on (type: string | Interact.EventTypes, listener: Interact.ListenersArg, options?: object) {
     if (is.string(type) && type.search(' ') !== -1) {
       type = type.trim().split(/ +/)
     }
@@ -168,9 +171,10 @@ export function createInteractStatic (scope: Interact.Scope): Interact.InteractS
     }
 
     return this
-  }
+  }, 'The interact.on() method is being deprecated')
 
   /**
+   * @deprecated
    * Removes a global InteractEvent listener or DOM event from `document`
    *
    * @alias module:interact.off
@@ -182,7 +186,7 @@ export function createInteractStatic (scope: Interact.Scope): Interact.InteractS
    * removeEventListener
    * @return {object} interact
    */
-  interact.off = function (type: Interact.EventTypes, listener: any, options?: object) {
+  interact.off = warnOnce(function off (type: Interact.EventTypes, listener: any, options?: object) {
     if (is.string(type) && type.search(' ') !== -1) {
       type = type.trim().split(/ +/)
     }
@@ -216,7 +220,7 @@ export function createInteractStatic (scope: Interact.Scope): Interact.InteractS
     }
 
     return this
-  }
+  }, 'The interact.off() method is being deprecated')
 
   interact.debug = function () {
     return this.scope
