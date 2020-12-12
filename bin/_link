@@ -1,5 +1,9 @@
 #!/bin/bash
 ROOT=$(dirname $(dirname $(readlink -f $0)))
+if [ -z "$ROOT" ]
+then
+    ROOT=$(dirname $(dirname $0))
+fi
 
 modules_scope_dir=node_modules/@interactjs
 modules_bin_dir=node_modules/.bin
