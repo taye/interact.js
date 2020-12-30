@@ -11,9 +11,7 @@ declare module '@interactjs/core/Interaction' {
     }
   }
 
-  // eslint-disable-next-line no-shadow
   enum _ProxyMethods {
-    // eslint-disable-next-line no-shadow
     offsetBy = ''
   }
 }

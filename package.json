@@ -8,15 +8,15 @@
   },
   "scripts": {
     "bootstrap": "yarn install --prefer-offline --pure-lockfile",
-    "start": "yarn esnext -- --serve",
+    "start": "yarn esnext --serve",
     "bundle": "NODE_ENV=production _bundle",
     "esnext": "_add_plugin_indexes && _esnext",
     "build": "yarn docs && yarn bundle && _add_plugin_indexes && _types && _esnext",
     "docs": "node jsdoc/index.js",
-    "lint": "_lint --fail-on-error",
+    "lint": "_lint",
     "test": "_test",
     "test:debug": "TEST_RUNNER=nodemon TEST_RUNNER_ARGS='-x node --inspect' yarn test",
-    "tsc_lint_test": "_add_plugin_indexes && tsc -b -f && _lint --fail-on-error && _test",
+    "tsc_lint_test": "_add_plugin_indexes && tsc -b -f && _lint && _test",
     "postinstall": "bin/_link"
   },
   "dependencies": {
@@ -49,14 +49,13 @@
     "del": "^5.1.0",
     "domator": "latest",
     "errorify": "latest",
-    "eslint": "6",
+    "eslint": "latest",
     "eslint-config-standard": "latest",
     "eslint-import-resolver-typescript": "latest",
     "eslint-plugin-import": "latest",
     "eslint-plugin-node": "latest",
     "eslint-plugin-promise": "latest",
     "eslint-plugin-require-path-exists": "latest",
-    "eslint-plugin-standard": "latest",
     "fs-extra": "latest",
     "glob": "latest",
     "husky": "latest",
@@ -64,8 +63,9 @@
     "jsdoc-babel": "latest",
     "jsdoc-stale": "github:taye/jsdoc-stale#master",
     "jsdom": "latest",
+    "lint-staged": "latest",
     "mkdirp": "latest",
-    "node-sass": "latest",
+    "node-sass": "4",
     "nodemon": "latest",
     "nyc": "latest",
     "p-queue": "latest",
@@ -85,8 +85,11 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "_lint --fail-on-error",
-      "pre-push": "yarn tsc_lint_test"
+      "pre-commit": "lint-staged",
+      "pre-push": "yarn tsc -b"
     }
+  },
+  "lint-staged": {
+    "**/*.(t|j)s?(x)": "yarn lint --fix"
   }
 }

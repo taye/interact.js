@@ -25,12 +25,11 @@ declare module '@interactjs/core/Interactable' {
 declare module '@interactjs/core/Interaction' {
   interface Interaction {
     _reflowPromise: Promise<void>
-    _reflowResolve: () => void
+    _reflowResolve: (...args: unknown[]) => void
   }
 }
 
 declare module '@interactjs/core/InteractEvent' {
-  // eslint-disable-next-line no-shadow
   interface PhaseMap {
     reflow?: true
   }
@@ -39,7 +38,6 @@ declare module '@interactjs/core/InteractEvent' {
 export function install (scope: Scope) {
   const {
     /** @lends Interactable */
-    // eslint-disable-next-line no-shadow
     Interactable,
   } = scope
 

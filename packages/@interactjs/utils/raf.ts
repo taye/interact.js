@@ -23,7 +23,7 @@ function init (window: Window) {
     request = callback => {
       const currTime = Date.now()
       const timeToCall = Math.max(0, 16 - (currTime - lastTime))
-      // eslint-disable-next-line standard/no-callback-literal
+      // eslint-disable-next-line node/no-callback-literal
       const token = window.setTimeout(() => { callback(currTime + timeToCall) },
         timeToCall)
 

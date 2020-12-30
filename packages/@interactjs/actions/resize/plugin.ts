@@ -247,6 +247,7 @@ function checkResizeEdge (
     : dom.matchesUpTo(element, value, interactableElement)
 }
 
+/* eslint-disable multiline-ternary */
 function initCursors (browser: typeof import ('@interactjs/utils/browser').default) {
   return (browser.isIe9 ? {
     x : 'e-resize',
@@ -276,6 +277,7 @@ function initCursors (browser: typeof import ('@interactjs/utils/browser').defau
     bottomleft : 'nesw-resize',
   })
 }
+/* eslint-enable multiline-ternary */
 
 function start ({ iEvent, interaction }: { iEvent: Interact.InteractEvent<any, any>, interaction: Interaction }) {
   if (interaction.prepared.name !== 'resize' || !interaction.prepared.edges) {
@@ -312,7 +314,6 @@ function move ({ iEvent, interaction }: { iEvent: Interact.InteractEvent<any, an
   const invert = resizeOptions.invert
   const invertible = invert === 'reposition' || invert === 'negate'
 
-  // eslint-disable-next-line no-shadow
   const current = interaction.rect
   const { start: startRect, corrected, delta: deltaRect, previous } = interaction._rects
 

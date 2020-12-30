@@ -5,14 +5,14 @@ const dirs = ['up', 'down', 'left', 'right']
 
 interact('#swipe')
   .draggable(true)
-  .on('dragend', (event) => {
+  .on('dragend', event => {
     if (!event.swipe) {
       return
     }
 
     let str = 'swipe'
 
-    _.forEach(dirs, (dir) => {
+    _.forEach(dirs, dir => {
       if (event.swipe[dir]) {
         str += ' ' + dir
       }

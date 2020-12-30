@@ -58,7 +58,7 @@ class Rectangle {
 interact('.edit-rectangle')
   // change how interact gets the
   // dimensions of '.edit-rectangle' elements
-  .rectChecker((element) => {
+  .rectChecker(element => {
     // find the Rectangle object that the element belongs to
     const { x, y, w, h } = rectangles[element.getAttribute('data-index')]
 
@@ -114,7 +114,7 @@ for (let i = 0; i < 5; i++) {
   svgCanvas.appendChild(r.el)
 }
 
-interact('#invert').on('input change', (event) => {
+interact('#invert').on('input change', event => {
   interact('.edit-rectangle').resizable({ invert: event.target.value })
   console.log(event.target.value)
 })

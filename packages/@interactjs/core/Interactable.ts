@@ -146,7 +146,7 @@ export class Interactable implements Partial<Eventable> {
       this.getRect = element => {
         const rect = extend({}, this._rectChecker(element))
 
-        if (!('width' in rect)) {
+        if (!('width' in rect as unknown)) {
           rect.width = rect.right - rect.left
           rect.height = rect.bottom - rect.top
         }

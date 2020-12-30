@@ -96,7 +96,7 @@ function install (scope: Interact.Scope) {
     /** @lends module:interact */
     interactStatic: interact,
     /** @lends Interactable */
-    Interactable, // eslint-disable-line no-shadow
+    Interactable,
     defaults,
   } = scope
 

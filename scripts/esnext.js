@@ -31,7 +31,7 @@ const OUTPUT_VERSIONS = [
     extension: '.prod.js',
     nodeEnv: 'production',
     async post (result) {
-      const { code, map, error } = minify(result)
+      const { code, map, error } = await minify(result)
 
       if (error) {
         throw error
@@ -141,7 +141,7 @@ async function generate ({
         const sourceCode = (await fs.readFile(sourceFilename)).toString()
         const ast = babel.parseSync(sourceCode, { ...babelOptions, filename: sourceFilename })
 
-        return Promise.all(OUTPUT_VERSIONS.map(async (version) => {
+        return Promise.all(OUTPUT_VERSIONS.map(async version => {
           const { extension, nodeEnv } = version
           const env = { NODE_ENV: nodeEnv, INTERACTJS_ESNEXT: true }
           const finalBabelOptions = extendBabelOptions({

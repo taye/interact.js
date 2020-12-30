@@ -13,7 +13,7 @@ declare module '@interactjs/core/scope' {
     Interaction: typeof InteractionBase
     interactions: {
       new: <T extends Interact.ActionName> (options: any) => InteractionBase<T>
-      list: Array<InteractionBase<ActionName>>
+      list: Array<InteractionBase<Interact.ActionName>>
       listeners: { [type: string]: Interact.Listener }
       docEvents: Array<{ type: string, listener: Interact.Listener }>
       pointerMoveTolerance: number

@@ -2,6 +2,8 @@
 
 const { existsSync } = require('fs')
 
+const yargs = require('yargs')
+
 const { lintSourcesGlob, lintIgnoreGlobs } = require('../scripts/utils')
 
 const jsExt = /\.js$/
@@ -18,9 +20,8 @@ function isNotGenerated (source) {
   return true
 }
 
-const argv = require('yargs')
+const argv = yargs
   .boolean('fix')
-  .boolean('failOnError')
   .argv
 
 function getSources () {
@@ -34,35 +35,31 @@ function getSources () {
   return sources.filter(source => isNotGenerated(source))
 }
 
-const CLIEngine = require('eslint').CLIEngine
+const { ESLint } = require(require.resolve('eslint', { basedir: process.cwd() }))
 
 console.log('Linting...')
 
-const cli = new CLIEngine({
+const eslint = new ESLint({
   fix: argv.fix,
   useEslintrc: true,
-  rules: {
-    'node/no-missing-import': 0,
-  },
+  // rules: { 'node/no-missing-import': 0, },
 })
 
 const sources = argv._.length ? argv._ : getSources()
-const report = cli.executeOnFiles(sources)
-const errors = CLIEngine.getErrorResults(report.results)
-const formatted = cli.getFormatter('stylish')(errors)
 
-if (errors.length) {
-  console.error(formatted)
+;(async () => {
+  const results = await eslint.lintFiles(sources)
+  const formatter = await eslint.loadFormatter('stylish')
 
-  if (argv.failOnError) {
-    // eslint-disable-next-line no-throw-literal
-    throw 'The lint errors above were found'
+  if (argv.fix) {
+    ESLint.outputFixes(results)
   }
-}
-else {
-  console.log(formatted)
-}
 
-if (argv.fix) {
-  CLIEngine.outputFixes(report)
-}
+  console.log(formatter.format(results))
+
+  const hasUnfixedError = results.some(r => r.errorCount > r.fixableErrorCount)
+
+  if (hasUnfixedError) {
+    process.exit(1)
+  }
+})()

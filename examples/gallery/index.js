@@ -64,12 +64,12 @@ interact('#gallery .stage')
     accept: ' #gallery .thumbnail',
     overlap: 1,
   })
-  .on('dragenter', (event) => {
+  .on('dragenter', event => {
     event.draggable.draggable({
       snap: { targets: [snapTarget] },
     })
   })
-  .on('dragleave drop', (event) => {
+  .on('dragleave drop', event => {
     event.draggable.draggable({
       snap: { targets: [] },
     })

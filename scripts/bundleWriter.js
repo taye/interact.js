@@ -8,7 +8,7 @@ const bundleHeader = require('./bundleHeader')
 const minify = require('./minify')
 const { transformInlineEnvironmentVariables } = require('./utils')
 
-module.exports = function bundleWriter (bundleCode, {
+module.exports = async function bundleWriter (bundleCode, {
   bundleStream,
   headerFile,
   minHeaderFile,
@@ -29,7 +29,7 @@ module.exports = function bundleWriter (bundleCode, {
 
   if (!writeMin) { return }
 
-  const minifiedResult = minify({ ...raw, env: { NODE_ENV: 'production' } })
+  const minifiedResult = await minify({ ...raw, env: { NODE_ENV: 'production' } })
   const headerOpts = getHeaderOpts(headers.min, filenames.min, minifiedResult.code, JSON.parse(minifiedResult.map))
   const min = bundleHeader(headerOpts)
 

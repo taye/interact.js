@@ -9,7 +9,6 @@ import { copyCoords } from '@interactjs/utils/pointerUtils'
 import raf from '@interactjs/utils/raf'
 
 declare module '@interactjs/core/InteractEvent' {
-  // eslint-disable-next-line no-shadow
   interface PhaseMap {
     resume?: true
     inertiastart?: true

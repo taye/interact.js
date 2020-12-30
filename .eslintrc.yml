@@ -14,7 +14,6 @@ parser: '@typescript-eslint/parser'
 parserOptions:
   sourceType: module
   ecmaVersion: 2018
-  project: './tsconfig.json'
 
 plugins:
   - '@typescript-eslint'
@@ -23,10 +22,12 @@ globals:
   globalThis: false
 
 rules:
+  arrow-parens: [error, 'as-needed']
   brace-style: off
   comma-dangle: [error, 'always-multiline']
   comma-style: [error, last]
   guard-for-in: off
+  indent: off
   key-spacing: off
   linebreak-style: [error, unix]
   lines-between-class-members: off
@@ -69,9 +70,11 @@ overrides:
   -
     files: '*.ts{,x}'
     rules:
-      arrow-parens: [error, 'as-needed']
+      no-redeclare: off
+      no-shadow: off
       no-unused-vars: off
       no-use-before-define: off
+      no-undef: off
   -
     files: '**/examples/**/*.js'
     rules:
@@ -80,4 +83,4 @@ overrides:
 settings:
   import/resolver:
     typescript:
-      directory: './tsconfig.json'
+      project: './tsconfig.json'
