@@ -1,3 +1,7 @@
+## v1.10.2
+
+ - marked interact.{on,off} methods as deprecated
+
 ## v1.10.1
 
  - fixed mouseButtons option typings (#865)
