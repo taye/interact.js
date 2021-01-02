@@ -1,0 +1,2 @@
+export default t=>{const o=[["x","y"],["left","top"],["right","bottom"],["width","height"]].filter((([o,r])=>o in t||r in t)),r=(r,n)=>{const{range:i,limits:e={left:-1/0,right:1/0,top:-1/0,bottom:1/0},offset:h={x:0,y:0}}=t,a={range:i,grid:t,x:null,y:null};for(const[i,l]of o){const o=Math.round((r-h.x)/t[i]),f=Math.round((n-h.y)/t[l]);a[i]=Math.max(e.left,Math.min(e.right,o*t[i]+h.x)),a[l]=Math.max(e.top,Math.min(e.bottom,f*t[l]+h.y))}return a};return r.grid=t,r.coordFields=o,r};
+//# sourceMappingURL=grid.prod.js.map

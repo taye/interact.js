@@ -1,0 +1,34 @@
+{
+	"version": 3,
+	"sources": [
+		"index.ts"
+	],
+	"names": [
+		"actions",
+		"arrange",
+		"autoScroll",
+		"autoStart",
+		"clone",
+		"interactablePreventDefault",
+		"devTools",
+		"feedback",
+		"inertia",
+		"interact",
+		"modifiers",
+		"multiTarget",
+		"offset",
+		"pointerEvents",
+		"reactComponents",
+		"reflow",
+		"vueComponents",
+		"use",
+		"module",
+		"exports",
+		"_unused",
+		"default"
+	],
+	"mappings": "OAAOA,MAAa,mCACbC,MAAa,mCACbC,MAAgB,uCAChBC,MAAe,sCACfC,MAAW,iCACXC,MAAgC,oDAChCC,MAAc,qCACdC,MAAc,oCACdC,MAAa,mCACbC,MAAc,mCACdC,MAAe,qCACfC,MAAiB,wCACjBC,MAAY,kCACZC,MAAmB,0CACnBC,MAAqB,iCACrBC,MAAY,kCACZC,MAAmB,wBAE1BP,EAASQ,IAAIN,GAEbF,EAASQ,IAAIZ,GAEbI,EAASQ,IAAIL,GAGbH,EAASQ,IAAIb,GAGbK,EAASQ,IAAIhB,GAGbQ,EAASQ,IAAIJ,GAGbJ,EAASQ,IAAIT,GAGbC,EAASQ,IAAIP,GAGbD,EAASQ,IAAId,GAGbM,EAASQ,IAAIjB,GAGbS,EAASQ,IAAIf,GAGbO,EAASQ,IAAIF,GAEbN,EAASQ,IAAIV,GAEbE,EAASQ,IAAID,GAEbP,EAASQ,IAAIH,kBAOEL,EAEf,GAAsB,iBAAXS,QAAyBA,OAClC,IAAMA,OAAOC,QAAUV,EACvB,MAAAW,IAGDX,EAAiBY,QAAUZ",
+	"sourcesContent": [
+		"import actions from '@interactjs/actions/plugin'\nimport arrange from '@interactjs/arrange/plugin'\nimport autoScroll from '@interactjs/auto-scroll/plugin'\nimport autoStart from '@interactjs/auto-start/plugin'\nimport clone from '@interactjs/clone/plugin'\nimport interactablePreventDefault from '@interactjs/core/interactablePreventDefault'\nimport devTools from '@interactjs/dev-tools/plugin'\nimport feedback from '@interactjs/feedback/plugin'\nimport inertia from '@interactjs/inertia/plugin'\nimport interact from '@interactjs/interact'\nimport modifiers from '@interactjs/modifiers/plugin'\nimport multiTarget from '@interactjs/multi-target/plugin'\nimport offset from '@interactjs/offset/plugin'\nimport pointerEvents from '@interactjs/pointer-events/plugin'\nimport reactComponents from '@interactjs/react/plugin'\nimport reflow from '@interactjs/reflow/plugin'\nimport vueComponents from '@interactjs/vue/plugin'\n\ninteract.use(multiTarget)\n\ninteract.use(interactablePreventDefault)\n\ninteract.use(offset)\n\n// interaction element cloning\ninteract.use(clone)\n\n// sortable and swappable\ninteract.use(arrange)\n\n// pointerEvents\ninteract.use(pointerEvents)\n\n// inertia\ninteract.use(inertia)\n\n// snap, resize, etc.\ninteract.use(modifiers)\n\n// autoStart, hold\ninteract.use(autoStart)\n\n// drag and drop, resize, gesture\ninteract.use(actions)\n\n// autoScroll\ninteract.use(autoScroll)\n\n// reflow\ninteract.use(reflow)\n\ninteract.use(feedback)\n\ninteract.use(vueComponents)\n\ninteract.use(reactComponents)\n\n// eslint-disable-next-line no-undef\nif (process.env.NODE_ENV !== 'production') {\n  interact.use(devTools)\n}\n\nexport default interact\n\nif (typeof module === 'object' && !!module) {\n  try { module.exports = interact }\n  catch {}\n}\n\n(interact as any).default = interact\n"
+	]
+}

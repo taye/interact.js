@@ -1,0 +1,52 @@
+{
+	"version": 3,
+	"sources": [
+		"pointer.ts"
+	],
+	"names": [
+		"extend",
+		"is",
+		"rectUtils",
+		"makeModifier",
+		"start",
+		"rect",
+		"startOffset",
+		"state",
+		"interaction",
+		"pageCoords",
+		"options",
+		"elementRect",
+		"offset",
+		"left",
+		"top",
+		"right",
+		"bottom",
+		"restriction",
+		"getRestrictionRect",
+		"widthDiff",
+		"width",
+		"heightDiff",
+		"height",
+		"set",
+		"coords",
+		"xywhToTlbr",
+		"x",
+		"Math",
+		"max",
+		"min",
+		"y",
+		"value",
+		"func",
+		"resolveRectLike",
+		"interactable",
+		"element",
+		"defaults",
+		"endOnly",
+		"enabled",
+		"restrict"
+	],
+	"mappings": "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",
+	"sourcesContent": [
+		"import Interaction from '@interactjs/core/Interaction'\nimport { RectResolvable, Rect, Point } from '@interactjs/types/index'\nimport extend from '@interactjs/utils/extend'\nimport is from '@interactjs/utils/is'\nimport * as rectUtils from '@interactjs/utils/rect'\n\nimport { makeModifier, ModifierArg, ModifierModule, ModifierState } from '../base'\n\nexport interface RestrictOptions {\n  // where to drag over\n  restriction: RectResolvable<[number, number, Interaction]>\n  // what part of self is allowed to drag over\n  elementRect: Rect\n  offset: Rect\n  // restrict just before the end drag\n  endOnly: boolean\n  enabled?: boolean\n}\n\nexport type RestrictState = ModifierState<RestrictOptions, {\n  offset: Rect\n}>\n\nfunction start ({ rect, startOffset, state, interaction, pageCoords }: ModifierArg<RestrictState>) {\n  const { options } = state\n  const { elementRect } = options\n  const offset: Rect = extend({\n    left: 0,\n    top: 0,\n    right: 0,\n    bottom: 0,\n  }, options.offset || {})\n\n  if (rect && elementRect) {\n    const restriction = getRestrictionRect(options.restriction, interaction, pageCoords)\n\n    if (restriction) {\n      const widthDiff = (restriction.right - restriction.left) - rect.width\n      const heightDiff = (restriction.bottom - restriction.top) - rect.height\n\n      if (widthDiff < 0) {\n        offset.left += widthDiff\n        offset.right += widthDiff\n      }\n      if (heightDiff < 0) {\n        offset.top += heightDiff\n        offset.bottom += heightDiff\n      }\n    }\n\n    offset.left += startOffset.left - (rect.width  * elementRect.left)\n    offset.top  += startOffset.top  - (rect.height * elementRect.top)\n\n    offset.right  += startOffset.right  - (rect.width  * (1 - elementRect.right))\n    offset.bottom += startOffset.bottom - (rect.height * (1 - elementRect.bottom))\n  }\n\n  state.offset = offset\n}\n\nfunction set ({ coords, interaction, state }: ModifierArg<RestrictState>) {\n  const { options, offset } = state\n\n  const restriction = getRestrictionRect(options.restriction, interaction, coords)\n\n  if (!restriction) { return }\n\n  const rect = rectUtils.xywhToTlbr(restriction)\n\n  coords.x = Math.max(Math.min(rect.right  - offset.right, coords.x), rect.left + offset.left)\n  coords.y = Math.max(Math.min(rect.bottom - offset.bottom, coords.y), rect.top  + offset.top)\n}\n\nexport function getRestrictionRect (\n  value: RectResolvable<[number, number, Interaction]>,\n  interaction: Interaction,\n  coords?: Point,\n) {\n  if (is.func(value)) {\n    return rectUtils.resolveRectLike(value, interaction.interactable, interaction.element, [coords.x, coords.y, interaction])\n  } else {\n    return rectUtils.resolveRectLike(value, interaction.interactable, interaction.element)\n  }\n}\n\nconst defaults: RestrictOptions = {\n  restriction: null,\n  elementRect: null,\n  offset: null,\n  endOnly: false,\n  enabled: false,\n}\n\nconst restrict: ModifierModule<RestrictOptions, RestrictState> = {\n  start,\n  set,\n  defaults,\n}\n\nexport default makeModifier(restrict, 'restrict')\nexport { restrict }\n"
+	]
+}

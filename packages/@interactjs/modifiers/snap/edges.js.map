@@ -1,0 +1,31 @@
+{
+	"version": 3,
+	"sources": [
+		"edges.ts"
+	],
+	"names": [
+		"clone",
+		"extend",
+		"makeModifier",
+		"snapSize",
+		"start",
+		"arg",
+		"edges",
+		"state",
+		"targetFields",
+		"left",
+		"top",
+		"snapEdges",
+		"set",
+		"defaults",
+		"targets",
+		"range",
+		"offset",
+		"x",
+		"y"
+	],
+	"mappings": "AAAA;AACA;AACA;AACA;AACA;AACA;AACA;AACA;AACA;AACA;AACA;AACA;AACA;AACA;AACA;AACA;AACA;AACA;AACA;AACA;AACA;AACA;AACA;AACA;AACA;AACA;AACA;AACA;AAEA,OAAOA,KAAP,MAAkB,sBAAlB;AACA,OAAOC,MAAP,MAAmB,uBAAnB;AAEA,SAASC,YAAT,QAA0D,YAA1D;AAGA,SAASC,QAAT,QAAyB,WAAzB;;AAIA,SAASC,KAAT,CAAgBC,GAAhB,EAA6C;AAC3C,QAAM;AAAEC,IAAAA;AAAF,MAAYD,GAAlB;;AAEA,MAAI,CAACC,KAAL,EAAY;AAAE,WAAO,IAAP;AAAa;;AAE3BD,EAAAA,GAAG,CAACE,KAAJ,CAAUC,YAAV,GAAyBH,GAAG,CAACE,KAAJ,CAAUC,YAAV,IAA0B,CACjD,CAACF,KAAK,CAACG,IAAN,GAAa,MAAb,GAAsB,OAAvB,EAAgCH,KAAK,CAACI,GAAN,GAAY,KAAZ,GAAoB,QAApD,CADiD,CAAnD;AAIA,SAAOP,QAAQ,CAACC,KAAT,CAAeC,GAAf,CAAP;AACD;;AAED,MAAMM,SAAsD,GAAG;AAC7DP,EAAAA,KAD6D;AAE7DQ,EAAAA,GAAG,EAAET,QAAQ,CAACS,GAF+C;AAG7DC,EAAAA,QAAQ,EAAEZ,MAAM,CACdD,KAAK,CAACG,QAAQ,CAACU,QAAV,CADS,EAEd;AACEC,IAAAA,OAAO,EAAE,IADX;AAEEC,IAAAA,KAAK,EAAE,IAFT;AAGEC,IAAAA,MAAM,EAAE;AAAEC,MAAAA,CAAC,EAAE,CAAL;AAAQC,MAAAA,CAAC,EAAE;AAAX;AAHV,GAFc;AAH6C,CAA/D;AAaA,eAAehB,YAAY,CAACS,SAAD,EAAY,WAAZ,CAA3B;AACA,SAASA,SAAT",
+	"sourcesContent": [
+		"/**\n * @module modifiers/snapEdges\n *\n * @description\n * WOW> This module allows snapping of the edges of targets during resize\n * interactions.\n *\n * ```js\n * interact(target).resizable({\n *   snapEdges: {\n *     targets: [interact.snappers.grid({ x: 100, y: 50 })],\n *   },\n * })\n *\n * interact(target).resizable({\n *   snapEdges: {\n *     targets: [\n *       interact.snappers.grid({\n *        top: 50,\n *        left: 50,\n *        bottom: 100,\n *        right: 100,\n *       }),\n *     ],\n *   },\n * })\n * ```\n */\n\nimport clone from '@interactjs/utils/clone'\nimport extend from '@interactjs/utils/extend'\n\nimport { makeModifier, ModifierArg, ModifierModule } from '../base'\n\nimport { SnapOptions, SnapState } from './pointer'\nimport { snapSize } from './size'\n\nexport type SnapEdgesOptions = Pick<SnapOptions, 'targets' | 'range' | 'offset' | 'endOnly' | 'enabled'>\n\nfunction start (arg: ModifierArg<SnapState>) {\n  const { edges } = arg\n\n  if (!edges) { return null }\n\n  arg.state.targetFields = arg.state.targetFields || [\n    [edges.left ? 'left' : 'right', edges.top ? 'top' : 'bottom'],\n  ]\n\n  return snapSize.start(arg)\n}\n\nconst snapEdges: ModifierModule<SnapEdgesOptions, SnapState> = {\n  start,\n  set: snapSize.set,\n  defaults: extend(\n    clone(snapSize.defaults),\n    {\n      targets: null,\n      range: null,\n      offset: { x: 0, y: 0 },\n    } as const,\n  ),\n}\n\nexport default makeModifier(snapEdges, 'snapEdges')\nexport { snapEdges }\n"
+	]
+}

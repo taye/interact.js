@@ -1,0 +1,33 @@
+{
+	"version": 3,
+	"sources": [
+		"index.ts"
+	],
+	"names": [
+		"actions",
+		"arrange",
+		"autoScroll",
+		"autoStart",
+		"clone",
+		"interactablePreventDefault",
+		"devTools",
+		"feedback",
+		"inertia",
+		"interact",
+		"modifiers",
+		"multiTarget",
+		"offset",
+		"pointerEvents",
+		"reactComponents",
+		"reflow",
+		"vueComponents",
+		"use",
+		"module",
+		"exports",
+		"default"
+	],
+	"mappings": "AAAA,OAAOA,OAAP,MAAoB,sBAApB;AACA,OAAOC,OAAP,MAAoB,sBAApB;AACA,OAAOC,UAAP,MAAuB,0BAAvB;AACA,OAAOC,SAAP,MAAsB,yBAAtB;AACA,OAAOC,KAAP,MAAkB,oBAAlB;AACA,OAAOC,0BAAP,MAAuC,uCAAvC;AACA,OAAOC,QAAP,MAAqB,wBAArB;AACA,OAAOC,QAAP,MAAqB,uBAArB;AACA,OAAOC,OAAP,MAAoB,sBAApB;AACA,OAAOC,QAAP,MAAqB,sBAArB;AACA,OAAOC,SAAP,MAAsB,wBAAtB;AACA,OAAOC,WAAP,MAAwB,2BAAxB;AACA,OAAOC,MAAP,MAAmB,qBAAnB;AACA,OAAOC,aAAP,MAA0B,6BAA1B;AACA,OAAOC,eAAP,MAA4B,oBAA5B;AACA,OAAOC,MAAP,MAAmB,qBAAnB;AACA,OAAOC,aAAP,MAA0B,kBAA1B;AAEAP,QAAQ,CAACQ,GAAT,CAAaN,WAAb;AAEAF,QAAQ,CAACQ,GAAT,CAAaZ,0BAAb;AAEAI,QAAQ,CAACQ,GAAT,CAAaL,MAAb,E,CAEA;;AACAH,QAAQ,CAACQ,GAAT,CAAab,KAAb,E,CAEA;;AACAK,QAAQ,CAACQ,GAAT,CAAahB,OAAb,E,CAEA;;AACAQ,QAAQ,CAACQ,GAAT,CAAaJ,aAAb,E,CAEA;;AACAJ,QAAQ,CAACQ,GAAT,CAAaT,OAAb,E,CAEA;;AACAC,QAAQ,CAACQ,GAAT,CAAaP,SAAb,E,CAEA;;AACAD,QAAQ,CAACQ,GAAT,CAAad,SAAb,E,CAEA;;AACAM,QAAQ,CAACQ,GAAT,CAAajB,OAAb,E,CAEA;;AACAS,QAAQ,CAACQ,GAAT,CAAaf,UAAb,E,CAEA;;AACAO,QAAQ,CAACQ,GAAT,CAAaF,MAAb;AAEAN,QAAQ,CAACQ,GAAT,CAAaV,QAAb;AAEAE,QAAQ,CAACQ,GAAT,CAAaD,aAAb;AAEAP,QAAQ,CAACQ,GAAT,CAAaH,eAAb,E,CAEA;;AACA,IAAI,kBAAyB,YAA7B,EAA2C;AACzCL,EAAAA,QAAQ,CAACQ,GAAT,CAAaX,QAAb;AACD;;AAED,eAAeG,QAAf;;AAEA,IAAI,OAAOS,MAAP,KAAkB,QAAlB,IAA8B,CAAC,CAACA,MAApC,EAA4C;AAC1C,MAAI;AAAEA,IAAAA,MAAM,CAACC,OAAP,GAAiBV,QAAjB;AAA2B,GAAjC,CACA,gBAAM,CAAE;AACT;;AAEAA,QAAD,CAAkBW,OAAlB,GAA4BX,QAA5B",
+	"sourcesContent": [
+		"import actions from '@interactjs/actions/plugin'\nimport arrange from '@interactjs/arrange/plugin'\nimport autoScroll from '@interactjs/auto-scroll/plugin'\nimport autoStart from '@interactjs/auto-start/plugin'\nimport clone from '@interactjs/clone/plugin'\nimport interactablePreventDefault from '@interactjs/core/interactablePreventDefault'\nimport devTools from '@interactjs/dev-tools/plugin'\nimport feedback from '@interactjs/feedback/plugin'\nimport inertia from '@interactjs/inertia/plugin'\nimport interact from '@interactjs/interact'\nimport modifiers from '@interactjs/modifiers/plugin'\nimport multiTarget from '@interactjs/multi-target/plugin'\nimport offset from '@interactjs/offset/plugin'\nimport pointerEvents from '@interactjs/pointer-events/plugin'\nimport reactComponents from '@interactjs/react/plugin'\nimport reflow from '@interactjs/reflow/plugin'\nimport vueComponents from '@interactjs/vue/plugin'\n\ninteract.use(multiTarget)\n\ninteract.use(interactablePreventDefault)\n\ninteract.use(offset)\n\n// interaction element cloning\ninteract.use(clone)\n\n// sortable and swappable\ninteract.use(arrange)\n\n// pointerEvents\ninteract.use(pointerEvents)\n\n// inertia\ninteract.use(inertia)\n\n// snap, resize, etc.\ninteract.use(modifiers)\n\n// autoStart, hold\ninteract.use(autoStart)\n\n// drag and drop, resize, gesture\ninteract.use(actions)\n\n// autoScroll\ninteract.use(autoScroll)\n\n// reflow\ninteract.use(reflow)\n\ninteract.use(feedback)\n\ninteract.use(vueComponents)\n\ninteract.use(reactComponents)\n\n// eslint-disable-next-line no-undef\nif (process.env.NODE_ENV !== 'production') {\n  interact.use(devTools)\n}\n\nexport default interact\n\nif (typeof module === 'object' && !!module) {\n  try { module.exports = interact }\n  catch {}\n}\n\n(interact as any).default = interact\n"
+	]
+}
