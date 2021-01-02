@@ -1,4 +1,6 @@
-import * as Interact from '@interactjs/types/index'
+import { Interactable } from '@interactjs/core/Interactable'
+import { Scope, Plugin } from '@interactjs/core/scope'
+import { Element } from '@interactjs/types'
 import extend from '@interactjs/utils/extend'
 
 declare module '@interactjs/core/Interactable' {
@@ -8,7 +10,7 @@ declare module '@interactjs/core/Interactable' {
   }
 }
 
-function install (scope: Interact.Scope) {
+function install (scope: Scope) {
   const { Interactable } = scope
 
   Interactable.prototype.pointerEvents = pointerEventsMethod
@@ -26,13 +28,13 @@ function install (scope: Interact.Scope) {
   }
 }
 
-function pointerEventsMethod (this: Interact.Interactable, options: any) {
+function pointerEventsMethod (this: Interactable, options: any) {
   extend(this.events.options, options)
 
   return this
 }
 
-const plugin: Interact.Plugin = {
+const plugin: Plugin = {
   id: 'pointer-events/interactableTargets',
   install,
   listeners: {
@@ -42,7 +44,7 @@ const plugin: Interact.Plugin = {
       type,
       eventTarget,
     }, scope) => {
-      scope.interactables.forEachMatch(node, (interactable: Interact.Interactable) => {
+      scope.interactables.forEachMatch(node, (interactable: Interactable) => {
         const eventable = interactable.events
         const options = eventable.options
 
@@ -60,7 +62,7 @@ const plugin: Interact.Plugin = {
     },
 
     'interactable:new': ({ interactable }) => {
-      interactable.events.getRect = function (element: Interact.Element) {
+      interactable.events.getRect = function (element: Element) {
         return interactable.getRect(element)
       }
     },

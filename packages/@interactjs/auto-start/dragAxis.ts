@@ -1,10 +1,13 @@
-import * as Interact from '@interactjs/types/index'
+import { Interactable } from '@interactjs/core/Interactable'
+import Interaction from '@interactjs/core/Interaction'
+import { SignalArgs, Scope, ActionName } from '@interactjs/core/scope'
+import { Element } from '@interactjs/types'
 import { parentNode } from '@interactjs/utils/domUtils'
 import is from '@interactjs/utils/is'
 
 import autoStart from './base'
 
-function beforeStart ({ interaction, eventTarget, dx, dy }: Interact.SignalArgs['interactions:move'], scope: Interact.Scope) {
+function beforeStart ({ interaction, eventTarget, dx, dy }: SignalArgs['interactions:move'], scope: Scope) {
   if (interaction.prepared.name !== 'drag') { return }
 
   // check if a drag is in the correct axis
@@ -21,12 +24,12 @@ function beforeStart ({ interaction, eventTarget, dx, dy }: Interact.SignalArgs[
   // if the movement isn't in the startAxis of the interactable
   if (currentAxis !== 'xy' && startAxis !== 'xy' && startAxis !== currentAxis) {
     // cancel the prepared action
-    (interaction as Interact.Interaction<Interact.ActionName>).prepared.name = null
+    (interaction as Interaction<ActionName>).prepared.name = null
 
     // then try to get a drag from another ineractable
-    let element = eventTarget as Interact.Element
+    let element = eventTarget as Element
 
-    const getDraggable = function (interactable: Interact.Interactable): Interact.Interactable | void {
+    const getDraggable = function (interactable: Interactable): Interactable | void {
       if (interactable === interaction.interactable) { return }
 
       const options = interaction.interactable.options.drag
@@ -50,18 +53,18 @@ function beforeStart ({ interaction, eventTarget, dx, dy }: Interact.SignalArgs[
       const interactable = scope.interactables.forEachMatch(element, getDraggable)
 
       if (interactable) {
-        (interaction as Interact.Interaction<Interact.ActionName>).prepared.name = 'drag'
+        (interaction as Interaction<ActionName>).prepared.name = 'drag'
         interaction.interactable = interactable
         interaction.element = element
         break
       }
 
-      element = parentNode(element) as Interact.Element
+      element = parentNode(element) as Element
     }
   }
 }
 
-function checkStartAxis (startAxis: string, interactable: Interact.Interactable) {
+function checkStartAxis (startAxis: string, interactable: Interactable) {
   if (!interactable) { return false }
 
   const thisAxis = interactable.options.drag.startAxis

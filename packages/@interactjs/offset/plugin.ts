@@ -1,13 +1,14 @@
-import { _ProxyMethods } from '@interactjs/core/Interaction'
-import * as Interact from '@interactjs/types/index'
+import Interaction, { _ProxyMethods } from '@interactjs/core/Interaction'
+import { Plugin } from '@interactjs/core/scope'
+import { Point } from '@interactjs/types'
 import * as rectUtils from '@interactjs/utils/rect'
 
 declare module '@interactjs/core/Interaction' {
   interface Interaction {
     offsetBy?: typeof offsetBy
     offset: {
-      total: Interact.Point
-      pending: Interact.Point
+      total: Point
+      pending: Point
     }
   }
 
@@ -18,7 +19,7 @@ declare module '@interactjs/core/Interaction' {
 
 (_ProxyMethods as any).offsetBy = ''
 
-export function addTotal (interaction: Interact.Interaction) {
+export function addTotal (interaction: Interaction) {
   if (!interaction.pointerIsDown) { return }
 
   addToCoords(interaction.coords.cur, interaction.offset.total)
@@ -27,11 +28,11 @@ export function addTotal (interaction: Interact.Interaction) {
   interaction.offset.pending.y = 0
 }
 
-function beforeAction ({ interaction }: { interaction: Interact.Interaction }) {
+function beforeAction ({ interaction }: { interaction: Interaction }) {
   applyPending(interaction)
 }
 
-function beforeEnd ({ interaction }: { interaction: Interact.Interaction }): boolean | void {
+function beforeEnd ({ interaction }: { interaction: Interaction }): boolean | void {
   const hadPending = applyPending(interaction)
 
   if (!hadPending) { return }
@@ -42,14 +43,14 @@ function beforeEnd ({ interaction }: { interaction: Interact.Interaction }): boo
   return false
 }
 
-function end ({ interaction }: { interaction: Interact.Interaction }) {
+function end ({ interaction }: { interaction: Interaction }) {
   interaction.offset.total.x = 0
   interaction.offset.total.y = 0
   interaction.offset.pending.x = 0
   interaction.offset.pending.y = 0
 }
 
-export function applyPending (interaction: Interact.Interaction) {
+export function applyPending (interaction: Interaction) {
   if (!hasPending(interaction)) {
     return false
   }
@@ -66,7 +67,7 @@ export function applyPending (interaction: Interact.Interaction) {
   return true
 }
 
-function offsetBy (this: Interact.Interaction, { x, y }: Interact.Point) {
+function offsetBy (this: Interaction, { x, y }: Point) {
   this.offset.pending.x += x
   this.offset.pending.y += y
 
@@ -74,18 +75,18 @@ function offsetBy (this: Interact.Interaction, { x, y }: Interact.Point) {
   this.offset.total.y += y
 }
 
-function addToCoords ({ page, client }, { x, y }: Interact.Point) {
+function addToCoords ({ page, client }, { x, y }: Point) {
   page.x += x
   page.y += y
   client.x += x
   client.y += y
 }
 
-function hasPending (interaction) {
+function hasPending (interaction: Interaction) {
   return !!(interaction.offset.pending.x || interaction.offset.pending.y)
 }
 
-const offset: Interact.Plugin = {
+const offset: Plugin = {
   id: 'offset',
   before: ['modifiers', 'pointer-events', 'actions', 'inertia'],
   install (scope) {

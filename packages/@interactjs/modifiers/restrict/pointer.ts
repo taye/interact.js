@@ -1,4 +1,5 @@
-import * as Interact from '@interactjs/types/index'
+import Interaction from '@interactjs/core/Interaction'
+import { RectResolvable, Rect, Point } from '@interactjs/types'
 import extend from '@interactjs/utils/extend'
 import is from '@interactjs/utils/is'
 import * as rectUtils from '@interactjs/utils/rect'
@@ -7,23 +8,23 @@ import { makeModifier, ModifierArg, ModifierModule, ModifierState } from '../bas
 
 export interface RestrictOptions {
   // where to drag over
-  restriction: Interact.RectResolvable<[number, number, Interact.Interaction]>
+  restriction: RectResolvable<[number, number, Interaction]>
   // what part of self is allowed to drag over
-  elementRect: Interact.Rect
-  offset: Interact.Rect
+  elementRect: Rect
+  offset: Rect
   // restrict just before the end drag
   endOnly: boolean
   enabled?: boolean
 }
 
 export type RestrictState = ModifierState<RestrictOptions, {
-  offset: Interact.Rect
+  offset: Rect
 }>
 
 function start ({ rect, startOffset, state, interaction, pageCoords }: ModifierArg<RestrictState>) {
   const { options } = state
   const { elementRect } = options
-  const offset: Interact.Rect = extend({
+  const offset: Rect = extend({
     left: 0,
     top: 0,
     right: 0,
@@ -71,9 +72,9 @@ function set ({ coords, interaction, state }: ModifierArg<RestrictState>) {
 }
 
 export function getRestrictionRect (
-  value: Interact.RectResolvable<[number, number, Interact.Interaction]>,
-  interaction: Interact.Interaction,
-  coords?: Interact.Point,
+  value: RectResolvable<[number, number, Interaction]>,
+  interaction: Interaction,
+  coords?: Point,
 ) {
   if (is.func(value)) {
     return rectUtils.resolveRectLike(value, interaction.interactable, interaction.element, [coords.x, coords.y, interaction])

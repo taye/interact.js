@@ -1,12 +1,12 @@
 import test from '@interactjs/_dev/test/test'
+import { Scope, ActionName } from '@interactjs/core/scope'
 import * as helpers from '@interactjs/core/tests/_helpers'
-import * as Interact from '@interactjs/types/index'
 import * as pointerUtils from '@interactjs/utils/pointerUtils'
 
 import actions from './plugin'
 
 test('actions integration', t => {
-  const scope: Interact.Scope = helpers.mockScope()
+  const scope: Scope = helpers.mockScope()
   const event = pointerUtils.coordsToEvent(pointerUtils.newCoords())
   const element = scope.document.body
 
@@ -20,7 +20,7 @@ test('actions integration', t => {
   interaction1.pointerDown(event, event, element)
 
   for (const name in scope.actions.map) {
-    interaction1.start({ name: name as Interact.ActionName }, interactable, element)
+    interaction1.start({ name: name as ActionName }, interactable, element)
     interaction1.stop()
 
     t.doesNotThrow(() => {
@@ -30,7 +30,7 @@ test('actions integration', t => {
 
   const actionNames = Object.keys(scope.actions.map)
 
-  for (const order of ([actionNames, [...actionNames].reverse()] as Interact.ActionName[][])) {
+  for (const order of ([actionNames, [...actionNames].reverse()] as ActionName[][])) {
     const interaction2 = scope.interactions.new({})
 
     for (const name of order) {

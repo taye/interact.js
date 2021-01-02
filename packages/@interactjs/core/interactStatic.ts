@@ -1,5 +1,6 @@
 /** @module interact */
-import * as Interact from '@interactjs/types/index'
+import { Scope, Plugin } from '@interactjs/core/scope'
+import { Context, EventTypes, ListenersArg, Target, Element, Listener } from '@interactjs/types'
 import browser from '@interactjs/utils/browser'
 import * as domUtils from '@interactjs/utils/domUtils'
 import is from '@interactjs/utils/is'
@@ -12,7 +13,7 @@ import { Options } from './defaultOptions'
 import isNonNativeEvent from './isNonNativeEvent'
 
 export interface InteractStatic {
-  (target: Interact.Target, options?: Options): Interactable
+  (target: Target, options?: Options): Interactable
   getPointerAverage: typeof pointerUtils.pointerAverage
   getTouchBBox: typeof pointerUtils.touchBBox
   getTouchDistance: typeof pointerUtils.touchDistance
@@ -23,13 +24,13 @@ export interface InteractStatic {
   closest: typeof domUtils.closest
   /** @internal */ globalEvents: any
   version: string
-  /** @internal */ scope: Interact.Scope
-  use(plugin: Interact.Plugin, options?: {
+  /** @internal */ scope: Scope
+  use(plugin: Plugin, options?: {
     [key: string]: any
   }): any
-  isSet(target: Interact.Element, options?: any): boolean
-  on(type: string | Interact.EventTypes, listener: Interact.ListenersArg, options?: object): any
-  off(type: Interact.EventTypes, listener: any, options?: object): any
+  isSet(target: Element, options?: any): boolean
+  on(type: string | EventTypes, listener: ListenersArg, options?: object): any
+  off(type: EventTypes, listener: any, options?: object): any
   debug(): any
   supportsTouch(): boolean
   supportsPointerEvent(): boolean
@@ -39,7 +40,7 @@ export interface InteractStatic {
   removeDocument(doc: Document): void
 }
 
-export function createInteractStatic (scope: Interact.Scope): Interact.InteractStatic {
+export function createInteractStatic (scope: Scope): InteractStatic {
   /**
    * ```js
    * interact('#draggable').draggable(true)
@@ -97,9 +98,6 @@ export function createInteractStatic (scope: Interact.Scope): Interact.InteractS
   *
   * @alias module:interact.use
   *
-  * @param {Object} plugin
-  * @param {function} plugin.install
-  * @return {Interact.InteractStatic}
    */
   interact.use = function (plugin, options) {
     this.scope.usePlugin(plugin, options)
@@ -113,12 +111,12 @@ export function createInteractStatic (scope: Interact.Scope): Interact.InteractS
    *
    * @alias module:interact.isSet
    *
-   * @param {Interact.Target} target The Element or string being searched for
+   * @param {Target} target The Element or string being searched for
    * @param {object} options
    * @return {boolean} Indicates if the element or CSS selector was previously
    * passed to interact
    */
-  interact.isSet = function (target: Interact.Target, options?: { context?: Interact.Context }): boolean {
+  interact.isSet = function (target: Target, options?: { context?: Context }): boolean {
     return !!this.scope.interactables.get(target, options && options.context)
   }
 
@@ -134,7 +132,7 @@ export function createInteractStatic (scope: Interact.Scope): Interact.InteractS
    * addEventListener
    * @return {object} interact
    */
-  interact.on = warnOnce(function on (type: string | Interact.EventTypes, listener: Interact.ListenersArg, options?: object) {
+  interact.on = warnOnce(function on (type: string | EventTypes, listener: ListenersArg, options?: object) {
     if (is.string(type) && type.search(' ') !== -1) {
       type = type.trim().split(/ +/)
     }
@@ -167,7 +165,7 @@ export function createInteractStatic (scope: Interact.Scope): Interact.InteractS
     }
     // If non InteractEvent type, addEventListener to document
     else {
-      this.scope.events.add(this.scope.document, type, listener as Interact.Listener, { options })
+      this.scope.events.add(this.scope.document, type, listener as Listener, { options })
     }
 
     return this
@@ -186,7 +184,7 @@ export function createInteractStatic (scope: Interact.Scope): Interact.InteractS
    * removeEventListener
    * @return {object} interact
    */
-  interact.off = warnOnce(function off (type: Interact.EventTypes, listener: any, options?: object) {
+  interact.off = warnOnce(function off (type: EventTypes, listener: any, options?: object) {
     if (is.string(type) && type.search(' ') !== -1) {
       type = type.trim().split(/ +/)
     }

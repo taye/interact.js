@@ -1,13 +1,15 @@
-import { Interaction } from '@interactjs/core/Interaction'
-import { Scope } from '@interactjs/core/scope'
-import * as Interact from '@interactjs/types/index'
+import { EventPhase, InteractEvent } from '@interactjs/core/InteractEvent'
+import { Interactable } from '@interactjs/core/Interactable'
+import { ActionProps, Interaction } from '@interactjs/core/Interaction'
+import { Scope, Plugin } from '@interactjs/core/scope'
+import { ActionMethod, ResizableOptions, FullRect, OrBoolean, Point, Rect } from '@interactjs/types'
 import * as dom from '@interactjs/utils/domUtils'
 import extend from '@interactjs/utils/extend'
 import is from '@interactjs/utils/is'
 
 export type EdgeName = 'top' | 'left' | 'bottom' | 'right'
 
-export type ResizableMethod = Interact.ActionMethod<Interact.ResizableOptions>
+export type ResizableMethod = ActionMethod<ResizableOptions>
 
 declare module '@interactjs/core/Interactable' {
   interface Interactable {
@@ -24,7 +26,7 @@ declare module '@interactjs/core/Interaction' {
 
 declare module '@interactjs/core/defaultOptions' {
   interface ActionDefaults {
-    resize: Interact.ResizableOptions
+    resize: ResizableOptions
   }
 }
 
@@ -34,9 +36,9 @@ declare module '@interactjs/core/scope' {
   }
 }
 
-export interface ResizeEvent<P extends Interact.EventPhase = Interact.EventPhase> extends Interact.InteractEvent<'resize', P> {
-  deltaRect?: Interact.FullRect
-  edges?: Interact.ActionProps['edges']
+export interface ResizeEvent<P extends EventPhase = EventPhase> extends InteractEvent<'resize', P> {
+  deltaRect?: FullRect
+  edges?: ActionProps['edges']
 }
 
 function install (scope: Scope) {
@@ -98,7 +100,7 @@ function install (scope: Scope) {
    * @return {boolean | Interactable} A boolean indicating if this can be the
    * target of resize elements, or this Interactable
    */
-  Interactable.prototype.resizable = function (this: Interact.Interactable, options: Interact.ResizableOptions | boolean) {
+  Interactable.prototype.resizable = function (this: Interactable, options: ResizableOptions | boolean) {
     return resizable(this, options, scope)
   } as ResizableMethod
 
@@ -170,7 +172,7 @@ function resizeChecker (arg) {
   return arg.action ? false : undefined
 }
 
-function resizable (interactable: Interact.Interactable, options: Interact.OrBoolean<Interact.ResizableOptions> | boolean, scope: Scope) {
+function resizable (interactable: Interactable, options: OrBoolean<ResizableOptions> | boolean, scope: Scope) {
   if (is.object(options)) {
     interactable.options.resize.enabled = options.enabled !== false
     interactable.setPerAction('resize', options)
@@ -203,10 +205,10 @@ function resizable (interactable: Interact.Interactable, options: Interact.OrBoo
 function checkResizeEdge (
   name: string,
   value: any,
-  page: Interact.Point,
+  page: Point,
   element: Node,
-  interactableElement: Interact.Element,
-  rect: Interact.Rect,
+  interactableElement: Element,
+  rect: Rect,
   margin: number,
 ) {
   // false, '', undefined, null
@@ -279,7 +281,7 @@ function initCursors (browser: typeof import ('@interactjs/utils/browser').defau
 }
 /* eslint-enable multiline-ternary */
 
-function start ({ iEvent, interaction }: { iEvent: Interact.InteractEvent<any, any>, interaction: Interaction }) {
+function start ({ iEvent, interaction }: { iEvent: InteractEvent<any, any>, interaction: Interaction }) {
   if (interaction.prepared.name !== 'resize' || !interaction.prepared.edges) {
     return
   }
@@ -306,7 +308,7 @@ function start ({ iEvent, interaction }: { iEvent: Interact.InteractEvent<any, a
   resizeEvent.deltaRect = interaction._rects.delta
 }
 
-function move ({ iEvent, interaction }: { iEvent: Interact.InteractEvent<any, any>, interaction: Interaction }) {
+function move ({ iEvent, interaction }: { iEvent: InteractEvent<any, any>, interaction: Interaction }) {
   if (interaction.prepared.name !== 'resize' || !interaction.prepared.edges) { return }
 
   const resizeEvent = iEvent as ResizeEvent
@@ -359,7 +361,7 @@ function move ({ iEvent, interaction }: { iEvent: Interact.InteractEvent<any, an
   resizeEvent.deltaRect = deltaRect
 }
 
-function end ({ iEvent, interaction }: { iEvent: Interact.InteractEvent<any, any>, interaction: Interaction }) {
+function end ({ iEvent, interaction }: { iEvent: InteractEvent<any, any>, interaction: Interaction }) {
   if (interaction.prepared.name !== 'resize' || !interaction.prepared.edges) { return }
 
   const resizeEvent = iEvent as ResizeEvent
@@ -369,7 +371,7 @@ function end ({ iEvent, interaction }: { iEvent: Interact.InteractEvent<any, any
   resizeEvent.deltaRect = interaction._rects.delta
 }
 
-function updateEventAxes ({ iEvent, interaction }: { iEvent: Interact.InteractEvent<any, any>, interaction: Interaction }) {
+function updateEventAxes ({ iEvent, interaction }: { iEvent: InteractEvent<any, any>, interaction: Interaction }) {
   if (interaction.prepared.name !== 'resize' || !interaction.resizeAxes) { return }
 
   const options = interaction.interactable.options
@@ -396,7 +398,7 @@ function updateEventAxes ({ iEvent, interaction }: { iEvent: Interact.InteractEv
   }
 }
 
-const resize: Interact.Plugin = {
+const resize: Plugin = {
   id: 'actions/resize',
   before: ['actions/drag'],
   install,
@@ -436,11 +438,11 @@ const resize: Interact.Plugin = {
     // 'reposition' will keep the width/height positive by swapping
     // the top and bottom edges and/or swapping the left and right edges
     invert: 'none',
-  } as Interact.ResizableOptions,
+  } as ResizableOptions,
 
   cursors: null as ReturnType<typeof initCursors>,
 
-  getCursor ({ edges, axis, name }: Interact.ActionProps) {
+  getCursor ({ edges, axis, name }: ActionProps) {
     const cursors = resize.cursors
     let result: string = null
 

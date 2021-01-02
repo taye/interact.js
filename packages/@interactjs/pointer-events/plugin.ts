@@ -1,10 +1,10 @@
-import * as Interact from '@interactjs/types/index'
+import { Plugin } from '@interactjs/core/scope'
 
 import * as pointerEvents from './base'
 import holdRepeat from './holdRepeat'
 import interactableTargets from './interactableTargets'
 
-const plugin: Interact.Plugin = {
+const plugin: Plugin = {
   id: 'pointer-events',
   install (scope) {
     scope.usePlugin(pointerEvents)

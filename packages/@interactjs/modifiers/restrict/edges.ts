@@ -9,7 +9,7 @@
 //   },
 // })
 
-import * as Interact from '@interactjs/types/index'
+import { Point, Rect } from '@interactjs/types'
 import extend from '@interactjs/utils/extend'
 import * as rectUtils from '@interactjs/utils/rect'
 
@@ -26,8 +26,8 @@ export interface RestrictEdgesOptions {
 }
 
 export type RestrictEdgesState = ModifierState<RestrictEdgesOptions, {
-  inner: Interact.Rect
-  outer: Interact.Rect
+  inner: Rect
+  outer: Rect
   offset: RestrictEdgesOptions['offset']
 }>
 
@@ -36,7 +36,7 @@ const noOuter = { top: -Infinity, left: -Infinity, bottom: +Infinity, right: +In
 
 function start ({ interaction, startOffset, state }: ModifierArg<RestrictEdgesState>) {
   const { options } = state
-  let offset
+  let offset: Point
 
   if (options) {
     const offsetRect = getRestrictionRect(options.offset, interaction, interaction.coords.start.page)
@@ -62,8 +62,8 @@ function set ({ coords, edges, interaction, state }: ModifierArg<RestrictEdgesSt
   }
 
   const page = extend({}, coords)
-  const inner = getRestrictionRect(options.inner, interaction, page) || {} as Interact.Rect
-  const outer = getRestrictionRect(options.outer, interaction, page) || {} as Interact.Rect
+  const inner = getRestrictionRect(options.inner, interaction, page) || {} as Rect
+  const outer = getRestrictionRect(options.outer, interaction, page) || {} as Rect
 
   fixRect(inner, noInner)
   fixRect(outer, noOuter)
@@ -82,7 +82,7 @@ function set ({ coords, edges, interaction, state }: ModifierArg<RestrictEdgesSt
   }
 }
 
-function fixRect (rect, defaults) {
+function fixRect (rect: Rect, defaults: Rect) {
   for (const edge of ['top', 'left', 'bottom', 'right']) {
     if (!(edge in rect)) {
       rect[edge] = defaults[edge]

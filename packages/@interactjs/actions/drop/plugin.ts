@@ -1,6 +1,8 @@
-import { InteractEvent } from '@interactjs/core/InteractEvent'
+import { EventPhase, InteractEvent } from '@interactjs/core/InteractEvent'
 import { Interactable } from '@interactjs/core/Interactable'
-import * as Interact from '@interactjs/types/index'
+import Interaction, { DoPhaseArg } from '@interactjs/core/Interaction'
+import { Scope, Plugin } from '@interactjs/core/scope'
+import { DropzoneOptions, Element, PointerEventType, Rect } from '@interactjs/types'
 import * as domUtils from '@interactjs/utils/domUtils'
 import extend from '@interactjs/utils/extend'
 import getOriginXY from '@interactjs/utils/getOriginXY'
@@ -8,13 +10,13 @@ import is from '@interactjs/utils/is'
 import normalizeListeners from '@interactjs/utils/normalizeListeners'
 import * as pointerUtils from '@interactjs/utils/pointerUtils'
 
-import drag from '../drag/plugin'
+import drag, { DragEvent } from '../drag/plugin'
 
 import { DropEvent } from './DropEvent'
 
 export interface DropzoneMethod {
-  (this: Interactable, options: Interact.DropzoneOptions | boolean): Interact.Interactable
-  (): Interact.DropzoneOptions
+  (this: Interactable, options: DropzoneOptions | boolean): Interactable
+  (): DropzoneOptions
 }
 
 declare module '@interactjs/core/Interactable' {
@@ -22,10 +24,10 @@ declare module '@interactjs/core/Interactable' {
     dropzone: DropzoneMethod
     dropCheck: (
       dragEvent: InteractEvent,
-      event: Interact.PointerEventType,
+      event: PointerEventType,
       draggable: Interactable,
-      draggableElement: Interact.Element,
-      dropElemen: Interact.Element,
+      draggableElement: Element,
+      dropElemen: Element,
       rect: any
     ) => boolean
   }
@@ -37,9 +39,18 @@ declare module '@interactjs/core/Interaction' {
   }
 }
 
+declare module '@interactjs/core/InteractEvent' {
+  interface InteractEvent {
+    prevDropzone?: Interactable
+    dropzone?: Interactable
+    dragEnter?: Element
+    dragLeave?: Element
+  }
+}
+
 declare module '@interactjs/core/defaultOptions' {
   interface ActionDefaults {
-    drop: Interact.DropzoneOptions
+    drop: DropzoneOptions
   }
 }
 
@@ -61,36 +72,42 @@ declare module '@interactjs/core/scope' {
 
 declare module '@interactjs/core/interactStatic' {
   export interface InteractStatic {
-    dynamicDrop: (this: Interact.InteractStatic, newValue?: boolean) => boolean | this
+    dynamicDrop: (this: InteractStatic, newValue?: boolean) => boolean | this
   }
 }
 
 interface DropSignalArg {
-  interaction: Interact.Interaction<'drag'>
-  dragEvent: Interact.DragEvent
+  interaction: Interaction<'drag'>
+  dragEvent: DragEvent
 }
 
 export interface ActiveDrop {
   dropzone: Interactable
-  element: Interact.Element
-  rect: Interact.Rect
+  element: Element
+  rect: Rect
 }
 
 export interface DropState {
   cur: {
-    dropzone: Interactable    // the dropzone a drag target might be dropped into
-    element: Interact.Element // the element at the time of checking
+    // the dropzone a drag target might be dropped into
+    dropzone: Interactable
+    // the element at the time of checking
+    element: Element
   }
   prev: {
-    dropzone: Interactable    // the dropzone that was recently dragged away from
-    element: Interact.Element // the element at the time of checking
+    // the dropzone that was recently dragged away from
+    dropzone: Interactable
+    // the element at the time of checking
+    element: Element
   }
-  rejected: boolean           // wheather the potential drop was rejected from a listener
-  events: any                 // the drop events related to the current drag event
+  // wheather the potential drop was rejected from a listener
+  rejected: boolean
+  // the drop events related to the current drag event
+  events: FiredDropEvents
   activeDrops: ActiveDrop[]
 }
 
-function install (scope: Interact.Scope) {
+function install (scope: Scope) {
   const {
     actions,
     /** @lends module:interact */
@@ -142,7 +159,7 @@ function install (scope: Interact.Scope) {
    * @param {boolean | object | null} [options] The new options to be set.
    * @return {object | Interactable} The current setting or this Interactable
    */
-  Interactable.prototype.dropzone = function (this: Interact.Interactable, options?: Interact.DropzoneOptions | boolean) {
+  Interactable.prototype.dropzone = function (this: Interactable, options?: DropzoneOptions | boolean) {
     return dropzoneMethod(this, options)
   } as Interactable['dropzone']
 
@@ -161,7 +178,7 @@ function install (scope: Interact.Scope) {
    * }
    * ```
    */
-  Interactable.prototype.dropCheck = function (this: Interact.Interactable, dragEvent, event, draggable, draggableElement, dropElement, rect) {
+  Interactable.prototype.dropCheck = function (this: Interactable, dragEvent, event, draggable, draggableElement, dropElement, rect) {
     return dropCheckMethod(this, dragEvent, event, draggable, draggableElement, dropElement, rect)
   }
 
@@ -201,8 +218,8 @@ function install (scope: Interact.Scope) {
   defaults.actions.drop = drop.defaults
 }
 
-function collectDrops ({ interactables }, draggableElement) {
-  const drops = []
+function collectDrops ({ interactables }: Scope, draggableElement: Element) {
+  const drops: ActiveDrop[] = []
 
   // collect all dropzones and their elements which qualify for a drop
   for (const dropzone of interactables.list) {
@@ -219,15 +236,16 @@ function collectDrops ({ interactables }, draggableElement) {
     }
 
     // query for new elements if necessary
-    const dropElements = is.string(dropzone.target)
+    const dropElements = (is.string(dropzone.target)
       ? dropzone._context.querySelectorAll(dropzone.target)
-      : is.array(dropzone.target) ? dropzone.target : [dropzone.target]
+      : is.array(dropzone.target) ? dropzone.target : [dropzone.target]) as Element[]
 
     for (const dropzoneElement of dropElements) {
       if (dropzoneElement !== draggableElement) {
         drops.push({
           dropzone,
           element: dropzoneElement,
+          rect: dropzone.getRect(dropzoneElement),
         })
       }
     }
@@ -236,7 +254,7 @@ function collectDrops ({ interactables }, draggableElement) {
   return drops
 }
 
-function fireActivationEvents (activeDrops, event) {
+function fireActivationEvents (activeDrops: ActiveDrop[], event: DropEvent) {
   // loop through all active dropzones and trigger event
   for (const { dropzone, element } of activeDrops.slice()) {
     event.dropzone = dropzone
@@ -251,7 +269,7 @@ function fireActivationEvents (activeDrops, event) {
 // return a new array of possible drops. getActiveDrops should always be
 // called when a drag has just started or a drag event happens while
 // dynamicDrop is true
-function getActiveDrops (scope: Interact.Scope, dragElement: Interact.Element) {
+function getActiveDrops (scope: Scope, dragElement: Element) {
   // get dropzones and their elements that could receive the draggable
   const activeDrops = collectDrops(scope, dragElement)
 
@@ -262,7 +280,7 @@ function getActiveDrops (scope: Interact.Scope, dragElement: Interact.Element) {
   return activeDrops
 }
 
-function getDrop ({ dropState, interactable: draggable, element: dragElement }: Partial<Interact.Interaction>, dragEvent, pointerEvent) {
+function getDrop ({ dropState, interactable: draggable, element: dragElement }: Partial<Interaction>, dragEvent, pointerEvent) {
   const validDrops = []
 
   // collect all dropzones and their elements which qualify for a drop
@@ -278,7 +296,7 @@ function getDrop ({ dropState, interactable: draggable, element: dragElement }: 
   return dropState.activeDrops[dropIndex] || null
 }
 
-function getDropEvents (interaction: Interact.Interaction, _pointerEvent, dragEvent) {
+function getDropEvents (interaction: Interaction, _pointerEvent, dragEvent: DragEvent) {
   const { dropState } = interaction
   const dropEvents = {
     enter     : null,
@@ -339,7 +357,9 @@ function getDropEvents (interaction: Interact.Interaction, _pointerEvent, dragEv
   return dropEvents
 }
 
-function fireDropEvents (interaction: Interact.Interaction, events) {
+type FiredDropEvents = Partial<Record<'leave' | 'enter' | 'move' | 'drop' | 'activate' | 'deactivate', DropEvent>>
+
+function fireDropEvents (interaction: Interaction, events: FiredDropEvents) {
   const { dropState } = interaction
   const {
     activeDrops,
@@ -360,7 +380,7 @@ function fireDropEvents (interaction: Interact.Interaction, events) {
   dropState.prev.element = cur.element
 }
 
-function onEventCreated ({ interaction, iEvent, event }: Interact.DoPhaseArg<'drag', Interact.EventPhase>, scope: Interact.Scope) {
+function onEventCreated ({ interaction, iEvent, event }: DoPhaseArg<'drag', EventPhase>, scope: Scope) {
   if (iEvent.type !== 'dragmove' && iEvent.type !== 'dragend') { return }
 
   const { dropState } = interaction
@@ -384,9 +404,9 @@ function onEventCreated ({ interaction, iEvent, event }: Interact.DoPhaseArg<'dr
   dropState.events = getDropEvents(interaction, event, dragEvent)
 }
 
-function dropzoneMethod (interactable: Interact.Interactable): Interact.DropzoneOptions
-function dropzoneMethod (interactable: Interact.Interactable, options: Interact.DropzoneOptions | boolean): Interact.Interactable
-function dropzoneMethod (interactable: Interact.Interactable, options?: Interact.DropzoneOptions | boolean) {
+function dropzoneMethod (interactable: Interactable): DropzoneOptions
+function dropzoneMethod (interactable: Interactable, options: DropzoneOptions | boolean): Interactable
+function dropzoneMethod (interactable: Interactable, options?: DropzoneOptions | boolean) {
   if (is.object(options)) {
     interactable.options.drop.enabled = options.enabled !== false
 
@@ -443,12 +463,12 @@ function dropzoneMethod (interactable: Interact.Interactable, options?: Interact
 }
 
 function dropCheckMethod (
-  interactable: Interact.Interactable,
+  interactable: Interactable,
   dragEvent: InteractEvent,
-  event: Interact.PointerEventType,
-  draggable: Interact.Interactable,
-  draggableElement: Interact.Element,
-  dropElement: Interact.Element,
+  event: PointerEventType,
+  draggable: Interactable,
+  draggableElement: Element,
+  dropElement: Element,
   rect: any,
 ) {
   let dropped = false
@@ -501,7 +521,7 @@ function dropCheckMethod (
   return dropped
 }
 
-const drop: Interact.Plugin = {
+const drop: Plugin = {
   id: 'actions/drop',
   install,
   listeners: {
@@ -523,7 +543,7 @@ const drop: Interact.Plugin = {
       }
     },
 
-    'interactions:after-action-start': ({ interaction, event, iEvent: dragEvent }: Interact.DoPhaseArg<'drag', Interact.EventPhase>, scope) => {
+    'interactions:after-action-start': ({ interaction, event, iEvent: dragEvent }: DoPhaseArg<'drag', EventPhase>, scope) => {
       if (interaction.prepared.name !== 'drag') { return }
 
       const { dropState } = interaction
@@ -542,7 +562,7 @@ const drop: Interact.Plugin = {
 
     'interactions:action-move': onEventCreated,
 
-    'interactions:after-action-move': ({ interaction, iEvent: dragEvent }: Interact.DoPhaseArg<'drag', Interact.EventPhase>, scope) => {
+    'interactions:after-action-move': ({ interaction, iEvent: dragEvent }: DoPhaseArg<'drag', EventPhase>, scope) => {
       if (interaction.prepared.name !== 'drag') { return }
 
       fireDropEvents(interaction, interaction.dropState.events)
@@ -551,7 +571,7 @@ const drop: Interact.Plugin = {
       interaction.dropState.events = {}
     },
 
-    'interactions:action-end': (arg: Interact.DoPhaseArg<'drag', Interact.EventPhase>, scope) => {
+    'interactions:action-end': (arg: DoPhaseArg<'drag', EventPhase>, scope) => {
       if (arg.interaction.prepared.name !== 'drag') { return }
 
       const { interaction, iEvent: dragEvent } = arg
@@ -585,7 +605,7 @@ const drop: Interact.Plugin = {
     enabled: false,
     accept : null,
     overlap: 'pointer',
-  } as Interact.DropzoneOptions,
+  } as DropzoneOptions,
 }
 
 export default drop

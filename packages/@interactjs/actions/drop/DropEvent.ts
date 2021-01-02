@@ -1,14 +1,14 @@
 import { BaseEvent } from '@interactjs/core/BaseEvent'
 import { InteractEvent } from '@interactjs/core/InteractEvent'
 import { Interactable } from '@interactjs/core/Interactable'
-import * as Interact from '@interactjs/types/index'
+import { Element } from '@interactjs/types'
 import * as arr from '@interactjs/utils/arr'
 
 export class DropEvent extends BaseEvent<'drag'> {
-  target: Interact.Element
+  target: Element
   dropzone: Interactable
   dragEvent: InteractEvent<'drag'>
-  relatedTarget: Interact.Element
+  relatedTarget: Element
   draggable: Interactable
   timeStamp: number
   propagationStopped = false

@@ -1,16 +1,19 @@
-import * as Interact from '@interactjs/types/index'
+import { Interactable } from '@interactjs/core/Interactable'
+import Interaction, { ActionProps } from '@interactjs/core/Interaction'
+import { Scope } from '@interactjs/core/scope'
+import { PointerType, PointerEventType, Element } from '@interactjs/types'
 import is from '@interactjs/utils/is'
 import { warnOnce } from '@interactjs/utils/misc'
 
 declare module '@interactjs/core/Interactable' {
   interface Interactable {
     getAction: (
-      this: Interact.Interactable,
-      pointer: Interact.PointerType,
-      event: Interact.PointerEventType,
-      interaction: Interact.Interaction,
-      element: Interact.Element,
-    ) => Interact.ActionProps | null
+      this: Interactable,
+      pointer: PointerType,
+      event: PointerEventType,
+      interaction: Interaction,
+      element: Element,
+    ) => ActionProps | null
     styleCursor: typeof styleCursor
     actionChecker: typeof actionChecker
     ignoreFrom: {
@@ -24,19 +27,19 @@ declare module '@interactjs/core/Interactable' {
   }
 }
 
-function install (scope: Interact.Scope) {
+function install (scope: Scope) {
   const {
     /** @lends Interactable */
     Interactable, // tslint:disable-line no-shadowed-variable
   } = scope
 
   Interactable.prototype.getAction = function getAction (
-    this: Interact.Interactable,
-    pointer: Interact.PointerType,
-    event: Interact.PointerEventType,
-    interaction: Interact.Interaction,
-    element: Interact.Element,
-  ): Interact.ActionProps {
+    this: Interactable,
+    pointer: PointerType,
+    event: PointerEventType,
+    interaction: Interaction,
+    element: Element,
+  ): ActionProps {
     const action = defaultActionChecker(this, event, interaction, element, scope)
 
     if (this.options.actionChecker) {
@@ -70,7 +73,7 @@ function install (scope: Interact.Scope) {
    * @return {string | Element | object} The current ignoreFrom value or this
    * Interactable
    */
-  Interactable.prototype.ignoreFrom = warnOnce(function (this: Interact.Interactable, newValue) {
+  Interactable.prototype.ignoreFrom = warnOnce(function (this: Interactable, newValue) {
     return this._backCompatOption('ignoreFrom', newValue)
   }, 'Interactable.ignoreFrom() has been deprecated. Use Interactble.draggable({ignoreFrom: newValue}).')
 
@@ -98,7 +101,7 @@ function install (scope: Interact.Scope) {
    * @return {string | Element | object} The current allowFrom value or this
    * Interactable
    */
-  Interactable.prototype.allowFrom = warnOnce(function (this: Interact.Interactable, newValue) {
+  Interactable.prototype.allowFrom = warnOnce(function (this: Interactable, newValue) {
     return this._backCompatOption('allowFrom', newValue)
   }, 'Interactable.allowFrom() has been deprecated. Use Interactble.draggable({allowFrom: newValue}).')
 
@@ -146,11 +149,11 @@ function install (scope: Interact.Scope) {
 }
 
 function defaultActionChecker (
-  interactable: Interact.Interactable,
-  event: Interact.PointerEventType,
-  interaction: Interact.Interaction,
-  element: Interact.Element,
-  scope: Interact.Scope,
+  interactable: Interactable,
+  event: PointerEventType,
+  interaction: Interaction,
+  element: Element,
+  scope: Scope,
 ) {
   const rect = interactable.getRect(element)
   const buttons = (event as MouseEvent).buttons || ({
@@ -173,9 +176,9 @@ function defaultActionChecker (
   return arg.action
 }
 
-function styleCursor (this: Interact.Interactable): boolean
-function styleCursor (this: Interact.Interactable, newValue: boolean): typeof this
-function styleCursor (this: Interact.Interactable, newValue?: boolean) {
+function styleCursor (this: Interactable): boolean
+function styleCursor (this: Interactable, newValue: boolean): typeof this
+function styleCursor (this: Interactable, newValue?: boolean) {
   if (is.bool(newValue)) {
     this.options.styleCursor = newValue
 
@@ -191,7 +194,7 @@ function styleCursor (this: Interact.Interactable, newValue?: boolean) {
   return this.options.styleCursor
 }
 
-function actionChecker (this: Interact.Interactable, checker: any) {
+function actionChecker (this: Interactable, checker: any) {
   if (is.func(checker)) {
     this.options.actionChecker = checker
 

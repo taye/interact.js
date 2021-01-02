@@ -2,7 +2,6 @@
   "name": "@interactjs/types",
   "version": "1.10.1",
   "license": "MIT",
-  "typings": "typings.d.ts",
   "devDependencies": {
     "@interactjs/actions": "1.10.1",
     "@interactjs/arrange": "1.10.1",

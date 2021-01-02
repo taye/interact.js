@@ -1,15 +1,15 @@
-import * as Interact from '@interactjs/types/index'
+import { EventTypes, Listener, ListenersArg } from '@interactjs/types'
 
 import extend from './extend'
 import is from './is'
 
 export interface NormalizedListeners {
-  [type: string]: Interact.Listener[]
+  [type: string]: Listener[]
 }
 
 export default function normalize (
-  type: Interact.EventTypes,
-  listeners?: Interact.ListenersArg | Interact.ListenersArg[],
+  type: EventTypes,
+  listeners?: ListenersArg | ListenersArg[],
   result?: NormalizedListeners,
 ): NormalizedListeners {
   result = result || {}

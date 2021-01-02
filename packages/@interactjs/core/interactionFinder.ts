@@ -1,14 +1,16 @@
-import * as Interact from '@interactjs/types/index'
+import Interaction from '@interactjs/core/Interaction'
+import { Scope } from '@interactjs/core/scope'
+import { PointerType } from '@interactjs/types'
 import * as dom from '@interactjs/utils/domUtils'
 
 export interface SearchDetails {
-  pointer: Interact.PointerType
+  pointer: PointerType
   pointerId: number
   pointerType: string
   eventType: string
-  eventTarget: Interact.EventTarget
-  curEventTarget: Interact.EventTarget
-  scope: Interact.Scope
+  eventTarget: EventTarget
+  curEventTarget: EventTarget
+  scope: Scope
 }
 
 const finder = {
@@ -129,7 +131,7 @@ const finder = {
   },
 }
 
-function hasPointerId (interaction: Interact.Interaction, pointerId: number) {
+function hasPointerId (interaction: Interaction, pointerId: number) {
   return interaction.pointers.some(({ id }) => id === pointerId)
 }
 

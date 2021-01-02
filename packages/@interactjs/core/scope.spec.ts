@@ -1,5 +1,5 @@
 import test from '@interactjs/_dev/test/test'
-import * as Interact from '@interactjs/types/index'
+import { ActionName } from '@interactjs/core/scope'
 
 import * as helpers from './tests/_helpers'
 
@@ -14,7 +14,7 @@ test('scope', t => {
   ;(interactable.options as any).test = { enabled: true }
 
   interaction.pointerDown(event, event, scope.document.body)
-  interaction.start({ name: 'test' as Interact.ActionName }, interactable, scope.document.body)
+  interaction.start({ name: 'test' as ActionName }, interactable, scope.document.body)
 
   const started = interaction._interacting
 

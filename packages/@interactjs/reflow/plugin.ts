@@ -1,7 +1,7 @@
 import { Interactable } from '@interactjs/core/Interactable'
-import { ActionProps, Interaction } from '@interactjs/core/Interaction'
-import { Scope } from '@interactjs/core/scope'
-import * as Interact from '@interactjs/types/index'
+import { ActionProps, DoAnyPhaseArg, Interaction } from '@interactjs/core/Interaction'
+import { ActionName, Scope, Plugin } from '@interactjs/core/scope'
+import { Element } from '@interactjs/types'
 import * as arr from '@interactjs/utils/arr'
 import is from '@interactjs/utils/is'
 import { copyAction } from '@interactjs/utils/misc'
@@ -10,15 +10,15 @@ import { tlbrToXywh } from '@interactjs/utils/rect'
 
 declare module '@interactjs/core/scope' {
   interface SignalArgs {
-    'interactions:before-action-reflow': Omit<Interact.DoAnyPhaseArg, 'iEvent'>
-    'interactions:action-reflow': Interact.DoAnyPhaseArg
-    'interactions:after-action-reflow': Interact.DoAnyPhaseArg
+    'interactions:before-action-reflow': Omit<DoAnyPhaseArg, 'iEvent'>
+    'interactions:action-reflow': DoAnyPhaseArg
+    'interactions:after-action-reflow': DoAnyPhaseArg
   }
 }
 
 declare module '@interactjs/core/Interactable' {
   interface Interactable {
-    reflow: <T extends Interact.ActionName>(action: ActionProps<T>) => ReturnType<typeof reflow>
+    reflow: <T extends ActionName>(action: ActionProps<T>) => ReturnType<typeof doReflow>
   }
 }
 
@@ -60,14 +60,14 @@ export function install (scope: Scope) {
    * @returns { Promise } A promise that resolves to the `Interactable` when actions on all targets have ended
    */
   Interactable.prototype.reflow = function (action: ActionProps) {
-    return reflow(this, action, scope)
+    return doReflow(this, action, scope)
   }
 }
 
-function reflow<T extends Interact.ActionName> (interactable: Interactable, action: ActionProps<T>, scope: Scope): Promise<Interactable> {
+function doReflow<T extends ActionName> (interactable: Interactable, action: ActionProps<T>, scope: Scope): Promise<Interactable> {
   const elements = (is.string(interactable.target)
     ? arr.from(interactable._context.querySelectorAll(interactable.target))
-    : [interactable.target]) as Interact.Element[]
+    : [interactable.target]) as Element[]
 
   // tslint:disable-next-line variable-name
   const Promise = (scope.window as any).Promise
@@ -117,7 +117,7 @@ function reflow<T extends Interact.ActionName> (interactable: Interactable, acti
   return promises && Promise.all(promises).then(() => interactable)
 }
 
-function startReflow<T extends Interact.ActionName> (scope: Scope, interactable: Interactable, element: Interact.Element, action: ActionProps<T>, event: any) {
+function startReflow<T extends ActionName> (scope: Scope, interactable: Interactable, element: Element, action: ActionProps<T>, event: any) {
   const interaction = scope.interactions.new({ pointerType: 'reflow' })
   const signalArg = {
     interaction,
@@ -160,7 +160,7 @@ function startReflow<T extends Interact.ActionName> (scope: Scope, interactable:
   return reflowPromise
 }
 
-export default {
+const reflow: Plugin = {
   id: 'reflow',
   install,
   listeners: {
@@ -175,4 +175,6 @@ export default {
       }
     },
   },
-} as Interact.Plugin
+}
+
+export default reflow

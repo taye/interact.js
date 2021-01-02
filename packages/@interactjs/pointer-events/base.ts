@@ -1,8 +1,8 @@
 import { Eventable } from '@interactjs/core/Eventable'
 import { Interaction } from '@interactjs/core/Interaction'
 import { PerActionDefaults } from '@interactjs/core/defaultOptions'
-import { Scope } from '@interactjs/core/scope'
-import * as Interact from '@interactjs/types/index'
+import { Scope, SignalArgs, Plugin } from '@interactjs/core/scope'
+import { Point, PointerType, PointerEventType, Element } from '@interactjs/types'
 import * as domUtils from '@interactjs/utils/domUtils'
 import extend from '@interactjs/utils/extend'
 import getOriginXY from '@interactjs/utils/getOriginXY'
@@ -20,7 +20,7 @@ export interface PointerEventOptions extends PerActionDefaults {
   holdDuration?: number
   ignoreFrom?: any
   allowFrom?: any
-  origin?: Interact.Point | string | Interact.Element
+  origin?: Point | string | Element
 }
 
 declare module '@interactjs/core/scope' {
@@ -47,7 +47,7 @@ declare module '@interactjs/core/PointerInfo' {
 
 declare module '@interactjs/core/defaultOptions' {
   interface ActionDefaults {
-    pointerEvents: Interact.Options
+    pointerEvents: Options
   }
 }
 
@@ -55,18 +55,18 @@ declare module '@interactjs/core/scope' {
   interface SignalArgs {
     'pointerEvents:new': { pointerEvent: PointerEvent<any> }
     'pointerEvents:fired': {
-      interaction: Interaction<never>
-      pointer: Interact.PointerType | PointerEvent<any>
-      event: Interact.PointerEventType | PointerEvent<any>
+      interaction: Interaction<null>
+      pointer: PointerType | PointerEvent<any>
+      event: PointerEventType | PointerEvent<any>
       eventTarget: Node
       pointerEvent: PointerEvent<any>
       targets?: EventTargetList
       type: string
     }
     'pointerEvents:collect-targets': {
-      interaction: Interaction<never>
-      pointer: Interact.PointerType | PointerEvent<any>
-      event: Interact.PointerEventType | PointerEvent<any>
+      interaction: Interaction<any>
+      pointer: PointerType | PointerEvent<any>
+      event: PointerEventType | PointerEvent<any>
       eventTarget: Node
       targets?: EventTargetList
       type: string
@@ -83,7 +83,7 @@ const defaults: PointerEventOptions = {
   origin      : { x: 0, y: 0 },
 }
 
-const pointerEvents: Interact.Plugin = {
+const pointerEvents: Plugin = {
   id: 'pointer-events/base',
   before: ['inertia', 'modifiers', 'auto-start', 'actions'],
   install,
@@ -122,14 +122,14 @@ const pointerEvents: Interact.Plugin = {
 
 function fire<T extends string> (
   arg: {
-    pointer: Interact.PointerType | PointerEvent<any>
-    event: Interact.PointerEventType | PointerEvent<any>
+    pointer: PointerType | PointerEvent<any>
+    event: PointerEventType | PointerEvent<any>
     eventTarget: Node
-    interaction: Interaction<never>
+    interaction: Interaction<null>
     type: T
     targets?: EventTargetList
   },
-  scope: Interact.Scope,
+  scope: Scope,
 ) {
   const {
     interaction,
@@ -201,12 +201,12 @@ function fire<T extends string> (
 }
 
 function collectEventTargets<T extends string> ({ interaction, pointer, event, eventTarget, type }: {
-  interaction: Interaction<never>
-  pointer: Interact.PointerType | PointerEvent<any>
-  event: Interact.PointerEventType | PointerEvent<any>
+  interaction: Interaction<any>
+  pointer: PointerType | PointerEvent<any>
+  event: PointerEventType | PointerEvent<any>
   eventTarget: Node
   type: T
-}, scope: Interact.Scope) {
+}, scope: Scope) {
   const pointerIndex = interaction.getPointerIndex(pointer)
   const pointerInfo = interaction.pointers[pointerIndex]
 
@@ -217,7 +217,7 @@ function collectEventTargets<T extends string> ({ interaction, pointer, event, e
     return []
   }
 
-  const path = domUtils.getPath(eventTarget as Interact.Element | Document)
+  const path = domUtils.getPath(eventTarget as Element | Document)
   const signalArg = {
     interaction,
     pointer,
@@ -248,7 +248,7 @@ function addInteractionProps ({ interaction }) {
   interaction.tapTime = 0     // time of the most recent tap event
 }
 
-function addHoldInfo ({ down, pointerInfo }: Interact.SignalArgs['interactions:update-pointer']) {
+function addHoldInfo ({ down, pointerInfo }: SignalArgs['interactions:update-pointer']) {
   if (!down && pointerInfo.hold) {
     return
   }
@@ -266,8 +266,8 @@ function clearHold ({ interaction, pointerIndex }) {
 }
 
 function moveAndClearHold (
-  arg: Interact.SignalArgs['interactions:move'],
-  scope: Interact.Scope,
+  arg: SignalArgs['interactions:move'],
+  scope: Scope,
 ) {
   const { interaction, pointer, event, eventTarget, duplicate } = arg
 
@@ -280,15 +280,15 @@ function moveAndClearHold (
       interaction,
       pointer,
       event,
-      eventTarget: eventTarget as Interact.Element,
+      eventTarget: eventTarget as Element,
       type: 'move',
     }, scope)
   }
 }
 
-function downAndStartHold ({ interaction, pointer, event, eventTarget, pointerIndex }: Interact.SignalArgs['interactions:down'], scope: Interact.Scope) {
+function downAndStartHold ({ interaction, pointer, event, eventTarget, pointerIndex }: SignalArgs['interactions:down'], scope: Scope) {
   const timer = interaction.pointers[pointerIndex].hold
-  const path = domUtils.getPath(eventTarget as Interact.Element | Document)
+  const path = domUtils.getPath(eventTarget as Element | Document)
   const signalArg = {
     interaction,
     pointer,
@@ -330,7 +330,7 @@ function downAndStartHold ({ interaction, pointer, event, eventTarget, pointerIn
   }, minDuration)
 }
 
-function tapAfterUp ({ interaction, pointer, event, eventTarget }: Interact.SignalArgs['interactions:up'], scope: Interact.Scope) {
+function tapAfterUp ({ interaction, pointer, event, eventTarget }: SignalArgs['interactions:up'], scope: Scope) {
   if (!interaction.pointerWasMoved) {
     fire({ interaction, eventTarget, pointer, event, type: 'tap' }, scope)
   }

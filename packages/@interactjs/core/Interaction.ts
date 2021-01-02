@@ -1,5 +1,5 @@
 import type { ActionDefaults } from '@interactjs/core/defaultOptions'
-import * as Interact from '@interactjs/types/index'
+import { Element, EdgeOptions, PointerEventType, PointerType, FullRect, CoordsSet } from '@interactjs/types'
 import * as arr from '@interactjs/utils/arr'
 import extend from '@interactjs/utils/extend'
 import hypot from '@interactjs/utils/hypot'
@@ -10,12 +10,12 @@ import * as rectUtils from '@interactjs/utils/rect'
 import { InteractEvent, EventPhase } from './InteractEvent'
 import { Interactable } from './Interactable'
 import { PointerInfo } from './PointerInfo'
-import { ActionName } from './scope'
+import { ActionName, Scope } from './scope'
 
-export interface ActionProps<T extends ActionName = never> {
+export interface ActionProps<T extends ActionName | null = never> {
   name: T
-  axis?: 'x' | 'y' | 'xy'
-  edges?: Interact.EdgeOptions
+  axis?: 'x' | 'y' | 'xy' | null
+  edges?: EdgeOptions | null
 }
 
 export enum _ProxyValues {
@@ -36,16 +36,16 @@ export enum _ProxyMethods {
 }
 
 export type PointerArgProps<T extends {} = {}> = {
-  pointer: Interact.PointerType
-  event: Interact.PointerEventType
+  pointer: PointerType
+  event: PointerEventType
   eventTarget: Node
   pointerIndex: number
   pointerInfo: PointerInfo
-  interaction: Interaction<never>
+  interaction: Interaction<null>
 } & T
 
 export interface DoPhaseArg<T extends ActionName, P extends EventPhase> {
-  event: Interact.PointerEventType
+  event: PointerEventType
   phase: EventPhase
   interaction: Interaction<T>
   iEvent: InteractEvent<T, P>
@@ -105,17 +105,17 @@ export class Interaction<T extends ActionName = ActionName> {
   interactable: Interactable = null
 
   // the target element of the interactable
-  element: Interact.Element = null
-  rect: Interact.FullRect
+  element: Element = null
+  rect: FullRect
   _rects?: {
-    start: Interact.FullRect
-    corrected: Interact.FullRect
-    previous: Interact.FullRect
-    delta: Interact.FullRect
+    start: FullRect
+    corrected: FullRect
+    previous: FullRect
+    delta: FullRect
   }
-  edges: Interact.EdgeOptions
+  edges: EdgeOptions
 
-  _scopeFire: Interact.Scope['fire']
+  _scopeFire: Scope['fire']
 
   // action that's ready to be fired on next move event
   prepared: ActionProps<T> = {
@@ -130,13 +130,13 @@ export class Interaction<T extends ActionName = ActionName> {
   pointers: PointerInfo[] = []
 
   // pointerdown/mousedown/touchstart event
-  downEvent: Interact.PointerEventType = null
+  downEvent: PointerEventType = null
 
-  downPointer: Interact.PointerType = {} as Interact.PointerType
+  downPointer: PointerType = {} as PointerType
 
   _latestPointer: {
-    pointer: Interact.PointerType
-    event: Interact.PointerEventType
+    pointer: PointerType
+    event: PointerEventType
     eventTarget: Node
   } = {
     pointer: null,
@@ -169,7 +169,7 @@ export class Interaction<T extends ActionName = ActionName> {
     },
     'The interaction.doMove() method has been renamed to interaction.move()')
 
-  coords: Interact.CoordsSet = {
+  coords: CoordsSet = {
     // Starting InteractEvent pointer coordinates
     start: pointerUtils.newCoords(),
     // Previous native pointer move event coordinates
@@ -187,7 +187,7 @@ export class Interaction<T extends ActionName = ActionName> {
   /** */
   constructor ({ pointerType, scopeFire }: {
     pointerType?: string
-    scopeFire: Interact.Scope['fire']
+    scopeFire: Scope['fire']
   }) {
     this._scopeFire = scopeFire
     this.pointerType = pointerType
@@ -211,7 +211,7 @@ export class Interaction<T extends ActionName = ActionName> {
     this._scopeFire('interactions:new', { interaction: this })
   }
 
-  pointerDown (pointer: Interact.PointerType, event: Interact.PointerEventType, eventTarget: Node) {
+  pointerDown (pointer: PointerType, event: PointerEventType, eventTarget: Node) {
     const pointerIndex = this.updatePointer(pointer, event, eventTarget, true)
     const pointerInfo = this.pointers[pointerIndex]
 
@@ -222,7 +222,7 @@ export class Interaction<T extends ActionName = ActionName> {
       pointerIndex,
       pointerInfo,
       type: 'down',
-      interaction: this as unknown as Interact.Interaction<never>,
+      interaction: this as unknown as Interaction<never>,
     })
   }
 
@@ -257,7 +257,7 @@ export class Interaction<T extends ActionName = ActionName> {
    * @param {Element} element The DOM Element to target
    * @return {Boolean} Whether the interaction was successfully started
    */
-  start<A extends ActionName> (action: ActionProps<A>, interactable: Interactable, element: Interact.Element): boolean {
+  start<A extends ActionName> (action: ActionProps<A>, interactable: Interactable, element: Element): boolean {
     if (this.interacting() ||
         !this.pointerIsDown ||
         this.pointers.length < (action.name === 'gesture' ? 2 : 1) ||
@@ -283,7 +283,7 @@ export class Interaction<T extends ActionName = ActionName> {
     return this._interacting
   }
 
-  pointerMove (pointer: Interact.PointerType, event: Interact.PointerEventType, eventTarget: Node) {
+  pointerMove (pointer: PointerType, event: PointerEventType, eventTarget: Node) {
     if (!this.simulation && !(this.modification && this.modification.endResult)) {
       this.updatePointer(pointer, event, eventTarget, false)
     }
@@ -315,7 +315,7 @@ export class Interaction<T extends ActionName = ActionName> {
       dx,
       dy,
       duplicate: duplicateMove,
-      interaction: this as unknown as Interact.Interaction<never>,
+      interaction: this as unknown as Interaction<never>,
     }
 
     if (!duplicateMove) {
@@ -374,7 +374,7 @@ export class Interaction<T extends ActionName = ActionName> {
   }
 
   // End interact move events and stop auto-scroll unless simulation is running
-  pointerUp (pointer: Interact.PointerType, event: Interact.PointerEventType, eventTarget: Node, curEventTarget: Interact.EventTarget) {
+  pointerUp (pointer: PointerType, event: PointerEventType, eventTarget: Node, curEventTarget: EventTarget) {
     let pointerIndex = this.getPointerIndex(pointer)
 
     if (pointerIndex === -1) {
@@ -391,7 +391,7 @@ export class Interaction<T extends ActionName = ActionName> {
       eventTarget,
       type: type as any,
       curEventTarget,
-      interaction: this as unknown as Interact.Interaction<never>,
+      interaction: this as unknown as Interaction<never>,
     })
 
     if (!this.simulation) {
@@ -422,7 +422,7 @@ export class Interaction<T extends ActionName = ActionName> {
    *
    * @param {PointerEvent} [event]
    */
-  end (event?: Interact.PointerEventType) {
+  end (event?: PointerEventType) {
     this._ending = true
     event = event || this._latestPointer.event
     let endPhaseResult: boolean
@@ -461,7 +461,7 @@ export class Interaction<T extends ActionName = ActionName> {
     this.prepared.name = this.prevEvent = null
   }
 
-  getPointerIndex (pointer: Interact.PointerType) {
+  getPointerIndex (pointer: PointerType) {
     const pointerId = pointerUtils.getPointerId(pointer)
 
     // mouse and pen interactions may have only one pointer
@@ -474,7 +474,7 @@ export class Interaction<T extends ActionName = ActionName> {
     return this.pointers[this.getPointerIndex(pointer)]
   }
 
-  updatePointer (pointer: Interact.PointerType, event: Interact.PointerEventType, eventTarget: Node, down?: boolean) {
+  updatePointer (pointer: PointerType, event: PointerEventType, eventTarget: Node, down?: boolean) {
     const id = pointerUtils.getPointerId(pointer)
     let pointerIndex = this.getPointerIndex(pointer)
     let pointerInfo = this.pointers[pointerIndex]
@@ -527,13 +527,13 @@ export class Interaction<T extends ActionName = ActionName> {
       down,
       pointerInfo,
       pointerIndex,
-      interaction: this as unknown as Interact.Interaction<never>,
+      interaction: this as unknown as Interaction<never>,
     })
 
     return pointerIndex
   }
 
-  removePointer (pointer: Interact.PointerType, event: Interact.PointerEventType) {
+  removePointer (pointer: PointerType, event: PointerEventType) {
     const pointerIndex = this.getPointerIndex(pointer)
 
     if (pointerIndex === -1) { return }
@@ -546,14 +546,14 @@ export class Interaction<T extends ActionName = ActionName> {
       eventTarget: null,
       pointerIndex,
       pointerInfo,
-      interaction: this as unknown as Interact.Interaction<never>,
+      interaction: this as unknown as Interaction<never>,
     })
 
     this.pointers.splice(pointerIndex, 1)
     this.pointerIsDown = false
   }
 
-  _updateLatestPointer (pointer: Interact.PointerType, event: Interact.PointerEventType, eventTarget: Node) {
+  _updateLatestPointer (pointer: PointerType, event: PointerEventType, eventTarget: Node) {
     this._latestPointer.pointer = pointer
     this._latestPointer.event = event
     this._latestPointer.eventTarget = eventTarget
@@ -565,7 +565,7 @@ export class Interaction<T extends ActionName = ActionName> {
     this._latestPointer.eventTarget = null
   }
 
-  _createPreparedEvent<P extends EventPhase> (event: Interact.PointerEventType, phase: P, preEnd?: boolean, type?: string) {
+  _createPreparedEvent<P extends EventPhase> (event: PointerEventType, phase: P, preEnd?: boolean, type?: string) {
     return new InteractEvent<T, P>(this, event, this.prepared.name, phase, this.element, preEnd, type)
   }
 

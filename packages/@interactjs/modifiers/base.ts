@@ -1,4 +1,8 @@
-import * as Interact from '@interactjs/types/index'
+import { EventPhase, InteractEvent } from '@interactjs/core/InteractEvent'
+import { Interactable } from '@interactjs/core/Interactable'
+import Interaction from '@interactjs/core/Interaction'
+import { Plugin } from '@interactjs/core/scope'
+import { EdgeOptions, FullRect, Point, Rect } from '@interactjs/types'
 
 import Modification from './Modification'
 
@@ -32,7 +36,7 @@ export interface Modifier<
   methods: {
     start?: (arg: ModifierArg<State>) => void
     set: (arg: ModifierArg<State>) => void
-    beforeEnd?: (arg: ModifierArg<State>) => Interact.Point | void
+    beforeEnd?: (arg: ModifierArg<State>) => Point | void
     stop?: (arg: ModifierArg<State>) => void
   }
   name?: Name
@@ -52,18 +56,18 @@ export type ModifierState<
 } & StateProps
 
 export interface ModifierArg<State extends ModifierState = ModifierState> {
-  interaction: Interact.Interaction
-  interactable: Interact.Interactable
-  phase: Interact.EventPhase
-  rect: Interact.FullRect
-  edges: Interact.EdgeOptions
+  interaction: Interaction
+  interactable: Interactable
+  phase: EventPhase
+  rect: FullRect
+  edges: EdgeOptions
   state?: State
-  element: Interact.Element
-  pageCoords?: Interact.Point
-  prevCoords?: Interact.Point
-  prevRect?: Interact.FullRect
-  coords?: Interact.Point
-  startOffset?: Interact.Rect
+  element: Element
+  pageCoords?: Point
+  prevCoords?: Point
+  prevRect?: FullRect
+  coords?: Point
+  startOffset?: Rect
   preEnd?: boolean
 }
 
@@ -74,7 +78,7 @@ export interface ModifierModule<
   defaults?: Defaults
   start? (arg: ModifierArg<State>): void
   set? (arg: ModifierArg<State>): any
-  beforeEnd? (arg: ModifierArg<State>): Interact.Point | void
+  beforeEnd? (arg: ModifierArg<State>): Point | void
   stop? (arg: ModifierArg<State>): void
 }
 
@@ -143,15 +147,15 @@ export function makeModifier<
 }
 
 export function addEventModifiers ({ iEvent, interaction: { modification: { result } } }: {
-  iEvent: Interact.InteractEvent<any>
-  interaction: Interact.Interaction<any>
+  iEvent: InteractEvent<any>
+  interaction: Interaction<any>
 }) {
   if (result) {
     iEvent.modifiers = result.eventProps
   }
 }
 
-const modifiersBase: Interact.Plugin = {
+const modifiersBase: Plugin = {
   id: 'modifiers/base',
   before: ['actions'],
   install: scope => {

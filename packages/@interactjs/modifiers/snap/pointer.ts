@@ -1,4 +1,5 @@
-import * as Interact from '@interactjs/types/index'
+import Interaction, { InteractionProxy } from '@interactjs/core/Interaction'
+import { Point, RectResolvable, Element } from '@interactjs/types'
 import extend from '@interactjs/utils/extend'
 import getOriginXY from '@interactjs/utils/getOriginXY'
 import hypot from '@interactjs/utils/hypot'
@@ -11,7 +12,7 @@ export interface Offset {
   x: number
   y: number
   index: number
-  relativePoint?: Interact.Point
+  relativePoint?: Point
 }
 
 export interface SnapPosition {
@@ -25,7 +26,7 @@ export interface SnapPosition {
 export type SnapFunction = (
   x: number,
   y: number,
-  interaction: Interact.InteractionProxy,
+  interaction: InteractionProxy,
   offset: Offset,
   index: number
 ) => SnapPosition
@@ -35,11 +36,11 @@ export interface SnapOptions {
   // target range
   range: number
   // self points for snapping. [0,0] = top left, [1,1] = bottom right
-  relativePoints: Interact.Point[]
+  relativePoints: Point[]
   // startCoords = offset snapping from drag start page position
-  offset: Interact.Point | Interact.RectResolvable<[Interact.Interaction]> | 'startCoords'
+  offset: Point | RectResolvable<[Interaction]> | 'startCoords'
   offsetWithOrigin?: boolean
-  origin: Interact.RectResolvable<[Interact.Element]> | Interact.Point
+  origin: RectResolvable<[Element]> | Point
   endOnly?: boolean
   enabled?: boolean
 }
@@ -57,7 +58,7 @@ function start (arg: ModifierArg<SnapState>) {
     ? getOrigin(arg)
     : { x: 0, y: 0 }
 
-  let snapOffset: Interact.Point
+  let snapOffset: Point
 
   if (options.offset === 'startCoords') {
     snapOffset = {

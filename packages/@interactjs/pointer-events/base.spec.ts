@@ -1,7 +1,8 @@
 import test from '@interactjs/_dev/test/test'
 import { Eventable } from '@interactjs/core/Eventable'
+import { Scope } from '@interactjs/core/scope'
 import * as helpers from '@interactjs/core/tests/_helpers'
-import * as Interact from '@interactjs/types/index'
+import { PointerEventType, PointerType } from '@interactjs/types'
 
 import pointerEvents, { EventTargetList } from './base'
 import interactableTargets from './interactableTargets'
@@ -86,7 +87,7 @@ test('pointerEvents.collectEventTargets', t => {
     props: { TEST_PROP },
     eventable: new Eventable(pointerEvents.defaults),
   }
-  let collectedTargets
+  let collectedTargets: EventTargetList
 
   function onCollect ({ targets }: { targets?: EventTargetList }) {
     targets.push(target)
@@ -112,13 +113,13 @@ test('pointerEvents.collectEventTargets', t => {
 })
 
 test('pointerEvents Interaction update-pointer signal', t => {
-  const scope: Interact.Scope = helpers.mockScope()
+  const scope: Scope = helpers.mockScope()
 
   scope.usePlugin(pointerEvents)
 
   const interaction = scope.interactions.new({})
   const initialHold = { duration: Infinity, timeout: null as number }
-  const event = {} as Interact.PointerEventType
+  const event = {} as PointerEventType
 
   interaction.updatePointer(helpers.newPointer(0), event, null, false)
   t.deepEqual(interaction.pointers.map(p => p.hold), [initialHold], 'set hold info for move on new pointer')
@@ -135,7 +136,7 @@ test('pointerEvents Interaction update-pointer signal', t => {
 })
 
 test('pointerEvents Interaction remove-pointer signal', t => {
-  const scope: Interact.Scope = helpers.mockScope()
+  const scope: Scope = helpers.mockScope()
 
   scope.usePlugin(pointerEvents)
 
@@ -150,7 +151,7 @@ test('pointerEvents Interaction remove-pointer signal', t => {
   ]
 
   for (const id of ids) {
-    const index = interaction.updatePointer({ pointerId: id } as Interact.PointerType, {} as Interact.PointerEventType, null, true)
+    const index = interaction.updatePointer({ pointerId: id } as PointerType, {} as PointerEventType, null, true)
     // use the ids as the pointerInfo.hold value for this test
     interaction.pointers[index].hold = id as any
   }

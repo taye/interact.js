@@ -1,7 +1,7 @@
 import test from '@interactjs/_dev/test/test'
 import resize from '@interactjs/actions/resize/plugin'
 import * as helpers from '@interactjs/core/tests/_helpers'
-import * as Interact from '@interactjs/types/index'
+import { FullRect, EdgeOptions } from '@interactjs/types'
 
 import aspectRatio, { AspectRatioOptions } from './aspectRatio'
 import modifiersBase from './base'
@@ -25,7 +25,7 @@ test('modifiers/aspectRatio', t => {
   coords.client = coords.page
 
   const options: AspectRatioOptions = {}
-  let lastRect: Interact.FullRect = null
+  let lastRect: FullRect = null
 
   interactable.resizable({
     edges: { left: true, top: true, right: true, bottom: true },
@@ -78,7 +78,7 @@ test('modifiers/aspectRatio', t => {
   )
   t.end()
 
-  function downStartMoveUp ({ x, y, edges }: { x: number, y: number, edges: Interact.EdgeOptions }) {
+  function downStartMoveUp ({ x, y, edges }: { x: number, y: number, edges: EdgeOptions }) {
     coords.timeStamp = 0
     interaction.stop()
     lastRect = null

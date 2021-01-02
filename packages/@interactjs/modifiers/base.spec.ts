@@ -1,6 +1,7 @@
 import test from '@interactjs/_dev/test/test'
+import { ActionName } from '@interactjs/core/scope'
 import * as helpers from '@interactjs/core/tests/_helpers'
-import * as Interact from '@interactjs/types/index'
+import { Element } from '@interactjs/types'
 import extend from '@interactjs/utils/extend'
 import is from '@interactjs/utils/is'
 
@@ -20,8 +21,8 @@ test('modifiers/base', t => {
 
   coords.client = coords.page
 
-  const testAction = { name: 'test' as Interact.ActionName }
-  const element = target as Interact.Element
+  const testAction = { name: 'test' as ActionName }
+  const element = target as Element
   const startCoords = { x: 100, y: 200 }
   const moveCoords = { x: 400, y: 500 }
   const options: any = { target: { x: 100, y: 100 }, setStart: true }

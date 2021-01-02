@@ -2,11 +2,11 @@ import test from '@interactjs/_dev/test/test'
 import drag from '@interactjs/actions/drag/plugin'
 import drop from '@interactjs/actions/drop/plugin'
 import autoStart from '@interactjs/auto-start/base'
-import * as Interact from '@interactjs/types/index'
+import { PointerType } from '@interactjs/types'
 import extend from '@interactjs/utils/extend'
 import * as pointerUtils from '@interactjs/utils/pointerUtils'
 
-import { InteractEvent } from './InteractEvent'
+import { EventPhase, InteractEvent } from './InteractEvent'
 import { Interaction } from './Interaction'
 import * as helpers from './tests/_helpers'
 
@@ -183,7 +183,7 @@ test('Interaction.removePointer', t => {
   ids.forEach(pointerId => interaction.updatePointer({ pointerId } as any, {} as any, null))
 
   for (const removal of removals) {
-    interaction.removePointer({ pointerId: removal.id } as Interact.PointerType, null)
+    interaction.removePointer({ pointerId: removal.id } as PointerType, null)
 
     t.deepEqual(
       interaction.pointers.map(p => p.id),
@@ -428,7 +428,7 @@ test('interaction move() and stop() from start event', t => {
     down,
   } = helpers.testEnv({ plugins: [drag, drop, autoStart] })
 
-  let stoppedBeforeStartFired
+  let stoppedBeforeStartFired: boolean
 
   interactable.draggable({
     listeners: {
@@ -462,7 +462,7 @@ test('Interaction createPreparedEvent', t => {
   const { interaction, interactable, target } = helpers.testEnv()
 
   const action = { name: 'resize' } as const
-  const phase = 'TEST_PHASE' as Interact.EventPhase
+  const phase = 'TEST_PHASE' as EventPhase
 
   interaction.prepared = action
   interaction.interactable = interactable
@@ -488,7 +488,7 @@ test('Interaction createPreparedEvent', t => {
 
 test('Interaction fireEvent', t => {
   const { interaction, interactable } = helpers.testEnv()
-  const iEvent = {} as Interact.InteractEvent
+  const iEvent = {} as InteractEvent
   let firedEvent
 
   // this method should be called from actions.firePrepared

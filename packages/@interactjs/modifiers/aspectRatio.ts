@@ -16,7 +16,7 @@
  * ```
  */
 
-import * as Interact from '@interactjs/types/index'
+import { Point, Rect, EdgeOptions } from '@interactjs/types'
 import extend from '@interactjs/utils/extend'
 import { addEdges } from '@interactjs/utils/rect'
 
@@ -31,9 +31,9 @@ export interface AspectRatioOptions {
 }
 
 export type AspectRatioState = ModifierState<AspectRatioOptions, {
-  startCoords: Interact.Point
-  startRect: Interact.Rect
-  linkedEdges: Interact.EdgeOptions
+  startCoords: Point
+  startRect: Rect
+  linkedEdges: EdgeOptions
   ratio: number
   equalDelta: boolean
   xIsPrimaryAxis: boolean
@@ -129,7 +129,7 @@ const aspectRatio: ModifierModule<AspectRatioOptions, AspectRatioState> = {
   },
 }
 
-function setEqualDelta ({ startCoords, edgeSign }: AspectRatioState, xIsPrimaryAxis: boolean, coords: Interact.Point) {
+function setEqualDelta ({ startCoords, edgeSign }: AspectRatioState, xIsPrimaryAxis: boolean, coords: Point) {
   if (xIsPrimaryAxis) {
     coords.y = startCoords.y + (coords.x - startCoords.x) * edgeSign
   }
@@ -138,7 +138,7 @@ function setEqualDelta ({ startCoords, edgeSign }: AspectRatioState, xIsPrimaryA
   }
 }
 
-function setRatio ({ startRect, startCoords, ratio, edgeSign }: AspectRatioState, xIsPrimaryAxis: boolean, coords: Interact.Point, rect: Interact.Rect) {
+function setRatio ({ startRect, startCoords, ratio, edgeSign }: AspectRatioState, xIsPrimaryAxis: boolean, coords: Point, rect: Rect) {
   if (xIsPrimaryAxis) {
     const newHeight = rect.width / ratio
 

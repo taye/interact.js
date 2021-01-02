@@ -1,11 +1,13 @@
-import * as Interact from '@interactjs/types/index'
+import { PerActionDefaults } from '@interactjs/core/defaultOptions'
+import { ActionName } from '@interactjs/core/scope'
+import { HasGetRect } from '@interactjs/types'
 
 import { rectToXY, resolveRectLike } from './rect'
 
 export default function (
-  target: Interact.HasGetRect & { options: Interact.PerActionDefaults },
+  target: HasGetRect & { options: PerActionDefaults },
   element: Node,
-  actionName?: Interact.ActionName,
+  actionName?: ActionName,
 ) {
   const actionOptions = (target.options as any)[actionName]
   const actionOrigin = actionOptions && actionOptions.origin

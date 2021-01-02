@@ -1,4 +1,7 @@
-import * as Interact from '@interactjs/types/index'
+import { Interactable } from '@interactjs/core/Interactable'
+import Interaction from '@interactjs/core/Interaction'
+import { Scope } from '@interactjs/core/scope'
+import { PointerEventType } from '@interactjs/types'
 import { matchesSelector, nodeContains } from '@interactjs/utils/domUtils'
 import is from '@interactjs/utils/is'
 import { getWindow } from '@interactjs/utils/window'
@@ -11,9 +14,9 @@ declare module '@interactjs/core/Interactable' {
 }
 
 type PreventDefaultValue = 'always' | 'never' | 'auto'
-function preventDefault (this: Interact.Interactable): PreventDefaultValue
-function preventDefault (this: Interact.Interactable, newValue: PreventDefaultValue): typeof this
-function preventDefault (this: Interact.Interactable, newValue?: PreventDefaultValue) {
+function preventDefault (this: Interactable): PreventDefaultValue
+function preventDefault (this: Interactable, newValue: PreventDefaultValue): typeof this
+function preventDefault (this: Interactable, newValue?: PreventDefaultValue) {
   if (/^(always|never|auto)$/.test(newValue)) {
     this.options.preventDefault = newValue
     return this
@@ -27,7 +30,7 @@ function preventDefault (this: Interact.Interactable, newValue?: PreventDefaultV
   return this.options.preventDefault
 }
 
-function checkAndPreventDefault (interactable: Interact.Interactable, scope: Interact.Scope, event: Event) {
+function checkAndPreventDefault (interactable: Interactable, scope: Scope, event: Event) {
   const setting = interactable.options.preventDefault
 
   if (setting === 'never') { return }
@@ -65,13 +68,13 @@ function checkAndPreventDefault (interactable: Interact.Interactable, scope: Int
   event.preventDefault()
 }
 
-function onInteractionEvent ({ interaction, event }: { interaction: Interact.Interaction, event: Interact.PointerEventType }) {
+function onInteractionEvent ({ interaction, event }: { interaction: Interaction, event: PointerEventType }) {
   if (interaction.interactable) {
     interaction.interactable.checkAndPreventDefault(event as Event)
   }
 }
 
-export function install (scope: Interact.Scope) {
+export function install (scope: Scope) {
   /** @lends Interactable */
   const { Interactable } = scope
 

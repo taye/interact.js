@@ -1,7 +1,7 @@
 import test from '@interactjs/_dev/test/test'
 import drag from '@interactjs/actions/drag/plugin'
+import { EventPhase, InteractEvent } from '@interactjs/core/InteractEvent'
 import * as helpers from '@interactjs/core/tests/_helpers'
-import * as Interact from '@interactjs/types/index'
 import extend from '@interactjs/utils/extend'
 
 import inertia from './plugin'
@@ -31,8 +31,8 @@ test('inertia', t => {
     },
   }
 
-  let fired: Array<Interact.InteractEvent<'drag'>> = []
-  let modifierCallPhases: Interact.EventPhase[] = []
+  let fired: Array<InteractEvent<'drag'>> = []
+  let modifierCallPhases: EventPhase[] = []
 
   coords.client = coords.page
   scope.now = () => coords.timeStamp

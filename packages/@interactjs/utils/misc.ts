@@ -1,4 +1,5 @@
-import * as Interact from '@interactjs/types/index'
+import { ActionProps } from '@interactjs/core/Interaction'
+import { ActionName } from '@interactjs/core/scope'
 
 import { window } from './window'
 
@@ -15,7 +16,7 @@ export function warnOnce<T> (this: T, method: (...args: any[]) => any, message: 
   }
 }
 
-export function copyAction (dest: Interact.ActionProps, src: Interact.ActionProps) {
+export function copyAction <T extends ActionName> (dest: ActionProps<any>, src: ActionProps<T>) {
   dest.name  = src.name
   dest.axis  = src.axis
   dest.edges = src.edges

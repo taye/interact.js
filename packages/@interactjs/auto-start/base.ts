@@ -1,4 +1,7 @@
-import * as Interact from '@interactjs/types/index'
+import { Interactable } from '@interactjs/core/Interactable'
+import Interaction, { ActionProps } from '@interactjs/core/Interaction'
+import { Scope, SignalArgs, ActionName, Plugin } from '@interactjs/core/scope'
+import { CursorChecker, PointerType, PointerEventType, Element } from '@interactjs/types'
 import * as domUtils from '@interactjs/utils/domUtils'
 import extend from '@interactjs/utils/extend'
 import is from '@interactjs/utils/is'
@@ -18,8 +21,8 @@ declare module '@interactjs/core/scope' {
   }
 
   interface SignalArgs {
-    'autoStart:before-start': Interact.SignalArgs['interactions:move']
-    'autoStart:prepared': { interaction: Interact.Interaction }
+    'autoStart:before-start': SignalArgs['interactions:move']
+    'autoStart:prepared': { interaction: Interaction }
     'auto-start:check': CheckSignalArg
   }
 }
@@ -35,21 +38,22 @@ declare module '@interactjs/core/defaultOptions' {
     manualStart?: boolean
     max?: number
     maxPerElement?: number
-    allowFrom?: string | Interact.Element
-    ignoreFrom?: string | Interact.Element
-    cursorChecker?: Interact.CursorChecker
+    allowFrom?: string | Element
+    ignoreFrom?: string | Element
+    cursorChecker?: CursorChecker
 
     // only allow left button by default
     // see https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/buttons#Return_value
+    // TODO: docst
     mouseButtons?: 0 | 1 | 2 | 4 | 8 | 16
   }
 }
 
 interface CheckSignalArg {
-  interactable: Interact.Interactable
-  interaction: Interact.Interaction
-  element: Interact.Element
-  action: Interact.ActionProps
+  interactable: Interactable
+  interaction: Interaction
+  element: Element
+  action: ActionProps<ActionName>
   buttons: number
 }
 
@@ -57,10 +61,10 @@ export interface AutoStart {
   // Allow this many interactions to happen simultaneously
   maxInteractions: number
   withinInteractionLimit: typeof withinInteractionLimit
-  cursorElement: Interact.Element
+  cursorElement: Element
 }
 
-function install (scope: Interact.Scope) {
+function install (scope: Scope) {
   const {
     interactStatic: interact,
     defaults,
@@ -104,23 +108,23 @@ function install (scope: Interact.Scope) {
   }
 }
 
-function prepareOnDown ({ interaction, pointer, event, eventTarget }: Interact.SignalArgs['interactions:down'], scope: Interact.Scope) {
+function prepareOnDown ({ interaction, pointer, event, eventTarget }: SignalArgs['interactions:down'], scope: Scope) {
   if (interaction.interacting()) { return }
 
   const actionInfo = getActionInfo(interaction, pointer, event, eventTarget, scope)
   prepare(interaction, actionInfo, scope)
 }
 
-function prepareOnMove ({ interaction, pointer, event, eventTarget }: Interact.SignalArgs['interactions:move'], scope: Interact.Scope) {
+function prepareOnMove ({ interaction, pointer, event, eventTarget }: SignalArgs['interactions:move'], scope: Scope) {
   if (interaction.pointerType !== 'mouse' ||
       interaction.pointerIsDown ||
       interaction.interacting()) { return }
 
-  const actionInfo = getActionInfo(interaction, pointer, event, eventTarget as Interact.Element, scope)
+  const actionInfo = getActionInfo(interaction, pointer, event, eventTarget as Element, scope)
   prepare(interaction, actionInfo, scope)
 }
 
-function startOnMove (arg: Interact.SignalArgs['interactions:move'], scope: Interact.Scope) {
+function startOnMove (arg: SignalArgs['interactions:move'], scope: Scope) {
   const { interaction } = arg
 
   if (!interaction.pointerIsDown ||
@@ -133,7 +137,7 @@ function startOnMove (arg: Interact.SignalArgs['interactions:move'], scope: Inte
   scope.fire('autoStart:before-start', arg)
 
   const { interactable } = interaction
-  const actionName = (interaction as Interact.Interaction<Interact.ActionName>).prepared.name
+  const actionName = (interaction as Interaction<ActionName>).prepared.name
 
   if (actionName && interactable) {
     // check manualStart and interaction limit
@@ -148,7 +152,7 @@ function startOnMove (arg: Interact.SignalArgs['interactions:move'], scope: Inte
   }
 }
 
-function clearCursorOnStop ({ interaction }: { interaction: Interact.Interaction }, scope: Interact.Scope) {
+function clearCursorOnStop ({ interaction }: { interaction: Interaction }, scope: Scope) {
   const { interactable } = interaction
 
   if (interactable && interactable.options.styleCursor) {
@@ -158,12 +162,12 @@ function clearCursorOnStop ({ interaction }: { interaction: Interact.Interaction
 
 // Check if the current interactable supports the action.
 // If so, return the validated action. Otherwise, return null
-function validateAction<T extends Interact.ActionName> (
-  action: Interact.ActionProps<T>,
-  interactable: Interact.Interactable,
-  element: Interact.Element,
+function validateAction<T extends ActionName> (
+  action: ActionProps<T>,
+  interactable: Interactable,
+  element: Element,
   eventTarget: Node,
-  scope: Interact.Scope,
+  scope: Scope,
 ) {
   if (interactable.testIgnoreAllow(interactable.options[action.name], element, eventTarget) &&
       interactable.options[action.name].enabled &&
@@ -175,13 +179,13 @@ function validateAction<T extends Interact.ActionName> (
 }
 
 function validateMatches (
-  interaction: Interact.Interaction,
-  pointer: Interact.PointerType,
-  event: Interact.PointerEventType,
-  matches: Interact.Interactable[],
-  matchElements: Interact.Element[],
+  interaction: Interaction,
+  pointer: PointerType,
+  event: PointerEventType,
+  matches: Interactable[],
+  matchElements: Element[],
   eventTarget: Node,
-  scope: Interact.Scope,
+  scope: Scope,
 ) {
   for (let i = 0, len = matches.length; i < len; i++) {
     const match = matches[i]
@@ -190,7 +194,7 @@ function validateMatches (
 
     if (!matchAction) { continue }
 
-    const action = validateAction(
+    const action = validateAction<ActionName>(
       matchAction,
       match,
       matchElement,
@@ -210,18 +214,18 @@ function validateMatches (
 }
 
 function getActionInfo (
-  interaction: Interact.Interaction,
-  pointer: Interact.PointerType,
-  event: Interact.PointerEventType,
+  interaction: Interaction,
+  pointer: PointerType,
+  event: PointerEventType,
   eventTarget: Node,
-  scope: Interact.Scope,
+  scope: Scope,
 ) {
-  let matches: Interact.Interactable[] = []
-  let matchElements: Interact.Element[] = []
+  let matches: Interactable[] = []
+  let matchElements: Element[] = []
 
-  let element = eventTarget as Interact.Element
+  let element = eventTarget as Element
 
-  function pushMatches (interactable: Interact.Interactable) {
+  function pushMatches (interactable: Interactable) {
     matches.push(interactable)
     matchElements.push(element)
   }
@@ -239,20 +243,20 @@ function getActionInfo (
       return actionInfo
     }
 
-    element = domUtils.parentNode(element) as Interact.Element
+    element = domUtils.parentNode(element) as Element
   }
 
   return { action: null, interactable: null, element: null }
 }
 
 function prepare (
-  interaction: Interact.Interaction,
+  interaction: Interaction,
   { action, interactable, element }: {
-    action: Interact.ActionProps
-    interactable: Interact.Interactable
-    element: Interact.Element
+    action: ActionProps<any>
+    interactable: Interactable
+    element: Element
   },
-  scope: Interact.Scope,
+  scope: Scope,
 ) {
   action = action || { name: null }
 
@@ -269,11 +273,11 @@ function prepare (
   scope.fire('autoStart:prepared', { interaction })
 }
 
-function withinInteractionLimit<T extends Interact.ActionName> (
-  interactable: Interact.Interactable,
-  element: Interact.Element,
-  action: Interact.ActionProps<T>,
-  scope: Interact.Scope,
+function withinInteractionLimit<T extends ActionName> (
+  interactable: Interactable,
+  element: Element,
+  action: ActionProps<T>,
+  scope: Scope,
 ) {
   const options = interactable.options
   const maxActions = options[action.name].max
@@ -317,7 +321,7 @@ function withinInteractionLimit<T extends Interact.ActionName> (
   return autoStartMax > 0
 }
 
-function maxInteractions (newValue: any, scope: Interact.Scope) {
+function maxInteractions (newValue: any, scope: Scope) {
   if (is.number(newValue)) {
     scope.autoStart.maxInteractions = newValue
 
@@ -327,7 +331,7 @@ function maxInteractions (newValue: any, scope: Interact.Scope) {
   return scope.autoStart.maxInteractions
 }
 
-function setCursor (element: Interact.Element, cursor: string, scope: Interact.Scope) {
+function setCursor (element: Element, cursor: string, scope: Scope) {
   const { cursorElement: prevCursorElement } = scope.autoStart
 
   if (prevCursorElement && prevCursorElement !== element) {
@@ -339,7 +343,7 @@ function setCursor (element: Interact.Element, cursor: string, scope: Interact.S
   scope.autoStart.cursorElement = cursor ? element : null
 }
 
-function setInteractionCursor<T extends Interact.ActionName> (interaction: Interact.Interaction<T>, scope: Interact.Scope) {
+function setInteractionCursor<T extends ActionName> (interaction: Interaction<T>, scope: Scope) {
   const { interactable, element, prepared } = interaction
 
   if (!(interaction.pointerType === 'mouse' && interactable && interactable.options.styleCursor)) {
@@ -367,7 +371,7 @@ function setInteractionCursor<T extends Interact.ActionName> (interaction: Inter
   setCursor(interaction.element, cursor || '', scope)
 }
 
-const autoStart: Interact.Plugin = {
+const autoStart: Plugin = {
   id: 'auto-start/base',
   before: ['actions'],
   install,
@@ -382,6 +386,6 @@ const autoStart: Interact.Plugin = {
   maxInteractions,
   withinInteractionLimit,
   validateAction,
-} as Interact.Plugin
+}
 
 export default autoStart

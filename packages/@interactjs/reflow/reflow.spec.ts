@@ -1,12 +1,14 @@
 import PromisePolyfill from 'promise-polyfill'
 
 import test from '@interactjs/_dev/test/test'
+import { InteractEvent } from '@interactjs/core/InteractEvent'
+import { ActionName } from '@interactjs/core/scope'
 import * as helpers from '@interactjs/core/tests/_helpers'
-import * as Interact from '@interactjs/types/index'
+import { Point } from '@interactjs/types'
 
 import reflow from './plugin'
 
-const testAction = { name: 'TEST' as Interact.ActionName }
+const testAction = { name: 'TEST' as ActionName }
 
 test('reflow', t => {
   const rect = Object.freeze({ top: 100, left: 200, bottom: 300, right: 400 })
@@ -23,8 +25,8 @@ test('reflow', t => {
     'reflow method is added to Interactable.prototype',
   )
 
-  const fired: Interact.InteractEvent[] = []
-  let beforeReflowDelta: Interact.Point
+  const fired: InteractEvent[] = []
+  let beforeReflowDelta: Point
 
   interactable.fire = ((iEvent: any) => { fired.push(iEvent) }) as any
   (interactable.target as any) = {}

@@ -1,4 +1,5 @@
-import * as Interact from '@interactjs/types/index'
+import { ActionName } from '@interactjs/core/scope'
+import { Point, FullRect, PointerEventType, Element } from '@interactjs/types'
 import extend from '@interactjs/utils/extend'
 import getOriginXY from '@interactjs/utils/getOriginXY'
 import hypot from '@interactjs/utils/hypot'
@@ -32,12 +33,12 @@ export interface InteractEvent {
 }
 
 export class InteractEvent<
-  T extends Interact.ActionName = never,
+  T extends ActionName = never,
   P extends EventPhase = EventPhase,
 > extends BaseEvent<T> {
-  target: Interact.Element
-  currentTarget: Interact.Element
-  relatedTarget: null = null
+  target: Element
+  currentTarget: Element
+  relatedTarget: Element | null = null
   screenX?: number
   screenY?: number
   button: number
@@ -46,10 +47,10 @@ export class InteractEvent<
   shiftKey: boolean
   altKey: boolean
   metaKey: boolean
-  page: Interact.Point
-  client: Interact.Point
-  delta: Interact.Point
-  rect: Interact.FullRect
+  page: Point
+  client: Point
+  delta: Point
+  rect: FullRect
   x0: number
   y0: number
   t0: number
@@ -57,13 +58,10 @@ export class InteractEvent<
   duration: number
   clientX0: number
   clientY0: number
-  velocity: Interact.Point
+  velocity: Point
   speed: number
   swipe: ReturnType<InteractEvent<T>['getSwipe']>
   timeStamp: any
-  // drag
-  dragEnter?: Interact.Element
-  dragLeave?: Interact.Element
   // resize
   axes?: 'x' | 'y' | 'xy'
   preEnd?: boolean
@@ -71,10 +69,10 @@ export class InteractEvent<
   /** */
   constructor (
     interaction: Interaction<T>,
-    event: Interact.PointerEventType,
+    event: PointerEventType,
     actionName: T,
     phase: P,
-    element: Interact.Element,
+    element: Element,
     preEnd?: boolean,
     type?: string,
   ) {

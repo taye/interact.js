@@ -1,5 +1,7 @@
 import { Interactable } from '@interactjs/core/Interactable'
-import * as Interact from '@interactjs/types/index'
+import { OptionsArg, Options } from '@interactjs/core/defaultOptions'
+import { Scope } from '@interactjs/core/scope'
+import { Target, Context } from '@interactjs/types'
 import * as arr from '@interactjs/utils/arr'
 import * as domUtils from '@interactjs/utils/domUtils'
 import extend from '@interactjs/utils/extend'
@@ -8,30 +10,30 @@ import is from '@interactjs/utils/is'
 declare module '@interactjs/core/scope' {
   interface SignalArgs {
     'interactable:new': {
-      interactable: Interact.Interactable
-      target: Interact.Target
-      options: Interact.OptionsArg
+      interactable: Interactable
+      target: Target
+      options: OptionsArg
       win: Window
     }
   }
 }
 
 interface InteractableScopeProp {
-  context: Document | Interact.Element
-  interactable: Interact.Interactable
+  context: Context
+  interactable: Interactable
 }
 
 export class InteractableSet {
   // all set interactables
-  list: Interact.Interactable[] = []
+  list: Interactable[] = []
 
   selectorMap: {
     [selector: string]: InteractableScopeProp[]
   } = {}
 
-  scope: Interact.Scope
+  scope: Scope
 
-  constructor (scope: Interact.Scope) {
+  constructor (scope: Scope) {
     this.scope = scope
     scope.addListeners({
       'interactable:unset': ({ interactable }) => {
@@ -51,7 +53,7 @@ export class InteractableSet {
     })
   }
 
-  new (target: Interact.Target, options?: any): Interactable {
+  new (target: Target, options?: any): Interactable {
     options = extend(options || {}, {
       actions: this.scope.actions,
     })
@@ -85,7 +87,7 @@ export class InteractableSet {
     return interactable
   }
 
-  get (target: Interact.Target, options?: Interact.Options) {
+  get (target: Target, options?: Options) {
     const context = (options && options.context) || this.scope.document
     const isSelector = is.string(target)
     const targetMappings: InteractableScopeProp[] = isSelector
@@ -102,7 +104,7 @@ export class InteractableSet {
     return found && found.interactable
   }
 
-  forEachMatch<T> (node: Node, callback: (interactable: Interact.Interactable) => T) {
+  forEachMatch<T> (node: Node, callback: (interactable: Interactable) => T) {
     for (const interactable of this.list) {
       let ret: void | T
 

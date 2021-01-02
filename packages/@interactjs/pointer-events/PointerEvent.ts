@@ -1,11 +1,12 @@
-import * as Interact from '@interactjs/types/index'
+import Interaction from '@interactjs/core/Interaction'
+import { PointerEventType, PointerType, Point } from '@interactjs/types'
 import * as pointerUtils from '@interactjs/utils/pointerUtils'
 
 import { BaseEvent } from '../core/BaseEvent'
 
-export default class PointerEvent<T extends string = any> extends BaseEvent<never> {
+export default class PointerEvent<T extends string = any> extends BaseEvent<null> {
   type: T
-  originalEvent: Interact.PointerEventType
+  originalEvent: PointerEventType
   pointerId: number
   pointerType: string
   double: boolean
@@ -20,10 +21,10 @@ export default class PointerEvent<T extends string = any> extends BaseEvent<neve
   /** */
   constructor (
     type: T,
-    pointer: Interact.PointerType | PointerEvent<any>,
-    event: Interact.PointerEventType,
+    pointer: PointerType | PointerEvent<any>,
+    event: PointerEventType,
     eventTarget: Node,
-    interaction: Interact.Interaction<never>,
+    interaction: Interaction<null>,
     timeStamp: number,
   ) {
     super(interaction)
@@ -57,7 +58,7 @@ export default class PointerEvent<T extends string = any> extends BaseEvent<neve
     }
   }
 
-  _subtractOrigin ({ x: originX, y: originY }: Interact.Point) {
+  _subtractOrigin ({ x: originX, y: originY }: Point) {
     this.pageX   -= originX
     this.pageY   -= originY
     this.clientX -= originX
@@ -66,7 +67,7 @@ export default class PointerEvent<T extends string = any> extends BaseEvent<neve
     return this
   }
 
-  _addOrigin ({ x: originX, y: originY }: Interact.Point) {
+  _addOrigin ({ x: originX, y: originY }: Point) {
     this.pageX   += originX
     this.pageY   += originY
     this.clientX += originX

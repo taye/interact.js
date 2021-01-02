@@ -1,9 +1,9 @@
-import * as Interact from '@interactjs/types/index'
+import { Listener, ListenersArg, Rect } from '@interactjs/types'
 import * as arr from '@interactjs/utils/arr'
 import extend from '@interactjs/utils/extend'
 import normalize, { NormalizedListeners } from '@interactjs/utils/normalizeListeners'
 
-function fireUntilImmediateStopped (event: any, listeners: Interact.Listener[]) {
+function fireUntilImmediateStopped (event: any, listeners: Listener[]) {
   for (const listener of listeners) {
     if (event.immediatePropagationStopped) { break }
 
@@ -23,7 +23,7 @@ export class Eventable {
   }
 
   fire<T extends { type: string, propagationStopped?: boolean }> (event: T) {
-    let listeners: Interact.Listener[]
+    let listeners: Listener[]
     const global = this.global
 
     // Interactable#on() listeners
@@ -38,7 +38,7 @@ export class Eventable {
     }
   }
 
-  on (type: string, listener: Interact.ListenersArg) {
+  on (type: string, listener: ListenersArg) {
     const listeners = normalize(type, listener)
 
     for (type in listeners) {
@@ -46,7 +46,7 @@ export class Eventable {
     }
   }
 
-  off (type: string, listener: Interact.ListenersArg) {
+  off (type: string, listener: ListenersArg) {
     const listeners = normalize(type, listener)
 
     for (type in listeners) {
@@ -64,7 +64,7 @@ export class Eventable {
     }
   }
 
-  getRect (_element: Interact.Element): Interact.Rect {
+  getRect (_element: Element): Rect {
     return null
   }
 }

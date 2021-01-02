@@ -1,5 +1,5 @@
-import { ListenerMap } from '@interactjs/core/scope'
-import * as Interact from '@interactjs/types/index'
+import Interaction from '@interactjs/core/Interaction'
+import { ListenerMap, Scope, SignalArgs, Plugin } from '@interactjs/core/scope'
 
 import PointerEvent from './PointerEvent'
 import basePlugin from './base'
@@ -22,7 +22,7 @@ declare module '@interactjs/pointer-events/base' {
   }
 }
 
-function install (scope: Interact.Scope) {
+function install (scope: Scope) {
   scope.usePlugin(basePlugin)
 
   const {
@@ -41,8 +41,8 @@ function onNew ({ pointerEvent }: { pointerEvent: PointerEvent<any> }) {
 }
 
 function onFired (
-  { interaction, pointerEvent, eventTarget, targets }: Interact.SignalArgs['pointerEvents:fired'],
-  scope: Interact.Scope,
+  { interaction, pointerEvent, eventTarget, targets }: SignalArgs['pointerEvents:fired'],
+  scope: Scope,
 ) {
   if (pointerEvent.type !== 'hold' || !targets.length) { return }
 
@@ -64,7 +64,7 @@ function onFired (
   }, interval)
 }
 
-function endHoldRepeat ({ interaction }: { interaction: Interact.Interaction }) {
+function endHoldRepeat ({ interaction }: { interaction: Interaction }) {
   // set the interaction's holdStopTime property
   // to stop further holdRepeat events
   if (interaction.holdIntervalHandle) {
@@ -73,7 +73,7 @@ function endHoldRepeat ({ interaction }: { interaction: Interact.Interaction }) 
   }
 }
 
-const holdRepeat: Interact.Plugin = {
+const holdRepeat: Plugin = {
   id: 'pointer-events/holdRepeat',
   install,
   listeners: ['move', 'up', 'cancel', 'endall'].reduce(

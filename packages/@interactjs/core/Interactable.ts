@@ -1,6 +1,6 @@
 /* eslint-disable no-dupe-class-members */
-import { ActionMap } from '@interactjs/core/scope'
-import * as Interact from '@interactjs/types/index'
+import { ActionMap, ActionName, Actions, Scope } from '@interactjs/core/scope'
+import { Context, Element, Target, Listeners, OrBoolean, EventTypes, ListenersArg, ActionMethod } from '@interactjs/types'
 import * as arr from '@interactjs/utils/arr'
 import browser from '@interactjs/utils/browser'
 import clone from '@interactjs/utils/clone'
@@ -11,10 +11,10 @@ import normalizeListeners from '@interactjs/utils/normalizeListeners'
 import { getWindow } from '@interactjs/utils/window'
 
 import { Eventable } from './Eventable'
-import { ActionDefaults, Defaults, Options } from './defaultOptions'
+import { ActionDefaults, Defaults, Options, OptionsArg, PerActionDefaults } from './defaultOptions'
 import isNonNativeEvent from './isNonNativeEvent'
 
-type IgnoreValue = string | Interact.Element | boolean
+type IgnoreValue = string | Element | boolean
 type DeltaSource = 'page' | 'client'
 
 /** */
@@ -28,18 +28,18 @@ export class Interactable implements Partial<Eventable> {
   }
 
   readonly options!: Required<Options>
-  readonly _actions: Interact.Actions
-  readonly target: Interact.Target
+  readonly _actions: Actions
+  readonly target: Target
   readonly events = new Eventable()
-  readonly _context: Interact.Context
+  readonly _context: Context
   readonly _win: Window
   readonly _doc: Document
-  readonly _scopeEvents: Interact.Scope['events']
+  readonly _scopeEvents: Scope['events']
 
   /** @internal */ _rectChecker?: typeof Interactable.prototype.getRect
 
   /** */
-  constructor (target: Interact.Target, options: any, defaultContext: Document | Interact.Element, scopeEvents: Interact.Scope['events']) {
+  constructor (target: Target, options: any, defaultContext: Document | Element, scopeEvents: Scope['events']) {
     this._actions = options.actions
     this.target   = target
     this._context = options.context || defaultContext
@@ -50,7 +50,7 @@ export class Interactable implements Partial<Eventable> {
     this.set(options)
   }
 
-  setOnEvents (actionName: Interact.ActionName, phases: NonNullable<any>) {
+  setOnEvents (actionName: ActionName, phases: NonNullable<any>) {
     if (is.func(phases.onstart)) { this.on(`${actionName}start`, phases.onstart) }
     if (is.func(phases.onmove)) { this.on(`${actionName}move`, phases.onmove) }
     if (is.func(phases.onend)) { this.on(`${actionName}end`, phases.onend) }
@@ -59,7 +59,7 @@ export class Interactable implements Partial<Eventable> {
     return this
   }
 
-  updatePerActionListeners (actionName: Interact.ActionName, prev: Interact.Listeners, cur: Interact.Listeners) {
+  updatePerActionListeners (actionName: ActionName, prev: Listeners, cur: Listeners) {
     if (is.array(prev) || is.object(prev)) {
       this.off(actionName, prev)
     }
@@ -69,18 +69,18 @@ export class Interactable implements Partial<Eventable> {
     }
   }
 
-  setPerAction (actionName: Interact.ActionName, options: Interact.OrBoolean<Options>) {
+  setPerAction (actionName: ActionName, options: OrBoolean<Options>) {
     const defaults = this._defaults
 
     // for all the default per-action options
     for (const optionName_ in options) {
-      const optionName = optionName_ as keyof Interact.PerActionDefaults
+      const optionName = optionName_ as keyof PerActionDefaults
       const actionOptions = this.options[actionName]
       const optionValue: any = options[optionName]
 
       // remove old event listeners and add new ones
       if (optionName === 'listeners') {
-        this.updatePerActionListeners(actionName, actionOptions.listeners, optionValue as Interact.Listeners)
+        this.updatePerActionListeners(actionName, actionOptions.listeners, optionValue as Listeners)
       }
 
       // if the option value is an array
@@ -115,9 +115,9 @@ export class Interactable implements Partial<Eventable> {
    * overridden using {@link Interactable.rectChecker}.
    *
    * @param {Element} [element] The element to measure.
-   * @return {Interact.Rect} The object's bounding rectangle.
+   * @return {Rect} The object's bounding rectangle.
    */
-  getRect (element: Interact.Element) {
+  getRect (element: Element) {
     element = element || (is.element(this.target)
       ? this.target
       : null)
@@ -137,9 +137,9 @@ export class Interactable implements Partial<Eventable> {
    * bounding rectangle. See {@link Interactable.getRect}
    * @return {function | object} The checker function or this Interactable
    */
-  rectChecker (): (element: Interact.Element) => any | null
-  rectChecker (checker: (element: Interact.Element) => any): this
-  rectChecker (checker?: (element: Interact.Element) => any) {
+  rectChecker (): (element: Element) => any | null
+  rectChecker (checker: (element: Element) => any): this
+  rectChecker (checker?: (element: Element) => any) {
     if (is.func(checker)) {
       this._rectChecker = checker
 
@@ -167,7 +167,7 @@ export class Interactable implements Partial<Eventable> {
     return this.getRect
   }
 
-  _backCompatOption (optionName: keyof Interact.Options, newValue: any) {
+  _backCompatOption (optionName: keyof Options, newValue: any) {
     if (trySelector(newValue) || is.object(newValue)) {
       (this.options[optionName] as any) = newValue
 
@@ -292,7 +292,7 @@ export class Interactable implements Partial<Eventable> {
     return this
   }
 
-  _onOff (method: 'on' | 'off', typeArg: Interact.EventTypes, listenerArg?: Interact.ListenersArg | null, options?: any) {
+  _onOff (method: 'on' | 'off', typeArg: EventTypes, listenerArg?: ListenersArg | null, options?: any) {
     if (is.object(typeArg) && !is.array(typeArg)) {
       options = listenerArg
       listenerArg = null
@@ -333,7 +333,7 @@ export class Interactable implements Partial<Eventable> {
    * addEventListener
    * @return {Interactable} This Interactable
    */
-  on (types: Interact.EventTypes, listener?: Interact.ListenersArg, options?: any) {
+  on (types: EventTypes, listener?: ListenersArg, options?: any) {
     return this._onOff('on', types, listener, options)
   }
 
@@ -347,7 +347,7 @@ export class Interactable implements Partial<Eventable> {
    * removeEventListener
    * @return {Interactable} This Interactable
    */
-  off (types: string | string[] | Interact.EventTypes, listener?: Interact.ListenersArg, options?: any) {
+  off (types: string | string[] | EventTypes, listener?: ListenersArg, options?: any) {
     return this._onOff('off', types, listener, options)
   }
 
@@ -357,7 +357,7 @@ export class Interactable implements Partial<Eventable> {
    * @param {object} options The new settings to apply
    * @return {object} This Interactable
    */
-  set (options: Interact.OptionsArg) {
+  set (options: OptionsArg) {
     const defaults = this._defaults
 
     if (!is.object(options)) {
@@ -367,13 +367,13 @@ export class Interactable implements Partial<Eventable> {
     (this.options as Required<Options>) = clone(defaults.base) as Required<Options>
 
     for (const actionName_ in this._actions.methodDict) {
-      const actionName = actionName_ as Interact.ActionName
+      const actionName = actionName_ as ActionName
       const methodName = this._actions.methodDict[actionName]
 
       this.options[actionName] = {}
       this.setPerAction(actionName, extend(extend({}, defaults.perAction), defaults.actions[actionName]))
 
-      ;(this[methodName] as Interact.ActionMethod<unknown>)(options[actionName])
+      ;(this[methodName] as ActionMethod<unknown>)(options[actionName])
     }
 
     for (const setting in options) {

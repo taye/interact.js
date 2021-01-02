@@ -31,7 +31,6 @@
     "@babel/preset-typescript": "latest",
     "@babel/register": "latest",
     "@babel/runtime": "latest",
-    "@interactjs/_dev": "link:./",
     "@types/node": "latest",
     "@types/shelljs": "latest",
     "@types/tape": "latest",

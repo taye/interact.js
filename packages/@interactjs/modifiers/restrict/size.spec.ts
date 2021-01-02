@@ -1,7 +1,6 @@
 import test from '@interactjs/_dev/test/test'
-import resize from '@interactjs/actions/resize/plugin'
+import resize, { ResizeEvent } from '@interactjs/actions/resize/plugin'
 import * as helpers from '@interactjs/core/tests/_helpers'
-import * as Interact from '@interactjs/types/index'
 import extend from '@interactjs/utils/extend'
 import * as rectUtils from '@interactjs/utils/rect'
 
@@ -25,7 +24,7 @@ test('restrictSize', t => {
     min: { width:  60, height:  50 } as any,
     max: { width: 300, height: 350 } as any,
   }
-  let latestEvent: Interact.ResizeEvent = null
+  let latestEvent: ResizeEvent = null
 
   interactable
     .resizable({

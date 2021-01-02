@@ -1,6 +1,6 @@
 import test from '@interactjs/_dev/test/test'
 import * as helpers from '@interactjs/core/tests/_helpers'
-import * as Interact from '@interactjs/types/index'
+import { EdgeOptions } from '@interactjs/types'
 
 import { snapEdges } from '../snap/edges'
 
@@ -29,7 +29,7 @@ test('modifiers/snap/edges', t => {
   const arg = {
     interaction,
     // resize from top left
-    edges: { top: true, left: true } as Interact.EdgeOptions,
+    edges: { top: true, left: true } as EdgeOptions,
     interactable: interaction.interactable,
     state: null as any,
     pageCoords,

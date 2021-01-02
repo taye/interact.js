@@ -1,8 +1,7 @@
 import test from '@interactjs/_dev/test/test'
 import * as helpers from '@interactjs/core/tests/_helpers'
-import * as Interact from '@interactjs/types/index'
 
-import resize from './plugin'
+import resize, { ResizeEvent } from './plugin'
 
 const { ltrbwh } = helpers
 
@@ -83,7 +82,7 @@ test('resize', t => {
   )
 
   const zeroRect = { left: 0, top: 0, right: 0, bottom: 0, width: 0, height: 0 }
-  let resizeEvent: Interact.ResizeEvent = null
+  let resizeEvent: ResizeEvent = null
 
   interactable.on('resizestart resizemove resizeend', e => {
     resizeEvent = e
@@ -169,6 +168,6 @@ test('resize', t => {
   t.end()
 })
 
-function hasResizeProps (event: Interact.ResizeEvent) {
+function hasResizeProps (event: ResizeEvent) {
   return !!(event.deltaRect && event.rect && event.edges)
 }

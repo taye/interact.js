@@ -1,4 +1,5 @@
-import * as Interact from '@interactjs/types/index'
+import { Scope } from '@interactjs/core/scope'
+import { Element } from '@interactjs/types'
 import * as arr from '@interactjs/utils/arr'
 import * as domUtils from '@interactjs/utils/domUtils'
 import extend from '@interactjs/utils/extend'
@@ -14,7 +15,7 @@ declare module '@interactjs/core/scope' {
 
 type Listener = (event: Event | FakeEvent) => any
 
-function install (scope: Interact.Scope) {
+function install (scope: Scope) {
   const targets: Array<{
     eventTarget: EventTarget
     events: { [type: string]: Listener[] }
@@ -153,7 +154,7 @@ function install (scope: Interact.Scope) {
 
   function removeDelegate (
     selector: string,
-    context: Document | Interact.Element,
+    context: Document | Element,
     type: string,
     listener?: Listener,
     optionalArg?: any,
@@ -236,7 +237,7 @@ function install (scope: Interact.Scope) {
     }
   }
 
-  function delegateUseCapture (this: Interact.Element, event: Event | FakeEvent) {
+  function delegateUseCapture (this: Element, event: Event | FakeEvent) {
     return delegateListener.call(this, event, true)
   }
 

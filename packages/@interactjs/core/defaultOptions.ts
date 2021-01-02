@@ -1,4 +1,4 @@
-import * as Interact from '@interactjs/types/index'
+import { Point, Listeners, OrBoolean, Element } from '@interactjs/types'
 
 export interface Defaults {
   base: BaseDefaults
@@ -18,10 +18,10 @@ export interface BaseDefaults {
 
 export interface PerActionDefaults {
   enabled?: boolean
-  origin?: Interact.Point | string | Interact.Element
-  listeners?: Interact.Listeners
-  allowFrom?: string | Interact.Element
-  ignoreFrom?: string | Interact.Element
+  origin?: Point | string | Element
+  listeners?: Listeners
+  allowFrom?: string | Element
+  ignoreFrom?: string | Element
 }
 
 export type Options = Partial<BaseDefaults> & Partial<PerActionDefaults> & {
@@ -30,7 +30,7 @@ export type Options = Partial<BaseDefaults> & Partial<PerActionDefaults> & {
 
 // export interface Options extends BaseDefaults, PerActionDefaults {}
 
-export interface OptionsArg extends BaseDefaults, Interact.OrBoolean<Partial<ActionDefaults>> {}
+export interface OptionsArg extends BaseDefaults, OrBoolean<Partial<ActionDefaults>> {}
 
 export const defaults: Defaults = {
   base: {

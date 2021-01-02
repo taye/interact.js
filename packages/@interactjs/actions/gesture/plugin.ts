@@ -1,7 +1,12 @@
-import * as Interact from '@interactjs/types/index'
+import { InteractEvent, EventPhase } from '@interactjs/core/InteractEvent'
+import Interaction, { DoPhaseArg } from '@interactjs/core/Interaction'
+import { Options } from '@interactjs/core/defaultOptions'
+import { Scope, Plugin } from '@interactjs/core/scope'
+import { ActionMethod, GesturableOptions, Rect, PointerType } from '@interactjs/types'
 import is from '@interactjs/utils/is'
 import * as pointerUtils from '@interactjs/utils/pointerUtils'
-export type GesturableMethod = Interact.ActionMethod<Interact.GesturableOptions>
+
+export type GesturableMethod = ActionMethod<GesturableOptions>
 
 declare module '@interactjs/core/Interaction' {
   interface Interaction {
@@ -23,7 +28,7 @@ declare module '@interactjs/core/Interactable' {
 
 declare module '@interactjs/core/defaultOptions' {
   interface ActionDefaults {
-    gesture: Interact.GesturableOptions
+    gesture: GesturableOptions
   }
 }
 
@@ -33,22 +38,22 @@ declare module '@interactjs/core/scope' {
   }
 }
 
-export interface GestureEvent extends Interact.InteractEvent<'gesture'> {
+export interface GestureEvent extends InteractEvent<'gesture'> {
   distance: number
   angle: number
   da: number // angle change
   scale: number // ratio of distance start to current event
   ds: number // scale change
-  box: Interact.Rect // enclosing box of all points
-  touches: Interact.PointerType[]
+  box: Rect // enclosing box of all points
+  touches: PointerType[]
 }
 
-export interface GestureSignalArg extends Interact.DoPhaseArg<'gesture', Interact.EventPhase> {
+export interface GestureSignalArg extends DoPhaseArg<'gesture', EventPhase> {
   iEvent: GestureEvent
-  interaction: Interact.Interaction<'gesture'>
+  interaction: Interaction<'gesture'>
 }
 
-function install (scope: Interact.Scope) {
+function install (scope: Scope) {
   const {
     actions,
     Interactable,
@@ -78,7 +83,7 @@ function install (scope: Interact.Scope) {
    * @return {boolean | Interactable} A boolean indicating if this can be the
    * target of gesture events, or this Interactable
    */
-  Interactable.prototype.gesturable = function (this: Interact.Interactable, options: Interact.GesturableOptions | boolean) {
+  Interactable.prototype.gesturable = function (this: InstanceType<typeof Interactable>, options: GesturableOptions | boolean) {
     if (is.object(options)) {
       this.options.gesture.enabled = options.enabled !== false
       this.setPerAction('gesture', options)
@@ -93,7 +98,7 @@ function install (scope: Interact.Scope) {
       return this
     }
 
-    return this.options.gesture as Interact.Options
+    return this.options.gesture as Options
   } as GesturableMethod
 
   actions.map.gesture = gesture
@@ -153,7 +158,7 @@ function updateGestureProps ({ interaction, iEvent, phase }: GestureSignalArg) {
   }
 }
 
-const gesture: Interact.Plugin = {
+const gesture: Plugin = {
   id: 'actions/gesture',
   before: ['actions/drag', 'actions/resize'],
   install,

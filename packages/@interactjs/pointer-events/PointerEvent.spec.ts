@@ -1,6 +1,5 @@
 import test from '@interactjs/_dev/test/test'
 import * as helpers from '@interactjs/core/tests/_helpers'
-import * as Interact from '@interactjs/types/index'
 import * as pointerUtils from '@interactjs/utils/pointerUtils'
 
 import PointerEvent from './PointerEvent'
@@ -19,7 +18,7 @@ test('PointerEvent constructor', t => {
     testEventProp,
   } as any
   const { interaction } = helpers.testEnv()
-  const eventTarget = {} as Interact.Element
+  const eventTarget = {} as Element
   const pointerEvent = new PointerEvent(type, pointer, event, eventTarget, interaction as any, 0) as any
 
   t.equal(pointerEvent.testPointerProp, testPointerProp,

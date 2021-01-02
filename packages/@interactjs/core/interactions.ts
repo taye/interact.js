@@ -1,4 +1,5 @@
-import * as Interact from '@interactjs/types/index'
+import { Scope, ActionName, SignalArgs, Plugin } from '@interactjs/core/scope'
+import { Listener } from '@interactjs/types'
 import browser from '@interactjs/utils/browser'
 import domObjects from '@interactjs/utils/domObjects'
 import { nodeContains } from '@interactjs/utils/domUtils'
@@ -12,10 +13,10 @@ declare module '@interactjs/core/scope' {
   interface Scope {
     Interaction: typeof InteractionBase
     interactions: {
-      new: <T extends Interact.ActionName> (options: any) => InteractionBase<T>
-      list: Array<InteractionBase<Interact.ActionName>>
-      listeners: { [type: string]: Interact.Listener }
-      docEvents: Array<{ type: string, listener: Interact.Listener }>
+      new: <T extends ActionName> (options: any) => InteractionBase<T>
+      list: Array<InteractionBase<ActionName>>
+      listeners: { [type: string]: Listener }
+      docEvents: Array<{ type: string, listener: Listener }>
       pointerMoveTolerance: number
     }
     prevTouchTime: number
@@ -36,7 +37,7 @@ const methodNames = [
   'updatePointer', 'removePointer', 'windowBlur',
 ]
 
-function install (scope: Interact.Scope) {
+function install (scope: Scope) {
   const listeners = {} as any
 
   for (const method of methodNames) {
@@ -81,7 +82,7 @@ function install (scope: Interact.Scope) {
   // for ignoring browser's simulated mouse events
   scope.prevTouchTime = 0
 
-  scope.Interaction = class <T extends Interact.ActionName> extends InteractionBase<T> {
+  scope.Interaction = class <T extends ActionName> extends InteractionBase<T> {
     get pointerMoveTolerance () {
       return scope.interactions.pointerMoveTolerance
     }
@@ -96,7 +97,7 @@ function install (scope: Interact.Scope) {
   scope.interactions = {
     // all active and idle interactions
     list: [],
-    new<T extends Interact.ActionName> (options: { pointerType?: string, scopeFire?: Interact.Scope['fire'] }) {
+    new<T extends ActionName> (options: { pointerType?: string, scopeFire?: Scope['fire'] }) {
       options.scopeFire = (name, arg) => scope.fire(name, arg)
 
       const interaction = new scope.Interaction<T>(options as Required<typeof options>)
@@ -131,7 +132,7 @@ function install (scope: Interact.Scope) {
   scope.usePlugin(interactablePreventDefault)
 }
 
-function doOnInteractions (method: string, scope: Interact.Scope) {
+function doOnInteractions (method: string, scope: Scope) {
   return function (event: Event) {
     const interactions = scope.interactions.list
 
@@ -222,7 +223,7 @@ function getInteraction (searchDetails: SearchDetails) {
   return signalArg.interaction || scope.interactions.new({ pointerType })
 }
 
-function onDocSignal<T extends 'scope:add-document' | 'scope:remove-document'> ({ doc, scope, options }: Interact.SignalArgs[T], eventMethodName: 'add' | 'remove') {
+function onDocSignal<T extends 'scope:add-document' | 'scope:remove-document'> ({ doc, scope, options }: SignalArgs[T], eventMethodName: 'add' | 'remove') {
   const { interactions: { docEvents }, events } = scope
   const eventMethod = events[eventMethodName]
 
@@ -243,7 +244,7 @@ function onDocSignal<T extends 'scope:add-document' | 'scope:remove-document'> (
   }
 }
 
-const interactions: Interact.Plugin = {
+const interactions: Plugin = {
   id: 'core/interactions',
   install,
   listeners: {

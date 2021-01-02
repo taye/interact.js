@@ -1,4 +1,4 @@
-import * as Interact from '@interactjs/types/index'
+import { Element } from '@interactjs/types'
 
 import isWindow from './isWindow'
 import * as win from './window'
@@ -24,7 +24,7 @@ const bool = (thing: any): thing is boolean =>
 const string = (thing: any): thing is string =>
   typeof thing === 'string'
 
-const element = (thing: any): thing is Interact.Element => {
+const element = (thing: any): thing is Element => {
   if (!thing || (typeof thing !== 'object')) { return false }
 
   // eslint-disable-next-line import/no-named-as-default-member

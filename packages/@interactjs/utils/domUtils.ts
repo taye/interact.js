@@ -1,4 +1,4 @@
-import * as Interact from '@interactjs/types/index'
+import { Rect, Target, Element } from '@interactjs/types'
 
 import browser from './browser'
 import domObjects from './domObjects'
@@ -47,7 +47,7 @@ export function parentNode (node: Node | Document) {
   return parent
 }
 
-export function matchesSelector (element: Interact.Element, selector: string) {
+export function matchesSelector (element: Element, selector: string) {
   // remove /deep/ from selectors if shadowDOM polyfill is used
   if (win.window !== win.realWindow) {
     selector = selector.replace(/\/deep\//g, ' ')
@@ -59,7 +59,7 @@ export function matchesSelector (element: Interact.Element, selector: string) {
 const getParent = (el: Node | Document | ShadowRoot) => el.parentNode || (el as ShadowRoot).host
 
 // Test for the element that's "above" all other qualifiers
-export function indexOfDeepestElement (elements: Interact.Element[] | NodeListOf<Element>) {
+export function indexOfDeepestElement (elements: Element[] | NodeListOf<globalThis.Element>) {
   let deepestNodeParents: Node[] = []
   let deepestNodeIndex: number
 
@@ -175,13 +175,13 @@ function zIndexIsHigherThan (higherNode: Node, lowerNode: Node) {
   return higherIndex >= lowerIndex
 }
 
-export function matchesUpTo (element: Interact.Element, selector: string, limit: Node) {
+export function matchesUpTo (element: Element, selector: string, limit: Node) {
   while (is.element(element)) {
     if (matchesSelector(element, selector)) {
       return true
     }
 
-    element = parentNode(element) as Interact.Element
+    element = parentNode(element) as Element
 
     if (element === limit) {
       return matchesSelector(element, selector)
@@ -191,7 +191,7 @@ export function matchesUpTo (element: Interact.Element, selector: string, limit:
   return false
 }
 
-export function getActualElement (element: Interact.Element) {
+export function getActualElement (element: Element) {
   return (element as SVGElement).correspondingUseElement || element
 }
 
@@ -203,7 +203,7 @@ export function getScrollXY (relevantWindow?: Window) {
   }
 }
 
-export function getElementClientRect (element: Interact.Element): Required<Interact.Rect> {
+export function getElementClientRect (element: Element): Required<Rect> {
   const clientRect = (element instanceof domObjects.SVGElement
     ? element.getBoundingClientRect()
     : element.getClientRects()[0])
@@ -218,7 +218,7 @@ export function getElementClientRect (element: Interact.Element): Required<Inter
   }
 }
 
-export function getElementRect (element: Interact.Element) {
+export function getElementRect (element: Element) {
   const clientRect = getElementClientRect(element)
 
   if (!browser.isIOS7 && clientRect) {
@@ -244,7 +244,7 @@ export function getPath (node: Node | Document) {
   return path
 }
 
-export function trySelector (value: Interact.Target) {
+export function trySelector (value: Target) {
   if (!is.string(value)) { return false }
 
   // an exception will be raised if it is invalid

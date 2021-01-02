@@ -1,9 +1,11 @@
-import * as Interact from '@interactjs/types/index'
+import { Rect, Point } from '@interactjs/types'
 
-export type GridOptions = (Partial<Interact.Rect> | Interact.Point) & {
+import { SnapFunction, SnapTarget } from '../modifiers/snap/pointer'
+
+export type GridOptions = (Partial<Rect> | Point) & {
   range?: number
-  limits?: Interact.Rect
-  offset?: Interact.Point
+  limits?: Rect
+  offset?: Point
 }
 
 export default (grid: GridOptions) => {
@@ -14,7 +16,7 @@ export default (grid: GridOptions) => {
     ['width', 'height'],
   ] as const).filter(([xField, yField]) => xField in grid || yField in grid)
 
-  const gridFunc: Interact.SnapFunction & {
+  const gridFunc: SnapFunction & {
     grid: typeof grid
     coordFields: typeof coordFields
   } = (x, y) => {
@@ -29,7 +31,7 @@ export default (grid: GridOptions) => {
       offset = { x: 0, y: 0 },
     } = grid
 
-    const result: Interact.SnapTarget & {
+    const result: SnapTarget & {
       grid: typeof grid
     } = { range, grid, x: null as number, y: null as number }
 

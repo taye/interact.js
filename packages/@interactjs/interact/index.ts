@@ -2,7 +2,7 @@ import { Scope } from '@interactjs/core/scope'
 
 const scope = new Scope()
 
-const interact: import('@interactjs/core/interactStatic').InteractStatic = scope.interactStatic
+const interact = scope.interactStatic
 
 export default interact
 

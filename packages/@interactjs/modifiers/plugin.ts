@@ -1,5 +1,5 @@
+import { Plugin } from '@interactjs/core/scope'
 import snappers from '@interactjs/snappers/plugin'
-import * as Interact from '@interactjs/types/index'
 
 import all from './all'
 import base from './base'
@@ -10,7 +10,7 @@ declare module '@interactjs/core/interactStatic' {
   }
 }
 
-const modifiers: Interact.Plugin = {
+const modifiers: Plugin = {
   id: 'modifiers',
   install (scope) {
     const { interactStatic: interact } = scope

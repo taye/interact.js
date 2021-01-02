@@ -1,4 +1,5 @@
-import * as Interact from '@interactjs/types/index'
+import { InteractEvent } from '@interactjs/core/InteractEvent'
+import { CoordsSetMember, PointerType, Point, PointerEventType, Element } from '@interactjs/types'
 
 import browser from './browser'
 import dom from './domObjects'
@@ -7,7 +8,7 @@ import hypot from './hypot'
 import is from './is'
 import pointerExtend from './pointerExtend'
 
-export function copyCoords (dest: Interact.CoordsSetMember, src: Interact.CoordsSetMember) {
+export function copyCoords (dest: CoordsSetMember, src: CoordsSetMember) {
   dest.page = dest.page || {} as any
   dest.page.x = src.page.x
   dest.page.y = src.page.y
@@ -19,7 +20,7 @@ export function copyCoords (dest: Interact.CoordsSetMember, src: Interact.Coords
   dest.timeStamp = src.timeStamp
 }
 
-export function setCoordDeltas (targetObj: Interact.CoordsSetMember, prev: Interact.CoordsSetMember, cur: Interact.CoordsSetMember) {
+export function setCoordDeltas (targetObj: CoordsSetMember, prev: CoordsSetMember, cur: CoordsSetMember) {
   targetObj.page.x    = cur.page.x    - prev.page.x
   targetObj.page.y    = cur.page.y    - prev.page.y
   targetObj.client.x  = cur.client.x  - prev.client.x
@@ -27,7 +28,7 @@ export function setCoordDeltas (targetObj: Interact.CoordsSetMember, prev: Inter
   targetObj.timeStamp = cur.timeStamp - prev.timeStamp
 }
 
-export function setCoordVelocity (targetObj: Interact.CoordsSetMember, delta: Interact.CoordsSetMember) {
+export function setCoordVelocity (targetObj: CoordsSetMember, delta: CoordsSetMember) {
   const dt = Math.max(delta.timeStamp / 1000, 0.001)
 
   targetObj.page.x   = delta.page.x / dt
@@ -37,7 +38,7 @@ export function setCoordVelocity (targetObj: Interact.CoordsSetMember, delta: In
   targetObj.timeStamp = dt
 }
 
-export function setZeroCoords (targetObj: Interact.CoordsSetMember) {
+export function setZeroCoords (targetObj: CoordsSetMember) {
   targetObj.page.x = 0
   targetObj.page.y = 0
   targetObj.client.x = 0
@@ -49,17 +50,17 @@ export function isNativePointer  (pointer: any) {
 }
 
 // Get specified X/Y coords for mouse or event.touches[0]
-export function getXY (type: string, pointer: Interact.PointerType | Interact.InteractEvent, xy: Interact.Point) {
-  xy = xy || {} as Interact.Point
+export function getXY (type: string, pointer: PointerType | InteractEvent, xy: Point) {
+  xy = xy || {} as Point
   type = type || 'page'
 
-  xy.x = pointer[type + 'X' as keyof Interact.PointerType]
-  xy.y = pointer[type + 'Y' as keyof Interact.PointerType]
+  xy.x = pointer[type + 'X' as keyof PointerType]
+  xy.y = pointer[type + 'Y' as keyof PointerType]
 
   return xy
 }
 
-export function getPageXY (pointer: Interact.PointerType | Interact.InteractEvent, page?: Interact.Point) {
+export function getPageXY (pointer: PointerType | InteractEvent, page?: Point) {
   page = page || { x: 0, y: 0 }
 
   // Opera Mobile handles the viewport and scrolling oddly
@@ -76,7 +77,7 @@ export function getPageXY (pointer: Interact.PointerType | Interact.InteractEven
   return page
 }
 
-export function getClientXY (pointer: Interact.PointerType, client: Interact.Point) {
+export function getClientXY (pointer: PointerType, client: Point) {
   client = client || {} as any
 
   if (browser.isOperaMobile && isNativePointer(pointer)) {
@@ -94,7 +95,7 @@ export function getPointerId (pointer: { pointerId?: number, identifier?: number
   return is.number(pointer.pointerId) ? pointer.pointerId : pointer.identifier
 }
 
-export function setCoords (dest: Interact.CoordsSetMember, pointers: any[], timeStamp: number) {
+export function setCoords (dest: CoordsSetMember, pointers: any[], timeStamp: number) {
   const pointer = (pointers.length > 1
     ? pointerAverage(pointers)
     : pointers[0])
@@ -105,8 +106,8 @@ export function setCoords (dest: Interact.CoordsSetMember, pointers: any[], time
   dest.timeStamp = timeStamp
 }
 
-export function getTouchPair (event: TouchEvent | Interact.PointerType[]) {
-  const touches: Interact.PointerType[] = []
+export function getTouchPair (event: TouchEvent | PointerType[]) {
+  const touches: PointerType[] = []
 
   // array of touches is supplied
   if (is.array(event)) {
@@ -134,7 +135,7 @@ export function getTouchPair (event: TouchEvent | Interact.PointerType[]) {
   return touches
 }
 
-export function pointerAverage (pointers: Interact.PointerType[]) {
+export function pointerAverage (pointers: PointerType[]) {
   const average = {
     pageX  : 0,
     pageY  : 0,
@@ -158,7 +159,7 @@ export function pointerAverage (pointers: Interact.PointerType[]) {
   return average
 }
 
-export function touchBBox (event: Interact.PointerType[]) {
+export function touchBBox (event: PointerType[]) {
   if (!event.length) {
     return null
   }
@@ -181,7 +182,7 @@ export function touchBBox (event: Interact.PointerType[]) {
   }
 }
 
-export function touchDistance (event: Interact.PointerType[] | TouchEvent, deltaSource: string) {
+export function touchDistance (event: PointerType[] | TouchEvent, deltaSource: string) {
   const sourceX = deltaSource + 'X' as 'pageX'
   const sourceY = deltaSource + 'Y' as 'pageY'
   const touches = getTouchPair(event)
@@ -192,7 +193,7 @@ export function touchDistance (event: Interact.PointerType[] | TouchEvent, delta
   return hypot(dx, dy)
 }
 
-export function touchAngle (event: Interact.PointerType[] | TouchEvent, deltaSource: string) {
+export function touchAngle (event: PointerType[] | TouchEvent, deltaSource: string) {
   const sourceX = deltaSource + 'X' as 'pageX'
   const sourceY = deltaSource + 'Y' as 'pageY'
   const touches = getTouchPair(event)
@@ -218,16 +219,16 @@ export function getPointerType (pointer: { pointerType?: string, identifier?: nu
 // [ event.target, event.currentTarget ]
 export function getEventTargets (event: Event) {
   const path = is.func(event.composedPath)
-    ? event.composedPath() as Interact.Element[]
-    : (event as unknown as { path: Interact.Element[]}).path
+    ? event.composedPath() as Element[]
+    : (event as unknown as { path: Element[]}).path
 
   return [
-    domUtils.getActualElement(path ? path[0] : event.target as Interact.Element),
-    domUtils.getActualElement(event.currentTarget as Interact.Element),
+    domUtils.getActualElement(path ? path[0] : event.target as Element),
+    domUtils.getActualElement(event.currentTarget as Element),
   ]
 }
 
-export function newCoords (): Interact.CoordsSetMember {
+export function newCoords (): CoordsSetMember {
   return {
     page     : { x: 0, y: 0 },
     client   : { x: 0, y: 0 },
@@ -253,12 +254,12 @@ export function coordsToEvent (coords: MockCoords) {
     preventDefault () {},
   }
 
-  return event as typeof event & Interact.PointerType & Interact.PointerEventType
+  return event as typeof event & PointerType & PointerEventType
 }
 
 export interface MockCoords {
-  page: Interact.Point
-  client: Interact.Point
+  page: Point
+  client: Point
   timeStamp?: number
   pointerId?: any
   target?: any

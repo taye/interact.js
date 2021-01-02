@@ -1,4 +1,4 @@
-import * as Interact from '@interactjs/types/index'
+import Interaction from '@interactjs/core/Interaction'
 import browser from '@interactjs/utils/browser'
 import clone from '@interactjs/utils/clone'
 import domObjects from '@interactjs/utils/domObjects'
@@ -8,9 +8,9 @@ import * as win from '@interactjs/utils/window'
 
 import { Eventable } from './Eventable'
 import { InteractEvent, PhaseMap } from './InteractEvent'
-import { Interactable as InteractableBase } from './Interactable'
+import { Interactable, Interactable as InteractableBase } from './Interactable'
 import { InteractableSet } from './InteractableSet'
-import { defaults } from './defaultOptions'
+import { defaults, OptionsArg } from './defaultOptions'
 import events from './events'
 import { createInteractStatic } from './interactStatic'
 import interactions from './interactions'
@@ -19,8 +19,8 @@ export interface SignalArgs {
   'scope:add-document': DocSignalArg
   'scope:remove-document': DocSignalArg
   'interactable:unset': { interactable: InteractableBase }
-  'interactable:set': { interactable: InteractableBase, options: Interact.OptionsArg }
-  'interactions:destroy': { interaction: Interact.Interaction }
+  'interactable:set': { interactable: InteractableBase, options: OptionsArg }
+  'interactions:destroy': { interaction: Interaction }
 }
 
 export type ListenerName = keyof SignalArgs
@@ -43,7 +43,7 @@ export type ActionName = keyof ActionMap
 export interface Actions {
   map: ActionMap
   phases: PhaseMap
-  methodDict: { [P in ActionName]?: keyof Interact.Interactable }
+  methodDict: { [P in ActionName]?: keyof Interactable }
   phaselessTypes: { [type: string]: true }
 }
 
@@ -108,7 +108,7 @@ export class Scope {
     this.Interactable = class extends InteractableBase {
       get _defaults () { return scope.defaults }
 
-      set <T extends InteractableBase> (this: T, options: Interact.OptionsArg) {
+      set <T extends InteractableBase> (this: T, options: OptionsArg) {
         super.set(options)
 
         scope.fire('interactable:set', {

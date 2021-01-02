@@ -1,16 +1,18 @@
-import * as Interact from '@interactjs/types/index'
+import { Interactable } from '@interactjs/core/Interactable'
+import Interaction, { InteractionProxy } from '@interactjs/core/Interaction'
+import { ActionName } from '@interactjs/core/scope'
 
-export class BaseEvent<T extends Interact.ActionName = never> {
+export class BaseEvent<T extends ActionName = never> {
   type: string
   target: EventTarget
   currentTarget: Node
-  interactable: Interact.Interactable
-  _interaction: Interact.Interaction<T>
+  interactable: Interactable
+  _interaction: Interaction<T>
   timeStamp: any
   immediatePropagationStopped = false
   propagationStopped = false
 
-  constructor (interaction: Interact.Interaction<T>) {
+  constructor (interaction: Interaction<T>) {
     this._interaction = interaction
   }
 
@@ -33,8 +35,8 @@ export class BaseEvent<T extends Interact.ActionName = never> {
 
 // defined outside of class definition to avoid assignment of undefined during
 // construction
-export interface BaseEvent<T extends Interact.ActionName> {
-  interaction: Interact.InteractionProxy<T>
+export interface BaseEvent<T extends ActionName> {
+  interaction: InteractionProxy<T>
 }
 
 // getters and setters defined here to support typescript 3.6 and below which

@@ -1,4 +1,4 @@
-import * as Interact from '@interactjs/types/index'
+import { Point, Rect, Size } from '@interactjs/types'
 import extend from '@interactjs/utils/extend'
 import * as rectUtils from '@interactjs/utils/rect'
 
@@ -11,8 +11,8 @@ const noMin = { width: -Infinity, height: -Infinity }
 const noMax = { width: +Infinity, height: +Infinity }
 
 export interface RestrictSizeOptions {
-  min?: Interact.Size | Interact.Point | RestrictOptions['restriction']
-  max?: Interact.Size | Interact.Point | RestrictOptions['restriction']
+  min?: Size | Point | RestrictOptions['restriction']
+  max?: Size | Point | RestrictOptions['restriction']
   endOnly: boolean
   enabled?: boolean
 }
@@ -22,9 +22,9 @@ function start (arg: ModifierArg<RestrictEdgesState>) {
 }
 
 export type RestrictSizeState =
-  RestrictEdgesState & ModifierState<RestrictSizeOptions & { inner: Interact.Rect, outer: Interact.Rect }, {
-    min: Interact.Rect
-    max: Interact.Rect
+  RestrictEdgesState & ModifierState<RestrictSizeOptions & { inner: Rect, outer: Rect }, {
+    min: Rect
+    max: Rect
   }>
 
 function set (arg: ModifierArg<RestrictSizeState>) {

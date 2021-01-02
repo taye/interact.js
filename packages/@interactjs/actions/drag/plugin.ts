@@ -1,5 +1,7 @@
-import { Scope } from '@interactjs/core/scope'
-import * as Interact from '@interactjs/types/index'
+import { InteractEvent } from '@interactjs/core/InteractEvent'
+import { Interactable } from '@interactjs/core/Interactable'
+import { Scope, Plugin } from '@interactjs/core/scope'
+import { ActionMethod, DraggableOptions, DropzoneOptions } from '@interactjs/types'
 import is from '@interactjs/utils/is'
 
 declare module '@interactjs/core/Interactable' {
@@ -10,7 +12,7 @@ declare module '@interactjs/core/Interactable' {
 
 declare module '@interactjs/core/defaultOptions' {
   interface ActionDefaults {
-    drag: Interact.DraggableOptions
+    drag: DraggableOptions
   }
 }
 
@@ -20,9 +22,9 @@ declare module '@interactjs/core/scope' {
   }
 }
 
-export type DragEvent = Interact.InteractEvent<'drag'>
+export type DragEvent = InteractEvent<'drag'>
 
-export type DraggableMethod = Interact.ActionMethod<Interact.DraggableOptions>
+export type DraggableMethod = ActionMethod<DraggableOptions>
 
 function install (scope: Scope) {
   const {
@@ -113,7 +115,7 @@ function move ({ iEvent, interaction }) {
  * @return {boolean | Interactable} boolean indicating if this can be the
  * target of drag events, or this Interctable
  */
-const draggable: DraggableMethod = function draggable (this: Interact.Interactable, options?: Interact.DraggableOptions | boolean): any {
+const draggable: DraggableMethod = function draggable (this: Interactable, options?: DraggableOptions | boolean): any {
   if (is.object(options)) {
     this.options.drag.enabled = options.enabled !== false
     this.setPerAction('drag', options)
@@ -138,7 +140,7 @@ const draggable: DraggableMethod = function draggable (this: Interact.Interactab
   return this.options.drag
 }
 
-const drag: Interact.Plugin = {
+const drag: Plugin = {
   id: 'actions/drag',
   install,
   listeners: {
@@ -177,7 +179,7 @@ const drag: Interact.Plugin = {
   defaults: {
     startAxis : 'xy',
     lockAxis  : 'xy',
-  } as Interact.DropzoneOptions,
+  } as DropzoneOptions,
 
   getCursor () {
     return 'move'

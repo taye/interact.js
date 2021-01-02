@@ -1,20 +1,20 @@
-import * as Interact from '@interactjs/types/index'
+import { HasGetRect, RectResolvable, Rect, Element, Point, FullRect, EdgeOptions } from '../types'
 
 import { closest, getElementRect, parentNode } from './domUtils'
 import extend from './extend'
 import is from './is'
 
-export function getStringOptionResult (value: any, target: Interact.HasGetRect, element: Node) {
+export function getStringOptionResult (value: any, target: HasGetRect, element: Node) {
   if (value === 'parent') { return parentNode(element) }
 
-  if (value === 'self') { return target.getRect(element as Interact.Element) }
+  if (value === 'self') { return target.getRect(element as Element) }
 
   return closest(element, value)
 }
 
 export function resolveRectLike<T extends any[]> (
-  value: Interact.RectResolvable<T>,
-  target?: Interact.HasGetRect,
+  value: RectResolvable<T>,
+  target?: HasGetRect,
   element?: Node,
   functionArgs?: T,
 ) {
@@ -30,17 +30,17 @@ export function resolveRectLike<T extends any[]> (
     returnValue = getElementRect(returnValue)
   }
 
-  return returnValue as Interact.Rect
+  return returnValue as Rect
 }
 
-export function rectToXY (rect: Interact.Rect | Interact.Point) {
+export function rectToXY (rect: Rect | Point) {
   return  rect && {
     x: 'x' in rect ? rect.x : rect.left,
     y: 'y' in rect ? rect.y : rect.top,
   }
 }
 
-export function xywhToTlbr<T extends Partial<Interact.Rect & Interact.Point>> (rect: T) {
+export function xywhToTlbr<T extends Partial<Rect & Point>> (rect: T) {
   if (rect && !('left' in rect && 'top' in rect)) {
     rect = extend({}, rect)
 
@@ -50,10 +50,10 @@ export function xywhToTlbr<T extends Partial<Interact.Rect & Interact.Point>> (r
     rect.bottom = rect.bottom  || (rect.top + rect.height)
   }
 
-  return rect as Interact.Rect & T
+  return rect as Rect & T
 }
 
-export function tlbrToXywh (rect: Interact.Rect & Partial<Interact.Point>) {
+export function tlbrToXywh (rect: Rect & Partial<Point>) {
   if (rect && !('x' in rect && 'y' in rect)) {
     rect = extend({}, rect)
 
@@ -63,10 +63,10 @@ export function tlbrToXywh (rect: Interact.Rect & Partial<Interact.Point>) {
     rect.height = rect.height || ((rect.bottom || 0) - rect.y)
   }
 
-  return rect as Interact.FullRect & Interact.Point
+  return rect as FullRect & Point
 }
 
-export function addEdges (edges: Interact.EdgeOptions, rect: Interact.Rect, delta: Interact.Point) {
+export function addEdges (edges: EdgeOptions, rect: Rect, delta: Point) {
   if (edges.left)   { rect.left   += delta.x }
   if (edges.right)  { rect.right  += delta.x }
   if (edges.top)    { rect.top    += delta.y }

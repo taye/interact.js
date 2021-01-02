@@ -1,6 +1,7 @@
 import test from '@interactjs/_dev/test/test'
+import { InteractEvent } from '@interactjs/core/InteractEvent'
+import { Interactable } from '@interactjs/core/Interactable'
 import * as helpers from '@interactjs/core/tests/_helpers'
-import * as Interact from '@interactjs/types/index'
 import extend from '@interactjs/utils/extend'
 import * as pointerUtils from '@interactjs/utils/pointerUtils'
 
@@ -26,7 +27,7 @@ test('Interactable.draggable method', t => {
     draggable: drag.draggable,
     setPerAction: () => { calledSetPerAction = true },
     setOnEvents: () => { calledSetOnEvents = true },
-  } as unknown as Interact.Interactable
+  } as unknown as Interactable
   let calledSetPerAction = false
   let calledSetOnEvents = false
 
@@ -87,8 +88,8 @@ test('drag axis', t => {
       drag: {},
     },
     target: element,
-  } as Interact.Interactable
-  const iEvent = { page: {}, client: {}, delta: {}, type: 'dragmove' } as Interact.InteractEvent
+  } as Interactable
+  const iEvent = { page: {}, client: {}, delta: {}, type: 'dragmove' } as InteractEvent
 
   const opposites = { x: 'y', y: 'x' }
   const eventCoords = {

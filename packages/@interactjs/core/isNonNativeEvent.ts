@@ -1,6 +1,6 @@
-import * as Interact from '@interactjs/types/index'
+import { Actions } from '@interactjs/core/scope'
 
-export default function isNonNativeEvent (type: string, actions: Interact.Actions) {
+export default function isNonNativeEvent (type: string, actions: Actions) {
   if (actions.phaselessTypes[type]) { return true }
 
   for (const name in actions.map) {

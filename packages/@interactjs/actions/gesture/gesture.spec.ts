@@ -1,17 +1,17 @@
 import test from '@interactjs/_dev/test/test'
+import { Scope } from '@interactjs/core/scope'
 import * as helpers from '@interactjs/core/tests/_helpers'
-import * as Interact from '@interactjs/types/index'
 import extend from '@interactjs/utils/extend'
 import { coordsToEvent, newCoords } from '@interactjs/utils/pointerUtils'
 
-import gesture from './plugin'
+import gesture, { GestureEvent } from './plugin'
 
-function getGestureProps (event: Interact.GestureEvent) {
+function getGestureProps (event: GestureEvent) {
   return helpers.getProps(event, ['type', 'angle', 'distance', 'scale', 'ds', 'da'])
 }
 
 test('gesture action init', t => {
-  const scope: Interact.Scope = helpers.mockScope()
+  const scope: Scope = helpers.mockScope()
 
   scope.usePlugin(gesture)
 
@@ -34,7 +34,7 @@ test('Interactable.gesturable method', t => {
     start,
     move,
   } = helpers.testEnv({ plugins: [gesture], rect })
-  const events: Interact.GestureEvent[] = []
+  const events: GestureEvent[] = []
   const event2 = coordsToEvent(newCoords())
   event2.coords.pointerId = 2
 
@@ -42,7 +42,7 @@ test('Interactable.gesturable method', t => {
 
   interactable.rectChecker(() => ({ ...rect }))
   interactable.gesturable(true)
-  interactable.on('gesturestart gesturemove gestureend', (event: Interact.GestureEvent) => {
+  interactable.on('gesturestart gesturemove gestureend', (event: GestureEvent) => {
     events.push(event)
   })
   interaction.pointerType = 'touch'

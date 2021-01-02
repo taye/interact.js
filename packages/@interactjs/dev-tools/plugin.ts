@@ -1,5 +1,7 @@
 /* eslint-disable no-console */
-import * as Interact from '@interactjs/types/index'
+import Interaction from '@interactjs/core/Interaction'
+import { Scope, Plugin } from '@interactjs/core/scope'
+import { Element, OptionMethod } from '@interactjs/types'
 import domObjects from '@interactjs/utils/domObjects'
 import { parentNode } from '@interactjs/utils/domUtils'
 import extend from '@interactjs/utils/extend'
@@ -28,7 +30,7 @@ declare module '@interactjs/core/defaultOptions' {
 
 declare module '@interactjs/core/Interactable' {
   interface Interactable {
-    devTools: Interact.OptionMethod<DevToolsOptions>
+    devTools: OptionMethod<DevToolsOptions>
   }
 }
 
@@ -45,8 +47,8 @@ export interface Logger {
 export interface Check {
   name: CheckName
   text: string
-  perform: (interaction: Interact.Interaction) => boolean
-  getInfo: (interaction: Interact.Interaction) => any[]
+  perform: (interaction: Interaction) => boolean
+  getInfo: (interaction: Interaction) => any[]
 }
 
 enum CheckName {
@@ -65,7 +67,7 @@ const links = {
 const isProduction = process.env.NODE_ENV === 'production'
 
 // eslint-disable-next-line no-restricted-syntax
-function install (scope: Interact.Scope, { logger }: { logger?: Logger } = {}) {
+function install (scope: Scope, { logger }: { logger?: Logger } = {}) {
   const {
     Interactable,
     defaults,
@@ -143,7 +145,7 @@ function hasStyle (element: HTMLElement, prop: keyof CSSStyleDeclaration, styleR
   return styleRe.test((value || '').toString())
 }
 
-function parentHasStyle (element: Interact.Element, prop: keyof CSSStyleDeclaration, styleRe: RegExp) {
+function parentHasStyle (element: Element, prop: keyof CSSStyleDeclaration, styleRe: RegExp) {
   let parent = element as HTMLElement
 
   while (is.element(parent)) {
@@ -158,7 +160,7 @@ function parentHasStyle (element: Interact.Element, prop: keyof CSSStyleDeclarat
 }
 
 const id = 'dev-tools'
-const defaultExport: Interact.Plugin = isProduction
+const defaultExport: Plugin = isProduction
   ? { id, install: () => {} }
   : {
     id,

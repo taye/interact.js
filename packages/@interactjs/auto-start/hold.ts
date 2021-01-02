@@ -1,4 +1,5 @@
-import * as Interact from '@interactjs/types/index'
+import Interaction from '@interactjs/core/Interaction'
+import { Scope, Plugin } from '@interactjs/core/scope'
 
 import basePlugin from './base'
 
@@ -15,7 +16,7 @@ declare module '@interactjs/core/Interaction' {
   }
 }
 
-function install (scope: Interact.Scope) {
+function install (scope: Scope) {
   const {
     defaults,
   } = scope
@@ -26,7 +27,7 @@ function install (scope: Interact.Scope) {
   defaults.perAction.delay = 0
 }
 
-function getHoldDuration (interaction: Interact.Interaction) {
+function getHoldDuration (interaction: Interaction) {
   const actionName = interaction.prepared && interaction.prepared.name
 
   if (!actionName) { return null }
@@ -36,7 +37,7 @@ function getHoldDuration (interaction: Interact.Interaction) {
   return options[actionName].hold || options[actionName].delay
 }
 
-export default {
+const hold: Plugin = {
   id: 'auto-start/hold',
   install,
   listeners: {
@@ -63,12 +64,13 @@ export default {
 
     // prevent regular down->move autoStart
     'autoStart:before-start': ({ interaction }) => {
-      const hold = getHoldDuration(interaction)
+      const holdDuration = getHoldDuration(interaction)
 
-      if (hold > 0) {
+      if (holdDuration > 0) {
         interaction.prepared.name = null
       }
     },
   },
   getHoldDuration,
 }
+export default hold

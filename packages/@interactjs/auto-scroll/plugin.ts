@@ -1,4 +1,7 @@
-import * as Interact from '@interactjs/types/index'
+import { Interactable } from '@interactjs/core/Interactable'
+import Interaction from '@interactjs/core/Interaction'
+import { ActionName, Plugin } from '@interactjs/core/scope'
+import { PointerType } from '@interactjs/types'
 import * as domUtils from '@interactjs/utils/domUtils'
 import is from '@interactjs/utils/is'
 import raf from '@interactjs/utils/raf'
@@ -61,7 +64,7 @@ const autoScroll = {
 
   now: Date.now,
 
-  interaction: null as Interact.Interaction,
+  interaction: null as Interaction,
   i: 0, // the handle returned by window.setInterval
 
   // Direction each pulse is to scroll in
@@ -73,7 +76,7 @@ const autoScroll = {
   margin: 0,
   speed: 0,
 
-  start (interaction: Interact.Interaction) {
+  start (interaction: Interaction) {
     autoScroll.isScrolling = true
     raf.cancel(autoScroll.i)
 
@@ -147,12 +150,12 @@ const autoScroll = {
       autoScroll.i = raf.request(autoScroll.scroll)
     }
   },
-  check (interactable: Interact.Interactable, actionName: Interact.ActionName) {
+  check (interactable: Interactable, actionName: ActionName) {
     const options = interactable.options
 
     return options[actionName].autoScroll?.enabled
   },
-  onInteractionMove<T extends Interact.ActionName> ({ interaction, pointer }: { interaction: Interact.Interaction<T>, pointer: Interact.PointerType }) {
+  onInteractionMove<T extends ActionName> ({ interaction, pointer }: { interaction: Interaction<T>, pointer: PointerType }) {
     if (!(interaction.interacting() &&
           autoScroll.check(interaction.interactable, interaction.prepared.name))) {
       return
@@ -201,7 +204,7 @@ const autoScroll = {
   },
 }
 
-export function getContainer (value: any, interactable: Interact.Interactable, element: Interact.Element) {
+export function getContainer (value: any, interactable: Interactable, element: Element) {
   return (is.string(value) ? getStringOptionResult(value, interactable, element) : value) || getWindow(element)
 }
 
@@ -217,9 +220,9 @@ export function getScrollSize (container: any) {
   return { x: container.scrollWidth, y: container.scrollHeight }
 }
 
-export function getScrollSizeDelta<T extends Interact.ActionName> ({ interaction, element }: {
-  interaction: Partial<Interact.Interaction<T>>
-  element: Interact.Element
+export function getScrollSizeDelta<T extends ActionName> ({ interaction, element }: {
+  interaction: Partial<Interaction<T>>
+  element: Element
 }, func: any) {
   const scrollOptions = interaction && interaction.interactable.options[interaction.prepared.name].autoScroll
 
@@ -244,7 +247,7 @@ export function getScrollSizeDelta<T extends Interact.ActionName> ({ interaction
   }
 }
 
-const autoScrollPlugin: Interact.Plugin = {
+const autoScrollPlugin: Plugin = {
   id: 'auto-scroll',
   install,
   listeners: {

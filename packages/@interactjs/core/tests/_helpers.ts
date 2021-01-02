@@ -1,11 +1,12 @@
 /* eslint-disable no-restricted-syntax */
 import { doc } from '@interactjs/_dev/test/domator'
-import * as Interact from '@interactjs/types/index'
+import { ActionProps } from '@interactjs/core/Interaction'
+import { PointerType, Rect, Target } from '@interactjs/types'
 import extend from '@interactjs/utils/extend'
 import is from '@interactjs/utils/is'
 import * as pointerUtils from '@interactjs/utils/pointerUtils'
 
-import { Scope } from '../scope'
+import { Scope, Plugin, ActionName } from '../scope'
 
 let counter = 0
 
@@ -63,7 +64,7 @@ export function newPointer (n = 50) {
     pageY: n++,
     clientX: n++,
     clientY: n++,
-  } as Interact.PointerType
+  } as PointerType
 }
 
 export function mockScope (options = {} as any) {
@@ -87,14 +88,14 @@ export function getProps<T extends { [key: string]: any }, K extends keyof T> (s
   }, {} as Pick<T, K>)
 }
 
-export function testEnv<T extends Interact.Target = HTMLElement> ({
+export function testEnv<T extends Target = HTMLElement> ({
   plugins = [],
   target,
   rect = {  top: 0, left: 0, bottom: 0, right: 0  },
 }: {
-  plugins?: Interact.Plugin[]
+  plugins?: Plugin[]
   target?: T
-  rect?: Interact.Rect
+  rect?: Rect
 } = {}) {
   const scope = mockScope()
 
@@ -123,7 +124,7 @@ export function testEnv<T extends Interact.Target = HTMLElement> ({
     coords,
     event,
     interact: scope.interactStatic,
-    start: (action: Interact.ActionProps) => interaction.start(action, interactable, target as HTMLElement),
+    start: <T extends ActionName>(action: ActionProps<T>) => interaction.start(action, interactable, target as HTMLElement),
     stop: () => interaction.stop(),
     down: () => interaction.pointerDown(event, event, target as HTMLElement),
     move: (force?: boolean) => force ? interaction.move() : interaction.pointerMove(event, event, target as HTMLElement),

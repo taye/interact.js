@@ -1,7 +1,9 @@
+import Interaction, { DoPhaseArg } from '@interactjs/core/Interaction'
+import { ActionName, Scope, SignalArgs, Plugin } from '@interactjs/core/scope'
 import Modification from '@interactjs/modifiers/Modification'
 import * as modifiers from '@interactjs/modifiers/base'
 import offset from '@interactjs/offset/plugin'
-import * as Interact from '@interactjs/types/index'
+import { Point, PointerEventType } from '@interactjs/types'
 import * as dom from '@interactjs/utils/domUtils'
 import hypot from '@interactjs/utils/hypot'
 import is from '@interactjs/utils/is'
@@ -36,16 +38,16 @@ declare module '@interactjs/core/defaultOptions' {
 
 declare module '@interactjs/core/scope' {
   interface SignalArgs {
-    'interactions:before-action-inertiastart': Omit<Interact.DoPhaseArg<Interact.ActionName, 'inertiastart'>, 'iEvent'>
-    'interactions:action-inertiastart': Interact.DoPhaseArg<Interact.ActionName, 'inertiastart'>
-    'interactions:after-action-inertiastart': Interact.DoPhaseArg<Interact.ActionName, 'inertiastart'>
-    'interactions:before-action-resume': Omit<Interact.DoPhaseArg<Interact.ActionName, 'resume'>, 'iEvent'>
-    'interactions:action-resume': Interact.DoPhaseArg<Interact.ActionName, 'resume'>
-    'interactions:after-action-resume': Interact.DoPhaseArg<Interact.ActionName, 'resume'>
+    'interactions:before-action-inertiastart': Omit<DoPhaseArg<ActionName, 'inertiastart'>, 'iEvent'>
+    'interactions:action-inertiastart': DoPhaseArg<ActionName, 'inertiastart'>
+    'interactions:after-action-inertiastart': DoPhaseArg<ActionName, 'inertiastart'>
+    'interactions:before-action-resume': Omit<DoPhaseArg<ActionName, 'resume'>, 'iEvent'>
+    'interactions:action-resume': DoPhaseArg<ActionName, 'resume'>
+    'interactions:after-action-resume': DoPhaseArg<ActionName, 'resume'>
   }
 }
 
-function install (scope: Interact.Scope) {
+function install (scope: Scope) {
   const {
     defaults,
   } = scope
@@ -75,25 +77,25 @@ export class InertiaState {
   modifierCount = 0
   modifierArg: modifiers.ModifierArg = null
 
-  startCoords: Interact.Point = null
+  startCoords: Point = null
   t0 = 0
   v0 = 0
 
   te = 0
-  targetOffset: Interact.Point = null
-  modifiedOffset: Interact.Point = null
-  currentOffset: Interact.Point = null
+  targetOffset: Point = null
+  modifiedOffset: Point = null
+  currentOffset: Point = null
 
   lambda_v0? = 0 // eslint-disable-line camelcase
   one_ve_v0? = 0 // eslint-disable-line camelcase
   timeout: number = null
-  readonly interaction: Interact.Interaction
+  readonly interaction: Interaction
 
-  constructor (interaction: Interact.Interaction) {
+  constructor (interaction: Interaction) {
     this.interaction = interaction
   }
 
-  start (event: Interact.PointerEventType) {
+  start (event: PointerEventType) {
     const { interaction } = this
     const options = getOptions(interaction)
 
@@ -222,7 +224,7 @@ export class InertiaState {
 
     if (t < this.te) {
       const progress =  1 - (Math.exp(-lambda * t) - this.lambda_v0) / this.one_ve_v0
-      let newOffset: Interact.Point
+      let newOffset: Point
 
       if (this.isModified) {
         newOffset = getQuadraticCurvePoint(
@@ -292,7 +294,7 @@ export class InertiaState {
     }
   }
 
-  resume ({ pointer, event, eventTarget }: Interact.SignalArgs['interactions:down']) {
+  resume ({ pointer, event, eventTarget }: SignalArgs['interactions:down']) {
     const { interaction } = this
 
     // undo inertia changes to interaction coords
@@ -328,7 +330,7 @@ export class InertiaState {
   }
 }
 
-function start ({ interaction, event }: Interact.DoPhaseArg<Interact.ActionName, 'end'>) {
+function start ({ interaction, event }: DoPhaseArg<ActionName, 'end'>) {
   if (!interaction._interacting || interaction.simulation) {
     return null
   }
@@ -341,7 +343,7 @@ function start ({ interaction, event }: Interact.DoPhaseArg<Interact.ActionName,
 
 // Check if the down event hits the current inertia target
 // control should be return to the user
-function resume (arg: Interact.SignalArgs['interactions:down']) {
+function resume (arg: SignalArgs['interactions:down']) {
   const { interaction, eventTarget } = arg
   const state = interaction.inertia
 
@@ -361,7 +363,7 @@ function resume (arg: Interact.SignalArgs['interactions:down']) {
   }
 }
 
-function stop ({ interaction }: { interaction: Interact.Interaction }) {
+function stop ({ interaction }: { interaction: Interaction }) {
   const state = interaction.inertia
 
   if (state.active) {
@@ -369,14 +371,14 @@ function stop ({ interaction }: { interaction: Interact.Interaction }) {
   }
 }
 
-function getOptions ({ interactable, prepared }: Interact.Interaction) {
+function getOptions ({ interactable, prepared }: Interaction) {
   return interactable &&
     interactable.options &&
     prepared.name &&
     interactable.options[prepared.name].inertia
 }
 
-const inertia: Interact.Plugin = {
+const inertia: Plugin = {
   id: 'inertia',
   before: ['modifiers', 'actions'],
   install,

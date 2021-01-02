@@ -1,4 +1,6 @@
-import * as Interact from '@interactjs/types/index'
+import { EventPhase } from '@interactjs/core/InteractEvent'
+import Interaction, { DoAnyPhaseArg } from '@interactjs/core/Interaction'
+import { EdgeOptions, FullRect, Point, Rect } from '@interactjs/types'
 import clone from '@interactjs/utils/clone'
 import extend from '@interactjs/utils/extend'
 import * as rectUtils from '@interactjs/utils/rect'
@@ -6,40 +8,40 @@ import * as rectUtils from '@interactjs/utils/rect'
 import { Modifier, ModifierArg, ModifierState } from './base'
 
 export interface ModificationResult {
-  delta: Interact.Point
-  rectDelta: Interact.Rect
-  coords: Interact.Point
-  rect: Interact.FullRect
+  delta: Point
+  rectDelta: Rect
+  coords: Point
+  rect: FullRect
   eventProps: any[]
   changed: boolean
 }
 
 interface MethodArg {
-  phase: Interact.EventPhase
-  pageCoords?: Interact.Point
-  rect?: Interact.FullRect
-  coords?: Interact.Point
+  phase: EventPhase
+  pageCoords?: Point
+  rect?: FullRect
+  coords?: Point
   preEnd?: boolean
   skipModifiers?: number
 }
 
 export default class Modification {
   states: ModifierState[] = []
-  startOffset: Interact.Rect = { left: 0, right: 0, top: 0, bottom: 0 }
-  startDelta: Interact.Point = null
+  startOffset: Rect = { left: 0, right: 0, top: 0, bottom: 0 }
+  startDelta: Point = null
   result?: ModificationResult = null
-  endResult?: Interact.Point = null
-  edges: Interact.EdgeOptions
-  readonly interaction: Readonly<Interact.Interaction>
+  endResult?: Point = null
+  edges: EdgeOptions
+  readonly interaction: Readonly<Interaction>
 
-  constructor (interaction: Interact.Interaction) {
+  constructor (interaction: Interaction) {
     this.interaction = interaction
     this.result = createResult()
   }
 
   start (
     { phase }: MethodArg,
-    pageCoords: Interact.Point,
+    pageCoords: Point,
   ) {
     const { interaction } = this
     const modifierList = getModifierList(interaction)
@@ -144,7 +146,7 @@ export default class Modification {
     return newResult
   }
 
-  applyToInteraction (arg: { phase: Interact.EventPhase, rect?: Interact.Rect }) {
+  applyToInteraction (arg: { phase: EventPhase, rect?: Rect }) {
     const { interaction } = this
     const { phase } = arg
     const curCoords = interaction.coords.cur
@@ -175,11 +177,11 @@ export default class Modification {
     rect.height = rect.bottom - rect.top
   }
 
-  setAndApply (arg: Partial<Interact.DoAnyPhaseArg> & {
-    phase: Interact.EventPhase
+  setAndApply (arg: Partial<DoAnyPhaseArg> & {
+    phase: EventPhase
     preEnd?: boolean
     skipModifiers?: number
-    modifiedCoords?: Interact.Point
+    modifiedCoords?: Point
   }): void | false {
     const { interaction } = this
     const { phase, preEnd, skipModifiers } = arg
@@ -214,7 +216,7 @@ export default class Modification {
     this.applyToInteraction(arg)
   }
 
-  beforeEnd (arg: Omit<Interact.DoAnyPhaseArg, 'iEvent'> & { state?: ModifierState }): void | false {
+  beforeEnd (arg: Omit<DoAnyPhaseArg, 'iEvent'> & { state?: ModifierState }): void | false {
     const { interaction, event } = arg
     const states = this.states
 
@@ -244,7 +246,7 @@ export default class Modification {
     }
   }
 
-  stop (arg: { interaction: Interact.Interaction }) {
+  stop (arg: { interaction: Interaction }) {
     const { interaction } = arg
 
     if (!this.states || !this.states.length) {
@@ -287,7 +289,7 @@ export default class Modification {
     return this.states
   }
 
-  restoreInteractionCoords ({ interaction: { coords, rect, modification } }: { interaction: Interact.Interaction }) {
+  restoreInteractionCoords ({ interaction: { coords, rect, modification } }: { interaction: Interaction }) {
     if (!modification.result) { return }
 
     const { startDelta } = modification
@@ -343,7 +345,7 @@ export default class Modification {
   }
 }
 
-function createResult (coords?: Interact.Point, rect?: Interact.FullRect): ModificationResult {
+function createResult (coords?: Point, rect?: FullRect): ModificationResult {
   return {
     rect,
     coords,

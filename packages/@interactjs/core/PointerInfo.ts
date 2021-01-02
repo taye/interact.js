@@ -1,16 +1,16 @@
-import * as Interact from '@interactjs/types/index'
+import { PointerEventType, PointerType } from '@interactjs/types'
 
 export class PointerInfo {
   id: number
-  pointer: Interact.PointerType
-  event: Interact.PointerEventType
+  pointer: PointerType
+  event: PointerEventType
   downTime: number
   downTarget: Node
 
   constructor (
     id: number,
-    pointer: Interact.PointerType,
-    event: Interact.PointerEventType,
+    pointer: PointerType,
+    event: PointerEventType,
     downTime: number,
     downTarget: Node,
   ) {
