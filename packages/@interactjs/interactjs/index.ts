@@ -14,20 +14,7 @@ import offset from '@interactjs/offset/plugin'
 import pointerEvents from '@interactjs/pointer-events/plugin'
 import reactComponents from '@interactjs/react/plugin'
 import reflow from '@interactjs/reflow/plugin'
-import * as displace from '@interactjs/utils/displace'
-import { exchange } from '@interactjs/utils/exchange'
-import * as pointerUtils from '@interactjs/utils/pointerUtils'
 import vueComponents from '@interactjs/vue/plugin'
-
-declare module '@interactjs/core/interactStatic' {
-  export interface InteractStatic {
-    __utils: {
-      exchange: typeof exchange
-      displace: typeof displace
-      pointer: typeof pointerUtils
-    }
-  }
-}
 
 interact.use(multiTarget)
 
@@ -67,12 +54,6 @@ interact.use(feedback)
 interact.use(vueComponents)
 
 interact.use(reactComponents)
-
-interact.__utils = {
-  exchange,
-  displace,
-  pointer: pointerUtils,
-}
 
 // eslint-disable-next-line no-undef
 if (process.env.NODE_ENV !== 'production') {
