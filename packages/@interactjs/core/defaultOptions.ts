@@ -1,4 +1,4 @@
-import { Point, Listeners, OrBoolean, Element } from '@interactjs/types'
+import { Point, Listeners, OrBoolean, Element } from '@interactjs/types/index'
 
 export interface Defaults {
   base: BaseDefaults

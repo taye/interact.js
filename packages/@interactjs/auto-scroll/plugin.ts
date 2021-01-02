@@ -1,7 +1,7 @@
 import { Interactable } from '@interactjs/core/Interactable'
 import Interaction from '@interactjs/core/Interaction'
 import { ActionName, Plugin } from '@interactjs/core/scope'
-import { PointerType } from '@interactjs/types'
+import { PointerType } from '@interactjs/types/index'
 import * as domUtils from '@interactjs/utils/domUtils'
 import is from '@interactjs/utils/is'
 import raf from '@interactjs/utils/raf'

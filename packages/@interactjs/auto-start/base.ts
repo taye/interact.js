@@ -1,7 +1,7 @@
 import { Interactable } from '@interactjs/core/Interactable'
 import Interaction, { ActionProps } from '@interactjs/core/Interaction'
 import { Scope, SignalArgs, ActionName, Plugin } from '@interactjs/core/scope'
-import { CursorChecker, PointerType, PointerEventType, Element } from '@interactjs/types'
+import { CursorChecker, PointerType, PointerEventType, Element } from '@interactjs/types/index'
 import * as domUtils from '@interactjs/utils/domUtils'
 import extend from '@interactjs/utils/extend'
 import is from '@interactjs/utils/is'

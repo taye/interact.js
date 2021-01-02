@@ -1,7 +1,7 @@
 import { InteractEvent } from '@interactjs/core/InteractEvent'
 import { Interactable } from '@interactjs/core/Interactable'
 import { Scope, Plugin } from '@interactjs/core/scope'
-import { ActionMethod, DraggableOptions, DropzoneOptions } from '@interactjs/types'
+import { ActionMethod, DraggableOptions, DropzoneOptions } from '@interactjs/types/index'
 import is from '@interactjs/utils/is'
 
 declare module '@interactjs/core/Interactable' {

@@ -1,4 +1,4 @@
-import { Element } from '@interactjs/types'
+import { Element } from '@interactjs/types/index'
 
 import isWindow from './isWindow'
 import * as win from './window'

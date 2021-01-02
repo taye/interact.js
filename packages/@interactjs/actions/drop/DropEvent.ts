@@ -1,7 +1,7 @@
 import { BaseEvent } from '@interactjs/core/BaseEvent'
 import { InteractEvent } from '@interactjs/core/InteractEvent'
 import { Interactable } from '@interactjs/core/Interactable'
-import { Element } from '@interactjs/types'
+import { Element } from '@interactjs/types/index'
 import * as arr from '@interactjs/utils/arr'
 
 export class DropEvent extends BaseEvent<'drag'> {

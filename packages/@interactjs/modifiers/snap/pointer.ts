@@ -1,5 +1,5 @@
 import Interaction, { InteractionProxy } from '@interactjs/core/Interaction'
-import { Point, RectResolvable, Element } from '@interactjs/types'
+import { Point, RectResolvable, Element } from '@interactjs/types/index'
 import extend from '@interactjs/utils/extend'
 import getOriginXY from '@interactjs/utils/getOriginXY'
 import hypot from '@interactjs/utils/hypot'

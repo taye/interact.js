@@ -1,6 +1,6 @@
 import Interaction, { _ProxyMethods } from '@interactjs/core/Interaction'
 import { Plugin } from '@interactjs/core/scope'
-import { Point } from '@interactjs/types'
+import { Point } from '@interactjs/types/index'
 import * as rectUtils from '@interactjs/utils/rect'
 
 declare module '@interactjs/core/Interaction' {

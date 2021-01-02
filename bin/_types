@@ -21,7 +21,7 @@ const [,, modulesDir = 'packages'] = process.argv
   shell.exec(`tsc -p types.tsconfig.json --outFile ${outFile}`)
 
   const namespaceDeclaration = `
-import * as Interact from '@interactjs/types'
+import * as Interact from '@interactjs/types/index'
 
 export as namespace Interact
 export = Interact

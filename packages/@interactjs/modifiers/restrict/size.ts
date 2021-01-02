@@ -1,4 +1,4 @@
-import { Point, Rect, Size } from '@interactjs/types'
+import { Point, Rect, Size } from '@interactjs/types/index'
 import extend from '@interactjs/utils/extend'
 import * as rectUtils from '@interactjs/utils/rect'
 

@@ -2,7 +2,7 @@ import test from '@interactjs/_dev/test/test'
 import { Eventable } from '@interactjs/core/Eventable'
 import { Scope } from '@interactjs/core/scope'
 import * as helpers from '@interactjs/core/tests/_helpers'
-import { PointerEventType, PointerType } from '@interactjs/types'
+import { PointerEventType, PointerType } from '@interactjs/types/index'
 
 import pointerEvents, { EventTargetList } from './base'
 import interactableTargets from './interactableTargets'

@@ -1,7 +1,7 @@
 /* eslint-disable no-restricted-syntax */
 import { doc } from '@interactjs/_dev/test/domator'
 import { ActionProps } from '@interactjs/core/Interaction'
-import { PointerType, Rect, Target } from '@interactjs/types'
+import { PointerType, Rect, Target } from '@interactjs/types/index'
 import extend from '@interactjs/utils/extend'
 import is from '@interactjs/utils/is'
 import * as pointerUtils from '@interactjs/utils/pointerUtils'

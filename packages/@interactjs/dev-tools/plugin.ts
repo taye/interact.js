@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
 import Interaction from '@interactjs/core/Interaction'
 import { Scope, Plugin } from '@interactjs/core/scope'
-import { Element, OptionMethod } from '@interactjs/types'
+import { Element, OptionMethod } from '@interactjs/types/index'
 import domObjects from '@interactjs/utils/domObjects'
 import { parentNode } from '@interactjs/utils/domUtils'
 import extend from '@interactjs/utils/extend'

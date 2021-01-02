@@ -1,4 +1,4 @@
-import { Rect, Point } from '@interactjs/types'
+import { Rect, Point } from '@interactjs/types/index'
 
 import { SnapFunction, SnapTarget } from '../modifiers/snap/pointer'
 

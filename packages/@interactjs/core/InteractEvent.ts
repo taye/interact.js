@@ -1,5 +1,5 @@
 import { ActionName } from '@interactjs/core/scope'
-import { Point, FullRect, PointerEventType, Element } from '@interactjs/types'
+import { Point, FullRect, PointerEventType, Element } from '@interactjs/types/index'
 import extend from '@interactjs/utils/extend'
 import getOriginXY from '@interactjs/utils/getOriginXY'
 import hypot from '@interactjs/utils/hypot'

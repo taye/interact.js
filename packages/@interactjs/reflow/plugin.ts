@@ -1,7 +1,7 @@
 import { Interactable } from '@interactjs/core/Interactable'
 import { ActionProps, DoAnyPhaseArg, Interaction } from '@interactjs/core/Interaction'
 import { ActionName, Scope, Plugin } from '@interactjs/core/scope'
-import { Element } from '@interactjs/types'
+import { Element } from '@interactjs/types/index'
 import * as arr from '@interactjs/utils/arr'
 import is from '@interactjs/utils/is'
 import { copyAction } from '@interactjs/utils/misc'

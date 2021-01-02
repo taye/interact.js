@@ -1,5 +1,5 @@
 import { Scope, ActionName, SignalArgs, Plugin } from '@interactjs/core/scope'
-import { Listener } from '@interactjs/types'
+import { Listener } from '@interactjs/types/index'
 import browser from '@interactjs/utils/browser'
 import domObjects from '@interactjs/utils/domObjects'
 import { nodeContains } from '@interactjs/utils/domUtils'

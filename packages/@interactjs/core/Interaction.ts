@@ -1,5 +1,5 @@
 import type { ActionDefaults } from '@interactjs/core/defaultOptions'
-import { Element, EdgeOptions, PointerEventType, PointerType, FullRect, CoordsSet } from '@interactjs/types'
+import { Element, EdgeOptions, PointerEventType, PointerType, FullRect, CoordsSet } from '@interactjs/types/index'
 import * as arr from '@interactjs/utils/arr'
 import extend from '@interactjs/utils/extend'
 import hypot from '@interactjs/utils/hypot'
