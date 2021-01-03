@@ -1,6 +1,6 @@
 import test from '@interactjs/_dev/test/test'
 import drag from '@interactjs/actions/drag/plugin'
-import { EventPhase, InteractEvent } from '@interactjs/core/InteractEvent'
+import type { EventPhase, InteractEvent } from '@interactjs/core/InteractEvent'
 import * as helpers from '@interactjs/core/tests/_helpers'
 import extend from '@interactjs/utils/extend'
 

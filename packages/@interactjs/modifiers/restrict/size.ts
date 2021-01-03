@@ -1,11 +1,14 @@
-import { Point, Rect, Size } from '@interactjs/types/index'
+import type { Point, Rect, Size } from '@interactjs/types/index'
 import extend from '@interactjs/utils/extend'
 import * as rectUtils from '@interactjs/utils/rect'
 
-import { makeModifier, ModifierArg, ModifierState } from '../base'
+import type { ModifierArg, ModifierState } from '../base'
+import { makeModifier } from '../base'
 
-import { restrictEdges, RestrictEdgesState } from './edges'
-import { getRestrictionRect, RestrictOptions } from './pointer'
+import type { RestrictEdgesState } from './edges'
+import { restrictEdges } from './edges'
+import type { RestrictOptions } from './pointer'
+import { getRestrictionRect } from './pointer'
 
 const noMin = { width: -Infinity, height: -Infinity }
 const noMax = { width: +Infinity, height: +Infinity }

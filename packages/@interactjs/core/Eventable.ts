@@ -1,7 +1,8 @@
-import { Listener, ListenersArg, Rect } from '@interactjs/types/index'
+import type { Listener, ListenersArg, Rect } from '@interactjs/types/index'
 import * as arr from '@interactjs/utils/arr'
 import extend from '@interactjs/utils/extend'
-import normalize, { NormalizedListeners } from '@interactjs/utils/normalizeListeners'
+import type { NormalizedListeners } from '@interactjs/utils/normalizeListeners'
+import normalize from '@interactjs/utils/normalizeListeners'
 
 function fireUntilImmediateStopped (event: any, listeners: Listener[]) {
   for (const listener of listeners) {

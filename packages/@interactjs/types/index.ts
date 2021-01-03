@@ -1,16 +1,16 @@
 /* eslint-disable import/no-extraneous-dependencies */
-import * as dropEvent from '@interactjs/actions/drop/DropEvent'
-import * as gesture from '@interactjs/actions/gesture/plugin'
-import * as resize from '@interactjs/actions/resize/plugin'
-import * as iEvent from '@interactjs/core/InteractEvent'
-import * as iable from '@interactjs/core/Interactable'
-import * as iSet from '@interactjs/core/InteractableSet'
-import * as interaction from '@interactjs/core/Interaction'
-import * as defaults from '@interactjs/core/defaultOptions'
-import * as iStatic from '@interactjs/core/interactStatic'
-import * as scope from '@interactjs/core/scope'
-import * as snap from '@interactjs/modifiers/snap/pointer'
-import { PointerEvent as _PointerEvent } from '@interactjs/pointer-events/PointerEvent'
+import type * as dropEvent from '@interactjs/actions/drop/DropEvent'
+import type * as gesture from '@interactjs/actions/gesture/plugin'
+import type * as resize from '@interactjs/actions/resize/plugin'
+import type * as iEvent from '@interactjs/core/InteractEvent'
+import type * as iable from '@interactjs/core/Interactable'
+import type * as iSet from '@interactjs/core/InteractableSet'
+import type * as interaction from '@interactjs/core/Interaction'
+import type * as defaults from '@interactjs/core/defaultOptions'
+import type * as iStatic from '@interactjs/core/interactStatic'
+import type * as scope from '@interactjs/core/scope'
+import type * as snap from '@interactjs/modifiers/snap/pointer'
+import type { PointerEvent as _PointerEvent } from '@interactjs/pointer-events/PointerEvent'
 
 // import module augmentations
 import '@interactjs/actions/drag/plugin'
@@ -32,7 +32,7 @@ import '@interactjs/pointer-events/interactableTargets'
 import '@interactjs/reflow/plugin'
 import '@interactjs/snappers/plugin'
 
-import _NativePointerEventType from './NativePointerEventType'
+import type _NativePointerEventType from './NativePointerEventType'
 
 export type OrBoolean<T> = {
   [P in keyof T]: T[P] | boolean;

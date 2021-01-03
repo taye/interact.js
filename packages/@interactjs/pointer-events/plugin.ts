@@ -1,4 +1,4 @@
-import { Plugin } from '@interactjs/core/scope'
+import type { Plugin } from '@interactjs/core/scope'
 
 import * as pointerEvents from './base'
 import holdRepeat from './holdRepeat'

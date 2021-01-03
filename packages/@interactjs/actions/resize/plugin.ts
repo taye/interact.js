@@ -1,8 +1,8 @@
-import { EventPhase, InteractEvent } from '@interactjs/core/InteractEvent'
-import { Interactable } from '@interactjs/core/Interactable'
-import { ActionProps, Interaction } from '@interactjs/core/Interaction'
-import { Scope, Plugin } from '@interactjs/core/scope'
-import { ActionMethod, ResizableOptions, FullRect, OrBoolean, Point, Rect } from '@interactjs/types/index'
+import type { EventPhase, InteractEvent } from '@interactjs/core/InteractEvent'
+import type { Interactable } from '@interactjs/core/Interactable'
+import type { ActionProps, Interaction } from '@interactjs/core/Interaction'
+import type { Scope, Plugin } from '@interactjs/core/scope'
+import type { ActionMethod, ResizableOptions, FullRect, OrBoolean, Point, Rect } from '@interactjs/types/index'
 import * as dom from '@interactjs/utils/domUtils'
 import extend from '@interactjs/utils/extend'
 import is from '@interactjs/utils/is'
@@ -250,6 +250,7 @@ function checkResizeEdge (
 }
 
 /* eslint-disable multiline-ternary */
+// eslint-disable-next-line @typescript-eslint/consistent-type-imports
 function initCursors (browser: typeof import ('@interactjs/utils/browser').default) {
   return (browser.isIe9 ? {
     x : 'e-resize',

@@ -1,6 +1,6 @@
 import test from '@interactjs/_dev/test/test'
-import { InteractEvent } from '@interactjs/core/InteractEvent'
-import { Interactable } from '@interactjs/core/Interactable'
+import type { InteractEvent } from '@interactjs/core/InteractEvent'
+import type { Interactable } from '@interactjs/core/Interactable'
 import * as helpers from '@interactjs/core/tests/_helpers'
 import extend from '@interactjs/utils/extend'
 import * as pointerUtils from '@interactjs/utils/pointerUtils'

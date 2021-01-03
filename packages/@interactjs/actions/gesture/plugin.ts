@@ -1,8 +1,8 @@
-import { InteractEvent, EventPhase } from '@interactjs/core/InteractEvent'
-import Interaction, { DoPhaseArg } from '@interactjs/core/Interaction'
-import { Options } from '@interactjs/core/defaultOptions'
-import { Scope, Plugin } from '@interactjs/core/scope'
-import { ActionMethod, GesturableOptions, Rect, PointerType } from '@interactjs/types/index'
+import type { InteractEvent, EventPhase } from '@interactjs/core/InteractEvent'
+import type { Interaction, DoPhaseArg } from '@interactjs/core/Interaction'
+import type { Options } from '@interactjs/core/defaultOptions'
+import type { Scope, Plugin } from '@interactjs/core/scope'
+import type { ActionMethod, GesturableOptions, Rect, PointerType } from '@interactjs/types/index'
 import is from '@interactjs/utils/is'
 import * as pointerUtils from '@interactjs/utils/pointerUtils'
 

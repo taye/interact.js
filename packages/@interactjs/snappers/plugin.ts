@@ -1,4 +1,4 @@
-import { Plugin } from '@interactjs/core/scope'
+import type { Plugin } from '@interactjs/core/scope'
 import extend from '@interactjs/utils/extend'
 
 import * as allSnappers from './all'

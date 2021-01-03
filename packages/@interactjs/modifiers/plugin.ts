@@ -1,4 +1,4 @@
-import { Plugin } from '@interactjs/core/scope'
+import type { Plugin } from '@interactjs/core/scope'
 import snappers from '@interactjs/snappers/plugin'
 
 import all from './all'

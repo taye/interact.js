@@ -1,12 +1,13 @@
-import Interaction, { InteractionProxy } from '@interactjs/core/Interaction'
-import { Point, RectResolvable, Element } from '@interactjs/types/index'
+import type { Interaction, InteractionProxy } from '@interactjs/core/Interaction'
+import type { Point, RectResolvable, Element } from '@interactjs/types/index'
 import extend from '@interactjs/utils/extend'
 import getOriginXY from '@interactjs/utils/getOriginXY'
 import hypot from '@interactjs/utils/hypot'
 import is from '@interactjs/utils/is'
 import { resolveRectLike, rectToXY } from '@interactjs/utils/rect'
 
-import { makeModifier, ModifierArg, ModifierState } from '../base'
+import type { ModifierArg, ModifierState } from '../base'
+import { makeModifier } from '../base'
 
 export interface Offset {
   x: number

@@ -1,6 +1,6 @@
 import test from '@interactjs/_dev/test/test'
 import * as helpers from '@interactjs/core/tests/_helpers'
-import { EdgeOptions } from '@interactjs/types/index'
+import type { EdgeOptions } from '@interactjs/types/index'
 
 import { snapEdges } from '../snap/edges'
 

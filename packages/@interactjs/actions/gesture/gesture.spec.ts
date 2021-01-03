@@ -1,10 +1,11 @@
 import test from '@interactjs/_dev/test/test'
-import { Scope } from '@interactjs/core/scope'
+import type { Scope } from '@interactjs/core/scope'
 import * as helpers from '@interactjs/core/tests/_helpers'
 import extend from '@interactjs/utils/extend'
 import { coordsToEvent, newCoords } from '@interactjs/utils/pointerUtils'
 
-import gesture, { GestureEvent } from './plugin'
+import type { GestureEvent } from './plugin'
+import gesture from './plugin'
 
 function getGestureProps (event: GestureEvent) {
   return helpers.getProps(event, ['type', 'angle', 'distance', 'scale', 'ds', 'da'])

@@ -1,5 +1,5 @@
 import test from '@interactjs/_dev/test/test'
-import { InteractEvent } from '@interactjs/core/InteractEvent'
+import type { InteractEvent } from '@interactjs/core/InteractEvent'
 import extend from '@interactjs/utils/extend'
 
 import { DropEvent } from '../drop/DropEvent'

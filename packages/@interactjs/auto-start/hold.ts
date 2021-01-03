@@ -1,5 +1,5 @@
-import Interaction from '@interactjs/core/Interaction'
-import { Scope, Plugin } from '@interactjs/core/scope'
+import type Interaction from '@interactjs/core/Interaction'
+import type { Scope, Plugin } from '@interactjs/core/scope'
 
 import basePlugin from './base'
 

@@ -1,5 +1,5 @@
-import { ActionProps } from '@interactjs/core/Interaction'
-import { ActionName } from '@interactjs/core/scope'
+import type { ActionProps } from '@interactjs/core/Interaction'
+import type { ActionName } from '@interactjs/core/scope'
 
 import { window } from './window'
 

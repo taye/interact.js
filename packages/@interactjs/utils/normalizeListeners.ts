@@ -1,4 +1,4 @@
-import { EventTypes, Listener, ListenersArg } from '@interactjs/types/index'
+import type { EventTypes, Listener, ListenersArg } from '@interactjs/types/index'
 
 import extend from './extend'
 import is from './is'

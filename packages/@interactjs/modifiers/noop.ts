@@ -1,4 +1,4 @@
-import { ModifierFunction } from './base'
+import type { ModifierFunction } from './base'
 
 const noop = (() => {
 }) as unknown as ModifierFunction<any, any, 'noop'>

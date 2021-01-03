@@ -1,6 +1,6 @@
 /* eslint-disable no-dupe-class-members */
-import { ActionMap, ActionName, Actions, Scope } from '@interactjs/core/scope'
-import { Context, Element, Target, Listeners, OrBoolean, EventTypes, ListenersArg, ActionMethod } from '@interactjs/types/index'
+import type { ActionMap, ActionName, Actions, Scope } from '@interactjs/core/scope'
+import type { Context, Element, Target, Listeners, OrBoolean, EventTypes, ListenersArg, ActionMethod } from '@interactjs/types/index'
 import * as arr from '@interactjs/utils/arr'
 import browser from '@interactjs/utils/browser'
 import clone from '@interactjs/utils/clone'
@@ -11,7 +11,8 @@ import normalizeListeners from '@interactjs/utils/normalizeListeners'
 import { getWindow } from '@interactjs/utils/window'
 
 import { Eventable } from './Eventable'
-import { ActionDefaults, Defaults, Options, OptionsArg, PerActionDefaults } from './defaultOptions'
+import type { ActionDefaults, Defaults, OptionsArg, PerActionDefaults } from './defaultOptions'
+import { Options } from './defaultOptions'
 import isNonNativeEvent from './isNonNativeEvent'
 
 type IgnoreValue = string | Element | boolean

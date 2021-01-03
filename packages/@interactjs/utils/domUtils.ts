@@ -1,4 +1,4 @@
-import { Rect, Target, Element } from '@interactjs/types/index'
+import type { Rect, Target, Element } from '@interactjs/types/index'
 
 import browser from './browser'
 import domObjects from './domObjects'

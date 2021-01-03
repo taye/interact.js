@@ -3,7 +3,8 @@ import drag from '@interactjs/actions/drag/plugin'
 import resize from '@interactjs/actions/resize/plugin'
 import * as helpers from '@interactjs/core/tests/_helpers'
 
-import devTools, { Check, Logger } from './plugin'
+import type { Check, Logger } from './plugin'
+import devTools from './plugin'
 
 const { checks, links, prefix } = devTools
 const checkMap = checks.reduce((acc, check) => {

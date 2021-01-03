@@ -1,5 +1,6 @@
 import test from '@interactjs/_dev/test/test'
-import resize, { ResizeEvent } from '@interactjs/actions/resize/plugin'
+import type { ResizeEvent } from '@interactjs/actions/resize/plugin'
+import resize from '@interactjs/actions/resize/plugin'
 import * as helpers from '@interactjs/core/tests/_helpers'
 import extend from '@interactjs/utils/extend'
 import * as rectUtils from '@interactjs/utils/rect'

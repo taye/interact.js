@@ -1,5 +1,5 @@
-import { InteractEvent } from '@interactjs/core/InteractEvent'
-import { CoordsSetMember, PointerType, Point, PointerEventType, Element } from '@interactjs/types/index'
+import type { InteractEvent } from '@interactjs/core/InteractEvent'
+import type { CoordsSetMember, PointerType, Point, PointerEventType, Element } from '@interactjs/types/index'
 
 import browser from './browser'
 import dom from './domObjects'

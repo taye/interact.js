@@ -1,7 +1,7 @@
-import Interaction from '@interactjs/core/Interaction'
-import { ListenerMap, Scope, SignalArgs, Plugin } from '@interactjs/core/scope'
+import type Interaction from '@interactjs/core/Interaction'
+import type { ListenerMap, Scope, SignalArgs, Plugin } from '@interactjs/core/scope'
 
-import PointerEvent from './PointerEvent'
+import type PointerEvent from './PointerEvent'
 import basePlugin from './base'
 
 declare module '@interactjs/core/Interaction' {

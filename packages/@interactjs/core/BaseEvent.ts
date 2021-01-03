@@ -1,6 +1,6 @@
-import { Interactable } from '@interactjs/core/Interactable'
-import Interaction, { InteractionProxy } from '@interactjs/core/Interaction'
-import { ActionName } from '@interactjs/core/scope'
+import type { Interactable } from '@interactjs/core/Interactable'
+import type { Interaction, InteractionProxy } from '@interactjs/core/Interaction'
+import type { ActionName } from '@interactjs/core/scope'
 
 export class BaseEvent<T extends ActionName = never> {
   type: string

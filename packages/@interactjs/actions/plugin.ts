@@ -1,4 +1,4 @@
-import { Scope } from '@interactjs/core/scope'
+import type { Scope } from '@interactjs/core/scope'
 
 import drag from './drag/plugin'
 import drop from './drop/plugin'

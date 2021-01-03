@@ -89,6 +89,6 @@
     }
   },
   "lint-staged": {
-    "**/*.(t|j)s?(x)": "yarn lint --fix"
+    "**/*.(t|j)s?(x)": "eslint --fix"
   }
 }

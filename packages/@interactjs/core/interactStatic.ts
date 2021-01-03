@@ -1,6 +1,6 @@
 /** @module interact */
-import { Scope, Plugin } from '@interactjs/core/scope'
-import { Context, EventTypes, ListenersArg, Target, Element, Listener } from '@interactjs/types/index'
+import type { Scope, Plugin } from '@interactjs/core/scope'
+import type { Context, EventTypes, ListenersArg, Target, Element, Listener } from '@interactjs/types/index'
 import browser from '@interactjs/utils/browser'
 import * as domUtils from '@interactjs/utils/domUtils'
 import is from '@interactjs/utils/is'
@@ -8,8 +8,8 @@ import * as pointerUtils from '@interactjs/utils/pointerUtils'
 
 import { warnOnce } from '../utils/misc'
 
-import { Interactable } from './Interactable'
-import { Options } from './defaultOptions'
+import type { Interactable } from './Interactable'
+import type { Options } from './defaultOptions'
 import isNonNativeEvent from './isNonNativeEvent'
 
 export interface InteractStatic {

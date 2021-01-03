@@ -1,11 +1,11 @@
-import { EventPhase } from '@interactjs/core/InteractEvent'
-import Interaction, { DoAnyPhaseArg } from '@interactjs/core/Interaction'
-import { EdgeOptions, FullRect, Point, Rect } from '@interactjs/types/index'
+import type { EventPhase } from '@interactjs/core/InteractEvent'
+import type { Interaction, DoAnyPhaseArg } from '@interactjs/core/Interaction'
+import type { EdgeOptions, FullRect, Point, Rect } from '@interactjs/types/index'
 import clone from '@interactjs/utils/clone'
 import extend from '@interactjs/utils/extend'
 import * as rectUtils from '@interactjs/utils/rect'
 
-import { Modifier, ModifierArg, ModifierState } from './base'
+import type { Modifier, ModifierArg, ModifierState } from './base'
 
 export interface ModificationResult {
   delta: Point

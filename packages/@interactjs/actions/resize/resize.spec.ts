@@ -1,7 +1,8 @@
 import test from '@interactjs/_dev/test/test'
 import * as helpers from '@interactjs/core/tests/_helpers'
 
-import resize, { ResizeEvent } from './plugin'
+import type { ResizeEvent } from './plugin'
+import resize from './plugin'
 
 const { ltrbwh } = helpers
 

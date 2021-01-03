@@ -1,7 +1,7 @@
 import test from '@interactjs/_dev/test/test'
-import { ActionName } from '@interactjs/core/scope'
+import type { ActionName } from '@interactjs/core/scope'
 import * as helpers from '@interactjs/core/tests/_helpers'
-import { Element } from '@interactjs/types/index'
+import type { Element } from '@interactjs/types/index'
 import extend from '@interactjs/utils/extend'
 import is from '@interactjs/utils/is'
 

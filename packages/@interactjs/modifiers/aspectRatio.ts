@@ -16,12 +16,13 @@
  * ```
  */
 
-import { Point, Rect, EdgeOptions } from '@interactjs/types/index'
+import type { Point, Rect, EdgeOptions } from '@interactjs/types/index'
 import extend from '@interactjs/utils/extend'
 import { addEdges } from '@interactjs/utils/rect'
 
 import Modification from './Modification'
-import { Modifier, ModifierModule, ModifierState, makeModifier } from './base'
+import type { Modifier, ModifierModule, ModifierState } from './base'
+import { makeModifier } from './base'
 
 export interface AspectRatioOptions {
   ratio?: number | 'preserve'

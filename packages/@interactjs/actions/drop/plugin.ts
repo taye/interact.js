@@ -1,8 +1,8 @@
-import { EventPhase, InteractEvent } from '@interactjs/core/InteractEvent'
-import { Interactable } from '@interactjs/core/Interactable'
-import Interaction, { DoPhaseArg } from '@interactjs/core/Interaction'
-import { Scope, Plugin } from '@interactjs/core/scope'
-import { DropzoneOptions, Element, PointerEventType, Rect } from '@interactjs/types/index'
+import type { EventPhase, InteractEvent } from '@interactjs/core/InteractEvent'
+import type { Interactable } from '@interactjs/core/Interactable'
+import type { Interaction, DoPhaseArg } from '@interactjs/core/Interaction'
+import type { Scope, Plugin } from '@interactjs/core/scope'
+import type { DropzoneOptions, Element, PointerEventType, Rect } from '@interactjs/types/index'
 import * as domUtils from '@interactjs/utils/domUtils'
 import extend from '@interactjs/utils/extend'
 import getOriginXY from '@interactjs/utils/getOriginXY'
@@ -10,7 +10,8 @@ import is from '@interactjs/utils/is'
 import normalizeListeners from '@interactjs/utils/normalizeListeners'
 import * as pointerUtils from '@interactjs/utils/pointerUtils'
 
-import drag, { DragEvent } from '../drag/plugin'
+import type { DragEvent } from '../drag/plugin'
+import drag from '../drag/plugin'
 
 import { DropEvent } from './DropEvent'
 

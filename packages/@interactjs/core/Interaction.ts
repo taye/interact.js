@@ -1,5 +1,5 @@
 import type { ActionDefaults } from '@interactjs/core/defaultOptions'
-import { Element, EdgeOptions, PointerEventType, PointerType, FullRect, CoordsSet } from '@interactjs/types/index'
+import type { Element, EdgeOptions, PointerEventType, PointerType, FullRect, CoordsSet } from '@interactjs/types/index'
 import * as arr from '@interactjs/utils/arr'
 import extend from '@interactjs/utils/extend'
 import hypot from '@interactjs/utils/hypot'
@@ -7,10 +7,11 @@ import { warnOnce, copyAction } from '@interactjs/utils/misc'
 import * as pointerUtils from '@interactjs/utils/pointerUtils'
 import * as rectUtils from '@interactjs/utils/rect'
 
-import { InteractEvent, EventPhase } from './InteractEvent'
-import { Interactable } from './Interactable'
+import type { EventPhase } from './InteractEvent'
+import { InteractEvent } from './InteractEvent'
+import type { Interactable } from './Interactable'
 import { PointerInfo } from './PointerInfo'
-import { ActionName, Scope } from './scope'
+import type { ActionName, Scope } from './scope'
 
 export interface ActionProps<T extends ActionName | null = never> {
   name: T

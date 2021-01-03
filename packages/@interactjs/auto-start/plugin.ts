@@ -1,4 +1,4 @@
-import { Scope } from '@interactjs/core/scope'
+import type { Scope } from '@interactjs/core/scope'
 
 import autoStart from './base'
 import dragAxis from './dragAxis'

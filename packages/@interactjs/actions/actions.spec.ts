@@ -1,5 +1,5 @@
 import test from '@interactjs/_dev/test/test'
-import { Scope, ActionName } from '@interactjs/core/scope'
+import type { Scope, ActionName } from '@interactjs/core/scope'
 import * as helpers from '@interactjs/core/tests/_helpers'
 import * as pointerUtils from '@interactjs/utils/pointerUtils'
 

@@ -1,10 +1,11 @@
-import Interaction from '@interactjs/core/Interaction'
-import { RectResolvable, Rect, Point } from '@interactjs/types/index'
+import type Interaction from '@interactjs/core/Interaction'
+import type { RectResolvable, Rect, Point } from '@interactjs/types/index'
 import extend from '@interactjs/utils/extend'
 import is from '@interactjs/utils/is'
 import * as rectUtils from '@interactjs/utils/rect'
 
-import { makeModifier, ModifierArg, ModifierModule, ModifierState } from '../base'
+import type { ModifierArg, ModifierModule, ModifierState } from '../base'
+import { makeModifier } from '../base'
 
 export interface RestrictOptions {
   // where to drag over

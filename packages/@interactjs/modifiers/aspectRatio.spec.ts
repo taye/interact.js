@@ -1,9 +1,10 @@
 import test from '@interactjs/_dev/test/test'
 import resize from '@interactjs/actions/resize/plugin'
 import * as helpers from '@interactjs/core/tests/_helpers'
-import { FullRect, EdgeOptions } from '@interactjs/types/index'
+import type { FullRect, EdgeOptions } from '@interactjs/types/index'
 
-import aspectRatio, { AspectRatioOptions } from './aspectRatio'
+import type { AspectRatioOptions } from './aspectRatio'
+import aspectRatio from './aspectRatio'
 import modifiersBase from './base'
 import restrictSize from './restrict/size'
 

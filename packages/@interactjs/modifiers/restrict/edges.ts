@@ -9,13 +9,15 @@
 //   },
 // })
 
-import { Point, Rect } from '@interactjs/types/index'
+import type { Point, Rect } from '@interactjs/types/index'
 import extend from '@interactjs/utils/extend'
 import * as rectUtils from '@interactjs/utils/rect'
 
-import { makeModifier, ModifierArg, ModifierState } from '../base'
+import type { ModifierArg, ModifierState } from '../base'
+import { makeModifier } from '../base'
 
-import { getRestrictionRect, RestrictOptions } from './pointer'
+import type { RestrictOptions } from './pointer'
+import { getRestrictionRect } from './pointer'
 
 export interface RestrictEdgesOptions {
   inner: RestrictOptions['restriction']

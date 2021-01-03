@@ -1,12 +1,13 @@
 /* eslint-disable no-restricted-syntax */
 import { doc } from '@interactjs/_dev/test/domator'
-import { ActionProps } from '@interactjs/core/Interaction'
-import { PointerType, Rect, Target } from '@interactjs/types/index'
+import type { ActionProps } from '@interactjs/core/Interaction'
+import type { PointerType, Rect, Target } from '@interactjs/types/index'
 import extend from '@interactjs/utils/extend'
 import is from '@interactjs/utils/is'
 import * as pointerUtils from '@interactjs/utils/pointerUtils'
 
-import { Scope, Plugin, ActionName } from '../scope'
+import type { Plugin, ActionName } from '../scope'
+import { Scope } from '../scope'
 
 let counter = 0
 

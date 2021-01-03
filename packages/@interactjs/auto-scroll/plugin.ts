@@ -1,14 +1,12 @@
-import { Interactable } from '@interactjs/core/Interactable'
-import Interaction from '@interactjs/core/Interaction'
-import { ActionName, Plugin } from '@interactjs/core/scope'
-import { PointerType } from '@interactjs/types/index'
+import type { Interactable } from '@interactjs/core/Interactable'
+import type Interaction from '@interactjs/core/Interaction'
+import type { ActionName, Scope, Plugin } from '@interactjs/core/scope'
+import type { PointerType } from '@interactjs/types/index'
 import * as domUtils from '@interactjs/utils/domUtils'
 import is from '@interactjs/utils/is'
 import raf from '@interactjs/utils/raf'
 import { getStringOptionResult } from '@interactjs/utils/rect'
 import { getWindow } from '@interactjs/utils/window'
-
-type Scope = import ('@interactjs/core/scope').Scope
 
 declare module '@interactjs/core/scope' {
   interface Scope {
