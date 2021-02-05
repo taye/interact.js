@@ -237,7 +237,7 @@ function collectEventTargets<T extends string> ({ interaction, pointer, event, e
 
   if (type === 'hold') {
     signalArg.targets = signalArg.targets.filter(target =>
-      target.eventable.options.holdDuration === interaction.pointers[pointerIndex].hold.duration)
+      target.eventable.options.holdDuration === interaction.pointers[pointerIndex]?.hold.duration)
   }
 
   return signalArg.targets
