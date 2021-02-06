@@ -59,7 +59,7 @@ async function generate ({
   serverOptions,
   outDir = serve ? temp.mkdirSync('ijs-serve') : packagesDir,
 } = {}) {
-  sources = sources || await getSources()
+  sources = sources || (await getSources())
   watch = watch || serve
   moduleDirectory = [outDir, ...moduleDirectory]
 
@@ -91,14 +91,15 @@ async function generate ({
 
   console.log('watching for changes')
 
-  if (!serve) { return }
+  if (!serve) return
 
   const serverWatch = [
-    ...OUTPUT_VERSIONS.map(v => sources.map(s => {
-      const outModuleName = path.join(outDir, getRelativeToRoot(s, moduleDirectory).result)
+    ...OUTPUT_VERSIONS.map(v =>
+      sources.map(s => {
+        const outModuleName = path.join(outDir, getRelativeToRoot(s, moduleDirectory).result)
 
-      return `${getModuleName(outModuleName)}${v.extension}`
-    }),
+        return `${getModuleName(outModuleName)}${v.extension}`
+      }),
     ).flat(),
     glob.sync('**/*.{html,css}', { ignore: ['**/node_modules/**'] }),
   ]
@@ -121,68 +122,78 @@ async function generate ({
 
   function _generate (changedSources) {
     for (const sourceFilename of changedSources) {
-      queue.add(async () => {
-        const shimResult = shim && await shim(sourceFilename)
-        const moduleName = getModuleName(sourceFilename)
-        const rootRelativeModuleName = getRelativeToRoot(moduleName, moduleDirectory).result
-        const outModuleName = path.join(outDir, rootRelativeModuleName)
+      queue
+        .add(async () => {
+          const shimResult = shim && (await shim(sourceFilename))
+          const moduleName = getModuleName(sourceFilename)
+          const rootRelativeModuleName = getRelativeToRoot(moduleName, moduleDirectory).result
+          const outModuleName = path.join(outDir, rootRelativeModuleName)
 
-        if (shimResult) {
-          await mkdirp(path.dirname(outModuleName))
+          if (shimResult) {
+            await mkdirp(path.dirname(outModuleName))
 
-          return Promise.all(OUTPUT_VERSIONS.map(
-            ({ extension }) => Promise.all([
-              fs.writeFile(`${outModuleName}${extension}`, shimResult.code),
-              shimResult.map && fs.writeFile(`${outModuleName}${extension}.map`, JSON.stringify(shimResult.map)),
-            ]),
-          ))
-        }
-
-        const sourceCode = (await fs.readFile(sourceFilename)).toString()
-        const ast = babel.parseSync(sourceCode, { ...babelOptions, filename: sourceFilename })
-
-        return Promise.all(OUTPUT_VERSIONS.map(async version => {
-          const { extension, nodeEnv } = version
-          const env = { NODE_ENV: nodeEnv, INTERACTJS_ESNEXT: true }
-          const finalBabelOptions = extendBabelOptions({
-            filename: sourceFilename,
-            plugins: [
-              [transformInlineEnvironmentVariables, { env }],
-              [transformImportsToRelative, { extension, moduleDirectory }],
-            ],
-          }, babelOptions)
-          const result = {
-            ...await babel.transformFromAst(ast, sourceCode, finalBabelOptions),
-            modern: true,
+            return Promise.all(
+              OUTPUT_VERSIONS.map(({ extension }) =>
+                Promise.all([
+                  fs.writeFile(`${outModuleName}${extension}`, shimResult.code),
+                  shimResult.map &&
+                    fs.writeFile(`${outModuleName}${extension}.map`, JSON.stringify(shimResult.map)),
+                ]),
+              ),
+            )
           }
 
-          const { code, map } = version.post ? await version.post(result) : result
-          const jsFilename = `${outModuleName}${extension}`
-          const mapFilename = `${jsFilename}.map`
+          const sourceCode = (await fs.readFile(sourceFilename)).toString()
+          const ast = babel.parseSync(sourceCode, { ...babelOptions, filename: sourceFilename })
 
-          await mkdirp(path.dirname(jsFilename))
+          return Promise.all(
+            OUTPUT_VERSIONS.map(async version => {
+              const { extension, nodeEnv } = version
+              const env = { NODE_ENV: nodeEnv, INTERACTJS_ESNEXT: true }
+              const finalBabelOptions = extendBabelOptions(
+                {
+                  filename: sourceFilename,
+                  plugins: [
+                    [transformInlineEnvironmentVariables, { env }],
+                    [transformImportsToRelative, { extension, moduleDirectory }],
+                  ],
+                },
+                babelOptions,
+              )
+              const result = {
+                ...(await babel.transformFromAst(ast, sourceCode, finalBabelOptions)),
+                modern: true,
+              }
 
-          const jsStream = createWriteStream(jsFilename)
+              const { code, map } = version.post ? await version.post(result) : result
+              const jsFilename = `${outModuleName}${extension}`
+              const mapFilename = `${jsFilename}.map`
 
-          jsStream.write(code)
-          jsStream.end(`\n//# sourceMappingURL=${path.basename(mapFilename)}`)
+              await mkdirp(path.dirname(jsFilename))
 
-          await Promise.all([
-            new Promise((resolve, reject) => {
-              jsStream.on('close', resolve)
-              jsStream.on('error', reject)
+              const jsStream = createWriteStream(jsFilename)
+
+              jsStream.write(code)
+              jsStream.end(`\n//# sourceMappingURL=${path.basename(mapFilename)}`)
+
+              await Promise.all([
+                new Promise((resolve, reject) => {
+                  jsStream.on('close', resolve)
+                  jsStream.on('error', reject)
+                }),
+                fs.writeFile(mapFilename, JSON.stringify(map, null, '\t')),
+              ])
             }),
-            fs.writeFile(mapFilename, JSON.stringify(map, null, '\t')),
-          ])
-        }))
-      }).catch(error => {
-        console.error(error)
+          )
+        })
+        .catch(error => {
+          console.error(error)
 
-        if (!watch) {
-          queue.clear()
-          process.exit(1)
-        }
-      })
+          if (!watch) {
+            queue.clear()
+            process.exit(1)
+          }
+        })
     }
 
     return queue.onIdle()

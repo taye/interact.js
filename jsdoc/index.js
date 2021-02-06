@@ -24,6 +24,6 @@ module.exports = ({ stdio = 'inherit' } = {}) => {
   console.log(' done.')
 }
 
-if (!module.parent)  {
+if (!module.parent) {
   module.exports()
 }

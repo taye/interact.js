@@ -4,20 +4,19 @@ import finder from './interactionFinder'
 import * as helpers from './tests/_helpers'
 
 test('modifiers/snap', t => {
-  const {
-    interactable,
-    event,
-    coords,
-    scope,
-  } = helpers.testEnv()
+  const { interactable, event, coords, scope } = helpers.testEnv()
 
   const { body } = scope.document
 
   const { list } = scope.interactions
   const details = {
     pointer: event,
-    get pointerId (): number { return details.pointer.pointerId },
-    get pointerType (): string { return details.pointer.pointerType },
+    get pointerId (): number {
+      return details.pointer.pointerId
+    },
+    get pointerType (): string {
+      return details.pointer.pointerType
+    },
     eventType: null as string,
     eventTarget: body,
     curEventTarget: scope.document,
@@ -49,11 +48,7 @@ test('modifiers/snap', t => {
   list[1].pointerDown({ ...event } as any, { ...event } as any, body)
   coords.pointerType = 'touch'
 
-  t.equal(
-    list.indexOf(finder.search(details)),
-    1,
-    '[pointerType: touch] gets interaction with pointerId',
-  )
+  t.equal(list.indexOf(finder.search(details)), 1, '[pointerType: touch] gets interaction with pointerId')
 
   coords.pointerId = 5
 

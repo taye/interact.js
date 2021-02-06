@@ -14,14 +14,16 @@ declare module '@interactjs/core/Interaction' {
   }
 
   enum _ProxyMethods {
-    offsetBy = ''
+    offsetBy = '',
   }
 }
 
-(_ProxyMethods as any).offsetBy = ''
+;(_ProxyMethods as any).offsetBy = ''
 
 export function addTotal (interaction: Interaction) {
-  if (!interaction.pointerIsDown) { return }
+  if (!interaction.pointerIsDown) {
+    return
+  }
 
   addToCoords(interaction.coords.cur, interaction.offset.total)
 
@@ -36,7 +38,7 @@ function beforeAction ({ interaction }: { interaction: Interaction }) {
 function beforeEnd ({ interaction }: { interaction: Interaction }): boolean | void {
   const hadPending = applyPending(interaction)
 
-  if (!hadPending) { return }
+  if (!hadPending) return
 
   interaction.move({ offset: true })
   interaction.end()

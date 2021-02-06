@@ -47,6 +47,7 @@ rules:
     groups: [builtin, external, internal, parent, index, sibling],
     pathGroups: [{ pattern: '@interactjs/**', group: internal }],
   }]
+  operator-linebreak: off
   prefer-arrow-callback: [error, { allowNamedFunctions: true }]
   prefer-const: error
   standard/array-bracket-even-spacing: off

@@ -12,21 +12,38 @@ test('@dev-tools/prod/babel-plugin-prod', t => {
   const cases = [
     { module: 'x', expected: 'x', message: 'non @interact/* package unchanged' },
     { module: 'interact', expected: 'interact', message: 'unscoped interact import unchanged' },
-    { module: '@interactjs/NONEXISTENT_PACKAGE', expected: '@interactjs/NONEXISTENT_PACKAGE', message: 'missing package unchanged' },
-    { module: '@interactjs/a/NONEXISTENT_MODULE', expected: '@interactjs/a/NONEXISTENT_MODULE', message: 'import of missing module unchanged' },
-    { module: '@interactjs/a', expected: '@interactjs/a/package-main-file.prod', message: 'package main module' },
-    { module: '@interactjs/a/a', expected: '@interactjs/a/a.prod', message: 'package root-level non index module' },
+    {
+      module: '@interactjs/NONEXISTENT_PACKAGE',
+      expected: '@interactjs/NONEXISTENT_PACKAGE',
+      message: 'missing package unchanged',
+    },
+    {
+      module: '@interactjs/a/NONEXISTENT_MODULE',
+      expected: '@interactjs/a/NONEXISTENT_MODULE',
+      message: 'import of missing module unchanged',
+    },
+    {
+      module: '@interactjs/a',
+      expected: '@interactjs/a/package-main-file.prod',
+      message: 'package main module',
+    },
+    {
+      module: '@interactjs/a/a',
+      expected: '@interactjs/a/a.prod',
+      message: 'package root-level non index module',
+    },
     { module: '@interactjs/a/b', expected: '@interactjs/a/b/index.prod', message: 'nested index module' },
-    { module: '@interactjs/a/b/b', expected: '@interactjs/a/b/b.prod', message: 'package nested non index module' },
+    {
+      module: '@interactjs/a/b/b',
+      expected: '@interactjs/a/b/b.prod',
+      message: 'package nested non index module',
+    },
   ]
 
   for (const { module, expected, message } of cases) {
     const source = { value: module }
 
-    fixImportSource(
-      { node: { source } },
-      { filename },
-    )
+    fixImportSource({ node: { source } }, { filename })
 
     t.equal(source.value, expected, message)
   }

@@ -12,18 +12,19 @@ import { Scope } from '../scope'
 let counter = 0
 
 export function unique () {
-  return (counter++)
+  return counter++
 }
 
 export function uniqueProps (obj: any) {
   for (const prop in obj) {
-    if (!obj.hasOwnProperty(prop)) { continue }
+    if (!obj.hasOwnProperty(prop)) {
+      continue
+    }
 
     if (is.object(obj)) {
       uniqueProps(obj[prop])
-    }
-    else {
-      obj[prop] = (counter++)
+    } else {
+      obj[prop] = counter++
     }
   }
 }
@@ -31,28 +32,28 @@ export function uniqueProps (obj: any) {
 export function newCoordsSet (n = 0) {
   return {
     start: {
-      page     : { x: n++, y: n++ },
-      client   : { x: n++, y: n++ },
+      page: { x: n++, y: n++ },
+      client: { x: n++, y: n++ },
       timeStamp: n++,
     },
     cur: {
-      page     : { x: n++, y: n++ },
-      client   : { x: n++, y: n++ },
+      page: { x: n++, y: n++ },
+      client: { x: n++, y: n++ },
       timeStamp: n++,
     },
     prev: {
-      page     : { x: n++, y: n++ },
-      client   : { x: n++, y: n++ },
+      page: { x: n++, y: n++ },
+      client: { x: n++, y: n++ },
       timeStamp: n++,
     },
     delta: {
-      page     : { x: n++, y: n++ },
-      client   : { x: n++, y: n++ },
+      page: { x: n++, y: n++ },
+      client: { x: n++, y: n++ },
       timeStamp: n++,
     },
     velocity: {
-      page     : { x: n++, y: n++ },
-      client   : { x: n++, y: n++ },
+      page: { x: n++, y: n++ },
+      client: { x: n++, y: n++ },
       timeStamp: n++,
     },
   }
@@ -92,7 +93,7 @@ export function getProps<T extends { [key: string]: any }, K extends keyof T> (s
 export function testEnv<T extends Target = HTMLElement> ({
   plugins = [],
   target,
-  rect = {  top: 0, left: 0, bottom: 0, right: 0  },
+  rect = { top: 0, left: 0, bottom: 0, right: 0 },
 }: {
   plugins?: Plugin[]
   target?: T
@@ -105,7 +106,7 @@ export function testEnv<T extends Target = HTMLElement> ({
   }
 
   if (!target) {
-    (target as unknown as HTMLElement) = scope.document.body
+    ;((target as unknown) as HTMLElement) = scope.document.body
   }
 
   const interaction = scope.interactions.new<any | never>({})
@@ -125,10 +126,12 @@ export function testEnv<T extends Target = HTMLElement> ({
     coords,
     event,
     interact: scope.interactStatic,
-    start: <T extends ActionName>(action: ActionProps<T>) => interaction.start(action, interactable, target as HTMLElement),
+    start: <T extends ActionName>(action: ActionProps<T>) =>
+      interaction.start(action, interactable, target as HTMLElement),
     stop: () => interaction.stop(),
     down: () => interaction.pointerDown(event, event, target as HTMLElement),
-    move: (force?: boolean) => force ? interaction.move() : interaction.pointerMove(event, event, target as HTMLElement),
+    move: (force?: boolean) =>
+      force ? interaction.move() : interaction.pointerMove(event, event, target as HTMLElement),
     up: () => interaction.pointerUp(event, event, target as HTMLElement, target as HTMLElement),
   }
 }
@@ -137,6 +140,13 @@ export function timeout (n: number) {
   return new Promise(resolve => setTimeout(resolve, n))
 }
 
-export function ltrbwh (left: number, top: number, right: number, bottom: number, width: number, height: number) {
+export function ltrbwh (
+  left: number,
+  top: number,
+  right: number,
+  bottom: number,
+  width: number,
+  height: number,
+) {
   return { left, top, right, bottom, width, height }
 }

@@ -35,7 +35,7 @@ import '@interactjs/snappers/plugin'
 import type _NativePointerEventType from './NativePointerEventType'
 
 export type OrBoolean<T> = {
-  [P in keyof T]: T[P] | boolean;
+  [P in keyof T]: T[P] | boolean
 }
 
 export type Element = HTMLElement | SVGElement
@@ -54,7 +54,7 @@ export type InteractionProxy<T extends scope.ActionName = ActionName> = interact
 export type PointerArgProps<T extends {} = {}> = interaction.PointerArgProps<T>
 export type InteractEvent<
   T extends keyof scope.ActionMap = never,
-  P extends iEvent.EventPhase = iEvent.EventPhase,
+  P extends iEvent.EventPhase = iEvent.EventPhase
 > = iEvent.InteractEvent<T, P>
 export type EventPhase = iEvent.EventPhase
 export type Options = defaults.Options
@@ -111,7 +111,7 @@ export interface CoordsSet {
 }
 
 export interface HasGetRect {
-  getRect (element: Element): Rect
+  getRect(element: Element): Rect
 }
 
 export interface InertiaOption {
@@ -130,8 +130,12 @@ export interface EdgeOptions {
   right?: boolean | string | Element
 }
 
-export type CursorChecker =
-  (action: ActionProps<ActionName>, interactable: Interactable, element: Element, interacting: boolean) => string
+export type CursorChecker = (
+  action: ActionProps<ActionName>,
+  interactable: Interactable,
+  element: Element,
+  interacting: boolean,
+) => string
 
 export interface ActionMethod<T> {
   (this: Interactable): T
@@ -158,10 +162,10 @@ export interface DraggableOptions extends PerActionDefaults {
 }
 
 export interface DropzoneOptions extends PerActionDefaults {
-  accept?: string | Element | (({ dropzone, draggableElement }: {
-    dropzone: Interactable
-    draggableElement: Element
-  }) => boolean)
+  accept?:
+  | string
+  | Element
+  | (({ dropzone, draggableElement }: { dropzone: Interactable, draggableElement: Element }) => boolean)
   // How the overlap is checked on the drop zone
   overlap?: 'pointer' | 'center' | number
   checker?: DropFunctionChecker
@@ -223,17 +227,17 @@ export interface PointerEventsOptions {
   origin?: Rect | Point | string | Element | OriginFunction
 }
 
-export type RectChecker = (element: Element)  => Rect
+export type RectChecker = (element: Element) => Rect
 
 export type NativePointerEventType = typeof _NativePointerEventType
 export type PointerEventType = MouseEvent | TouchEvent | NativePointerEventType | PointerEvent | InteractEvent
 export type PointerType = MouseEvent | Touch | NativePointerEventType | PointerEvent | InteractEvent
 
-export type EventTypes = string | ListenerMap | Array<(string | ListenerMap)>
+export type EventTypes = string | ListenerMap | Array<string | ListenerMap>
 
 export type Listener = (...args: any[]) => any
 export type Listeners = ListenerMap | ListenerMap[]
-export type ListenersArg = Listener | ListenerMap | Array<(Listener | ListenerMap)>
+export type ListenersArg = Listener | ListenerMap | Array<Listener | ListenerMap>
 export interface ListenerMap {
   [index: string]: ListenersArg | ListenersArg[]
 }

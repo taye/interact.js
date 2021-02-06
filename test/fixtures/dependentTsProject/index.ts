@@ -1,4 +1,4 @@
-/* eslint-disable import/no-extraneous-dependencies */
+/* eslint-disable import/no-extraneous-dependencies, import/no-unresolved */
 import interact from 'interactjs'
 
 // Interactables
@@ -57,40 +57,49 @@ const myList = document.querySelector('#my-list') as HTMLElement | SVGElement
 
 interact('li', {
   context: myList,
+}).draggable({
+  /* ... */
 })
-  .draggable({ /* ... */ })
 
 // Action options
 const target = 'li'
 interact(target)
   .draggable({
-    max          : 1,
+    max: 1,
     maxPerElement: 2,
-    manualStart  : true,
-    modifiers    : [],
-    inertia      : {/* ... */},
-    autoScroll   : {/* ... */},
+    manualStart: true,
+    modifiers: [],
+    inertia: {
+      /* ... */
+    },
+    autoScroll: {
+      /* ... */
+    },
 
-    lockAxis     : 'x' || 'y' || 'start',
-    startAxis    : 'x' || 'y',
+    lockAxis: 'x' || 'y' || 'start',
+    startAxis: 'x' || 'y',
   })
   .resizable({
-    max          : 1,
+    max: 1,
     maxPerElement: 2,
-    manualStart  : true,
-    modifiers    : [],
-    inertia      : {/* ... */},
-    autoScroll   : {/* ... */},
-    margin       : 50,
+    manualStart: true,
+    modifiers: [],
+    inertia: {
+      /* ... */
+    },
+    autoScroll: {
+      /* ... */
+    },
+    margin: 50,
 
-    square       : true || false,
-    axis         : 'x' || 'y',
+    square: true || false,
+    axis: 'x' || 'y',
   })
   .gesturable({
-    max          : 1,
+    max: 1,
     maxPerElement: 2,
-    manualStart  : true,
-    modifiers    : [],
+    manualStart: true,
+    modifiers: [],
   })
 
 // autoscroll
@@ -109,13 +118,15 @@ interact(element)
   })
 
 // axis
-interact(target).draggable({
-  startAxis: 'x',
-  lockAxis: 'y',
-}).draggable({
-  startAxis: 'xy',
-  lockAxis: 'x',
-})
+interact(target)
+  .draggable({
+    startAxis: 'x',
+    lockAxis: 'y',
+  })
+  .draggable({
+    startAxis: 'xy',
+    lockAxis: 'x',
+  })
 
 interact(target).resizable({
   axis: 'x',
@@ -124,10 +135,10 @@ interact(target).resizable({
 const handleEl = 'li'
 interact(target).resizable({
   edges: {
-    top   : true,       // Use pointer coords to check for resize.
-    left  : false,      // Disable resizing from left edge.
+    top: true, // Use pointer coords to check for resize.
+    left: false, // Disable resizing from left edge.
     bottom: '.resize-s', // Resize if pointer target matches selector
-    right : handleEl,    // Resize if pointer target is the given Element
+    right: handleEl, // Resize if pointer target is the given Element
   },
 })
 
@@ -155,13 +166,15 @@ interact(target).dropzone({
 // dropzone checker
 interact(target).dropzone({
   checker (
-    _dragEvent: Interact.Element,           // related dragmove or dragend
-    _event: Event,                          // Touch, Pointer or Mouse Event
-    dropped: boolean,                       // bool default checker result
-    _dropzone: Interact.Interactable,       // dropzone Interactable
-    dropElement: Interact.Element,          // dropzone elemnt
-    _draggable: Interact.Interactable,      // draggable Interactable
-    _draggableElement: Interact.Element) {  // draggable element
+    _dragEvent: Interact.Element, // related dragmove or dragend
+    _event: Event, // Touch, Pointer or Mouse Event
+    dropped: boolean, // bool default checker result
+    _dropzone: Interact.Interactable, // dropzone Interactable
+    dropElement: Interact.Element, // dropzone elemnt
+    _draggable: Interact.Interactable, // draggable Interactable
+    _draggableElement: Interact.Element,
+  ) {
+    // draggable element
     // only allow drops into empty dropzone elements
     return dropped && !dropElement.hasChildNodes()
   },
@@ -191,9 +204,7 @@ interact.on('resize', (event: Interact.ResizeEvent) => {
 })
 
 interact(target).resizable({
-  listeners: [
-    { start: listener, move: listener },
-  ],
+  listeners: [{ start: listener, move: listener }],
 })
 
 interact(target).draggable({
@@ -218,9 +229,7 @@ const dropTarget = 'div'
 interact(dropTarget)
   .dropzone({
     ondrop (event) {
-      alert(event.relatedTarget.id +
-            ' was dropped into ' +
-            event.target.id)
+      alert(event.relatedTarget.id + ' was dropped into ' + event.target.id)
     },
   })
   .on('dropactivate', event => {

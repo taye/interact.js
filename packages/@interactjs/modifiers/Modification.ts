@@ -39,10 +39,7 @@ export default class Modification {
     this.result = createResult()
   }
 
-  start (
-    { phase }: MethodArg,
-    pageCoords: Point,
-  ) {
+  start ({ phase }: MethodArg, pageCoords: Point) {
     const { interaction } = this
     const modifierList = getModifierList(interaction)
     this.prepareStates(modifierList)
@@ -60,7 +57,7 @@ export default class Modification {
     this.result = createResult()
     this.startAll(arg)
 
-    const result = this.result = this.setAll(arg)
+    const result = (this.result = this.setAll(arg))
 
     return result
   }
@@ -90,19 +87,12 @@ export default class Modification {
   setAll (arg: MethodArg & Partial<ModifierArg>): ModificationResult {
     this.fillArg(arg)
 
-    const {
-      phase,
-      preEnd,
-      skipModifiers,
-      rect: unmodifiedRect,
-    } = arg
+    const { phase, preEnd, skipModifiers, rect: unmodifiedRect } = arg
 
     arg.coords = extend({}, arg.pageCoords)
     arg.rect = extend({}, unmodifiedRect)
 
-    const states = skipModifiers
-      ? this.states.slice(skipModifiers)
-      : this.states
+    const states = skipModifiers ? this.states.slice(skipModifiers) : this.states
 
     const newResult = createResult(arg.coords, arg.rect)
 
@@ -115,7 +105,10 @@ export default class Modification {
         arg.state = state
         returnValue = state.methods.set(arg as ModifierArg)
 
-        rectUtils.addEdges(this.interaction.edges, arg.rect, { x: arg.coords.x - lastModifierCoords.x, y: arg.coords.y - lastModifierCoords.y })
+        rectUtils.addEdges(this.interaction.edges, arg.rect, {
+          x: arg.coords.x - lastModifierCoords.x,
+          y: arg.coords.y - lastModifierCoords.y,
+        })
       }
 
       newResult.eventProps.push(returnValue)
@@ -124,23 +117,23 @@ export default class Modification {
     newResult.delta.x = arg.coords.x - arg.pageCoords.x
     newResult.delta.y = arg.coords.y - arg.pageCoords.y
 
-    newResult.rectDelta.left   = arg.rect.left - unmodifiedRect.left
-    newResult.rectDelta.right  = arg.rect.right - unmodifiedRect.right
-    newResult.rectDelta.top    = arg.rect.top - unmodifiedRect.top
+    newResult.rectDelta.left = arg.rect.left - unmodifiedRect.left
+    newResult.rectDelta.right = arg.rect.right - unmodifiedRect.right
+    newResult.rectDelta.top = arg.rect.top - unmodifiedRect.top
     newResult.rectDelta.bottom = arg.rect.bottom - unmodifiedRect.bottom
 
     const prevCoords = this.result.coords
     const prevRect = this.result.rect
 
     if (prevCoords && prevRect) {
-      const rectChanged = newResult.rect.left !== prevRect.left ||
+      const rectChanged =
+        newResult.rect.left !== prevRect.left ||
         newResult.rect.right !== prevRect.right ||
         newResult.rect.top !== prevRect.top ||
         newResult.rect.bottom !== prevRect.bottom
 
-      newResult.changed = rectChanged ||
-        prevCoords.x !== newResult.coords.x ||
-        prevCoords.y !== newResult.coords.y
+      newResult.changed =
+        rectChanged || prevCoords.x !== newResult.coords.x || prevCoords.y !== newResult.coords.y
     }
 
     return newResult
@@ -158,9 +151,12 @@ export default class Modification {
       extend(this.startDelta, result.delta)
     }
 
-    for (const [coordsSet, delta] of [[startCoords, startDelta], [curCoords, curDelta]] as const) {
-      coordsSet.page.x   += delta.x
-      coordsSet.page.y   += delta.y
+    for (const [coordsSet, delta] of [
+      [startCoords, startDelta],
+      [curCoords, curDelta],
+    ] as const) {
+      coordsSet.page.x += delta.x
+      coordsSet.page.y += delta.y
       coordsSet.client.x += delta.x
       coordsSet.client.y += delta.y
     }
@@ -168,21 +164,23 @@ export default class Modification {
     const { rectDelta } = this.result
     const rect = arg.rect || interaction.rect
 
-    rect.left   += rectDelta.left
-    rect.right  += rectDelta.right
-    rect.top    += rectDelta.top
+    rect.left += rectDelta.left
+    rect.right += rectDelta.right
+    rect.top += rectDelta.top
     rect.bottom += rectDelta.bottom
 
     rect.width = rect.right - rect.left
     rect.height = rect.bottom - rect.top
   }
 
-  setAndApply (arg: Partial<DoAnyPhaseArg> & {
-    phase: EventPhase
-    preEnd?: boolean
-    skipModifiers?: number
-    modifiedCoords?: Point
-  }): void | false {
+  setAndApply (
+    arg: Partial<DoAnyPhaseArg> & {
+      phase: EventPhase
+      preEnd?: boolean
+      skipModifiers?: number
+      modifiedCoords?: Point
+    },
+  ): void | false {
     const { interaction } = this
     const { phase, preEnd, skipModifiers } = arg
 
@@ -196,7 +194,11 @@ export default class Modification {
 
     // don't fire an action move if a modifier would keep the event in the same
     // cordinates as before
-    if (!result.changed && (!skipModifiers || skipModifiers < this.states.length) && interaction.interacting()) {
+    if (
+      !result.changed &&
+      (!skipModifiers || skipModifiers < this.states.length) &&
+      interaction.interacting()
+    ) {
       return false
     }
 
@@ -230,7 +232,7 @@ export default class Modification {
       arg.state = state
       const { options, methods } = state
 
-      const endPosition = methods.beforeEnd && methods.beforeEnd(arg as unknown as ModifierArg)
+      const endPosition = methods.beforeEnd && methods.beforeEnd((arg as unknown) as ModifierArg)
 
       if (endPosition) {
         this.endResult = endPosition
@@ -253,19 +255,24 @@ export default class Modification {
       return
     }
 
-    const modifierArg: Partial<ModifierArg> = extend({
-      states: this.states,
-      interactable: interaction.interactable,
-      element: interaction.element,
-      rect: null,
-    }, arg)
+    const modifierArg: Partial<ModifierArg> = extend(
+      {
+        states: this.states,
+        interactable: interaction.interactable,
+        element: interaction.element,
+        rect: null,
+      },
+      arg,
+    )
 
     this.fillArg(modifierArg)
 
     for (const state of this.states) {
       modifierArg.state = state
 
-      if (state.methods.stop) { state.methods.stop(modifierArg as ModifierArg) }
+      if (state.methods.stop) {
+        state.methods.stop(modifierArg as ModifierArg)
+      }
     }
 
     this.states = null
@@ -290,7 +297,7 @@ export default class Modification {
   }
 
   restoreInteractionCoords ({ interaction: { coords, rect, modification } }: { interaction: Interaction }) {
-    if (!modification.result) { return }
+    if (!modification.result) return
 
     const { startDelta } = modification
     const { delta: curDelta, rectDelta } = modification.result
@@ -316,7 +323,8 @@ export default class Modification {
   shouldDo (options, preEnd?: boolean, phase?: string, requireEndOnly?: boolean) {
     if (
       // ignore disabled modifiers
-      (!options || options.enabled === false) ||
+      !options ||
+      options.enabled === false ||
       // check if we require endOnly option to fire move before end
       (requireEndOnly && !options.endOnly) ||
       // don't apply endOnly modifiers when not ending
@@ -351,9 +359,9 @@ function createResult (coords?: Point, rect?: FullRect): ModificationResult {
     coords,
     delta: { x: 0, y: 0 },
     rectDelta: {
-      left  : 0,
-      right : 0,
-      top   : 0,
+      left: 0,
+      right: 0,
+      top: 0,
       bottom: 0,
     },
     eventProps: [],
@@ -373,10 +381,13 @@ function getModifierList (interaction) {
     .map(type => {
       const options = actionOptions[type]
 
-      return options && options.enabled && {
-        options,
-        methods: options._methods,
-      }
+      return (
+        options &&
+        options.enabled && {
+          options,
+          methods: options._methods,
+        }
+      )
     })
     .filter(m => !!m)
 }
@@ -384,15 +395,15 @@ function getModifierList (interaction) {
 export function getRectOffset (rect, coords) {
   return rect
     ? {
-      left  : coords.x - rect.left,
-      top   : coords.y - rect.top,
-      right : rect.right  - coords.x,
+      left: coords.x - rect.left,
+      top: coords.y - rect.top,
+      right: rect.right - coords.x,
       bottom: rect.bottom - coords.y,
     }
     : {
-      left  : 0,
-      top   : 0,
-      right : 0,
+      left: 0,
+      top: 0,
+      right: 0,
       bottom: 0,
     }
 }

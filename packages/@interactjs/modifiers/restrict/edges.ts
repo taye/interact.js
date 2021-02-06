@@ -27,11 +27,14 @@ export interface RestrictEdgesOptions {
   enabled?: boolean
 }
 
-export type RestrictEdgesState = ModifierState<RestrictEdgesOptions, {
+export type RestrictEdgesState = ModifierState<
+RestrictEdgesOptions,
+{
   inner: Rect
   outer: Rect
   offset: RestrictEdgesOptions['offset']
-}>
+}
+>
 
 const noInner = { top: +Infinity, left: +Infinity, bottom: -Infinity, right: -Infinity }
 const noOuter = { top: -Infinity, left: -Infinity, bottom: +Infinity, right: +Infinity }
@@ -49,10 +52,10 @@ function start ({ interaction, startOffset, state }: ModifierArg<RestrictEdgesSt
   offset = offset || { x: 0, y: 0 }
 
   state.offset = {
-    top:    offset.y + startOffset.top,
-    left:   offset.x + startOffset.left,
+    top: offset.y + startOffset.top,
+    left: offset.x + startOffset.left,
     bottom: offset.y - startOffset.bottom,
-    right:  offset.x - startOffset.right,
+    right: offset.x - startOffset.right,
   }
 }
 
@@ -64,23 +67,21 @@ function set ({ coords, edges, interaction, state }: ModifierArg<RestrictEdgesSt
   }
 
   const page = extend({}, coords)
-  const inner = getRestrictionRect(options.inner, interaction, page) || {} as Rect
-  const outer = getRestrictionRect(options.outer, interaction, page) || {} as Rect
+  const inner = getRestrictionRect(options.inner, interaction, page) || ({} as Rect)
+  const outer = getRestrictionRect(options.outer, interaction, page) || ({} as Rect)
 
   fixRect(inner, noInner)
   fixRect(outer, noOuter)
 
   if (edges.top) {
-    coords.y = Math.min(Math.max(outer.top    + offset.top,    page.y), inner.top    + offset.top)
-  }
-  else if (edges.bottom) {
+    coords.y = Math.min(Math.max(outer.top + offset.top, page.y), inner.top + offset.top)
+  } else if (edges.bottom) {
     coords.y = Math.max(Math.min(outer.bottom + offset.bottom, page.y), inner.bottom + offset.bottom)
   }
   if (edges.left) {
-    coords.x = Math.min(Math.max(outer.left   + offset.left,   page.x), inner.left   + offset.left)
-  }
-  else if (edges.right) {
-    coords.x = Math.max(Math.min(outer.right  + offset.right,  page.x), inner.right  + offset.right)
+    coords.x = Math.min(Math.max(outer.left + offset.left, page.x), inner.left + offset.left)
+  } else if (edges.right) {
+    coords.x = Math.max(Math.min(outer.right + offset.right, page.x), inner.right + offset.right)
   }
 }
 

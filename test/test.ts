@@ -18,28 +18,27 @@ interface Test extends tape.Test {
   /**
    * Assert that a === b with an optional description msg.
    */
-  equal<T> (actual: T, expected: T extends infer P ? P & T : never, msg?: string): void
-  equals<T> (actual: T, expected: T extends infer P ? P & T : never, msg?: string): void
-  isEqual<T> (actual: T, expected: T extends infer P ? P & T : never, msg?: string): void
-  is<T> (actual: T, expected: T extends infer P ? P & T : never, msg?: string): void
-  strictEqual<T> (actual: T, expected: T extends infer P ? P & T : never, msg?: string): void
-  strictEquals<T> (actual: T, expected: T extends infer P ? P & T : never, msg?: string): void
+  equal<T>(actual: T, expected: T extends infer P ? P & T : never, msg?: string): void
+  equals<T>(actual: T, expected: T extends infer P ? P & T : never, msg?: string): void
+  isEqual<T>(actual: T, expected: T extends infer P ? P & T : never, msg?: string): void
+  is<T>(actual: T, expected: T extends infer P ? P & T : never, msg?: string): void
+  strictEqual<T>(actual: T, expected: T extends infer P ? P & T : never, msg?: string): void
+  strictEquals<T>(actual: T, expected: T extends infer P ? P & T : never, msg?: string): void
 
   /**
    * Assert that a and b have the same structure and nested values using node's deepEqual() algorithm with strict comparisons (===) on leaf nodes and an optional description msg.
    */
-  deepEqual<T> (actual: T, expected: T extends infer P ? P & T : never, msg?: string): void
-  deepEquals<T> (actual: T, expected: T extends infer P ? P & T : never, msg?: string): void
-  isEquivalent<T> (actual: T, expected: T extends infer P ? P & T : never, msg?: string): void
-  same<T> (actual: T, expected: T extends infer P ? P & T : never, msg?: string): void
+  deepEqual<T>(actual: T, expected: T extends infer P ? P & T : never, msg?: string): void
+  deepEquals<T>(actual: T, expected: T extends infer P ? P & T : never, msg?: string): void
+  isEquivalent<T>(actual: T, expected: T extends infer P ? P & T : never, msg?: string): void
+  same<T>(actual: T, expected: T extends infer P ? P & T : never, msg?: string): void
 
   /**
    * Assert that a and b have the same structure and nested values using node's deepEqual() algorithm with loose comparisons (==) on leaf nodes and an optional description msg.
    */
-  deepLooseEqual<T> (actual: T, expected: T extends infer P ? P & T : never, msg?: string): void
-  looseEqual<T> (actual: T, expected: T extends infer P ? P & T : never, msg?: string): void
-  looseEquals<T> (actual: T, expected: T extends infer P ? P & T : never, msg?: string): void
-
+  deepLooseEqual<T>(actual: T, expected: T extends infer P ? P & T : never, msg?: string): void
+  looseEqual<T>(actual: T, expected: T extends infer P ? P & T : never, msg?: string): void
+  looseEquals<T>(actual: T, expected: T extends infer P ? P & T : never, msg?: string): void
 }
 
 type TestCase = (test: Test) => void

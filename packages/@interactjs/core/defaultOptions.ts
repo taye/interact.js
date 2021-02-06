@@ -7,8 +7,7 @@ export interface Defaults {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
-export interface ActionDefaults {
-}
+export interface ActionDefaults {}
 
 export interface BaseDefaults {
   preventDefault?: 'auto' | 'never' | string
@@ -24,7 +23,9 @@ export interface PerActionDefaults {
   ignoreFrom?: string | Element
 }
 
-export type Options = Partial<BaseDefaults> & Partial<PerActionDefaults> & {
+export type Options = Partial<BaseDefaults> &
+Partial<PerActionDefaults> &
+{
   [P in keyof ActionDefaults]?: Partial<ActionDefaults[P]>
 }
 

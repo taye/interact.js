@@ -12,7 +12,8 @@ test('utils/normalizeListeners', t => {
     {
       type1: [a],
     },
-    'single type, single listener function')
+    'single type, single listener function',
+  )
 
   t.deepEqual(
     normalizeListeners('type1 type2', a),
@@ -20,19 +21,22 @@ test('utils/normalizeListeners', t => {
       type1: [a],
       type2: [a],
     },
-    'multiple types, single listener function')
+    'multiple types, single listener function',
+  )
 
   t.deepEqual(
     normalizeListeners('type1 type2', a),
     normalizeListeners(['type1', 'type2'], a),
-    'array of types equivalent to space separated string')
+    'array of types equivalent to space separated string',
+  )
 
   t.deepEqual(
     normalizeListeners('type1', [a, b]),
     {
       type1: [a, b],
     },
-    'single type, multiple listener functions')
+    'single type, multiple listener functions',
+  )
 
   t.deepEqual(
     normalizeListeners('prefix', { _1: [a, b], _2: [b, c] }),
@@ -40,7 +44,8 @@ test('utils/normalizeListeners', t => {
       prefix_1: [a, b],
       prefix_2: [b, c],
     },
-    'single type prefix, object of { suffix: [fn, ...] }')
+    'single type prefix, object of { suffix: [fn, ...] }',
+  )
 
   t.deepEqual(
     normalizeListeners('prefix1 prefix2', [{ _1: [a, b], _2: [b, c] }]),
@@ -50,7 +55,8 @@ test('utils/normalizeListeners', t => {
       prefix2_1: [a, b],
       prefix2_2: [b, c],
     },
-    'multiple type prefixes, single length array of { suffix: [fn, ...] }')
+    'multiple type prefixes, single length array of { suffix: [fn, ...] }',
+  )
 
   t.deepEqual(
     normalizeListeners({ _1: [a, b], _2: [b, c] }),
@@ -58,7 +64,8 @@ test('utils/normalizeListeners', t => {
       _1: [a, b],
       _2: [b, c],
     },
-    'object of { suffix: [fn, ...] } as type arg')
+    'object of { suffix: [fn, ...] } as type arg',
+  )
 
   t.deepEqual(
     normalizeListeners({ '_1 _2': [a, b], _3: [b, c] }),
@@ -67,7 +74,8 @@ test('utils/normalizeListeners', t => {
       _2: [a, b],
       _3: [b, c],
     },
-    'object of { "suffix1 suffix2": [fn, ...], ... } as type arg')
+    'object of { "suffix1 suffix2": [fn, ...], ... } as type arg',
+  )
 
   t.deepEqual(
     normalizeListeners('prefix', { '_1 _2': [a, b], _3: [b, c] }),
@@ -76,7 +84,8 @@ test('utils/normalizeListeners', t => {
       prefix_2: [a, b],
       prefix_3: [b, c],
     },
-    'single type prefix, object of { "suffix1 suffix2": [fn, ...], ... }')
+    'single type prefix, object of { "suffix1 suffix2": [fn, ...], ... }',
+  )
 
   t.end()
 })

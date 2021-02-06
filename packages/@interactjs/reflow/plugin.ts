@@ -64,7 +64,11 @@ export function install (scope: Scope) {
   }
 }
 
-function doReflow<T extends ActionName> (interactable: Interactable, action: ActionProps<T>, scope: Scope): Promise<Interactable> {
+function doReflow<T extends ActionName> (
+  interactable: Interactable,
+  action: ActionProps<T>,
+  scope: Scope,
+): Promise<Interactable> {
   const elements = (is.string(interactable.target)
     ? arr.from(interactable._context.querySelectorAll(interactable.target))
     : [interactable.target]) as Element[]
@@ -76,32 +80,35 @@ function doReflow<T extends ActionName> (interactable: Interactable, action: Act
   for (const element of elements) {
     const rect = interactable.getRect(element as HTMLElement | SVGElement)
 
-    if (!rect) { break }
+    if (!rect) {
+      break
+    }
 
-    const runningInteraction = arr.find(
-      scope.interactions.list,
-      (interaction: Interaction) => {
-        return interaction.interacting() &&
-          interaction.interactable === interactable &&
-          interaction.element === element &&
-          interaction.prepared.name === action.name
-      })
+    const runningInteraction = arr.find(scope.interactions.list, (interaction: Interaction) => {
+      return (
+        interaction.interacting() &&
+        interaction.interactable === interactable &&
+        interaction.element === element &&
+        interaction.prepared.name === action.name
+      )
+    })
     let reflowPromise: Promise<null>
 
     if (runningInteraction) {
       runningInteraction.move()
 
       if (promises) {
-        reflowPromise = runningInteraction._reflowPromise || new Promise((resolve: any) => {
-          runningInteraction._reflowResolve = resolve
-        })
+        reflowPromise =
+          runningInteraction._reflowPromise ||
+          new Promise((resolve: any) => {
+            runningInteraction._reflowResolve = resolve
+          })
       }
-    }
-    else {
+    } else {
       const xywh = tlbrToXywh(rect)
       const coords = {
-        page     : { x: xywh.x, y: xywh.y },
-        client   : { x: xywh.x, y: xywh.y },
+        page: { x: xywh.x, y: xywh.y },
+        client: { x: xywh.x, y: xywh.y },
         timeStamp: scope.now(),
       }
 
@@ -117,7 +124,13 @@ function doReflow<T extends ActionName> (interactable: Interactable, action: Act
   return promises && Promise.all(promises).then(() => interactable)
 }
 
-function startReflow<T extends ActionName> (scope: Scope, interactable: Interactable, element: Element, action: ActionProps<T>, event: any) {
+function startReflow<T extends ActionName> (
+  scope: Scope,
+  interactable: Interactable,
+  element: Element,
+  action: ActionProps<T>,
+  event: any,
+) {
   const interaction = scope.interactions.new({ pointerType: 'reflow' })
   const signalArg = {
     interaction,
@@ -136,7 +149,7 @@ function startReflow<T extends ActionName> (scope: Scope, interactable: Interact
   copyAction(interaction.prepared, action)
   interaction._doPhase(signalArg)
 
-  const { Promise } = (scope.window as unknown as { Promise: PromiseConstructor })
+  const { Promise } = (scope.window as unknown) as { Promise: PromiseConstructor }
   const reflowPromise = Promise
     ? new Promise<undefined>(resolve => {
       interaction._reflowResolve = resolve
@@ -149,8 +162,7 @@ function startReflow<T extends ActionName> (scope: Scope, interactable: Interact
   if (interaction._interacting) {
     interaction.move(signalArg)
     interaction.end(event)
-  }
-  else {
+  } else {
     interaction.stop()
     interaction._reflowResolve()
   }

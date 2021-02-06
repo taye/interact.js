@@ -10,24 +10,25 @@ import { makeModifier } from '../base'
 import type { SnapOptions, SnapState } from './pointer'
 import { snap } from './pointer'
 
-export type SnapSizeOptions = Pick<
-SnapOptions,
-'targets' | 'offset' | 'endOnly' | 'range' | 'enabled'
->
+export type SnapSizeOptions = Pick<SnapOptions, 'targets' | 'offset' | 'endOnly' | 'range' | 'enabled'>
 
 function start (arg: ModifierArg<SnapState>) {
   const { state, edges } = arg
   const { options } = state
 
-  if (!edges) { return null }
+  if (!edges) {
+    return null
+  }
 
   arg.state = {
     options: {
       targets: null,
-      relativePoints: [{
-        x: edges.left ? 0 : 1,
-        y: edges.top ? 0 : 1,
-      }],
+      relativePoints: [
+        {
+          x: edges.left ? 0 : 1,
+          y: edges.top ? 0 : 1,
+        },
+      ],
       offset: options.offset || 'self',
       origin: { x: 0, y: 0 },
       range: options.range,
@@ -56,17 +57,18 @@ function set (arg) {
   state.options = extend({}, options)
   state.options.targets = []
 
-  for (const snapTarget of (options.targets || [])) {
+  for (const snapTarget of options.targets || []) {
     let target
 
     if (is.func(snapTarget)) {
       target = snapTarget(relative.x, relative.y, interaction)
-    }
-    else {
+    } else {
       target = snapTarget
     }
 
-    if (!target) { continue }
+    if (!target) {
+      continue
+    }
 
     for (const [xField, yField] of state.targetFields) {
       if (xField in target || yField in target) {

@@ -1,5 +1,12 @@
 import type { ActionDefaults } from '@interactjs/core/defaultOptions'
-import type { Element, EdgeOptions, PointerEventType, PointerType, FullRect, CoordsSet } from '@interactjs/types/index'
+import type {
+  Element,
+  EdgeOptions,
+  PointerEventType,
+  PointerType,
+  FullRect,
+  CoordsSet,
+} from '@interactjs/types/index'
 import * as arr from '@interactjs/utils/arr'
 import extend from '@interactjs/utils/extend'
 import hypot from '@interactjs/utils/hypot'
@@ -25,7 +32,7 @@ export enum _ProxyValues {
   prepared = '',
   pointerIsDown = '',
   pointerWasMoved = '',
-  _proxy = ''
+  _proxy = '',
 }
 
 export enum _ProxyMethods {
@@ -33,7 +40,7 @@ export enum _ProxyMethods {
   move = '',
   end = '',
   stop = '',
-  interacting = ''
+  interacting = '',
 }
 
 export type PointerArgProps<T extends {} = {}> = {
@@ -120,8 +127,8 @@ export class Interaction<T extends ActionName = ActionName> {
 
   // action that's ready to be fired on next move event
   prepared: ActionProps<T> = {
-    name : null,
-    axis : null,
+    name: null,
+    axis: null,
     edges: null,
   }
 
@@ -164,11 +171,9 @@ export class Interaction<T extends ActionName = ActionName> {
   /**
    * @alias Interaction.prototype.move
    */
-  doMove = warnOnce(
-    function (this: Interaction, signalArg: any) {
-      this.move(signalArg)
-    },
-    'The interaction.doMove() method has been renamed to interaction.move()')
+  doMove = warnOnce(function (this: Interaction, signalArg: any) {
+    this.move(signalArg)
+  }, 'The interaction.doMove() method has been renamed to interaction.move()')
 
   coords: CoordsSet = {
     // Starting InteractEvent pointer coordinates
@@ -186,10 +191,7 @@ export class Interaction<T extends ActionName = ActionName> {
   readonly _id: number = idCounter++
 
   /** */
-  constructor ({ pointerType, scopeFire }: {
-    pointerType?: string
-    scopeFire: Scope['fire']
-  }) {
+  constructor ({ pointerType, scopeFire }: { pointerType?: string, scopeFire: Scope['fire'] }) {
     this._scopeFire = scopeFire
     this.pointerType = pointerType
 
@@ -199,7 +201,9 @@ export class Interaction<T extends ActionName = ActionName> {
 
     for (const key in _ProxyValues) {
       Object.defineProperty(this._proxy, key, {
-        get () { return that[key] },
+        get () {
+          return that[key]
+        },
       })
     }
 
@@ -223,7 +227,7 @@ export class Interaction<T extends ActionName = ActionName> {
       pointerIndex,
       pointerInfo,
       type: 'down',
-      interaction: this as unknown as Interaction<never>,
+      interaction: (this as unknown) as Interaction<never>,
     })
   }
 
@@ -259,27 +263,30 @@ export class Interaction<T extends ActionName = ActionName> {
    * @return {Boolean} Whether the interaction was successfully started
    */
   start<A extends ActionName> (action: ActionProps<A>, interactable: Interactable, element: Element): boolean {
-    if (this.interacting() ||
-        !this.pointerIsDown ||
-        this.pointers.length < (action.name === 'gesture' ? 2 : 1) ||
-        !interactable.options[action.name as keyof ActionDefaults].enabled) {
+    if (
+      this.interacting() ||
+      !this.pointerIsDown ||
+      this.pointers.length < (action.name === 'gesture' ? 2 : 1) ||
+      !interactable.options[action.name as keyof ActionDefaults].enabled
+    ) {
       return false
     }
 
     copyAction(this.prepared, action)
 
     this.interactable = interactable
-    this.element      = element
-    this.rect         = interactable.getRect(element)
-    this.edges        = this.prepared.edges
+    this.element = element
+    this.rect = interactable.getRect(element)
+    this.edges = this.prepared.edges
       ? extend({}, this.prepared.edges)
       : { left: true, right: true, top: true, bottom: true }
-    this._stopped     = false
-    this._interacting = this._doPhase({
-      interaction: this,
-      event: this.downEvent,
-      phase: 'start',
-    }) && !this._stopped
+    this._stopped = false
+    this._interacting =
+      this._doPhase({
+        interaction: this,
+        event: this.downEvent,
+        phase: 'start',
+      }) && !this._stopped
 
     return this._interacting
   }
@@ -289,10 +296,11 @@ export class Interaction<T extends ActionName = ActionName> {
       this.updatePointer(pointer, event, eventTarget, false)
     }
 
-    const duplicateMove = (this.coords.cur.page.x === this.coords.prev.page.x &&
-                           this.coords.cur.page.y === this.coords.prev.page.y &&
-                           this.coords.cur.client.x === this.coords.prev.client.x &&
-                           this.coords.cur.client.y === this.coords.prev.client.y)
+    const duplicateMove =
+      this.coords.cur.page.x === this.coords.prev.page.x &&
+      this.coords.cur.page.y === this.coords.prev.page.y &&
+      this.coords.cur.client.x === this.coords.prev.client.x &&
+      this.coords.cur.client.y === this.coords.prev.client.y
 
     let dx: number
     let dy: number
@@ -316,7 +324,7 @@ export class Interaction<T extends ActionName = ActionName> {
       dx,
       dy,
       duplicate: duplicateMove,
-      interaction: this as unknown as Interaction<never>,
+      interaction: (this as unknown) as Interaction<never>,
     }
 
     if (!duplicateMove) {
@@ -362,12 +370,15 @@ export class Interaction<T extends ActionName = ActionName> {
       pointerUtils.setZeroCoords(this.coords.delta)
     }
 
-    signalArg = extend({
-      pointer: this._latestPointer.pointer,
-      event: this._latestPointer.event,
-      eventTarget: this._latestPointer.eventTarget,
-      interaction: this,
-    }, signalArg || {})
+    signalArg = extend(
+      {
+        pointer: this._latestPointer.pointer,
+        event: this._latestPointer.event,
+        eventTarget: this._latestPointer.eventTarget,
+        interaction: this,
+      },
+      signalArg || {},
+    )
 
     signalArg.phase = 'move'
 
@@ -392,7 +403,7 @@ export class Interaction<T extends ActionName = ActionName> {
       eventTarget,
       type: type as any,
       curEventTarget,
-      interaction: this as unknown as Interaction<never>,
+      interaction: (this as unknown) as Interaction<never>,
     })
 
     if (!this.simulation) {
@@ -466,7 +477,7 @@ export class Interaction<T extends ActionName = ActionName> {
     const pointerId = pointerUtils.getPointerId(pointer)
 
     // mouse and pen interactions may have only one pointer
-    return (this.pointerType === 'mouse' || this.pointerType === 'pen')
+    return this.pointerType === 'mouse' || this.pointerType === 'pen'
       ? this.pointers.length - 1
       : arr.findIndex(this.pointers, curPointer => curPointer.id === pointerId)
   }
@@ -480,27 +491,22 @@ export class Interaction<T extends ActionName = ActionName> {
     let pointerIndex = this.getPointerIndex(pointer)
     let pointerInfo = this.pointers[pointerIndex]
 
-    down = down === false
-      ? false
-      : down || /(down|start)$/i.test(event.type)
+    down = down === false ? false : down || /(down|start)$/i.test(event.type)
 
     if (!pointerInfo) {
-      pointerInfo = new PointerInfo(
-        id,
-        pointer,
-        event,
-        null,
-        null,
-      )
+      pointerInfo = new PointerInfo(id, pointer, event, null, null)
 
       pointerIndex = this.pointers.length
       this.pointers.push(pointerInfo)
-    }
-    else {
+    } else {
       pointerInfo.pointer = pointer
     }
 
-    pointerUtils.setCoords(this.coords.cur, this.pointers.map(p => p.pointer), this._now())
+    pointerUtils.setCoords(
+      this.coords.cur,
+      this.pointers.map(p => p.pointer),
+      this._now(),
+    )
     pointerUtils.setCoordDeltas(this.coords.delta, this.coords.prev, this.coords.cur)
 
     if (down) {
@@ -528,7 +534,7 @@ export class Interaction<T extends ActionName = ActionName> {
       down,
       pointerInfo,
       pointerIndex,
-      interaction: this as unknown as Interaction<never>,
+      interaction: (this as unknown) as Interaction<never>,
     })
 
     return pointerIndex
@@ -537,7 +543,7 @@ export class Interaction<T extends ActionName = ActionName> {
   removePointer (pointer: PointerType, event: PointerEventType) {
     const pointerIndex = this.getPointerIndex(pointer)
 
-    if (pointerIndex === -1) { return }
+    if (pointerIndex === -1) return
 
     const pointerInfo = this.pointers[pointerIndex]
 
@@ -547,7 +553,7 @@ export class Interaction<T extends ActionName = ActionName> {
       eventTarget: null,
       pointerIndex,
       pointerInfo,
-      interaction: this as unknown as Interaction<never>,
+      interaction: (this as unknown) as Interaction<never>,
     })
 
     this.pointers.splice(pointerIndex, 1)
@@ -566,7 +572,12 @@ export class Interaction<T extends ActionName = ActionName> {
     this._latestPointer.eventTarget = null
   }
 
-  _createPreparedEvent<P extends EventPhase> (event: PointerEventType, phase: P, preEnd?: boolean, type?: string) {
+  _createPreparedEvent<P extends EventPhase> (
+    event: PointerEventType,
+    phase: P,
+    preEnd?: boolean,
+    type?: string,
+  ) {
     return new InteractEvent<T, P>(this, event, this.prepared.name, phase, this.element, preEnd, type)
   }
 
@@ -578,7 +589,9 @@ export class Interaction<T extends ActionName = ActionName> {
     }
   }
 
-  _doPhase<P extends EventPhase> (signalArg: Omit<DoPhaseArg<T, P>, 'iEvent'> & { iEvent?: InteractEvent<T, P> }) {
+  _doPhase<P extends EventPhase> (
+    signalArg: Omit<DoPhaseArg<T, P>, 'iEvent'> & { iEvent?: InteractEvent<T, P> },
+  ) {
     const { event, phase, preEnd, type } = signalArg
     const { rect } = this
 
@@ -596,11 +609,13 @@ export class Interaction<T extends ActionName = ActionName> {
       return false
     }
 
-    const iEvent = signalArg.iEvent = this._createPreparedEvent(event, phase, preEnd, type)
+    const iEvent = (signalArg.iEvent = this._createPreparedEvent(event, phase, preEnd, type))
 
     this._scopeFire(`interactions:action-${phase}` as any, signalArg)
 
-    if (phase === 'start') { this.prevEvent = iEvent }
+    if (phase === 'start') {
+      this.prevEvent = iEvent
+    }
 
     this._fireEvent(iEvent)
 
@@ -609,7 +624,9 @@ export class Interaction<T extends ActionName = ActionName> {
     return true
   }
 
-  _now () { return Date.now() }
+  _now () {
+    return Date.now()
+  }
 }
 
 export default Interaction

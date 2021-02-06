@@ -27,11 +27,7 @@ export type DragEvent = InteractEvent<'drag'>
 export type DraggableMethod = ActionMethod<DraggableOptions>
 
 function install (scope: Scope) {
-  const {
-    actions,
-    Interactable,
-    defaults,
-  } = scope
+  const { actions, Interactable, defaults } = scope
 
   Interactable.prototype.draggable = drag.draggable
 
@@ -42,35 +38,34 @@ function install (scope: Scope) {
 }
 
 function beforeMove ({ interaction }) {
-  if (interaction.prepared.name !== 'drag') { return }
+  if (interaction.prepared.name !== 'drag') return
 
   const axis = interaction.prepared.axis
 
   if (axis === 'x') {
-    interaction.coords.cur.page.y   = interaction.coords.start.page.y
+    interaction.coords.cur.page.y = interaction.coords.start.page.y
     interaction.coords.cur.client.y = interaction.coords.start.client.y
 
     interaction.coords.velocity.client.y = 0
-    interaction.coords.velocity.page.y   = 0
-  }
-  else if (axis === 'y') {
-    interaction.coords.cur.page.x   = interaction.coords.start.page.x
+    interaction.coords.velocity.page.y = 0
+  } else if (axis === 'y') {
+    interaction.coords.cur.page.x = interaction.coords.start.page.x
     interaction.coords.cur.client.x = interaction.coords.start.client.x
 
     interaction.coords.velocity.client.x = 0
-    interaction.coords.velocity.page.x   = 0
+    interaction.coords.velocity.page.x = 0
   }
 }
 
 function move ({ iEvent, interaction }) {
-  if (interaction.prepared.name !== 'drag') { return }
+  if (interaction.prepared.name !== 'drag') return
 
   const axis = interaction.prepared.axis
 
   if (axis === 'x' || axis === 'y') {
     const opposite = axis === 'x' ? 'y' : 'x'
 
-    iEvent.page[opposite]   = interaction.coords.start.page[opposite]
+    iEvent.page[opposite] = interaction.coords.start.page[opposite]
     iEvent.client[opposite] = interaction.coords.start.client[opposite]
     iEvent.delta[opposite] = 0
   }
@@ -115,7 +110,10 @@ function move ({ iEvent, interaction }) {
  * @return {boolean | Interactable} boolean indicating if this can be the
  * target of drag events, or this Interctable
  */
-const draggable: DraggableMethod = function draggable (this: Interactable, options?: DraggableOptions | boolean): any {
+const draggable: DraggableMethod = function draggable (
+  this: Interactable,
+  options?: DraggableOptions | boolean,
+): any {
   if (is.object(options)) {
     this.options.drag.enabled = options.enabled !== false
     this.setPerAction('drag', options)
@@ -157,17 +155,15 @@ const drag: Plugin = {
         !(dragOptions && dragOptions.enabled) ||
         // check mouseButton setting if the pointer is down
         (interaction.pointerIsDown &&
-         /mouse|pointer/.test(interaction.pointerType) &&
-       (buttons & interactable.options.drag.mouseButtons) === 0)
+          /mouse|pointer/.test(interaction.pointerType) &&
+          (buttons & interactable.options.drag.mouseButtons) === 0)
       ) {
         return undefined
       }
 
       arg.action = {
         name: 'drag',
-        axis: (dragOptions.lockAxis === 'start'
-          ? dragOptions.startAxis
-          : dragOptions.lockAxis),
+        axis: dragOptions.lockAxis === 'start' ? dragOptions.startAxis : dragOptions.lockAxis,
       }
 
       return false
@@ -177,8 +173,8 @@ const drag: Plugin = {
   beforeMove,
   move,
   defaults: {
-    startAxis : 'xy',
-    lockAxis  : 'xy',
+    startAxis: 'xy',
+    lockAxis: 'xy',
   } as DropzoneOptions,
 
   getCursor () {

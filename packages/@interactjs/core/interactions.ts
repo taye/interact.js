@@ -14,7 +14,7 @@ declare module '@interactjs/core/scope' {
   interface Scope {
     Interaction: typeof InteractionBase
     interactions: {
-      new: <T extends ActionName> (options: any) => InteractionBase<T>
+      new: <T extends ActionName>(options: any) => InteractionBase<T>
       list: Array<InteractionBase<ActionName>>
       listeners: { [type: string]: Listener }
       docEvents: Array<{ type: string, listener: Listener }>
@@ -34,8 +34,12 @@ declare module '@interactjs/core/scope' {
 }
 
 const methodNames = [
-  'pointerDown', 'pointerMove', 'pointerUp',
-  'updatePointer', 'removePointer', 'windowBlur',
+  'pointerDown',
+  'pointerMove',
+  'pointerUp',
+  'updatePointer',
+  'removePointer',
+  'windowBlur',
 ]
 
 function install (scope: Scope) {
@@ -50,14 +54,13 @@ function install (scope: Scope) {
 
   if (domObjects.PointerEvent) {
     docEvents = [
-      { type: pEventTypes.down,   listener: releasePointersOnRemovedEls },
-      { type: pEventTypes.down,   listener: listeners.pointerDown },
-      { type: pEventTypes.move,   listener: listeners.pointerMove },
-      { type: pEventTypes.up,     listener: listeners.pointerUp },
+      { type: pEventTypes.down, listener: releasePointersOnRemovedEls },
+      { type: pEventTypes.down, listener: listeners.pointerDown },
+      { type: pEventTypes.move, listener: listeners.pointerMove },
+      { type: pEventTypes.up, listener: listeners.pointerUp },
       { type: pEventTypes.cancel, listener: listeners.pointerUp },
     ]
-  }
-  else {
+  } else {
     docEvents = [
       { type: 'mousedown', listener: listeners.pointerDown },
       { type: 'mousemove', listener: listeners.pointerMove },
@@ -92,7 +95,9 @@ function install (scope: Scope) {
       scope.interactions.pointerMoveTolerance = value
     }
 
-    _now () { return scope.now() }
+    _now () {
+      return scope.now()
+    }
   }
 
   scope.interactions = {
@@ -114,9 +119,7 @@ function install (scope: Scope) {
   function releasePointersOnRemovedEls () {
     // for all inactive touch interactions with pointers down
     for (const interaction of scope.interactions.list) {
-      if (!interaction.pointerIsDown ||
-        interaction.pointerType !== 'touch' ||
-        interaction._interacting) {
+      if (!interaction.pointerIsDown || interaction.pointerType !== 'touch' || interaction._interacting) {
         continue
       }
 
@@ -166,8 +169,7 @@ function doOnInteractions (method: string, scope: Scope) {
           interaction,
         ])
       }
-    }
-    else {
+    } else {
       let invalidPointer = false
 
       if (!browser.supportsPointerEvent && /mouse/.test(event.type)) {
@@ -178,8 +180,9 @@ function doOnInteractions (method: string, scope: Scope) {
 
         // try to ignore mouse events that are simulated by the browser
         // after a touch event
-        invalidPointer = invalidPointer ||
-          (scope.now() - scope.prevTouchTime < 500) ||
+        invalidPointer =
+          invalidPointer ||
+          scope.now() - scope.prevTouchTime < 500 ||
           // on iOS and Firefox Mobile, MouseEvent.timeStamp is zero if simulated
           event.timeStamp === 0
       }
@@ -224,8 +227,14 @@ function getInteraction (searchDetails: SearchDetails) {
   return signalArg.interaction || scope.interactions.new({ pointerType })
 }
 
-function onDocSignal<T extends 'scope:add-document' | 'scope:remove-document'> ({ doc, scope, options }: SignalArgs[T], eventMethodName: 'add' | 'remove') {
-  const { interactions: { docEvents }, events } = scope
+function onDocSignal<T extends 'scope:add-document' | 'scope:remove-document'> (
+  { doc, scope, options }: SignalArgs[T],
+  eventMethodName: 'add' | 'remove',
+) {
+  const {
+    interactions: { docEvents },
+    events,
+  } = scope
   const eventMethod = events[eventMethodName]
 
   if (scope.browser.isIOS && !options.events) {
@@ -256,7 +265,9 @@ const interactions: Plugin = {
       for (let i = scope.interactions.list.length - 1; i >= 0; i--) {
         const interaction = scope.interactions.list[i]
 
-        if (interaction.interactable !== interactable) { continue }
+        if (interaction.interactable !== interactable) {
+          continue
+        }
 
         interaction.stop()
         scope.fire('interactions:destroy', { interaction })

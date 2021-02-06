@@ -14,19 +14,20 @@ const [, , ...fileArgs] = process.argv
 
 function getMatches (pattern: string) {
   return new Promise<string[]>((resolve, reject) => {
-    glob(
-      pattern,
-      globOptions,
-      (error, files) => {
-        if (error) { reject(error) }
-        else { resolve(files) }
-      },
-    )
+    glob(pattern, globOptions, (error, files) => {
+      if (error) {
+        reject(error)
+      } else {
+        resolve(files)
+      }
+    })
   })
 }
 
-(fileArgs.length ? Promise.resolve(fileArgs.filter(f => f !== '--')) : getMatches('**/*.spec.ts')).then(tests => {
-  for (const file of tests) {
-    require(path.resolve(file))
-  }
-})
+;(fileArgs.length ? Promise.resolve(fileArgs.filter(f => f !== '--')) : getMatches('**/*.spec.ts')).then(
+  tests => {
+    for (const file of tests) {
+      require(path.resolve(file))
+    }
+  },
+)

@@ -41,7 +41,9 @@ export type SnapEdgesOptions = Pick<SnapOptions, 'targets' | 'range' | 'offset' 
 function start (arg: ModifierArg<SnapState>) {
   const { edges } = arg
 
-  if (!edges) { return null }
+  if (!edges) {
+    return null
+  }
 
   arg.state.targetFields = arg.state.targetFields || [
     [edges.left ? 'left' : 'right', edges.top ? 'top' : 'bottom'],
@@ -53,14 +55,11 @@ function start (arg: ModifierArg<SnapState>) {
 const snapEdges: ModifierModule<SnapEdgesOptions, SnapState> = {
   start,
   set: snapSize.set,
-  defaults: extend(
-    clone(snapSize.defaults),
-    {
-      targets: null,
-      range: null,
-      offset: { x: 0, y: 0 },
-    } as const,
-  ),
+  defaults: extend(clone(snapSize.defaults), {
+    targets: null,
+    range: null,
+    offset: { x: 0, y: 0 },
+  } as const),
 }
 
 export default makeModifier(snapEdges, 'snapEdges')

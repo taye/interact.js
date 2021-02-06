@@ -1,0 +1,10 @@
+{
+  "arrowParens": "avoid",
+  "parser": "babel-ts",
+  "printWidth": 110,
+  "semi": false,
+  "singleQuote": true,
+  "tabWidth": 2,
+  "trailingComma": "all",
+  "useTabs": false
+}

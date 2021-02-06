@@ -36,10 +36,7 @@ export interface AutoScrollOptions {
 }
 
 function install (scope: Scope) {
-  const {
-    defaults,
-    actions,
-  } = scope
+  const { defaults, actions } = scope
 
   scope.autoScroll = autoScroll
   autoScroll.now = () => scope.now()
@@ -50,14 +47,14 @@ function install (scope: Scope) {
 
 const autoScroll = {
   defaults: {
-    enabled  : false,
-    margin   : 60,
+    enabled: false,
+    margin: 60,
 
     // the item that is scrolled (Window or HTMLElement)
     container: null as AutoScrollOptions['container'],
 
     // the scroll speed in pixels per second
-    speed    : 300,
+    speed: 300,
   } as AutoScrollOptions,
 
   now: Date.now,
@@ -116,10 +113,9 @@ const autoScroll = {
 
         if (is.window(container)) {
           container.scrollBy(scrollBy.x, scrollBy.y)
-        }
-        else if (container) {
+        } else if (container) {
           container.scrollLeft += scrollBy.x
-          container.scrollTop  += scrollBy.y
+          container.scrollTop += scrollBy.y
         }
 
         const curScroll = getScroll(container)
@@ -153,9 +149,16 @@ const autoScroll = {
 
     return options[actionName].autoScroll?.enabled
   },
-  onInteractionMove<T extends ActionName> ({ interaction, pointer }: { interaction: Interaction<T>, pointer: PointerType }) {
-    if (!(interaction.interacting() &&
-          autoScroll.check(interaction.interactable, interaction.prepared.name))) {
+  onInteractionMove<T extends ActionName> ({
+    interaction,
+    pointer,
+  }: {
+    interaction: Interaction<T>
+    pointer: PointerType
+  }) {
+    if (
+      !(interaction.interacting() && autoScroll.check(interaction.interactable, interaction.prepared.name))
+    ) {
       return
     }
 
@@ -175,27 +178,26 @@ const autoScroll = {
     const container = getContainer(options.container, interactable, element)
 
     if (is.window(container)) {
-      left   = pointer.clientX < autoScroll.margin
-      top    = pointer.clientY < autoScroll.margin
-      right  = pointer.clientX > container.innerWidth  - autoScroll.margin
+      left = pointer.clientX < autoScroll.margin
+      top = pointer.clientY < autoScroll.margin
+      right = pointer.clientX > container.innerWidth - autoScroll.margin
       bottom = pointer.clientY > container.innerHeight - autoScroll.margin
-    }
-    else {
+    } else {
       const rect = domUtils.getElementClientRect(container)
 
-      left   = pointer.clientX < rect.left   + autoScroll.margin
-      top    = pointer.clientY < rect.top    + autoScroll.margin
-      right  = pointer.clientX > rect.right  - autoScroll.margin
+      left = pointer.clientX < rect.left + autoScroll.margin
+      top = pointer.clientY < rect.top + autoScroll.margin
+      right = pointer.clientX > rect.right - autoScroll.margin
       bottom = pointer.clientY > rect.bottom - autoScroll.margin
     }
 
-    autoScroll.x = (right ? 1 : left ? -1 : 0)
-    autoScroll.y = (bottom ? 1 :  top ? -1 : 0)
+    autoScroll.x = right ? 1 : left ? -1 : 0
+    autoScroll.y = bottom ? 1 : top ? -1 : 0
 
     if (!autoScroll.isScrolling) {
       // set the autoScroll properties to those of the target
       autoScroll.margin = options.margin
-      autoScroll.speed  = options.speed
+      autoScroll.speed = options.speed
 
       autoScroll.start(interaction)
     }
@@ -203,25 +205,37 @@ const autoScroll = {
 }
 
 export function getContainer (value: any, interactable: Interactable, element: Element) {
-  return (is.string(value) ? getStringOptionResult(value, interactable, element) : value) || getWindow(element)
+  return (
+    (is.string(value) ? getStringOptionResult(value, interactable, element) : value) || getWindow(element)
+  )
 }
 
 export function getScroll (container: any) {
-  if (is.window(container)) { container = window.document.body }
+  if (is.window(container)) {
+    container = window.document.body
+  }
 
   return { x: container.scrollLeft, y: container.scrollTop }
 }
 
 export function getScrollSize (container: any) {
-  if (is.window(container)) { container = window.document.body }
+  if (is.window(container)) {
+    container = window.document.body
+  }
 
   return { x: container.scrollWidth, y: container.scrollHeight }
 }
 
-export function getScrollSizeDelta<T extends ActionName> ({ interaction, element }: {
-  interaction: Partial<Interaction<T>>
-  element: Element
-}, func: any) {
+export function getScrollSizeDelta<T extends ActionName> (
+  {
+    interaction,
+    element,
+  }: {
+    interaction: Partial<Interaction<T>>
+    element: Element
+  },
+  func: any,
+) {
   const scrollOptions = interaction && interaction.interactable.options[interaction.prepared.name].autoScroll
 
   if (!scrollOptions || !scrollOptions.enabled) {
@@ -229,11 +243,7 @@ export function getScrollSizeDelta<T extends ActionName> ({ interaction, element
     return { x: 0, y: 0 }
   }
 
-  const scrollContainer = getContainer(
-    scrollOptions.container,
-    interaction.interactable,
-    element,
-  )
+  const scrollContainer = getContainer(scrollOptions.container, interaction.interactable, element)
 
   const prevSize = getScroll(scrollContainer)
   func()

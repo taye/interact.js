@@ -1,19 +1,15 @@
 #!/usr/bin/env node
 const path = require('path')
+
 const getVersion = require('../scripts/getVersion')
 
-let [,, cwd, versionChange, prereleaseId] = process.argv
+let [, , cwd, versionChange, prereleaseId] = process.argv
 
 if (cwd === undefined || !cwd.startsWith('/')) {
-  [cwd, versionChange, prereleaseId] = [process.cwd(), cwd, versionChange]
+  ;[cwd, versionChange, prereleaseId] = [process.cwd(), cwd, versionChange]
 }
 
-const depFields = [
-  'dependencies',
-  'peerDependencies',
-  'devDependencies',
-  'optionalDependencies',
-]
+const depFields = ['dependencies', 'peerDependencies', 'devDependencies', 'optionalDependencies']
 
 let currentVersion
 
@@ -22,14 +18,12 @@ if (!module.parent) {
   const fs = require('fs')
   const glob = require('glob')
 
-  const [,, versionChange, prereleaseId] = process.argv
   const previousVersion = getVersion(cwd)
 
   if (versionChange) {
     if (/^(major|minor|patch|premajor|preminor|prepatch|prerelease)$/.test(versionChange)) {
       currentVersion = semver.inc(previousVersion, versionChange, prereleaseId)
-    }
-    else {
+    } else {
       currentVersion = semver.clean(versionChange)
 
       if (currentVersion === null) {

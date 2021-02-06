@@ -21,11 +21,7 @@ module.exports = {
     recurse: true,
   },
 
-  plugins: [
-    'plugins/markdown',
-    'jsdoc-stale',
-    'jsdoc-babel',
-  ],
+  plugins: ['plugins/markdown', 'jsdoc-stale', 'jsdoc-babel'],
 
   babel: {
     extensions: ['js', 'ts'],

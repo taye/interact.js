@@ -10,11 +10,9 @@ export default function clone<T extends Object> (source: T): Partial<T> {
 
     if (is.plainObject(value)) {
       dest[prop] = clone(value) as any
-    }
-    else if (is.array(value)) {
+    } else if (is.array(value)) {
       dest[prop] = arr.from(value) as typeof value
-    }
-    else {
+    } else {
       dest[prop] = value
     }
   }

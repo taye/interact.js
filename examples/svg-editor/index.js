@@ -12,7 +12,7 @@ const svgNS = 'http://www.w3.org/2000/svg'
 const rectangles = []
 
 class Rectangle {
-  constructor  (x, y, w, h) {
+  constructor (x, y, w, h) {
     this.x = x
     this.y = y
     this.w = w

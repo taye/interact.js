@@ -11,7 +11,8 @@ function init (window: Window) {
 
     for (const vendor of vendors) {
       request = window[`${vendor}RequestAnimationFrame` as 'requestAnimationFrame']
-      cancel = window[`${vendor}CancelAnimationFrame` as 'cancelAnimationFrame'] ||
+      cancel =
+        window[`${vendor}CancelAnimationFrame` as 'cancelAnimationFrame'] ||
         window[`${vendor}CancelRequestAnimationFrame` as 'cancelAnimationFrame']
     }
   }
@@ -23,9 +24,10 @@ function init (window: Window) {
     request = callback => {
       const currTime = Date.now()
       const timeToCall = Math.max(0, 16 - (currTime - lastTime))
-      // eslint-disable-next-line node/no-callback-literal
-      const token = window.setTimeout(() => { callback(currTime + timeToCall) },
-        timeToCall)
+      const token = window.setTimeout(() => {
+        // eslint-disable-next-line node/no-callback-literal
+        callback(currTime + timeToCall)
+      }, timeToCall)
 
       lastTime = currTime + timeToCall
       return token

@@ -78,9 +78,9 @@ declare module '@interactjs/core/scope' {
 
 const defaults: PointerEventOptions = {
   holdDuration: 600,
-  ignoreFrom  : null,
-  allowFrom   : null,
-  origin      : { x: 0, y: 0 },
+  ignoreFrom: null,
+  allowFrom: null,
+  origin: { x: 0, y: 0 },
 }
 
 const pointerEvents: Plugin = {
@@ -131,14 +131,7 @@ function fire<T extends string> (
   },
   scope: Scope,
 ) {
-  const {
-    interaction,
-    pointer,
-    event,
-    eventTarget,
-    type,
-    targets = collectEventTargets(arg, scope),
-  } = arg
+  const { interaction, pointer, event, eventTarget, type, targets = collectEventTargets(arg, scope) } = arg
 
   const pointerEvent = new PointerEvent(type, pointer, event, eventTarget, interaction, scope.now())
 
@@ -158,7 +151,7 @@ function fire<T extends string> (
     const target = targets[i]
 
     for (const prop in target.props || {}) {
-      (pointerEvent as any)[prop] = target.props[prop]
+      ;(pointerEvent as any)[prop] = target.props[prop]
     }
 
     const origin = getOriginXY(target.eventable, target.node)
@@ -171,9 +164,12 @@ function fire<T extends string> (
 
     pointerEvent._addOrigin(origin)
 
-    if (pointerEvent.immediatePropagationStopped ||
-        (pointerEvent.propagationStopped &&
-            (i + 1) < targets.length && targets[i + 1].node !== pointerEvent.currentTarget)) {
+    if (
+      pointerEvent.immediatePropagationStopped ||
+      (pointerEvent.propagationStopped &&
+        i + 1 < targets.length &&
+        targets[i + 1].node !== pointerEvent.currentTarget)
+    ) {
       break
     }
   }
@@ -184,13 +180,16 @@ function fire<T extends string> (
     // if pointerEvent should make a double tap, create and fire a doubletap
     // PointerEvent and use that as the prevTap
     const prevTap = pointerEvent.double
-      ? fire({
-        interaction,
-        pointer,
-        event,
-        eventTarget,
-        type: 'doubletap',
-      }, scope)
+      ? fire(
+        {
+          interaction,
+          pointer,
+          event,
+          eventTarget,
+          type: 'doubletap',
+        },
+        scope,
+      )
       : pointerEvent
 
     interaction.prevTap = prevTap
@@ -200,20 +199,32 @@ function fire<T extends string> (
   return pointerEvent
 }
 
-function collectEventTargets<T extends string> ({ interaction, pointer, event, eventTarget, type }: {
-  interaction: Interaction<any>
-  pointer: PointerType | PointerEvent<any>
-  event: PointerEventType | PointerEvent<any>
-  eventTarget: Node
-  type: T
-}, scope: Scope) {
+function collectEventTargets<T extends string> (
+  {
+    interaction,
+    pointer,
+    event,
+    eventTarget,
+    type,
+  }: {
+    interaction: Interaction<any>
+    pointer: PointerType | PointerEvent<any>
+    event: PointerEventType | PointerEvent<any>
+    eventTarget: Node
+    type: T
+  },
+  scope: Scope,
+) {
   const pointerIndex = interaction.getPointerIndex(pointer)
   const pointerInfo = interaction.pointers[pointerIndex]
 
   // do not fire a tap event if the pointer was moved before being lifted
-  if (type === 'tap' && (interaction.pointerWasMoved ||
+  if (
+    type === 'tap' &&
+    (interaction.pointerWasMoved ||
       // or if the pointerup target is different to the pointerdown target
-      !(pointerInfo && pointerInfo.downTarget === eventTarget))) {
+      !(pointerInfo && pointerInfo.downTarget === eventTarget))
+  ) {
     return []
   }
 
@@ -236,16 +247,17 @@ function collectEventTargets<T extends string> ({ interaction, pointer, event, e
   }
 
   if (type === 'hold') {
-    signalArg.targets = signalArg.targets.filter(target =>
-      target.eventable.options.holdDuration === interaction.pointers[pointerIndex]?.hold.duration)
+    signalArg.targets = signalArg.targets.filter(
+      target => target.eventable.options.holdDuration === interaction.pointers[pointerIndex]?.hold.duration,
+    )
   }
 
   return signalArg.targets
 }
 
 function addInteractionProps ({ interaction }) {
-  interaction.prevTap = null   // the most recent tap event on this interaction
-  interaction.tapTime = 0     // time of the most recent tap event
+  interaction.prevTap = null // the most recent tap event on this interaction
+  interaction.tapTime = 0 // time of the most recent tap event
 }
 
 function addHoldInfo ({ down, pointerInfo }: SignalArgs['interactions:update-pointer']) {
@@ -265,10 +277,7 @@ function clearHold ({ interaction, pointerIndex }) {
   }
 }
 
-function moveAndClearHold (
-  arg: SignalArgs['interactions:move'],
-  scope: Scope,
-) {
+function moveAndClearHold (arg: SignalArgs['interactions:move'], scope: Scope) {
   const { interaction, pointer, event, eventTarget, duplicate } = arg
 
   if (!duplicate && (!interaction.pointerIsDown || interaction.pointerWasMoved)) {
@@ -276,17 +285,23 @@ function moveAndClearHold (
       clearHold(arg)
     }
 
-    fire({
-      interaction,
-      pointer,
-      event,
-      eventTarget: eventTarget as Element,
-      type: 'move',
-    }, scope)
+    fire(
+      {
+        interaction,
+        pointer,
+        event,
+        eventTarget: eventTarget as Element,
+        type: 'move',
+      },
+      scope,
+    )
   }
 }
 
-function downAndStartHold ({ interaction, pointer, event, eventTarget, pointerIndex }: SignalArgs['interactions:down'], scope: Scope) {
+function downAndStartHold (
+  { interaction, pointer, event, eventTarget, pointerIndex }: SignalArgs['interactions:down'],
+  scope: Scope,
+) {
   const timer = interaction.pointers[pointerIndex].hold
   const path = domUtils.getPath(eventTarget as Element | Document)
   const signalArg = {
@@ -306,7 +321,7 @@ function downAndStartHold ({ interaction, pointer, event, eventTarget, pointerIn
     scope.fire('pointerEvents:collect-targets', signalArg)
   }
 
-  if (!signalArg.targets.length) { return }
+  if (!signalArg.targets.length) return
 
   let minDuration = Infinity
 
@@ -320,17 +335,23 @@ function downAndStartHold ({ interaction, pointer, event, eventTarget, pointerIn
 
   timer.duration = minDuration
   timer.timeout = setTimeout(() => {
-    fire({
-      interaction,
-      eventTarget,
-      pointer,
-      event,
-      type: 'hold',
-    }, scope)
+    fire(
+      {
+        interaction,
+        eventTarget,
+        pointer,
+        event,
+        type: 'hold',
+      },
+      scope,
+    )
   }, minDuration)
 }
 
-function tapAfterUp ({ interaction, pointer, event, eventTarget }: SignalArgs['interactions:up'], scope: Scope) {
+function tapAfterUp (
+  { interaction, pointer, event, eventTarget }: SignalArgs['interactions:up'],
+  scope: Scope,
+) {
   if (!interaction.pointerWasMoved) {
     fire({ interaction, eventTarget, pointer, event, type: 'tap' }, scope)
   }

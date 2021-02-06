@@ -19,10 +19,7 @@ export default function normalize (
   }
 
   if (is.array(type)) {
-    return type.reduce<NormalizedListeners>(
-      (acc, t) => extend(acc, normalize(t, listeners, result)),
-      result,
-    )
+    return type.reduce<NormalizedListeners>((acc, t) => extend(acc, normalize(t, listeners, result)), result)
   }
 
   // ({ type: fn }) -> ('', { type: fn })
@@ -34,13 +31,11 @@ export default function normalize (
   if (is.func(listeners)) {
     result[type] = result[type] || []
     result[type].push(listeners)
-  }
-  else if (is.array(listeners)) {
+  } else if (is.array(listeners)) {
     for (const l of listeners) {
       normalize(type, l, result)
     }
-  }
-  else if (is.object(listeners)) {
+  } else if (is.object(listeners)) {
     for (const prefix in listeners) {
       const combinedTypes = split(prefix).map(p => `${type}${p}`)
 

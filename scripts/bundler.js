@@ -12,42 +12,31 @@ require('module')._initPaths()
 
 module.exports = function (options) {
   const browserify = require('browserify')
-  const plugins = (options.watch)
-    ? [
-      require('watchify'),
-      require('errorify'),
-    ]
+  const plugins = options.watch
+    ? [require('watchify'), require('errorify')]
     : process.env.NODE_ENV === 'production'
-      ? [
-        require('browser-pack-flat/plugin'),
-      ]
+      ? [require('browser-pack-flat/plugin')]
       : []
 
-  const babelrc = extendBabelOptions({
-    babelrc: false,
-    sourceType: 'module',
-    global: true,
-    extensions: [
-      '.ts',
-      '.tsx',
-      '.js',
-      '.jsx',
-    ],
-  }, getBabelrc())
+  const babelrc = extendBabelOptions(
+    {
+      babelrc: false,
+      sourceType: 'module',
+      global: true,
+      extensions: ['.ts', '.tsx', '.js', '.jsx'],
+    },
+    getBabelrc(),
+  )
 
   const b = browserify({
     debug: true,
     bare: true,
     standalone: options.standalone,
-    transform: [
-      [require('babelify'), babelrc],
-    ],
+    transform: [[require('babelify'), babelrc]],
     plugin: plugins,
     extensions: ['.ts', '.tsx'],
     paths: getModuleDirectories(),
-    ...options.watch
-      ? { cache: {}, packageCache: {} }
-      : {},
+    ...(options.watch ? { cache: {}, packageCache: {} } : {}),
     ...options.browserify,
   })
 
@@ -62,7 +51,7 @@ module.exports = function (options) {
     b.on('update', ids => {
       ids = ids.filter(id => !/\.js$/.test(id))
 
-      if (!ids.length) { return }
+      if (!ids.length) return
 
       console.log(ids)
       update(ids)
@@ -72,16 +61,20 @@ module.exports = function (options) {
 
   function update (ids) {
     if (ids) {
-      console.log(ids.reduce((formatted, id) => {
-        return `${formatted}\n    ${path.relative(process.cwd(), id)}`
-      }, ''))
+      console.log(
+        ids.reduce((formatted, id) => {
+          return `${formatted}\n    ${path.relative(process.cwd(), id)}`
+        }, ''),
+      )
     }
 
     let bundleCode = ''
 
     return new Promise((resolve, reject) => {
       b.bundle()
-        .on('data', chunk => { bundleCode += chunk })
+        .on('data', chunk => {
+          bundleCode += chunk
+        })
         .on('end', () => resolve(bundleCode))
         .on('error', reject)
     })

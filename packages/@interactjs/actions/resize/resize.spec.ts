@@ -8,16 +8,7 @@ const { ltrbwh } = helpers
 
 test('resize', t => {
   const rect = Object.freeze({ left: 0, top: 0, right: 10, bottom: 10, width: 10, height: 10 })
-  const {
-    scope,
-    interactable,
-    interaction,
-    coords,
-    target,
-    down,
-    start,
-    move,
-  } = helpers.testEnv({
+  const { scope, interactable, interaction, coords, target, down, start, move } = helpers.testEnv({
     plugins: [resize],
     rect,
   })
@@ -104,11 +95,7 @@ test('resize', t => {
     },
     'sets starting correct interaction._rects',
   )
-  t.deepEqual(
-    interaction.rect,
-    rect,
-    'sets starting correct interaction.rect',
-  )
+  t.deepEqual(interaction.rect, rect, 'sets starting correct interaction.rect')
   t.ok(hasResizeProps(resizeEvent), 'resizestart event has extra resize props')
 
   coords.page.x = -100

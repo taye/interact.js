@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-const [,, ...args] = process.argv
+const [, , ...args] = process.argv
 
 const fileArgs = []
 let watch = false

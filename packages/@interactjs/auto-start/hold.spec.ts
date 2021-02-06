@@ -16,20 +16,14 @@ test('autoStart/hold', t => {
     prepared: { name: actionName },
   }
 
-  t.equal(
-    hold.getHoldDuration(interaction),
-    holdDuration,
-    'gets holdDuration')
+  t.equal(hold.getHoldDuration(interaction), holdDuration, 'gets holdDuration')
 
   const delayDuration = 500
 
   interaction.interactable.options[actionName].delay = delayDuration
   delete interaction.interactable.options[actionName].hold
 
-  t.equal(
-    hold.getHoldDuration(interaction),
-    delayDuration,
-    'gets holdDuration from "delay" value')
+  t.equal(hold.getHoldDuration(interaction), delayDuration, 'gets holdDuration from "delay" value')
 
   t.end()
 })

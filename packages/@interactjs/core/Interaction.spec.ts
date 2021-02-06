@@ -19,32 +19,32 @@ test('Interaction constructor', t => {
     scopeFire: dummyScopeFire,
   })
   const zeroCoords = {
-    page     : { x: 0, y: 0 },
-    client   : { x: 0, y: 0 },
+    page: { x: 0, y: 0 },
+    client: { x: 0, y: 0 },
     timeStamp: 0,
   }
 
-  t.equal(interaction._scopeFire, dummyScopeFire,
-    'scopeFire option is set assigned to interaction._scopeFire')
+  t.equal(
+    interaction._scopeFire,
+    dummyScopeFire,
+    'scopeFire option is set assigned to interaction._scopeFire',
+  )
 
-  t.ok(interaction.prepared instanceof Object,
-    'interaction.prepared is an object')
-  t.ok(interaction.downPointer instanceof Object,
-    'interaction.downPointer is an object')
+  t.ok(interaction.prepared instanceof Object, 'interaction.prepared is an object')
+  t.ok(interaction.downPointer instanceof Object, 'interaction.downPointer is an object')
 
   for (const coordField in interaction.coords) {
-    t.deepEqual(interaction.coords[coordField as keyof typeof interaction.coords], zeroCoords,
-      `interaction.coords.${coordField} set to zero`)
+    t.deepEqual(
+      interaction.coords[coordField as keyof typeof interaction.coords],
+      zeroCoords,
+      `interaction.coords.${coordField} set to zero`,
+    )
   }
 
-  t.equal(interaction.pointerType, testType,
-    'interaction.pointerType is set')
+  t.equal(interaction.pointerType, testType, 'interaction.pointerType is set')
 
   // pointerInfo properties
-  t.deepEqual(
-    interaction.pointers,
-    [],
-    'interaction.pointers is initially an empty array')
+  t.deepEqual(interaction.pointers, [], 'interaction.pointers is initially an empty array')
 
   // false properties
   for (const prop of ['pointerIsDown', 'pointerWasMoved', '_interacting'] as const) {
@@ -65,14 +65,15 @@ test('Interaction destroy', t => {
 
   interaction.destroy()
 
-  t.strictEqual(interaction._latestPointer.pointer, null,
-    'interaction._latestPointer.pointer is null')
+  t.strictEqual(interaction._latestPointer.pointer, null, 'interaction._latestPointer.pointer is null')
 
-  t.strictEqual(interaction._latestPointer.event, null,
-    'interaction._latestPointer.event is null')
+  t.strictEqual(interaction._latestPointer.event, null, 'interaction._latestPointer.event is null')
 
-  t.strictEqual(interaction._latestPointer.eventTarget, null,
-    'interaction._latestPointer.eventTarget is null')
+  t.strictEqual(
+    interaction._latestPointer.eventTarget,
+    null,
+    'interaction._latestPointer.eventTarget is null',
+  )
 
   t.end()
 })
@@ -99,14 +100,17 @@ test('Interaction.updatePointer', t => {
 
     st.deepEqual(
       interaction.pointers,
-      [{
-        id: pointer.pointerId,
-        pointer,
-        event,
-        downTime: null,
-        downTarget: null,
-      }],
-      'interaction.pointers == [{ pointer, ... }]')
+      [
+        {
+          id: pointer.pointerId,
+          pointer,
+          event,
+          downTime: null,
+          downTarget: null,
+        },
+      ],
+      'interaction.pointers == [{ pointer, ... }]',
+    )
     st.equal(ret, 0, 'new pointer index is returned')
 
     st.end()
@@ -123,7 +127,8 @@ test('Interaction.updatePointer', t => {
     const ret = interaction.updatePointer(newPointer, event, null)
 
     st.deepEqual(
-      interaction.pointers, [
+      interaction.pointers,
+      [
         {
           id: existing.pointerId,
           pointer: existing,
@@ -139,7 +144,8 @@ test('Interaction.updatePointer', t => {
           downTarget: null,
         },
       ],
-      'interaction.pointers == [{ pointer: existing, ... }, { pointer: newPointer, ... }]')
+      'interaction.pointers == [{ pointer: existing, ... }, { pointer: newPointer, ... }]',
+    )
 
     st.equal(ret, 1, 'second pointer index is 1')
 
@@ -155,14 +161,11 @@ test('Interaction.updatePointer', t => {
     oldPointers.forEach((pointer: any) => interaction.updatePointer(pointer, pointer, null))
     newPointers.forEach((pointer: any) => interaction.updatePointer(pointer, pointer, null))
 
-    st.equal(interaction.pointers.length, oldPointers.length,
-      'number of pointers is unchanged')
+    st.equal(interaction.pointers.length, oldPointers.length, 'number of pointers is unchanged')
 
     interaction.pointers.forEach((pointerInfo, i) => {
-      st.equal(pointerInfo.id, oldPointers[i].pointerId,
-        `pointer[${i}].id is the same`)
-      st.notEqual(pointerInfo.pointer, oldPointers[i],
-        `new pointer ${i} !== old pointer object`)
+      st.equal(pointerInfo.id, oldPointers[i].pointerId, `pointer[${i}].id is the same`)
+      st.notEqual(pointerInfo.pointer, oldPointers[i], `new pointer ${i} !== old pointer object`)
     })
 
     st.end()
@@ -176,9 +179,9 @@ test('Interaction.removePointer', t => {
   const ids = [0, 1, 2, 3]
   const removals = [
     { id: 0, remain: [1, 2, 3], message: 'first of 4' },
-    { id: 2, remain: [1,    3], message: 'middle of 3' },
-    { id: 3, remain: [1      ], message: 'last of 2' },
-    { id: 1, remain: [       ], message: 'final' },
+    { id: 2, remain: [1, 3], message: 'middle of 3' },
+    { id: 3, remain: [1], message: 'last of 2' },
+    { id: 1, remain: [], message: 'final' },
   ]
 
   ids.forEach(pointerId => interaction.updatePointer({ pointerId } as any, {} as any, null))
@@ -189,7 +192,8 @@ test('Interaction.removePointer', t => {
     t.deepEqual(
       interaction.pointers.map(p => p.id),
       removal.remain,
-      `${removal.message} - remaining interaction.pointers is correct`)
+      `${removal.message} - remaining interaction.pointers is correct`,
+    )
   }
 
   t.end()
@@ -205,8 +209,12 @@ test('Interaction.pointer{Down,Move,Up} updatePointer', t => {
   let info: any = {}
 
   scope.addListeners({
-    'interactions:update-pointer': arg => { info.updated = arg.pointerInfo },
-    'interactions:remove-pointer': arg => { info.removed = arg.pointerInfo },
+    'interactions:update-pointer': arg => {
+      info.updated = arg.pointerInfo
+    },
+    'interactions:remove-pointer': arg => {
+      info.removed = arg.pointerInfo
+    },
   })
 
   interaction.coords.cur.timeStamp = 0
@@ -228,29 +236,21 @@ test('Interaction.pointer{Down,Move,Up} updatePointer', t => {
     },
     'interaction.pointerDown updates pointer',
   )
-  t.equal(info.removed, undefined, 'interaction.pointerDown doesn\'t remove pointer')
+  t.equal(info.removed, undefined, "interaction.pointerDown doesn't remove pointer")
   interaction.removePointer(pointer, null)
   info = {}
 
   interaction.pointerMove(pointer, pointer, eventTarget)
-  t.deepEqual(
-    info.updated,
-    commonPointerInfo,
-    'interaction.pointerMove updates pointer',
-  )
-  t.equal(info.removed, undefined, 'interaction.pointerMove doesn\'t remove pointer')
+  t.deepEqual(info.updated, commonPointerInfo, 'interaction.pointerMove updates pointer')
+  t.equal(info.removed, undefined, "interaction.pointerMove doesn't remove pointer")
   info = {}
 
   interaction.pointerUp(pointer, pointer, eventTarget, null)
-  t.equal(info.updated, undefined, 'interaction.pointerUp doesn\'t update existing pointer')
+  t.equal(info.updated, undefined, "interaction.pointerUp doesn't update existing pointer")
   info = {}
 
   interaction.pointerUp(pointer, pointer, eventTarget, null)
-  t.deepEqual(
-    info.updated,
-    commonPointerInfo,
-    'interaction.pointerUp updates non existing pointer',
-  )
+  t.deepEqual(info.updated, commonPointerInfo, 'interaction.pointerUp updates non existing pointer')
   t.deepEqual(info.removed, commonPointerInfo, 'interaction.pointerUp also removes pointer')
   info = {}
 
@@ -281,7 +281,10 @@ test('Interaction.pointerDown', t => {
   pointerUtils.setCoords(pointerCoords, [event], event.timeStamp)
 
   for (const prop in coordsSet) {
-    pointerUtils.copyCoords(interaction.coords[prop as keyof typeof coordsSet], coordsSet[prop as keyof typeof coordsSet])
+    pointerUtils.copyCoords(
+      interaction.coords[prop as keyof typeof coordsSet],
+      coordsSet[prop as keyof typeof coordsSet],
+    )
   }
 
   t.deepEqual(interaction.downPointer, {} as any, 'downPointer is initially empty')
@@ -293,33 +296,36 @@ test('Interaction.pointerDown', t => {
   t.equal(interaction.downEvent, null, 'downEvent is not updated')
   t.deepEqual(
     interaction.pointers,
-    [{
-      id: event.pointerId,
-      event,
-      pointer: event,
-      downTime: 0,
-      downTarget: target,
-    }],
+    [
+      {
+        id: event.pointerId,
+        event,
+        pointer: event,
+        downTime: 0,
+        downTarget: target,
+      },
+    ],
     'pointer is added',
   )
 
   t.notDeepEqual(interaction.downPointer, {} as any, 'downPointer is updated')
 
   t.deepEqual(interaction.coords.start, coordsSet.start, 'coords.start are not modified')
-  t.deepEqual(interaction.coords.prev,  coordsSet.prev,  'coords.prev  are not modified')
+  t.deepEqual(interaction.coords.prev, coordsSet.prev, 'coords.prev  are not modified')
 
   t.deepEqual(
     interaction.coords.cur,
     helpers.getProps(event, ['page', 'client', 'timeStamp']),
-    'coords.cur   *are* modified')
+    'coords.cur   *are* modified',
+  )
 
   t.ok(interaction.pointerIsDown, 'pointerIsDown')
   t.notOk(interaction.pointerWasMoved, '!pointerWasMoved')
 
-  t.equal(signalArg.pointer,      event,       'pointer      in down signal arg')
-  t.equal(signalArg.event,        event,       'event        in down signal arg')
-  t.equal(signalArg.eventTarget,  target,      'eventTarget  in down signal arg')
-  t.equal(signalArg.pointerIndex, 0,           'pointerIndex in down signal arg')
+  t.equal(signalArg.pointer, event, 'pointer      in down signal arg')
+  t.equal(signalArg.event, event, 'event        in down signal arg')
+  t.equal(signalArg.eventTarget, target, 'eventTarget  in down signal arg')
+  t.equal(signalArg.pointerIndex, 0, 'pointerIndex in down signal arg')
 
   // test while not interacting
   interaction._interacting = false
@@ -341,18 +347,21 @@ test('Interaction.pointerDown', t => {
 
   t.deepEqual(
     interaction.pointers,
-    [{
-      id: event.pointerId,
-      event,
-      pointer: event,
-      downTime: pointerCoords.timeStamp,
-      downTarget: target,
-    }],
-    'interaction.pointers is updated')
+    [
+      {
+        id: event.pointerId,
+        event,
+        pointer: event,
+        downTime: pointerCoords.timeStamp,
+        downTarget: target,
+      },
+    ],
+    'interaction.pointers is updated',
+  )
 
   t.deepEqual(interaction.coords.start, pointerCoords, 'coords.start are set to pointer')
-  t.deepEqual(interaction.coords.cur,   pointerCoords, 'coords.cur   are set to pointer')
-  t.deepEqual(interaction.coords.prev,  pointerCoords, 'coords.prev  are set to pointer')
+  t.deepEqual(interaction.coords.cur, pointerCoords, 'coords.cur   are set to pointer')
+  t.deepEqual(interaction.coords.prev, pointerCoords, 'coords.prev  are set to pointer')
 
   t.equal(typeof signalArg, 'object', 'down signal was fired again')
   t.ok(interaction.pointerIsDown, 'pointerIsDown')
@@ -362,15 +371,9 @@ test('Interaction.pointerDown', t => {
 })
 
 test('Interaction.start', t => {
-  const {
-    interaction,
-    interactable,
-    scope,
-    event,
-    target: element,
-    down,
-    stop,
-  } = helpers.testEnv({ plugins: [drag] })
+  const { interaction, interactable, scope, event, target: element, down, stop } = helpers.testEnv({
+    plugins: [drag],
+  })
   const action = { name: 'drag' } as const
 
   interaction.start(action, interactable, element)
@@ -422,12 +425,7 @@ test('Interaction.start', t => {
 })
 
 test('interaction move() and stop() from start event', t => {
-  const {
-    interaction,
-    interactable,
-    target,
-    down,
-  } = helpers.testEnv({ plugins: [drag, drop, autoStart] })
+  const { interaction, interactable, target, down } = helpers.testEnv({ plugins: [drag, drop, autoStart] })
 
   let stoppedBeforeStartFired: boolean
 
@@ -436,15 +434,9 @@ test('interaction move() and stop() from start event', t => {
       start (event) {
         stoppedBeforeStartFired = interaction._stopped
 
-        t.doesNotThrow(
-          () => event.interaction.move(),
-          "interaction.move() doesn't throw from start event",
-        )
+        t.doesNotThrow(() => event.interaction.move(), "interaction.move() doesn't throw from start event")
 
-        t.doesNotThrow(
-          () => event.interaction.stop(),
-          "interaction.stop() doesn't throw from start event",
-        )
+        t.doesNotThrow(() => event.interaction.stop(), "interaction.stop() doesn't throw from start event")
       },
     },
   })
@@ -472,17 +464,13 @@ test('Interaction createPreparedEvent', t => {
 
   const iEvent = interaction._createPreparedEvent({} as any, phase)
 
-  t.ok(iEvent instanceof InteractEvent,
-    'InteractEvent is fired')
+  t.ok(iEvent instanceof InteractEvent, 'InteractEvent is fired')
 
-  t.equal(iEvent.type, action.name + phase,
-    'event type')
+  t.equal(iEvent.type, action.name + phase, 'event type')
 
-  t.equal(iEvent.interactable, interactable,
-    'event.interactable')
+  t.equal(iEvent.interactable, interactable, 'event.interactable')
 
-  t.equal(iEvent.target, interactable.target,
-    'event.target')
+  t.equal(iEvent.target, interactable.target, 'event.target')
 
   t.end()
 })
@@ -501,11 +489,9 @@ test('Interaction fireEvent', t => {
   interaction.interactable = interactable
   interaction._fireEvent(iEvent)
 
-  t.equal(firedEvent, iEvent,
-    'target interactable\'s fire method is called')
+  t.equal(firedEvent, iEvent, "target interactable's fire method is called")
 
-  t.equal(interaction.prevEvent, iEvent,
-    'interaction.prevEvent is updated')
+  t.equal(interaction.prevEvent, iEvent, 'interaction.prevEvent is updated')
 
   t.end()
 })

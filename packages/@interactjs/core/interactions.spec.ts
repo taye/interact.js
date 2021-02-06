@@ -9,15 +9,19 @@ test('interactions', t => {
 
   const interaction = scope.interactions.new({ pointerType: 'TEST' })
 
-  t.equal(scope.interactions.list[0], interaction,
-    'new Interaction is pushed to scope.interactions')
+  t.equal(scope.interactions.list[0], interaction, 'new Interaction is pushed to scope.interactions')
 
   t.ok(scope.interactions instanceof Object, 'interactions object added to scope')
 
   const listeners = scope.interactions.listeners
 
-  t.ok(interactions.methodNames.reduce((acc: boolean, m: string) => acc && typeof listeners[m] === 'function', true),
-    'interactions object added to scope')
+  t.ok(
+    interactions.methodNames.reduce(
+      (acc: boolean, m: string) => acc && typeof listeners[m] === 'function',
+      true,
+    ),
+    'interactions object added to scope',
+  )
 
   scope = helpers.mockScope()
 
@@ -43,31 +47,27 @@ test('interactions document event options', t => {
   scope.browser = { isIOS: false } as any
   scope.fire('scope:add-document', { doc, scope, options } as any)
 
-  t.deepEqual(
-    options,
-    {},
-    'no doc options.event.passive is added when not iOS')
+  t.deepEqual(options, {}, 'no doc options.event.passive is added when not iOS')
 
   options = {}
 
   scope.browser.isIOS = true
   scope.fire('scope:add-document', { doc, scope, options } as any)
 
-  t.deepEqual(
-    options,
-    { events: { passive: false } },
-    'doc options.event.passive is set to false for iOS')
+  t.deepEqual(options, { events: { passive: false } }, 'doc options.event.passive is set to false for iOS')
 
   t.end()
 })
 
 test('interactions removes pointers on targeting removed elements', t => {
-  const {
-    interaction,
-    scope,
-  } = helpers.testEnv()
+  const { interaction, scope } = helpers.testEnv()
 
-  const { TouchEvent, Touch = function (_t: any) { return _t } } = scope.window as any
+  const {
+    TouchEvent,
+    Touch = function (_t: any) {
+      return _t
+    },
+  } = scope.window as any
   const div1 = scope.document.body.appendChild(scope.document.createElement('div'))
   const div2 = scope.document.body.appendChild(scope.document.createElement('div'))
 
@@ -78,9 +78,7 @@ test('interactions removes pointers on targeting removed elements', t => {
   div1.dispatchEvent(new TouchEvent('touchstart', touch1Init))
   div1.dispatchEvent(new TouchEvent('touchmove', touch1Init))
 
-  t.equal(
-    scope.interactions.list.length,
-    1)
+  t.equal(scope.interactions.list.length, 1)
 
   t.equal(interaction.pointers.length, 1, 'down pointer added to interaction')
   t.equal(interaction._latestPointer.eventTarget, div1, '_latestPointer target is down target')
@@ -92,12 +90,14 @@ test('interactions removes pointers on targeting removed elements', t => {
   t.deepEqual(
     scope.interactions.list,
     [interaction],
-    'interaction with removed element is reused for new pointer')
+    'interaction with removed element is reused for new pointer',
+  )
 
   t.equal(
     interaction.pointers.length,
     1,
-    'pointer on removed element is removed from existing interaction and new pointerdown is added')
+    'pointer on removed element is removed from existing interaction and new pointerdown is added',
+  )
 
   t.end()
 })

@@ -42,6 +42,8 @@ export interface BaseEvent<T extends ActionName> {
 // getters and setters defined here to support typescript 3.6 and below which
 // don't support getter and setters in .d.ts files
 Object.defineProperty(BaseEvent.prototype, 'interaction', {
-  get (this: BaseEvent) { return this._interaction._proxy },
+  get (this: BaseEvent) {
+    return this._interaction._proxy
+  },
   set (this: BaseEvent) {},
 })

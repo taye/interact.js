@@ -24,43 +24,47 @@ test('holdRepeat count', t => {
 })
 
 test('holdRepeat onFired', t => {
-  const {
-    scope,
-    interaction,
-  } = helpers.testEnv({ plugins: [holdRepeat] })
+  const { scope, interaction } = helpers.testEnv({ plugins: [holdRepeat] })
 
   const pointerEvent = {
     type: 'hold',
   }
   const eventTarget = {}
-  const eventable = new Eventable(Object.assign({}, scope.pointerEvents.defaults, {
-    holdRepeatInterval: 0,
-  }))
+  const eventable = new Eventable(
+    Object.assign({}, scope.pointerEvents.defaults, {
+      holdRepeatInterval: 0,
+    }),
+  )
   const signalArg = {
     interaction,
     pointerEvent,
     eventTarget,
-    targets: [{
-      eventable,
-    }],
+    targets: [
+      {
+        eventable,
+      },
+    ],
   }
 
   scope.fire('pointerEvents:fired', signalArg as any)
-  t.notOk('holdIntervalHandle' in interaction,
-    'interaction interval handle was not saved with 0 holdRepeatInterval')
+  t.notOk(
+    'holdIntervalHandle' in interaction,
+    'interaction interval handle was not saved with 0 holdRepeatInterval',
+  )
 
   eventable.options.holdRepeatInterval = 10
   scope.fire('pointerEvents:fired', signalArg as any)
-  t.ok('holdIntervalHandle' in interaction,
-    'interaction interval handle was saved with interval > 0')
+  t.ok('holdIntervalHandle' in interaction, 'interaction interval handle was saved with interval > 0')
 
   clearInterval(interaction.holdIntervalHandle)
 
   pointerEvent.type = 'NOT_HOLD'
   delete interaction.holdIntervalHandle
   scope.fire('pointerEvents:fired', signalArg as any)
-  t.notOk('holdIntervalHandle' in interaction,
-    'interaction interval handle is not saved if pointerEvent.type is not "hold"')
+  t.notOk(
+    'holdIntervalHandle' in interaction,
+    'interaction interval handle is not saved if pointerEvent.type is not "hold"',
+  )
 
   t.end()
 })

@@ -10,8 +10,7 @@ const domObjects: {
   Event: typeof Event
   Touch: typeof Touch
   PointerEvent: typeof PointerEvent
-} =
-{
+} = {
   init,
   document: null,
   DocumentFragment: null,
@@ -32,15 +31,15 @@ export default domObjects
 function init (window: Window) {
   const win = window as any
 
-  domObjects.document           = win.document
-  domObjects.DocumentFragment   = win.DocumentFragment   || blank
-  domObjects.SVGElement         = win.SVGElement         || blank
-  domObjects.SVGSVGElement      = win.SVGSVGElement      || blank
+  domObjects.document = win.document
+  domObjects.DocumentFragment = win.DocumentFragment || blank
+  domObjects.SVGElement = win.SVGElement || blank
+  domObjects.SVGSVGElement = win.SVGSVGElement || blank
   domObjects.SVGElementInstance = win.SVGElementInstance || blank
-  domObjects.Element            = win.Element            || blank
-  domObjects.HTMLElement        = win.HTMLElement        || domObjects.Element
+  domObjects.Element = win.Element || blank
+  domObjects.HTMLElement = win.HTMLElement || domObjects.Element
 
-  domObjects.Event        = win.Event
-  domObjects.Touch        = win.Touch || blank
-  domObjects.PointerEvent = (win.PointerEvent || win.MSPointerEvent)
+  domObjects.Event = win.Event
+  domObjects.Touch = win.Touch || blank
+  domObjects.PointerEvent = win.PointerEvent || win.MSPointerEvent
 }

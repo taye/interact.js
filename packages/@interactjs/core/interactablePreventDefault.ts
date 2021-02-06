@@ -14,8 +14,8 @@ declare module '@interactjs/core/Interactable' {
 }
 
 type PreventDefaultValue = 'always' | 'never' | 'auto'
-function preventDefault (this: Interactable): PreventDefaultValue
-function preventDefault (this: Interactable, newValue: PreventDefaultValue): typeof this
+function preventDefault(this: Interactable): PreventDefaultValue
+function preventDefault(this: Interactable, newValue: PreventDefaultValue): typeof this
 function preventDefault (this: Interactable, newValue?: PreventDefaultValue) {
   if (/^(always|never|auto)$/.test(newValue)) {
     this.options.preventDefault = newValue
@@ -33,7 +33,7 @@ function preventDefault (this: Interactable, newValue?: PreventDefaultValue) {
 function checkAndPreventDefault (interactable: Interactable, scope: Scope, event: Event) {
   const setting = interactable.options.preventDefault
 
-  if (setting === 'never') { return }
+  if (setting === 'never') return
 
   if (setting === 'always') {
     event.preventDefault()
@@ -60,8 +60,10 @@ function checkAndPreventDefault (interactable: Interactable, scope: Scope, event
   }
 
   // don't preventDefault on editable elements
-  if (is.element(event.target) &&
-      matchesSelector(event.target, 'input,select,textarea,[contenteditable=true],[contenteditable=true] *')) {
+  if (
+    is.element(event.target) &&
+    matchesSelector(event.target, 'input,select,textarea,[contenteditable=true],[contenteditable=true] *')
+  ) {
     return
   }
 
@@ -99,9 +101,10 @@ export function install (scope: Scope) {
     type: 'dragstart',
     listener (event) {
       for (const interaction of scope.interactions.list) {
-        if (interaction.element &&
-          (interaction.element === event.target ||
-           nodeContains(interaction.element, event.target))) {
+        if (
+          interaction.element &&
+          (interaction.element === event.target || nodeContains(interaction.element, event.target))
+        ) {
           interaction.interactable.checkAndPreventDefault(event)
           return
         }

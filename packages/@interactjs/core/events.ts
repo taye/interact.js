@@ -50,8 +50,12 @@ function install (scope: Scope) {
 
   // check if browser supports passive events and options arg
   scope.document.createElement('div').addEventListener('test', null, {
-    get capture () { return (eventsMethods.supportsOptions = true) },
-    get passive () { return (eventsMethods.supportsPassive = true) },
+    get capture () {
+      return (eventsMethods.supportsOptions = true)
+    },
+    get passive () {
+      return (eventsMethods.supportsPassive = true)
+    },
   })
 
   scope.events = eventsMethods
@@ -74,12 +78,21 @@ function install (scope: Scope) {
     }
 
     if (eventTarget.addEventListener && !arr.contains(target.events[type], listener)) {
-      eventTarget.addEventListener(type, listener as any, eventsMethods.supportsOptions ? options : options.capture)
+      eventTarget.addEventListener(
+        type,
+        listener as any,
+        eventsMethods.supportsOptions ? options : options.capture,
+      )
       target.events[type].push(listener)
     }
   }
 
-  function remove (eventTarget: EventTarget, type: string, listener?: 'all' | Listener, optionalArg?: boolean | any) {
+  function remove (
+    eventTarget: EventTarget,
+    type: string,
+    listener?: 'all' | Listener,
+    optionalArg?: boolean | any,
+  ) {
     const options = getOptions(optionalArg)
     const targetIndex = arr.findIndex(targets, t => t.eventTarget === eventTarget)
     const target = targets[targetIndex]
@@ -106,11 +119,14 @@ function install (scope: Scope) {
           remove(eventTarget, type, typeListeners[i], options)
         }
         return
-      }
-      else {
+      } else {
         for (let i = 0; i < typeListeners.length; i++) {
           if (typeListeners[i] === listener) {
-            eventTarget.removeEventListener(type, listener as any, eventsMethods.supportsOptions ? options : options.capture)
+            eventTarget.removeEventListener(
+              type,
+              listener as any,
+              eventsMethods.supportsOptions ? options : options.capture,
+            )
             typeListeners.splice(i, 1)
 
             if (typeListeners.length === 0) {
@@ -164,7 +180,7 @@ function install (scope: Scope) {
     let matchFound = false
     let index: number
 
-    if (!delegates) { return }
+    if (!delegates) return
 
     // count from last index of delegated to 0
     for (index = delegates.length - 1; index >= 0; index--) {
@@ -198,7 +214,9 @@ function install (scope: Scope) {
           }
         }
 
-        if (matchFound) { break }
+        if (matchFound) {
+          break
+        }
       }
     }
   }
@@ -209,7 +227,7 @@ function install (scope: Scope) {
     const options = getOptions(optionalArg)
     const fakeEvent = new FakeEvent(event as Event)
     const delegates = delegatedEvents[event.type]
-    const [eventTarget] = (pointerUtils.getEventTargets(event as Event))
+    const [eventTarget] = pointerUtils.getEventTargets(event as Event)
     let element: Node = eventTarget
 
     // climb up document tree looking for selector matches
@@ -218,9 +236,11 @@ function install (scope: Scope) {
         const cur = delegates[i]
         const { selector, context } = cur
 
-        if (domUtils.matchesSelector(element, selector) &&
-            domUtils.nodeContains(context, eventTarget) &&
-            domUtils.nodeContains(context, element)) {
+        if (
+          domUtils.matchesSelector(element, selector) &&
+          domUtils.nodeContains(context, eventTarget) &&
+          domUtils.nodeContains(context, element)
+        ) {
           const { listeners } = cur
 
           fakeEvent.currentTarget = element
@@ -270,7 +290,9 @@ class FakeEvent implements Partial<Event> {
 }
 
 function getOptions (param: { [index: string]: any } | boolean): { capture: boolean, passive: boolean } {
-  if (!is.object(param)) { return { capture: !!param, passive: false } }
+  if (!is.object(param)) {
+    return { capture: !!param, passive: false }
+  }
 
   const options = extend({}, param) as any
 

@@ -9,7 +9,8 @@ import pointerEvents from './base'
 import interactableTargets from './interactableTargets'
 
 test('pointerEvents.types', t => {
-  t.deepEqual(pointerEvents.types,
+  t.deepEqual(
+    pointerEvents.types,
     {
       down: true,
       move: true,
@@ -19,7 +20,8 @@ test('pointerEvents.types', t => {
       doubletap: true,
       hold: true,
     },
-    'pointerEvents.types is as expected')
+    'pointerEvents.types is as expected',
+  )
 
   t.end()
 })
@@ -33,35 +35,40 @@ test('pointerEvents.fire', t => {
   const eventTarget = {}
   const TEST_PROP = ['TEST_PROP']
   let firedEvent: any
-  const targets: EventTargetList = [{
-    eventable,
-    node: element as Node,
-    props: {
-      TEST_PROP,
+  const targets: EventTargetList = [
+    {
+      eventable,
+      node: element as Node,
+      props: {
+        TEST_PROP,
+      },
     },
-  }]
+  ]
 
-  eventable.on(type, e => { firedEvent = e })
+  eventable.on(type, e => {
+    firedEvent = e
+  })
 
-  pointerEvents.fire({
-    type,
-    eventTarget,
-    pointer: {},
-    event: {},
-    interaction: {},
-    targets,
-  } as any, scope)
+  pointerEvents.fire(
+    {
+      type,
+      eventTarget,
+      pointer: {},
+      event: {},
+      interaction: {},
+      targets,
+    } as any,
+    scope,
+  )
 
-  t.ok(firedEvent instanceof pointerEvents.PointerEvent,
-    'Fired event is an instance of pointerEvents.PointerEvent')
-  t.equal(firedEvent.type, type,
-    'Fired event type is correct')
-  t.equal(firedEvent.currentTarget, element,
-    'Fired event currentTarget is correct')
-  t.equal(firedEvent.target, eventTarget,
-    'Fired event target is correct')
-  t.equal(firedEvent.TEST_PROP, TEST_PROP,
-    'Fired event has props from target.props')
+  t.ok(
+    firedEvent instanceof pointerEvents.PointerEvent,
+    'Fired event is an instance of pointerEvents.PointerEvent',
+  )
+  t.equal(firedEvent.type, type, 'Fired event type is correct')
+  t.equal(firedEvent.currentTarget, element, 'Fired event currentTarget is correct')
+  t.equal(firedEvent.target, eventTarget, 'Fired event target is correct')
+  t.equal(firedEvent.TEST_PROP, TEST_PROP, 'Fired event has props from target.props')
 
   scope.now = () => coords.timeStamp
 
@@ -70,10 +77,8 @@ test('pointerEvents.fire', t => {
   coords.timeStamp = 500
   interaction.pointerUp(event, event, scope.document, scope.document)
 
-  t.equal(interaction.tapTime, 500,
-    'interaction.tapTime is updated')
-  t.equal(interaction.prevTap.type, 'tap',
-    'interaction.prevTap is updated')
+  t.equal(interaction.tapTime, 500, 'interaction.tapTime is updated')
+  t.equal(interaction.prevTap.type, 'tap', 'interaction.prevTap is updated')
 
   t.end()
 })
@@ -100,13 +105,16 @@ test('pointerEvents.collectEventTargets', t => {
     'pointerEvents:collect-targets': onCollect,
   })
 
-  pointerEvents.collectEventTargets({
-    interaction,
-    pointer: {},
-    event: {},
-    eventTarget: {},
-    type,
-  } as any, scope)
+  pointerEvents.collectEventTargets(
+    {
+      interaction,
+      pointer: {},
+      event: {},
+      eventTarget: {},
+      type,
+    } as any,
+    scope,
+  )
 
   t.deepEqual(collectedTargets, [target])
 
@@ -123,15 +131,25 @@ test('pointerEvents Interaction update-pointer signal', t => {
   const event = {} as PointerEventType
 
   interaction.updatePointer(helpers.newPointer(0), event, null, false)
-  t.deepEqual(interaction.pointers.map(p => p.hold), [initialHold], 'set hold info for move on new pointer')
+  t.deepEqual(
+    interaction.pointers.map(p => p.hold),
+    [initialHold],
+    'set hold info for move on new pointer',
+  )
 
   interaction.removePointer(helpers.newPointer(0), event)
 
   interaction.updatePointer(helpers.newPointer(0), event, null, true)
-  t.deepEqual(interaction.pointers.map(p => p.hold), [initialHold])
+  t.deepEqual(
+    interaction.pointers.map(p => p.hold),
+    [initialHold],
+  )
 
   interaction.updatePointer(helpers.newPointer(5), event, null, true)
-  t.deepEqual(interaction.pointers.map(p => p.hold), [initialHold, initialHold])
+  t.deepEqual(
+    interaction.pointers.map(p => p.hold),
+    [initialHold, initialHold],
+  )
 
   t.end()
 })
@@ -145,14 +163,19 @@ test('pointerEvents Interaction remove-pointer signal', t => {
 
   const ids = [0, 1, 2, 3]
   const removals = [
-    { id: 0, remain: [1, 2, 3], message: 'first of 4'  },
-    { id: 2, remain: [1,    3], message: 'middle of 3' },
-    { id: 3, remain: [1      ], message: 'last of 2'   },
-    { id: 1, remain: [       ], message: 'final'       },
+    { id: 0, remain: [1, 2, 3], message: 'first of 4' },
+    { id: 2, remain: [1, 3], message: 'middle of 3' },
+    { id: 3, remain: [1], message: 'last of 2' },
+    { id: 1, remain: [], message: 'final' },
   ]
 
   for (const id of ids) {
-    const index = interaction.updatePointer({ pointerId: id } as PointerType, {} as PointerEventType, null, true)
+    const index = interaction.updatePointer(
+      { pointerId: id } as PointerType,
+      {} as PointerEventType,
+      null,
+      true,
+    )
     // use the ids as the pointerInfo.hold value for this test
     interaction.pointers[index].hold = id as any
   }
@@ -160,19 +183,20 @@ test('pointerEvents Interaction remove-pointer signal', t => {
   for (const removal of removals) {
     interaction.removePointer({ pointerId: removal.id } as any, null)
 
-    t.deepEqual(interaction.pointers.map(p => p.hold as unknown as number), removal.remain,
-      `${removal.message} - remaining interaction.pointers[i].hold are correct`)
+    t.deepEqual(
+      interaction.pointers.map(p => (p.hold as unknown) as number),
+      removal.remain,
+      `${removal.message} - remaining interaction.pointers[i].hold are correct`,
+    )
   }
 
   t.end()
 })
 
 test('pointerEvents down hold up tap', async t => {
-  const {
-    interaction,
-    event,
-    interactable,
-  } = helpers.testEnv({ plugins: [pointerEvents, interactableTargets ] })
+  const { interaction, event, interactable } = helpers.testEnv({
+    plugins: [pointerEvents, interactableTargets],
+  })
 
   const fired: PointerEvent[] = []
 
@@ -186,7 +210,8 @@ test('pointerEvents down hold up tap', async t => {
   t.deepEqual(
     fired.map(e => e.type),
     ['down'],
-    'duplicate move event is not fired')
+    'duplicate move event is not fired',
+  )
 
   const holdTimer = interaction.pointers[0].hold
 
@@ -199,7 +224,8 @@ test('pointerEvents down hold up tap', async t => {
   t.deepEqual(
     fired.map(e => e.type),
     ['down', 'hold', 'up', 'tap'],
-    'tap event is fired after down, hold and up events')
+    'tap event is fired after down, hold and up events',
+  )
 
   t.end()
 })

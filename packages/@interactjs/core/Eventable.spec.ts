@@ -11,18 +11,20 @@ test('Eventable', t => {
     immediatePropagationStopped: false,
   }
   let firedEvent: any
-  const listener = (event: any) => { firedEvent = event }
+  const listener = (event: any) => {
+    firedEvent = event
+  }
 
   eventable.on(type, listener)
   eventable.fire(testEvent)
 
-  t.equal(firedEvent, testEvent, 'on\'d listener is called')
+  t.equal(firedEvent, testEvent, "on'd listener is called")
 
   firedEvent = undefined
   eventable.off(type, listener)
   eventable.fire(testEvent)
 
-  t.equal(firedEvent, undefined, 'off\'d listener is not called')
+  t.equal(firedEvent, undefined, "off'd listener is not called")
 
   testEvent.immediatePropagationStopped = true
   eventable.on(type, listener)

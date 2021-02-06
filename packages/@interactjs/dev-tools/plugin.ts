@@ -57,7 +57,7 @@ enum CheckName {
   noListeners = 'noListeners',
 }
 
-const prefix  = '[interact.js] '
+const prefix = '[interact.js] '
 const links = {
   touchAction: 'https://developer.mozilla.org/en-US/docs/Web/CSS/touch-action',
   boxSizing: 'https://developer.mozilla.org/en-US/docs/Web/CSS/box-sizing',
@@ -68,10 +68,7 @@ const isProduction = process.env.NODE_ENV === 'production'
 
 // eslint-disable-next-line no-restricted-syntax
 function install (scope: Scope, { logger }: { logger?: Logger } = {}) {
-  const {
-    Interactable,
-    defaults,
-  } = scope
+  const { Interactable, defaults } = scope
 
   scope.logger = logger || console
 
@@ -96,10 +93,7 @@ const checks: Check[] = [
       return !parentHasStyle(element, 'touchAction', /pan-|pinch|none/)
     },
     getInfo ({ element }) {
-      return [
-        element,
-        links.touchAction,
-      ]
+      return [element, links.touchAction]
     },
     text: 'Consider adding CSS "touch-action: none" to this element\n',
   },
@@ -109,16 +103,15 @@ const checks: Check[] = [
     perform (interaction) {
       const { element } = interaction
 
-      return interaction.prepared.name === 'resize' &&
+      return (
+        interaction.prepared.name === 'resize' &&
         element instanceof domObjects.HTMLElement &&
         !hasStyle(element, 'boxSizing', /border-box/)
+      )
     },
     text: 'Consider adding CSS "box-sizing: border-box" to this resizable element',
     getInfo ({ element }) {
-      return [
-        element,
-        links.boxSizing,
-      ]
+      return [element, links.boxSizing]
     },
   },
 
@@ -131,10 +124,7 @@ const checks: Check[] = [
       return !moveListeners.length
     },
     getInfo (interaction) {
-      return [
-        interaction.prepared.name,
-        interaction.interactable,
-      ]
+      return [interaction.prepared.name, interaction.interactable]
     },
     text: 'There are no listeners set for this action',
   },
@@ -172,7 +162,7 @@ const defaultExport: Plugin = isProduction
 
           if (
             !(options && options.devTools && options.devTools.ignore[check.name]) &&
-            check.perform(interaction)
+              check.perform(interaction)
           ) {
             scope.logger.warn(prefix + check.text, ...check.getInfo(interaction))
           }

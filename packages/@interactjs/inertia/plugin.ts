@@ -27,10 +27,10 @@ declare module '@interactjs/core/defaultOptions' {
   interface PerActionDefaults {
     inertia?: {
       enabled?: boolean
-      resistance?: number        // the lambda in exponential decay
-      minSpeed?: number          // target speed must be above this for inertia to start
-      endSpeed?: number          // the speed at which inertia is slow enough to stop
-      allowResume?: true         // allow resuming an action in inertia phase
+      resistance?: number // the lambda in exponential decay
+      minSpeed?: number // target speed must be above this for inertia to start
+      endSpeed?: number // the speed at which inertia is slow enough to stop
+      allowResume?: true // allow resuming an action in inertia phase
       smoothEndDuration?: number // animate to snap/restrict endOnly if there's no inertia
     }
   }
@@ -48,9 +48,7 @@ declare module '@interactjs/core/scope' {
 }
 
 function install (scope: Scope) {
-  const {
-    defaults,
-  } = scope
+  const { defaults } = scope
 
   scope.usePlugin(offset)
   scope.usePlugin(modifiers.default)
@@ -58,12 +56,12 @@ function install (scope: Scope) {
   scope.actions.phases.resume = true
 
   defaults.perAction.inertia = {
-    enabled          : false,
-    resistance       : 10,    // the lambda in exponential decay
-    minSpeed         : 100,   // target speed must be above this for inertia to start
-    endSpeed         : 10,    // the speed at which inertia is slow enough to stop
-    allowResume      : true,  // allow resuming an action in inertia phase
-    smoothEndDuration: 300,   // animate to snap/restrict endOnly if there's no inertia
+    enabled: false,
+    resistance: 10, // the lambda in exponential decay
+    minSpeed: 100, // target speed must be above this for inertia to start
+    endSpeed: 10, // the speed at which inertia is slow enough to stop
+    allowResume: true, // allow resuming an action in inertia phase
+    smoothEndDuration: 300, // animate to snap/restrict endOnly if there's no inertia
   }
 }
 
@@ -126,11 +124,10 @@ export class InertiaState {
       phase: 'inertiastart',
     }
 
-    const thrown = (
-      (this.t0 - interaction.coords.cur.timeStamp) < 50 &&
+    const thrown =
+      this.t0 - interaction.coords.cur.timeStamp < 50 &&
       pointerSpeed > options.minSpeed &&
       pointerSpeed > options.endSpeed
-    )
 
     if (thrown) {
       this.startInertia()
@@ -212,7 +209,9 @@ export class InertiaState {
 
   onNextFrame (tickFn: () => void) {
     this.timeout = raf.request(() => {
-      if (this.active) { tickFn() }
+      if (this.active) {
+        tickFn()
+      }
     })
   }
 
@@ -223,18 +222,20 @@ export class InertiaState {
     const t = (interaction._now() - this.t0) / 1000
 
     if (t < this.te) {
-      const progress =  1 - (Math.exp(-lambda * t) - this.lambda_v0) / this.one_ve_v0
+      const progress = 1 - (Math.exp(-lambda * t) - this.lambda_v0) / this.one_ve_v0
       let newOffset: Point
 
       if (this.isModified) {
         newOffset = getQuadraticCurvePoint(
-          0, 0,
-          this.targetOffset.x, this.targetOffset.y,
-          this.modifiedOffset.x, this.modifiedOffset.y,
+          0,
+          0,
+          this.targetOffset.x,
+          this.targetOffset.y,
+          this.modifiedOffset.x,
+          this.modifiedOffset.y,
           progress,
         )
-      }
-      else {
+      } else {
         newOffset = {
           x: this.targetOffset.x * progress,
           y: this.targetOffset.y * progress,
@@ -250,8 +251,7 @@ export class InertiaState {
       interaction.move()
 
       this.onNextFrame(() => this.inertiaTick())
-    }
-    else {
+    } else {
       interaction.offsetBy({
         x: this.modifiedOffset.x - this.currentOffset.x,
         y: this.modifiedOffset.y - this.currentOffset.y,
@@ -283,8 +283,7 @@ export class InertiaState {
       interaction.move({ skipModifiers: this.modifierCount })
 
       this.onNextFrame(() => this.smoothEndTick())
-    }
-    else {
+    } else {
       interaction.offsetBy({
         x: this.targetOffset.x - this.currentOffset.x,
         y: this.targetOffset.y - this.currentOffset.y,
@@ -347,7 +346,7 @@ function resume (arg: SignalArgs['interactions:down']) {
   const { interaction, eventTarget } = arg
   const state = interaction.inertia
 
-  if (!state.active) { return }
+  if (!state.active) return
 
   let element = eventTarget as Node
 
@@ -372,10 +371,7 @@ function stop ({ interaction }: { interaction: Interaction }) {
 }
 
 function getOptions ({ interactable, prepared }: Interaction) {
-  return interactable &&
-    interactable.options &&
-    prepared.name &&
-    interactable.options[prepared.name].inertia
+  return interactable && interactable.options && prepared.name && interactable.options[prepared.name].inertia
 }
 
 const inertia: Plugin = {
@@ -402,7 +398,8 @@ const inertia: Plugin = {
     'interactions:before-action-inertiastart': arg => arg.interaction.modification.setAndApply(arg),
     'interactions:action-resume': modifiers.addEventModifiers,
     'interactions:action-inertiastart': modifiers.addEventModifiers,
-    'interactions:after-action-inertiastart': arg => arg.interaction.modification.restoreInteractionCoords(arg),
+    'interactions:after-action-inertiastart': arg =>
+      arg.interaction.modification.restoreInteractionCoords(arg),
     'interactions:after-action-resume': arg => arg.interaction.modification.restoreInteractionCoords(arg),
   },
 }
@@ -414,10 +411,17 @@ function _getQBezierValue (t: number, p1: number, p2: number, p3: number) {
 }
 
 function getQuadraticCurvePoint (
-  startX: number, startY: number, cpX: number, cpY: number, endX: number, endY: number, position: number) {
+  startX: number,
+  startY: number,
+  cpX: number,
+  cpY: number,
+  endX: number,
+  endY: number,
+  position: number,
+) {
   return {
-    x:  _getQBezierValue(position, startX, cpX, endX),
-    y:  _getQBezierValue(position, startY, cpY, endY),
+    x: _getQBezierValue(position, startX, cpX, endX),
+    y: _getQBezierValue(position, startY, cpY, endY),
   }
 }
 

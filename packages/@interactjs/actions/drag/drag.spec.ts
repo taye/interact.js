@@ -20,39 +20,43 @@ test('drag action init', t => {
 })
 
 test('Interactable.draggable method', t => {
-  const interactable = {
+  const interactable = ({
     options: {
       drag: {},
     },
     draggable: drag.draggable,
-    setPerAction: () => { calledSetPerAction = true },
-    setOnEvents: () => { calledSetOnEvents = true },
-  } as unknown as Interactable
+    setPerAction: () => {
+      calledSetPerAction = true
+    },
+    setOnEvents: () => {
+      calledSetOnEvents = true
+    },
+  } as unknown) as Interactable
   let calledSetPerAction = false
   let calledSetOnEvents = false
 
-  t.equal(interactable.draggable(), interactable.options.drag,
-    'interactable.draggable() returns interactable.options.drag object')
+  t.equal(
+    interactable.draggable(),
+    interactable.options.drag,
+    'interactable.draggable() returns interactable.options.drag object',
+  )
 
   interactable.draggable(true)
-  t.ok(interactable.options.drag.enabled,
-    'calling `interactable.draggable(true)` enables dragging')
+  t.ok(interactable.options.drag.enabled, 'calling `interactable.draggable(true)` enables dragging')
 
   interactable.draggable(false)
-  t.notOk(interactable.options.drag.enabled,
-    'calling `interactable.draggable(false)` disables dragging')
+  t.notOk(interactable.options.drag.enabled, 'calling `interactable.draggable(false)` disables dragging')
 
   interactable.draggable({})
-  t.ok(interactable.options.drag.enabled,
-    'calling `interactable.draggable({})` enables dragging')
-  t.ok(calledSetOnEvents,
-    'calling `interactable.draggable({})` calls this.setOnEvents')
-  t.ok(calledSetPerAction,
-    'calling `interactable.draggable({})` calls this.setPerAction')
+  t.ok(interactable.options.drag.enabled, 'calling `interactable.draggable({})` enables dragging')
+  t.ok(calledSetOnEvents, 'calling `interactable.draggable({})` calls this.setOnEvents')
+  t.ok(calledSetPerAction, 'calling `interactable.draggable({})` calls this.setPerAction')
 
   interactable.draggable({ enabled: false })
-  t.notOk(interactable.options.drag.enabled,
-    'calling `interactable.draggable({ enabled: false })` disables dragging')
+  t.notOk(
+    interactable.options.drag.enabled,
+    'calling `interactable.draggable({ enabled: false })` disables dragging',
+  )
 
   const axisSettings = {
     lockAxis: ['x', 'y', 'xy', 'start'],
@@ -66,8 +70,7 @@ test('Interactable.draggable method', t => {
       options[axis] = value
 
       interactable.draggable(options)
-      t.equal(interactable.options.drag[axis], value,
-        '`' + axis + ': "' + value + '"` is set correctly')
+      t.equal(interactable.options.drag[axis], value, '`' + axis + ': "' + value + '"` is set correctly')
 
       delete interactable.options.drag[axis]
     }
@@ -107,10 +110,8 @@ test('drag axis', t => {
   t.test('xy (any direction)', tt => {
     scope.fire('interactions:before-action-move', { interaction } as any)
 
-    tt.deepEqual(interaction.coords.start, coords.start,
-      'coords.start is not modified')
-    tt.deepEqual(interaction.coords.delta, coords.delta,
-      'coords.delta is not modified')
+    tt.deepEqual(interaction.coords.start, coords.start, 'coords.start is not modified')
+    tt.deepEqual(interaction.coords.delta, coords.delta, 'coords.delta is not modified')
 
     scope.fire('interactions:action-move', { iEvent, interaction } as any)
 
@@ -135,7 +136,8 @@ test('drag axis', t => {
           [opposite]: 0,
           [axis]: eventCoords.delta[axis],
         },
-        `opposite axis (${opposite}) delta is 0; target axis (${axis}) delta is not modified`)
+        `opposite axis (${opposite}) delta is 0; target axis (${axis}) delta is not modified`,
+      )
 
       tt.deepEqual(
         iEvent.page,
@@ -146,22 +148,14 @@ test('drag axis', t => {
         `page.${opposite} is coords.start value`,
       )
 
-      tt.equal(
-        iEvent.page[axis],
-        eventCoords.page[axis],
-        `page.${axis} is not modified`,
-      )
+      tt.equal(iEvent.page[axis], eventCoords.page[axis], `page.${axis} is not modified`)
 
       tt.equal(
         iEvent.client[opposite],
         coords.start.client[opposite],
         `client.${opposite} is coords.start value`,
       )
-      tt.equal(
-        iEvent.client[axis],
-        eventCoords.client[axis],
-        `client.${axis} is not modified`,
-      )
+      tt.equal(iEvent.client[axis], eventCoords.client[axis], `client.${axis} is not modified`)
 
       tt.end()
     })

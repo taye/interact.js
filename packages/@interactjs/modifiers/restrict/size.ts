@@ -24,11 +24,14 @@ function start (arg: ModifierArg<RestrictEdgesState>) {
   return restrictEdges.start(arg)
 }
 
-export type RestrictSizeState =
-  RestrictEdgesState & ModifierState<RestrictSizeOptions & { inner: Rect, outer: Rect }, {
-    min: Rect
-    max: Rect
-  }>
+export type RestrictSizeState = RestrictEdgesState &
+ModifierState<
+RestrictSizeOptions & { inner: Rect, outer: Rect },
+{
+  min: Rect
+  max: Rect
+}
+>
 
 function set (arg: ModifierArg<RestrictSizeState>) {
   const { interaction, state, rect, edges } = arg
@@ -38,8 +41,10 @@ function set (arg: ModifierArg<RestrictSizeState>) {
     return
   }
 
-  const minSize = rectUtils.tlbrToXywh(getRestrictionRect(options.min as any, interaction, arg.coords)) || noMin
-  const maxSize = rectUtils.tlbrToXywh(getRestrictionRect(options.max as any, interaction, arg.coords)) || noMax
+  const minSize =
+    rectUtils.tlbrToXywh(getRestrictionRect(options.min as any, interaction, arg.coords)) || noMin
+  const maxSize =
+    rectUtils.tlbrToXywh(getRestrictionRect(options.max as any, interaction, arg.coords)) || noMax
 
   state.options = {
     endOnly: options.endOnly,
@@ -50,16 +55,14 @@ function set (arg: ModifierArg<RestrictSizeState>) {
   if (edges.top) {
     state.options.inner.top = rect.bottom - minSize.height
     state.options.outer.top = rect.bottom - maxSize.height
-  }
-  else if (edges.bottom) {
+  } else if (edges.bottom) {
     state.options.inner.bottom = rect.top + minSize.height
     state.options.outer.bottom = rect.top + maxSize.height
   }
   if (edges.left) {
     state.options.inner.left = rect.right - minSize.width
     state.options.outer.left = rect.right - maxSize.width
-  }
-  else if (edges.right) {
+  } else if (edges.right) {
     state.options.inner.right = rect.left + minSize.width
     state.options.outer.right = rect.left + maxSize.width
   }

@@ -31,7 +31,9 @@ export interface AspectRatioOptions {
   enabled?: boolean
 }
 
-export type AspectRatioState = ModifierState<AspectRatioOptions, {
+export type AspectRatioState = ModifierState<
+AspectRatioOptions,
+{
   startCoords: Point
   startRect: Rect
   linkedEdges: EdgeOptions
@@ -40,7 +42,8 @@ export type AspectRatioState = ModifierState<AspectRatioOptions, {
   xIsPrimaryAxis: boolean
   edgeSign: 1 | -1
   subModification: Modification
-}>
+}
+>
 
 const aspectRatio: ModifierModule<AspectRatioOptions, AspectRatioState> = {
   start (arg) {
@@ -57,26 +60,25 @@ const aspectRatio: ModifierModule<AspectRatioOptions, AspectRatioState> = {
     state.ratio = ratio
     state.equalDelta = equalDelta
 
-    const linkedEdges = state.linkedEdges = {
-      top   : originalEdges.top    || (originalEdges.left   && !originalEdges.bottom),
-      left  : originalEdges.left   || (originalEdges.top    && !originalEdges.right),
-      bottom: originalEdges.bottom || (originalEdges.right  && !originalEdges.top),
-      right : originalEdges.right  || (originalEdges.bottom && !originalEdges.left),
-    }
+    const linkedEdges = (state.linkedEdges = {
+      top: originalEdges.top || (originalEdges.left && !originalEdges.bottom),
+      left: originalEdges.left || (originalEdges.top && !originalEdges.right),
+      bottom: originalEdges.bottom || (originalEdges.right && !originalEdges.top),
+      right: originalEdges.right || (originalEdges.bottom && !originalEdges.left),
+    })
 
     state.xIsPrimaryAxis = !!(originalEdges.left || originalEdges.right)
 
     if (state.equalDelta) {
-      state.edgeSign = (linkedEdges.left ? 1 : -1) * (linkedEdges.top ? 1 : -1) as 1 | -1
-    }
-    else {
+      state.edgeSign = ((linkedEdges.left ? 1 : -1) * (linkedEdges.top ? 1 : -1)) as 1 | -1
+    } else {
       const negativeSecondaryEdge = state.xIsPrimaryAxis ? linkedEdges.top : linkedEdges.left
       state.edgeSign = negativeSecondaryEdge ? -1 : 1
     }
 
     extend(arg.edges, linkedEdges)
 
-    if (!modifiers || !modifiers.length) { return }
+    if (!modifiers || !modifiers.length) return
 
     const subModification = new Modification(arg.interaction)
 
@@ -94,11 +96,16 @@ const aspectRatio: ModifierModule<AspectRatioOptions, AspectRatioState> = {
 
     aspectMethod(state, state.xIsPrimaryAxis, coords, rect)
 
-    if (!state.subModification) { return null }
+    if (!state.subModification) {
+      return null
+    }
 
     const correctedRect = extend({}, rect)
 
-    addEdges(state.linkedEdges, correctedRect, { x: coords.x - initialCoords.x, y: coords.y - initialCoords.y })
+    addEdges(state.linkedEdges, correctedRect, {
+      x: coords.x - initialCoords.x,
+      y: coords.y - initialCoords.y,
+    })
 
     const result = state.subModification.setAll({
       ...arg,
@@ -133,19 +140,22 @@ const aspectRatio: ModifierModule<AspectRatioOptions, AspectRatioState> = {
 function setEqualDelta ({ startCoords, edgeSign }: AspectRatioState, xIsPrimaryAxis: boolean, coords: Point) {
   if (xIsPrimaryAxis) {
     coords.y = startCoords.y + (coords.x - startCoords.x) * edgeSign
-  }
-  else {
+  } else {
     coords.x = startCoords.x + (coords.y - startCoords.y) * edgeSign
   }
 }
 
-function setRatio ({ startRect, startCoords, ratio, edgeSign }: AspectRatioState, xIsPrimaryAxis: boolean, coords: Point, rect: Rect) {
+function setRatio (
+  { startRect, startCoords, ratio, edgeSign }: AspectRatioState,
+  xIsPrimaryAxis: boolean,
+  coords: Point,
+  rect: Rect,
+) {
   if (xIsPrimaryAxis) {
     const newHeight = rect.width / ratio
 
     coords.y = startCoords.y + (newHeight - startRect.height) * edgeSign
-  }
-  else {
+  } else {
     const newWidth = rect.height * ratio
 
     coords.x = startCoords.x + (newWidth - startRect.width) * edgeSign

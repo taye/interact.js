@@ -9,11 +9,9 @@ test('modifiers/snapSize', t => {
   interactable.getRect = () => ({ top: 0, left: 0, bottom: 100, right: 100 } as any)
   interaction._interacting = true
 
-  const target0 = Object.freeze({ x:  50, y:  100 })
+  const target0 = Object.freeze({ x: 50, y: 100 })
   const options = {
-    targets: [
-      { ...target0 },
-    ],
+    targets: [{ ...target0 }],
     range: Infinity,
   }
   const state = {
@@ -34,11 +32,7 @@ test('modifiers/snapSize', t => {
   snapSize.start(arg as any)
   snapSize.set(arg)
 
-  t.deepEqual(
-    arg.coords,
-    target0,
-    'snapSize.set single target, zereo offset',
-  )
+  t.deepEqual(arg.coords, target0, 'snapSize.set single target, zereo offset')
 
   t.end()
 })

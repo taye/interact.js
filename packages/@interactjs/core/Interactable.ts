@@ -1,6 +1,15 @@
 /* eslint-disable no-dupe-class-members */
 import type { ActionMap, ActionName, Actions, Scope } from '@interactjs/core/scope'
-import type { Context, Element, Target, Listeners, OrBoolean, EventTypes, ListenersArg, ActionMethod } from '@interactjs/types/index'
+import type {
+  Context,
+  Element,
+  Target,
+  Listeners,
+  OrBoolean,
+  EventTypes,
+  ListenersArg,
+  ActionMethod,
+} from '@interactjs/types/index'
 import * as arr from '@interactjs/utils/arr'
 import browser from '@interactjs/utils/browser'
 import clone from '@interactjs/utils/clone'
@@ -40,22 +49,35 @@ export class Interactable implements Partial<Eventable> {
   /** @internal */ _rectChecker?: typeof Interactable.prototype.getRect
 
   /** */
-  constructor (target: Target, options: any, defaultContext: Document | Element, scopeEvents: Scope['events']) {
+  constructor (
+    target: Target,
+    options: any,
+    defaultContext: Document | Element,
+    scopeEvents: Scope['events'],
+  ) {
     this._actions = options.actions
-    this.target   = target
+    this.target = target
     this._context = options.context || defaultContext
-    this._win     = getWindow(trySelector(target) ? this._context : target)
-    this._doc     = this._win.document
+    this._win = getWindow(trySelector(target) ? this._context : target)
+    this._doc = this._win.document
     this._scopeEvents = scopeEvents
 
     this.set(options)
   }
 
   setOnEvents (actionName: ActionName, phases: NonNullable<any>) {
-    if (is.func(phases.onstart)) { this.on(`${actionName}start`, phases.onstart) }
-    if (is.func(phases.onmove)) { this.on(`${actionName}move`, phases.onmove) }
-    if (is.func(phases.onend)) { this.on(`${actionName}end`, phases.onend) }
-    if (is.func(phases.oninertiastart)) { this.on(`${actionName}inertiastart`, phases.oninertiastart) }
+    if (is.func(phases.onstart)) {
+      this.on(`${actionName}start`, phases.onstart)
+    }
+    if (is.func(phases.onmove)) {
+      this.on(`${actionName}move`, phases.onmove)
+    }
+    if (is.func(phases.onend)) {
+      this.on(`${actionName}end`, phases.onend)
+    }
+    if (is.func(phases.oninertiastart)) {
+      this.on(`${actionName}inertiastart`, phases.oninertiastart)
+    }
 
     return this
   }
@@ -86,27 +108,31 @@ export class Interactable implements Partial<Eventable> {
 
       // if the option value is an array
       if (is.array<any>(optionValue)) {
-        (actionOptions[optionName] as any) = arr.from(optionValue)
+        ;(actionOptions[optionName] as any) = arr.from(optionValue)
       }
       // if the option value is an object
       else if (is.plainObject(optionValue)) {
         // copy the object
-        (actionOptions[optionName] as any) = extend(
-          actionOptions[optionName] || {} as any,
-          clone(optionValue))
+        ;(actionOptions[optionName] as any) = extend(
+          actionOptions[optionName] || ({} as any),
+          clone(optionValue),
+        )
 
         // set anabled field to true if it exists in the defaults
-        if (is.object(defaults.perAction[optionName]) && 'enabled' in (defaults.perAction[optionName] as any)) {
-          (actionOptions[optionName] as any).enabled = optionValue.enabled !== false
+        if (
+          is.object(defaults.perAction[optionName]) &&
+          'enabled' in (defaults.perAction[optionName] as any)
+        ) {
+          ;(actionOptions[optionName] as any).enabled = optionValue.enabled !== false
         }
       }
       // if the option value is a boolean and the default is an object
       else if (is.bool(optionValue) && is.object(defaults.perAction[optionName])) {
-        (actionOptions[optionName] as any).enabled = optionValue
+        ;(actionOptions[optionName] as any).enabled = optionValue
       }
       // if it's anything else, do a plain assignment
       else {
-        (actionOptions[optionName] as any) = optionValue
+        ;(actionOptions[optionName] as any) = optionValue
       }
     }
   }
@@ -119,9 +145,7 @@ export class Interactable implements Partial<Eventable> {
    * @return {Rect} The object's bounding rectangle.
    */
   getRect (element: Element) {
-    element = element || (is.element(this.target)
-      ? this.target
-      : null)
+    element = element || (is.element(this.target) ? this.target : null)
 
     if (is.string(this.target)) {
       element = element || this._context.querySelector(this.target)
@@ -138,8 +162,8 @@ export class Interactable implements Partial<Eventable> {
    * bounding rectangle. See {@link Interactable.getRect}
    * @return {function | object} The checker function or this Interactable
    */
-  rectChecker (): (element: Element) => any | null
-  rectChecker (checker: (element: Element) => any): this
+  rectChecker(): (element: Element) => any | null
+  rectChecker(checker: (element: Element) => any): this
   rectChecker (checker?: (element: Element) => any) {
     if (is.func(checker)) {
       this._rectChecker = checker
@@ -147,7 +171,7 @@ export class Interactable implements Partial<Eventable> {
       this.getRect = element => {
         const rect = extend({}, this._rectChecker(element))
 
-        if (!('width' in rect as unknown)) {
+        if (!(('width' in rect) as unknown)) {
           rect.width = rect.right - rect.left
           rect.height = rect.bottom - rect.top
         }
@@ -170,10 +194,10 @@ export class Interactable implements Partial<Eventable> {
 
   _backCompatOption (optionName: keyof Options, newValue: any) {
     if (trySelector(newValue) || is.object(newValue)) {
-      (this.options[optionName] as any) = newValue
+      ;(this.options[optionName] as any) = newValue
 
       for (const action in this._actions.map) {
-        (this.options[action as keyof ActionMap] as any)[optionName] = newValue
+        ;(this.options[action as keyof ActionMap] as any)[optionName] = newValue
       }
 
       return this
@@ -204,8 +228,8 @@ export class Interactable implements Partial<Eventable> {
    * interacting; Use 'page' if you want autoScroll to work
    * @return {string | object} The current deltaSource or this Interactable
    */
-  deltaSource (): DeltaSource
-  deltaSource (newValue: DeltaSource): this
+  deltaSource(): DeltaSource
+  deltaSource(newValue: DeltaSource): this
   deltaSource (newValue?: DeltaSource) {
     if (newValue === 'page' || newValue === 'client') {
       this.options.deltaSource = newValue
@@ -227,8 +251,7 @@ export class Interactable implements Partial<Eventable> {
   }
 
   inContext (element: Document | Node) {
-    return (this._context === element.ownerDocument ||
-            nodeContains(this._context, element))
+    return this._context === element.ownerDocument || nodeContains(this._context, element)
   }
 
   testIgnoreAllow (
@@ -237,42 +260,38 @@ export class Interactable implements Partial<Eventable> {
     targetNode: Node,
     eventTarget: Node,
   ) {
-    return (!this.testIgnore(options.ignoreFrom, targetNode, eventTarget) &&
-            this.testAllow(options.allowFrom, targetNode, eventTarget))
+    return (
+      !this.testIgnore(options.ignoreFrom, targetNode, eventTarget) &&
+      this.testAllow(options.allowFrom, targetNode, eventTarget)
+    )
   }
 
-  testAllow (
-    this: Interactable,
-    allowFrom: IgnoreValue,
-    targetNode: Node,
-    element: Node,
-  ) {
-    if (!allowFrom) { return true }
+  testAllow (this: Interactable, allowFrom: IgnoreValue, targetNode: Node, element: Node) {
+    if (!allowFrom) {
+      return true
+    }
 
-    if (!is.element(element)) { return false }
+    if (!is.element(element)) {
+      return false
+    }
 
     if (is.string(allowFrom)) {
       return matchesUpTo(element, allowFrom, targetNode)
-    }
-    else if (is.element(allowFrom)) {
+    } else if (is.element(allowFrom)) {
       return nodeContains(allowFrom, element)
     }
 
     return false
   }
 
-  testIgnore (
-    this: Interactable,
-    ignoreFrom: IgnoreValue,
-    targetNode: Node,
-    element: Node,
-  ) {
-    if (!ignoreFrom || !is.element(element)) { return false }
+  testIgnore (this: Interactable, ignoreFrom: IgnoreValue, targetNode: Node, element: Node) {
+    if (!ignoreFrom || !is.element(element)) {
+      return false
+    }
 
     if (is.string(ignoreFrom)) {
       return matchesUpTo(element, ignoreFrom, targetNode)
-    }
-    else if (is.element(ignoreFrom)) {
+    } else if (is.element(ignoreFrom)) {
       return nodeContains(ignoreFrom, element)
     }
 
@@ -303,7 +322,9 @@ export class Interactable implements Partial<Eventable> {
     const listeners = normalizeListeners(typeArg, listenerArg)
 
     for (let type in listeners) {
-      if (type === 'wheel') { type = browser.wheelEvent }
+      if (type === 'wheel') {
+        type = browser.wheelEvent
+      }
 
       for (const listener of listeners[type]) {
         // if it is an action event type
@@ -312,7 +333,13 @@ export class Interactable implements Partial<Eventable> {
         }
         // delegated event
         else if (is.string(this.target)) {
-          this._scopeEvents[`${addRemove}Delegate` as 'addDelegate' | 'removeDelegate'](this.target, this._context, type, listener, options)
+          this._scopeEvents[`${addRemove}Delegate` as 'addDelegate' | 'removeDelegate'](
+            this.target,
+            this._context,
+            type,
+            listener,
+            options,
+          )
         }
         // remove listener from this Interactable's element
         else {
@@ -365,7 +392,7 @@ export class Interactable implements Partial<Eventable> {
       options = {}
     }
 
-    (this.options as Required<Options>) = clone(defaults.base) as Required<Options>
+    ;(this.options as Required<Options>) = clone(defaults.base) as Required<Options>
 
     for (const actionName_ in this._actions.methodDict) {
       const actionName = actionName_ as ActionName
@@ -373,13 +400,12 @@ export class Interactable implements Partial<Eventable> {
 
       this.options[actionName] = {}
       this.setPerAction(actionName, extend(extend({}, defaults.perAction), defaults.actions[actionName]))
-
       ;(this[methodName] as ActionMethod<unknown>)(options[actionName])
     }
 
     for (const setting in options) {
       if (is.func((this as any)[setting])) {
-        (this as any)[setting](options[setting as keyof typeof options])
+        ;(this as any)[setting](options[setting as keyof typeof options])
       }
     }
 
@@ -404,12 +430,17 @@ export class Interactable implements Partial<Eventable> {
           }
 
           for (let l = listeners.length - 1; l >= 0; l--) {
-            this._scopeEvents.removeDelegate(this.target, this._context, type, listeners[l][0], listeners[l][1])
+            this._scopeEvents.removeDelegate(
+              this.target,
+              this._context,
+              type,
+              listeners[l][0],
+              listeners[l][1],
+            )
           }
         }
       }
-    }
-    else {
+    } else {
       this._scopeEvents.remove(this.target as Node, 'all')
     }
   }

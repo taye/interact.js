@@ -44,7 +44,7 @@ export class InteractableSet {
 
         const targetIndex = arr.findIndex(targetMappings, m => m.context === context)
         if (targetMappings[targetIndex]) {
-        // Destroying mappingInfo's context and interactable
+          // Destroying mappingInfo's context and interactable
           targetMappings[targetIndex].context = null
           targetMappings[targetIndex].interactable = null
         }
@@ -64,17 +64,19 @@ export class InteractableSet {
     this.list.push(interactable)
 
     if (is.string(target)) {
-      if (!this.selectorMap[target]) { this.selectorMap[target] = [] }
+      if (!this.selectorMap[target]) {
+        this.selectorMap[target] = []
+      }
       this.selectorMap[target].push(mappingInfo)
     } else {
-      if (!((interactable.target as any)[this.scope.id])) {
+      if (!(interactable.target as any)[this.scope.id]) {
         Object.defineProperty(target, this.scope.id, {
           value: [],
           configurable: true,
         })
       }
 
-      (target as any)[this.scope.id].push(mappingInfo)
+      ;(target as any)[this.scope.id].push(mappingInfo)
     }
 
     this.scope.fire('interactable:new', {
@@ -94,12 +96,14 @@ export class InteractableSet {
       ? this.selectorMap[target as string]
       : (target as any)[this.scope.id]
 
-    if (!targetMappings) { return null }
+    if (!targetMappings) {
+      return null
+    }
 
     const found = arr.find(
       targetMappings,
-      m => m.context === context &&
-        (isSelector || m.interactable.inContext(target as any)))
+      m => m.context === context && (isSelector || m.interactable.inContext(target as any)),
+    )
 
     return found && found.interactable
   }
@@ -108,13 +112,15 @@ export class InteractableSet {
     for (const interactable of this.list) {
       let ret: void | T
 
-      if ((is.string(interactable.target)
-      // target is a selector and the element matches
-        ? (is.element(node) && domUtils.matchesSelector(node, interactable.target))
-        // target is the element
-        : node === interactable.target) &&
+      if (
+        (is.string(interactable.target)
+          ? // target is a selector and the element matches
+          is.element(node) && domUtils.matchesSelector(node, interactable.target)
+          : // target is the element
+          node === interactable.target) &&
         // the element is in context
-        (interactable.inContext(node))) {
+        interactable.inContext(node)
+      ) {
         ret = callback(interactable)
       }
 

@@ -1,7 +1,6 @@
 import type { ModifierFunction } from './base'
 
-const noop = (() => {
-}) as unknown as ModifierFunction<any, any, 'noop'>
+const noop = ((() => {}) as unknown) as ModifierFunction<any, any, 'noop'>
 
 noop._defaults = {}
 

@@ -7,13 +7,7 @@ export class PointerInfo {
   downTime: number
   downTarget: Node
 
-  constructor (
-    id: number,
-    pointer: PointerType,
-    event: PointerEventType,
-    downTime: number,
-    downTarget: Node,
-  ) {
+  constructor (id: number, pointer: PointerType, event: PointerEventType, downTime: number, downTarget: Node) {
     this.id = id
     this.pointer = pointer
     this.event = event

@@ -8,15 +8,7 @@ import snap from '../snap/pointer'
 
 test('modifiers/snap', t => {
   const rect = helpers.ltrbwh(0, 0, 100, 100, 100, 100)
-  const {
-    interaction,
-    interactable,
-    coords,
-    down,
-    move,
-    start,
-    stop,
-  } = helpers.testEnv({
+  const { interaction, interactable, coords, down, move, start, stop } = helpers.testEnv({
     plugins: [modifiersBase, drag],
     rect,
   })
@@ -25,7 +17,7 @@ test('modifiers/snap', t => {
 
   const origin = { x: 120, y: 120 }
   let funcArgs = null
-  const target0 = Object.freeze({ x:  50, y:  100 })
+  const target0 = Object.freeze({ x: 50, y: 100 })
   const targetFunc = (x, y, _interaction, offset, index, ...unexpected) => {
     funcArgs = { x, y, offset, index, unexpected }
     return target0
@@ -35,19 +27,20 @@ test('modifiers/snap', t => {
   const options = {
     offset: null,
     offsetWithOrigin: true,
-    targets: [
-      target0,
-      targetFunc,
-    ],
+    targets: [target0, targetFunc],
     range: Infinity,
     relativePoints: [relativePoint],
   }
 
   let lastEventModifiers: any[] = null
-  interactable.draggable({
-    origin,
-    modifiers: [snap(options)],
-  }).on('dragmove dragstart dragend', e => { lastEventModifiers = e.modifiers })
+  interactable
+    .draggable({
+      origin,
+      modifiers: [snap(options)],
+    })
+    .on('dragmove dragstart dragend', e => {
+      lastEventModifiers = e.modifiers
+    })
 
   down()
   start({ name: 'drag' })

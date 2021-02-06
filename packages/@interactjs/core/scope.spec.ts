@@ -4,12 +4,7 @@ import type { ActionName } from '@interactjs/core/scope'
 import * as helpers from './tests/_helpers'
 
 test('scope', t => {
-  const {
-    scope,
-    interactable,
-    interaction,
-    event,
-  } = helpers.testEnv()
+  const { scope, interactable, interaction, event } = helpers.testEnv()
 
   ;(interactable.options as any).test = { enabled: true }
 
@@ -36,7 +31,10 @@ test('scope', t => {
   scope.usePlugin(plugin3)
   scope.usePlugin(plugin4)
 
-  t.deepEqual(scope.listenerMaps.map(l => l.id), [...initialListeners, '1', '4', '3', '2'])
+  t.deepEqual(
+    scope.listenerMaps.map(l => l.id),
+    [...initialListeners, '1', '4', '3', '2'],
+  )
 
   t.end()
 })

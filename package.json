@@ -68,6 +68,7 @@
     "nodemon": "latest",
     "nyc": "latest",
     "p-queue": "latest",
+    "prettier": "latest",
     "promise-polyfill": "latest",
     "resolve": "latest",
     "semver": "latest",
@@ -89,6 +90,9 @@
     }
   },
   "lint-staged": {
-    "**/*.(t|j)s?(x)": "eslint --fix"
+    "**/*.(t|j)s?(x)": [
+      "prettier --write",
+      "eslint --fix"
+    ]
   }
 }

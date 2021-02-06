@@ -23,7 +23,9 @@ export function nodeContains (parent: Node, child: Node) {
 
 export function closest (element: Node, selector: string) {
   while (is.element(element)) {
-    if (matchesSelector(element, selector)) { return element }
+    if (matchesSelector(element, selector)) {
+      return element
+    }
 
     element = parentNode(element)
   }
@@ -106,7 +108,8 @@ export function indexOfDeepestElement (elements: Element[] | NodeListOf<globalTh
     let ancestryStart: Node
 
     // if the deepest node is an HTMLElement and the current node is a non root svg element
-    if (deepestNode instanceof domObjects.HTMLElement &&
+    if (
+      deepestNode instanceof domObjects.HTMLElement &&
       currentNode instanceof domObjects.SVGElement &&
       !(currentNode instanceof domObjects.SVGSVGElement)
     ) {
@@ -116,8 +119,7 @@ export function indexOfDeepestElement (elements: Element[] | NodeListOf<globalTh
       }
 
       ancestryStart = currentNode.ownerSVGElement
-    }
-    else {
+    } else {
       ancestryStart = currentNode
     }
 
@@ -125,7 +127,10 @@ export function indexOfDeepestElement (elements: Element[] | NodeListOf<globalTh
     let commonIndex = 0
 
     // get (position of closest common ancestor) + 1
-    while (currentNodeParents[commonIndex] && currentNodeParents[commonIndex] === deepestNodeParents[commonIndex]) {
+    while (
+      currentNodeParents[commonIndex] &&
+      currentNodeParents[commonIndex] === deepestNodeParents[commonIndex]
+    ) {
       commonIndex++
     }
 
@@ -143,8 +148,7 @@ export function indexOfDeepestElement (elements: Element[] | NodeListOf<globalTh
         deepestNodeParents = currentNodeParents
 
         break
-      }
-      else if (child === parents[2]) {
+      } else if (child === parents[2]) {
         break
       }
 
@@ -204,18 +208,19 @@ export function getScrollXY (relevantWindow?: Window) {
 }
 
 export function getElementClientRect (element: Element): Required<Rect> {
-  const clientRect = (element instanceof domObjects.SVGElement
-    ? element.getBoundingClientRect()
-    : element.getClientRects()[0])
+  const clientRect =
+    element instanceof domObjects.SVGElement ? element.getBoundingClientRect() : element.getClientRects()[0]
 
-  return clientRect && {
-    left  : clientRect.left,
-    right : clientRect.right,
-    top   : clientRect.top,
-    bottom: clientRect.bottom,
-    width : clientRect.width  || clientRect.right  - clientRect.left,
-    height: clientRect.height || clientRect.bottom - clientRect.top,
-  }
+  return (
+    clientRect && {
+      left: clientRect.left,
+      right: clientRect.right,
+      top: clientRect.top,
+      bottom: clientRect.bottom,
+      width: clientRect.width || clientRect.right - clientRect.left,
+      height: clientRect.height || clientRect.bottom - clientRect.top,
+    }
+  )
 }
 
 export function getElementRect (element: Element) {
@@ -224,9 +229,9 @@ export function getElementRect (element: Element) {
   if (!browser.isIOS7 && clientRect) {
     const scroll = getScrollXY(win.getWindow(element))
 
-    clientRect.left   += scroll.x
-    clientRect.right  += scroll.x
-    clientRect.top    += scroll.y
+    clientRect.left += scroll.x
+    clientRect.right += scroll.x
+    clientRect.top += scroll.y
     clientRect.bottom += scroll.y
   }
 
@@ -245,7 +250,9 @@ export function getPath (node: Node | Document) {
 }
 
 export function trySelector (value: Target) {
-  if (!is.string(value)) { return false }
+  if (!is.string(value)) {
+    return false
+  }
 
   // an exception will be raised if it is invalid
   domObjects.document.querySelector(value)

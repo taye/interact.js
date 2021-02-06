@@ -10,29 +10,29 @@ const { checks, links, prefix } = devTools
 const checkMap = checks.reduce((acc, check) => {
   acc[check.name] = check
   return acc
-}, {} as { [name: string]: Check})
+}, {} as { [name: string]: Check })
 
 test('devTools', t => {
   const devToolsWithLogger = {
-    install: s => s.usePlugin(devTools, {
-      logger: {
-        warn (...args: any[]) { log(args, 'warn') },
-        log (...args: any[]) { log(args, 'log') },
-        error (...args: any[]) { log(args, 'error') },
-      },
-    }),
+    install: s =>
+      s.usePlugin(devTools, {
+        logger: {
+          warn (...args: any[]) {
+            log(args, 'warn')
+          },
+          log (...args: any[]) {
+            log(args, 'log')
+          },
+          error (...args: any[]) {
+            log(args, 'error')
+          },
+        },
+      }),
   }
 
-  const {
-    scope,
-    interaction,
-    interactable,
-    target: element,
-    down,
-    start,
-    move,
-    stop,
-  } = helpers.testEnv({ plugins: [devToolsWithLogger, drag, resize ] })
+  const { scope, interaction, interactable, target: element, down, start, move, stop } = helpers.testEnv({
+    plugins: [devToolsWithLogger, drag, resize],
+  })
 
   const logs: Array<{ args: any[], type: keyof Logger }> = []
 
@@ -43,21 +43,21 @@ test('devTools', t => {
   scope.usePlugin(drag)
   scope.usePlugin(resize)
 
-  interactable
-    .draggable(true)
-    .resizable({ onmove: () => {} })
+  interactable.draggable(true).resizable({ onmove: () => {} })
 
   down()
   start({ name: 'drag' })
   t.deepEqual(
     logs[0],
     { args: [prefix + checkMap.touchAction.text, element, links.touchAction], type: 'warn' },
-    'warning about missing touchAction')
+    'warning about missing touchAction',
+  )
 
   t.deepEqual(
     logs[1],
     { args: [prefix + checkMap.noListeners.text, 'drag', interactable], type: 'warn' },
-    'warning about missing move listeners')
+    'warning about missing move listeners',
+  )
 
   stop()
 
@@ -73,7 +73,8 @@ test('devTools', t => {
   t.deepEqual(
     logs[2],
     { args: [prefix + checkMap.boxSizing.text, element, links.boxSizing], type: 'warn' },
-    'warning about resizing without "box-sizing: none"')
+    'warning about resizing without "box-sizing: none"',
+  )
 
   logs.splice(0)
 
@@ -87,10 +88,7 @@ test('devTools', t => {
   move()
   stop()
 
-  t.equal(
-    logs.length,
-    1,
-    'warning removed with options.devTools.ignore')
+  t.equal(logs.length, 1, 'warning removed with options.devTools.ignore')
 
   logs.splice(0)
 
@@ -106,10 +104,7 @@ test('devTools', t => {
   move()
   stop()
 
-  t.equal(
-    logs.length,
-    0,
-    'no warnings when issues are resolved')
+  t.equal(logs.length, 0, 'no warnings when issues are resolved')
 
   t.end()
 })

@@ -25,16 +25,10 @@ test('gesture action init', t => {
 
 test('Interactable.gesturable method', t => {
   const rect = Object.freeze({ top: 100, left: 200, bottom: 300, right: 400 })
-  const {
-    scope,
-    interaction,
-    interactable,
-    target: element,
-    coords,
-    down,
-    start,
-    move,
-  } = helpers.testEnv({ plugins: [gesture], rect })
+  const { scope, interaction, interactable, target: element, coords, down, start, move } = helpers.testEnv({
+    plugins: [gesture],
+    rect,
+  })
   const events: GestureEvent[] = []
   const event2 = coordsToEvent(newCoords())
   event2.coords.pointerId = 2
@@ -81,7 +75,8 @@ test('Interactable.gesturable method', t => {
       startAngle: 0,
       startDistance: 100,
     },
-    'start interaction properties are correct')
+    'start interaction properties are correct',
+  )
 
   t.deepEqual(
     getGestureProps(events[0]),
@@ -93,7 +88,8 @@ test('Interactable.gesturable method', t => {
       ds: 0,
       da: 0,
     },
-    'start event properties are correct')
+    'start event properties are correct',
+  )
 
   // 0
   // |
@@ -111,7 +107,8 @@ test('Interactable.gesturable method', t => {
       startAngle: 0,
       startDistance: 100,
     },
-    'move interaction properties are correct')
+    'move interaction properties are correct',
+  )
 
   t.deepEqual(
     getGestureProps(events[1]),
@@ -123,7 +120,8 @@ test('Interactable.gesturable method', t => {
       ds: -0.5,
       da: 90,
     },
-    'move event properties are correct')
+    'move event properties are correct',
+  )
 
   // 1 <-- 0
   extend(coords.page, { x: 50, y: 50 })
@@ -138,7 +136,8 @@ test('Interactable.gesturable method', t => {
       startAngle: 0,
       startDistance: 100,
     },
-    'move interaction properties are correct')
+    'move interaction properties are correct',
+  )
 
   t.deepEqual(
     getGestureProps(events[2]),
@@ -150,7 +149,8 @@ test('Interactable.gesturable method', t => {
       ds: 0,
       da: 90,
     },
-    'move event properties are correct')
+    'move event properties are correct',
+  )
 
   interaction.pointerUp(event2, event2, element, element)
 
@@ -163,7 +163,8 @@ test('Interactable.gesturable method', t => {
       startAngle: 0,
       startDistance: 100,
     },
-    'move interaction properties are correct')
+    'move interaction properties are correct',
+  )
 
   t.deepEqual(
     getGestureProps(events[3]),
@@ -175,7 +176,8 @@ test('Interactable.gesturable method', t => {
       ds: 0,
       da: 0,
     },
-    'end event properties are correct')
+    'end event properties are correct',
+  )
 
   // 0
   // |
@@ -187,10 +189,7 @@ test('Interactable.gesturable method', t => {
   scope.fire('auto-start:check', checkArg)
   interaction.pointerMove(event2, event2, element)
 
-  t.ok(
-    checkArg.action,
-    'not allowed with re-added second pointers',
-  )
+  t.ok(checkArg.action, 'not allowed with re-added second pointers')
 
   interaction.start({ name: 'gesture' }, interactable, element)
 
@@ -203,7 +202,8 @@ test('Interactable.gesturable method', t => {
       startAngle: 90,
       startDistance: 200,
     },
-    'move interaction properties are correct')
+    'move interaction properties are correct',
+  )
 
   t.deepEqual(
     getGestureProps(events[4]),
@@ -215,7 +215,8 @@ test('Interactable.gesturable method', t => {
       ds: 0,
       da: 0,
     },
-    'second start event properties are correct')
+    'second start event properties are correct',
+  )
 
   t.equal(events.length, 5, 'correct number of events fired')
 

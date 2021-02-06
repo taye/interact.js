@@ -14,9 +14,7 @@ export function init (window: Window & { wrap?: (...args: any[]) => any }) {
   const el = window.document.createTextNode('')
 
   // check if it's wrapped by a polyfill
-  if (el.ownerDocument !== window.document &&
-      typeof window.wrap === 'function' &&
-    window.wrap(el) === el) {
+  if (el.ownerDocument !== window.document && typeof window.wrap === 'function' && window.wrap(el) === el) {
     // use wrapped window
     window = window.wrap(window)
   }
@@ -33,7 +31,7 @@ export function getWindow (node: any) {
     return node
   }
 
-  const rootNode = (node.ownerDocument || node)
+  const rootNode = node.ownerDocument || node
 
   return rootNode.defaultView || win.window
 }

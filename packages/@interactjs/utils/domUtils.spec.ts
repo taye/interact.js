@@ -55,10 +55,14 @@ test('utils/domUtils/indexOfDeepestElement', t => {
   d1.lastChild = d1
   wrapper.lastChild = a
 
-  const deepestShadow = [null, d2Shadow, c1, b1, a] as unknown as HTMLElement[]
-  t.equal(indexOfDeepestElement(deepestShadow), deepestShadow.indexOf(d2Shadow as any), 'works with shadow root')
+  const deepestShadow = ([null, d2Shadow, c1, b1, a] as unknown) as HTMLElement[]
+  t.equal(
+    indexOfDeepestElement(deepestShadow),
+    deepestShadow.indexOf(d2Shadow as any),
+    'works with shadow root',
+  )
 
-  const noShadow = [null, d1, c1, b1] as unknown as HTMLElement[]
+  const noShadow = ([null, d1, c1, b1] as unknown) as HTMLElement[]
 
   t.equal(
     indexOfDeepestElement(noShadow),
@@ -68,21 +72,13 @@ test('utils/domUtils/indexOfDeepestElement', t => {
 
   const siblings: NodeListOf<HTMLElement> = doc1.querySelectorAll('#topDiv > *')
 
-  t.equal(
-    indexOfDeepestElement(siblings),
-    2,
-    'last sibling is deepest with equal zIndex',
-  )
+  t.equal(indexOfDeepestElement(siblings), 2, 'last sibling is deepest with equal zIndex')
 
   siblings[0].style.zIndex = '2'
   siblings[1].style.zIndex = '2'
   siblings[2].style.zIndex = '1'
 
-  t.equal(
-    indexOfDeepestElement(siblings),
-    1,
-    'sibling with higher z-index is selected',
-  )
+  t.equal(indexOfDeepestElement(siblings), 1, 'sibling with higher z-index is selected')
 
   t.end()
 })

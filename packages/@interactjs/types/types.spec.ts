@@ -17,22 +17,19 @@ test('typings', async t => {
 
   await mkdirp(interactDir)
 
-  t.doesNotThrow(
-    () => {
-      shell.exec(`_types ${modulesDir}`)
-      shell.cp('packages/interactjs/{*.d.ts,package.json}', interactDir)
-      shell.cp('packages/@interactjs/types/{*.d.ts,package.json}', tempTypesDir)
-      shell.cp('-R', path.join(process.cwd(), 'test', 'fixtures', 'dependentTsProject', '*'), tempDir)
-      shell.exec('tsc -b', { cwd: tempDir })
+  t.doesNotThrow(() => {
+    shell.exec(`_types ${modulesDir}`)
+    shell.cp('packages/interactjs/{*.d.ts,package.json}', interactDir)
+    shell.cp('packages/@interactjs/types/{*.d.ts,package.json}', tempTypesDir)
+    shell.cp('-R', path.join(process.cwd(), 'test', 'fixtures', 'dependentTsProject', '*'), tempDir)
+    shell.exec('tsc -b', { cwd: tempDir })
 
-      const error = shell.error()
+    const error = shell.error()
 
-      if (error) {
-        throw error
-      }
-    },
-    'dependent typescript project compiles successfuly',
-  )
+    if (error) {
+      throw error
+    }
+  }, 'dependent typescript project compiles successfuly')
 
   t.end()
 })

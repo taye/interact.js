@@ -24,11 +24,7 @@ test('restrictEdges', t => {
   options.outer = { top: 100, left: 100, bottom: 200, right: 200 }
   restrictEdges.set(arg)
 
-  t.deepEqual(
-    arg.coords,
-    { x: coords.y + 60, y: coords.y + 60 },
-    'outer restriction is applied correctly',
-  )
+  t.deepEqual(arg.coords, { x: coords.y + 60, y: coords.y + 60 }, 'outer restriction is applied correctly')
 
   arg.coords = { ...coords }
 
@@ -37,11 +33,7 @@ test('restrictEdges', t => {
   options.inner = { top: 0, left: 0, bottom: 10, right: 10 }
   restrictEdges.set(arg)
 
-  t.deepEqual(
-    arg.coords,
-    { x: coords.x - 40, y: coords.y - 40 },
-    'inner restriction is applied correctly',
-  )
+  t.deepEqual(arg.coords, { x: coords.x - 40, y: coords.y - 40 }, 'inner restriction is applied correctly')
 
   // offset
   Object.assign(offset, {

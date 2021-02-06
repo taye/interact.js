@@ -8,7 +8,7 @@ export function warnOnce<T> (this: T, method: (...args: any[]) => any, message: 
 
   return function (this: T) {
     if (!warned) {
-      (window as any).console.warn(message)
+      ;(window as any).console.warn(message)
       warned = true
     }
 
@@ -16,9 +16,9 @@ export function warnOnce<T> (this: T, method: (...args: any[]) => any, message: 
   }
 }
 
-export function copyAction <T extends ActionName> (dest: ActionProps<any>, src: ActionProps<T>) {
-  dest.name  = src.name
-  dest.axis  = src.axis
+export function copyAction<T extends ActionName> (dest: ActionProps<any>, src: ActionProps<T>) {
+  dest.name = src.name
+  dest.axis = src.axis
   dest.edges = src.edges
 
   return dest

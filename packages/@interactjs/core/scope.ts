@@ -55,7 +55,7 @@ export interface Plugin {
   id?: string
   listeners?: ListenerMap
   before?: string[]
-  install? (scope: Scope, options?: any): void
+  install?(scope: Scope, options?: any): void
 }
 
 export class Scope {
@@ -109,9 +109,11 @@ export class Scope {
     const scope = this
 
     this.Interactable = class extends InteractableBase {
-      get _defaults () { return scope.defaults }
+      get _defaults () {
+        return scope.defaults
+      }
 
-      set <T extends InteractableBase> (this: T, options: OptionsArg) {
+      set<T extends InteractableBase> (this: T, options: OptionsArg) {
         super.set(options)
 
         scope.fire('interactable:set', {
@@ -136,7 +138,9 @@ export class Scope {
   }
 
   fire<T extends ListenerName> (name: T, arg: SignalArgs[T]): void | false {
-    for (const { map: { [name]: listener } } of this.listenerMaps) {
+    for (const {
+      map: { [name]: listener },
+    } of this.listenerMaps) {
       if (!!listener && listener(arg as any, this, name as never) === false) {
         return false
       }
@@ -146,9 +150,7 @@ export class Scope {
   onWindowUnload = (event: BeforeUnloadEvent) => this.removeDocument(event.target as Document)
 
   init (window: Window) {
-    return this.isInitialized
-      ? this
-      : initScope(this, window)
+    return this.isInitialized ? this : initScope(this, window)
   }
 
   pluginIsInstalled (plugin: Plugin) {
@@ -164,7 +166,9 @@ export class Scope {
       return this
     }
 
-    if (plugin.id) { this._plugins.map[plugin.id] = plugin }
+    if (plugin.id) {
+      this._plugins.map[plugin.id] = plugin
+    }
     this._plugins.list.push(plugin)
 
     if (plugin.install) {
@@ -183,12 +187,13 @@ export class Scope {
       for (; index < len; index++) {
         const otherId = this.listenerMaps[index].id
 
-        if (before[otherId] || before[pluginIdRoot(otherId)]) { break }
+        if (before[otherId] || before[pluginIdRoot(otherId)]) {
+          break
+        }
       }
 
       this.listenerMaps.splice(index, 0, { id: plugin.id, map: plugin.listeners })
-    }
-    else if (plugin.listeners) {
+    } else if (plugin.listeners) {
       this.listenerMaps.push({ id: plugin.id, map: plugin.listeners })
     }
 
@@ -197,7 +202,9 @@ export class Scope {
 
   addDocument (doc: Document, options?: any): void | false {
     // do nothing if document is already known
-    if (this.getDocIndex(doc) !== -1) { return false }
+    if (this.getDocIndex(doc) !== -1) {
+      return false
+    }
 
     const window = win.getWindow(doc)
 
@@ -246,7 +253,7 @@ export class Scope {
   }
 
   now () {
-    return ((this.window as any).Date as typeof Date || Date).now()
+    return (((this.window as any).Date as typeof Date) || Date).now()
   }
 }
 

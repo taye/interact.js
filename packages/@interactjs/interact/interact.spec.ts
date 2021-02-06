@@ -9,21 +9,15 @@ test('interact export', t => {
   scope.init(new JSDOM('').window)
 
   const interactable1 = interact('selector')
-  t.assert(interactable1 instanceof scope.Interactable,
-    'interact function returns Interactable instance')
-  t.equal(interact('selector'), interactable1,
-    'same interactable is returned with same target and context')
-  t.equal(scope.interactables.list.length, 1,
-    'new interactables are added to list')
+  t.assert(interactable1 instanceof scope.Interactable, 'interact function returns Interactable instance')
+  t.equal(interact('selector'), interactable1, 'same interactable is returned with same target and context')
+  t.equal(scope.interactables.list.length, 1, 'new interactables are added to list')
 
   interactable1.unset()
-  t.equal(scope.interactables.list.length, 0,
-    'unset interactables are removed')
-  t.strictEqual(scope.interactions.list.length, 0,
-    'unset interactions are removed')
+  t.equal(scope.interactables.list.length, 0, 'unset interactables are removed')
+  t.strictEqual(scope.interactions.list.length, 0, 'unset interactions are removed')
 
-  const constructsUniqueMessage =
-    'unique contexts make unique interactables with identical targets'
+  const constructsUniqueMessage = 'unique contexts make unique interactables with identical targets'
 
   const doc1 = new JSDOM('').window.document
   const doc2 = new JSDOM('').window.document
@@ -64,18 +58,28 @@ test('interact export', t => {
   t.deepEqual(
     scope.documents[prevDocCount],
     { doc: doc3, options: { events: { passive: false } } },
-    'interact.addDocument() adds to scope with options')
+    'interact.addDocument() adds to scope with options',
+  )
 
   interact.removeDocument(doc3)
-  t.equal(
-    scope.documents.length,
-    prevDocCount,
-    'interact.removeDocument() removes document from scope')
+  t.equal(scope.documents.length, prevDocCount, 'interact.removeDocument() removes document from scope')
 
   scope.interactables.list.forEach(i => i.unset())
 
-  const plugin1 = { id: 'test-1', install () { plugin1.count++ }, count: 0 }
-  const plugin2 = { id: '', install () { plugin2.count++ }, count: 0 }
+  const plugin1 = {
+    id: 'test-1',
+    install () {
+      plugin1.count++
+    },
+    count: 0,
+  }
+  const plugin2 = {
+    id: '',
+    install () {
+      plugin2.count++
+    },
+    count: 0,
+  }
 
   interact.use(plugin1)
   interact.use(plugin2)

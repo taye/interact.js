@@ -11,11 +11,11 @@ export type GesturableMethod = ActionMethod<GesturableOptions>
 declare module '@interactjs/core/Interaction' {
   interface Interaction {
     gesture?: {
-      angle: number           // angle from first to second touch
+      angle: number // angle from first to second touch
       distance: number
-      scale: number           // gesture.distance / gesture.startDistance
-      startAngle: number      // angle of line joining two touches
-      startDistance: number   // distance between two touches of touchStart
+      scale: number // gesture.distance / gesture.startDistance
+      startAngle: number // angle of line joining two touches
+      startDistance: number // distance between two touches of touchStart
     }
   }
 }
@@ -54,11 +54,7 @@ export interface GestureSignalArg extends DoPhaseArg<'gesture', EventPhase> {
 }
 
 function install (scope: Scope) {
-  const {
-    actions,
-    Interactable,
-    defaults,
-  } = scope
+  const { actions, Interactable, defaults } = scope
 
   /**
    * ```js
@@ -83,7 +79,10 @@ function install (scope: Scope) {
    * @return {boolean | Interactable} A boolean indicating if this can be the
    * target of gesture events, or this Interactable
    */
-  Interactable.prototype.gesturable = function (this: InstanceType<typeof Interactable>, options: GesturableOptions | boolean) {
+  Interactable.prototype.gesturable = function (
+    this: InstanceType<typeof Interactable>,
+    options: GesturableOptions | boolean,
+  ) {
     if (is.object(options)) {
       this.options.gesture.enabled = options.enabled !== false
       this.setPerAction('gesture', options)
@@ -108,7 +107,7 @@ function install (scope: Scope) {
 }
 
 function updateGestureProps ({ interaction, iEvent, phase }: GestureSignalArg) {
-  if (interaction.prepared.name !== 'gesture') { return }
+  if (interaction.prepared.name !== 'gesture') return
 
   const pointers = interaction.pointers.map(p => p.pointer)
   const starting = phase === 'start'
@@ -119,30 +118,28 @@ function updateGestureProps ({ interaction, iEvent, phase }: GestureSignalArg) {
 
   if (starting) {
     iEvent.distance = pointerUtils.touchDistance(pointers, deltaSource)
-    iEvent.box      = pointerUtils.touchBBox(pointers)
-    iEvent.scale    = 1
-    iEvent.ds       = 0
-    iEvent.angle    = pointerUtils.touchAngle(pointers, deltaSource)
-    iEvent.da       = 0
+    iEvent.box = pointerUtils.touchBBox(pointers)
+    iEvent.scale = 1
+    iEvent.ds = 0
+    iEvent.angle = pointerUtils.touchAngle(pointers, deltaSource)
+    iEvent.da = 0
 
     interaction.gesture.startDistance = iEvent.distance
     interaction.gesture.startAngle = iEvent.angle
-  }
-  else if (ending) {
+  } else if (ending) {
     const prevEvent = interaction.prevEvent as GestureEvent
 
     iEvent.distance = prevEvent.distance
-    iEvent.box      = prevEvent.box
-    iEvent.scale    = prevEvent.scale
-    iEvent.ds       = 0
-    iEvent.angle    = prevEvent.angle
-    iEvent.da       = 0
-  }
-  else {
+    iEvent.box = prevEvent.box
+    iEvent.scale = prevEvent.scale
+    iEvent.ds = 0
+    iEvent.angle = prevEvent.angle
+    iEvent.da = 0
+  } else {
     iEvent.distance = pointerUtils.touchDistance(pointers, deltaSource)
-    iEvent.box      = pointerUtils.touchBBox(pointers)
-    iEvent.scale    = iEvent.distance / interaction.gesture.startDistance
-    iEvent.angle    = pointerUtils.touchAngle(pointers, deltaSource)
+    iEvent.box = pointerUtils.touchBBox(pointers)
+    iEvent.scale = iEvent.distance / interaction.gesture.startDistance
+    iEvent.angle = pointerUtils.touchAngle(pointers, deltaSource)
 
     iEvent.ds = iEvent.scale - interaction.gesture.scale
     iEvent.da = iEvent.angle - interaction.gesture.angle
@@ -151,9 +148,7 @@ function updateGestureProps ({ interaction, iEvent, phase }: GestureSignalArg) {
   interaction.gesture.distance = iEvent.distance
   interaction.gesture.angle = iEvent.angle
 
-  if (is.number(iEvent.scale) &&
-      iEvent.scale !== Infinity &&
-      !isNaN(iEvent.scale)) {
+  if (is.number(iEvent.scale) && iEvent.scale !== Infinity && !isNaN(iEvent.scale)) {
     interaction.gesture.scale = iEvent.scale
   }
 }
@@ -194,8 +189,7 @@ const gesture: Plugin = {
     },
   },
 
-  defaults: {
-  },
+  defaults: {},
 
   getCursor () {
     return ''

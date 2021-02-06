@@ -4,12 +4,15 @@ import { makeModifier } from '../base'
 
 import { restrict } from './pointer'
 
-const defaults = extend({
-  get elementRect () {
-    return { top: 0, left: 0, bottom: 1, right: 1 }
+const defaults = extend(
+  {
+    get elementRect () {
+      return { top: 0, left: 0, bottom: 1, right: 1 }
+    },
+    set elementRect (_) {},
   },
-  set elementRect (_) {},
-}, restrict.defaults)
+  restrict.defaults,
+)
 
 const restrictRect = {
   start: restrict.start,

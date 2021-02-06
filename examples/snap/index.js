@@ -34,7 +34,7 @@ let prevClosest = { target: { x: 0, y: 0 }, range: 0 }
 const cursorRadius = 10
 
 function drawGrid (grid, gridOffset, range) {
-  if (!grid.x || !grid.y) { return }
+  if (!grid.x || !grid.y) return
 
   const barLength = 16
   const offset = {
@@ -50,8 +50,8 @@ function drawGrid (grid, gridOffset, range) {
     guidesContext.fillRect(0, 0, width, height)
   }
 
-  for (let i = -(1 + offset.x / grid.x | 0), lenX = width / grid.x + 1; i < lenX; i++) {
-    for (let j = -(1 + offset.y / grid.y | 0), lenY = height / grid.y + 1; j < lenY; j++) {
+  for (let i = -((1 + offset.x / grid.x) | 0), lenX = width / grid.x + 1; i < lenX; i++) {
+    for (let j = -((1 + offset.y / grid.y) | 0), lenY = height / grid.y + 1; j < lenY; j++) {
       if (range > 0 && range !== Infinity) {
         guidesContext.circle(i * grid.x + offset.x, j * grid.y + offset.y, range, blue).fill()
       }
@@ -109,8 +109,7 @@ function drawSnap (snap) {
 
   if (status.gridMode.checked) {
     drawGrid(snapGrid, snapGrid.offset, snapGrid.range)
-  }
-  else if (status.anchorMode.checked) {
+  } else if (status.anchorMode.checked) {
     drawAnchors(snap.range)
   }
 }
@@ -133,13 +132,15 @@ function dragMove (event) {
     prevCoords.x - cursorRadius - 2,
     prevCoords.y - cursorRadius - 2,
     cursorRadius * 2 + 4,
-    cursorRadius * 2 + 4)
+    cursorRadius * 2 + 4,
+  )
 
   context.clearRect(
     prevClosest.target.x - prevClosest.range - rect.left - 2,
     prevClosest.target.y - prevClosest.range - rect.top - 2,
     prevClosest.range * 2 + 4 + rect.left,
-    prevClosest.range * 2 + 4 + rect.top)
+    prevClosest.range * 2 + 4 + rect.top,
+  )
 
   if (closest && closest.range !== Infinity) {
     const closestTarget = {
@@ -147,12 +148,7 @@ function dragMove (event) {
       y: closest.target.y - rect.top,
     }
 
-    context.circle(
-      closestTarget.x,
-      closestTarget.y,
-      closest.range + 1,
-      'rgba(102, 225, 117, 0.8)',
-    ).fill()
+    context.circle(closestTarget.x, closestTarget.y, closest.range + 1, 'rgba(102, 225, 117, 0.8)').fill()
   }
 
   context.circle(event.pageX, event.pageY, cursorRadius, tango).fill()
@@ -224,8 +220,7 @@ function modeChange (event) {
       .on('dragstart', anchorDragStart)
       .on('dragmove', anchorDragMove)
       .on('dragend', anchorDragEnd)
-  }
-  else {
+  } else {
     status.anchorMode.disabled = status.offMode.disabled = status.gridMode.disabled = false
     status.modes.className = status.modes.className.replace(/ *\bdisabled\b/g, '')
 
@@ -238,21 +233,20 @@ function modeChange (event) {
       .off('dragend', anchorDragEnd)
   }
 
-  interact(canvas)
-    .draggable({
-      inertia: {
-        enabled: status.inertia.checked,
-      },
-      modifiers: [
-        interact.modifiers.restrict({ restriction: 'self' }),
-        interact.modifiers.snap({
-          targets: status.gridMode.checked ? [gridFunc] : status.anchorMode.checked ? anchors : null,
-          enabled: !status.offMode.checked,
-          endOnly: status.endOnly.checked,
-          offset: status.relative.checked ? 'startCoords' : null,
-        }),
-      ],
-    })
+  interact(canvas).draggable({
+    inertia: {
+      enabled: status.inertia.checked,
+    },
+    modifiers: [
+      interact.modifiers.restrict({ restriction: 'self' }),
+      interact.modifiers.snap({
+        targets: status.gridMode.checked ? [gridFunc] : status.anchorMode.checked ? anchors : null,
+        enabled: !status.offMode.checked,
+        endOnly: status.endOnly.checked,
+        offset: status.relative.checked ? 'startCoords' : null,
+      }),
+    ],
+  })
 
   if (!status.relative.checked) {
     snapOffset.x = snapOffset.y = 0
@@ -263,10 +257,12 @@ function modeChange (event) {
 
 function sliderInput (event) {
   // eslint-disable-next-line no-mixed-operators
-  if (event.target.type === 'range' &&
-    // eslint-disable-next-line no-mixed-operators
-    (Number(event.target.value) > Number(event.target.max)) ||
-    Number(event.target.value) < Number(event.target.min)) {
+  if (
+    (event.target.type === 'range' &&
+      // eslint-disable-next-line no-mixed-operators
+      Number(event.target.value) > Number(event.target.max)) ||
+    Number(event.target.value) < Number(event.target.min)
+  ) {
     return
   }
 
@@ -317,12 +313,9 @@ interact(document).on('DOMContentLoaded', () => {
     relative: document.getElementById('relative'),
   }
 
-  interact('#sliders')
-    .on('change', sliderInput)
-    .on('input', sliderInput)
+  interact('#sliders').on('change', sliderInput).on('input', sliderInput)
 
-  interact('#modes')
-    .on('change', modeChange)
+  interact('#modes').on('change', modeChange)
 
   sliderChange()
   modeChange()

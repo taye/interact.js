@@ -40,9 +40,7 @@ document.addEventListener('DOMContentLoaded', () => {
     })
   }
 
-  interact(root)
-    .on('mousedown', applyTransforms)
-    .on('touchstart', applyTransforms)
+  interact(root).on('mousedown', applyTransforms).on('touchstart', applyTransforms)
 
   interact('.point-handle')
     .draggable({

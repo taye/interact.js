@@ -9,7 +9,7 @@ shell.config.verbose = true
 shell.config.fatal = true
 
 const typesDir = '@interactjs/types'
-const [,, modulesDir = 'packages'] = process.argv
+const [, , modulesDir = 'packages'] = process.argv
 
 ;(async () => {
   const outBasename = 'index.d.ts'

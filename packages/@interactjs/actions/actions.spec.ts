@@ -30,7 +30,7 @@ test('actions integration', t => {
 
   const actionNames = Object.keys(scope.actions.map)
 
-  for (const order of ([actionNames, [...actionNames].reverse()] as ActionName[][])) {
+  for (const order of [actionNames, [...actionNames].reverse()] as ActionName[][]) {
     const interaction2 = scope.interactions.new({})
 
     for (const name of order) {

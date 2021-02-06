@@ -37,8 +37,11 @@ const finder = {
     for (const interaction of scope.interactions.list) {
       let element = eventTarget as Node
 
-      if (interaction.simulation && interaction.simulation.allowResume &&
-          (interaction.pointerType === pointerType)) {
+      if (
+        interaction.simulation &&
+        interaction.simulation.allowResume &&
+        interaction.pointerType === pointerType
+      ) {
         while (element) {
           // if the element is the interaction element
           if (element === interaction.element) {
@@ -63,7 +66,9 @@ const finder = {
     for (const interaction of scope.interactions.list) {
       if (interaction.pointerType === pointerType) {
         // if it's a down event, skip interactions with running simulations
-        if (interaction.simulation && !hasPointerId(interaction, pointerId)) { continue }
+        if (interaction.simulation && !hasPointerId(interaction, pointerId)) {
+          continue
+        }
 
         // if the interaction is active, return it immediately
         if (interaction.interacting()) {
@@ -122,7 +127,7 @@ const finder = {
         continue
       }
 
-      if (!interaction.interacting() && (pointerType === interaction.pointerType)) {
+      if (!interaction.interacting() && pointerType === interaction.pointerType) {
         return interaction
       }
     }

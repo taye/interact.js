@@ -22,18 +22,16 @@ export class DropEvent extends BaseEvent<'drag'> {
   constructor (dropState: DropState, dragEvent: InteractEvent<'drag'>, type: string) {
     super(dragEvent._interaction)
 
-    const { element, dropzone } = type === 'dragleave'
-      ? dropState.prev
-      : dropState.cur
+    const { element, dropzone } = type === 'dragleave' ? dropState.prev : dropState.cur
 
-    this.type          = type
-    this.target        = element
+    this.type = type
+    this.target = element
     this.currentTarget = element
-    this.dropzone      = dropzone
-    this.dragEvent     = dragEvent
+    this.dropzone = dropzone
+    this.dragEvent = dragEvent
     this.relatedTarget = dragEvent.target
-    this.draggable     = dragEvent.interactable
-    this.timeStamp     = dragEvent.timeStamp
+    this.draggable = dragEvent.interactable
+    this.timeStamp = dragEvent.timeStamp
   }
 
   /**
@@ -47,10 +45,9 @@ export class DropEvent extends BaseEvent<'drag'> {
     const { dropState } = this._interaction
 
     if (
-      (this.type !== 'dropactivate') && (
-        !this.dropzone ||
-        dropState.cur.dropzone !== this.dropzone ||
-        dropState.cur.element !== this.target)) {
+      this.type !== 'dropactivate' &&
+      (!this.dropzone || dropState.cur.dropzone !== this.dropzone || dropState.cur.element !== this.target)
+    ) {
       return
     }
 
@@ -64,8 +61,10 @@ export class DropEvent extends BaseEvent<'drag'> {
 
     if (this.type === 'dropactivate') {
       const activeDrops = dropState.activeDrops
-      const index = arr.findIndex(activeDrops, ({ dropzone, element }) =>
-        dropzone === this.dropzone && element === this.target)
+      const index = arr.findIndex(
+        activeDrops,
+        ({ dropzone, element }) => dropzone === this.dropzone && element === this.target,
+      )
 
       dropState.activeDrops.splice(index, 1)
 
@@ -75,8 +74,7 @@ export class DropEvent extends BaseEvent<'drag'> {
       deactivateEvent.target = this.target
 
       this.dropzone.fire(deactivateEvent)
-    }
-    else {
+    } else {
       this.dropzone.fire(new DropEvent(dropState, this.dragEvent, 'dragleave'))
     }
   }

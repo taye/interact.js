@@ -6,7 +6,9 @@ import normalize from '@interactjs/utils/normalizeListeners'
 
 function fireUntilImmediateStopped (event: any, listeners: Listener[]) {
   for (const listener of listeners) {
-    if (event.immediatePropagationStopped) { break }
+    if (event.immediatePropagationStopped) {
+      break
+    }
 
     listener(event)
   }
@@ -34,7 +36,7 @@ export class Eventable {
     }
 
     // interact.on() listeners
-    if (!event.propagationStopped && global && (listeners = global[event.type]))  {
+    if (!event.propagationStopped && global && (listeners = global[event.type])) {
       fireUntilImmediateStopped(event, listeners)
     }
   }
@@ -53,7 +55,9 @@ export class Eventable {
     for (type in listeners) {
       const eventList = this.types[type]
 
-      if (!eventList || !eventList.length) { continue }
+      if (!eventList || !eventList.length) {
+        continue
+      }
 
       for (const subListener of listeners[type]) {
         const index = eventList.indexOf(subListener)

@@ -10,35 +10,32 @@ const dragPositions = [1, 2, 3, 4].reduce((acc, n) => {
 interact.maxInteractions(Infinity)
 
 // setup draggable elements.
-interact('.js-drag')
-  .draggable({
-    listeners: {
-      start (event) {
-        const position = dragPositions[event.target.id]
-        position.x = parseInt(event.target.getAttribute('data-x'), 10) || 0
-        position.y = parseInt(event.target.getAttribute('data-y'), 10) || 0
-      },
-      move (event) {
-        const position = dragPositions[event.target.id]
-        position.x += event.dx
-        position.y += event.dy
-
-        if (transformProp) {
-          event.target.style[transformProp] =
-            'translate(' + position.x + 'px, ' + position.y + 'px)'
-        }
-        else {
-          event.target.style.left = position.x + 'px'
-          event.target.style.top  = position.y + 'px'
-        }
-      },
-      end (event) {
-        const position = dragPositions[event.target.id]
-        event.target.setAttribute('data-x', position.x)
-        event.target.setAttribute('data-y', position.y)
-      },
+interact('.js-drag').draggable({
+  listeners: {
+    start (event) {
+      const position = dragPositions[event.target.id]
+      position.x = parseInt(event.target.getAttribute('data-x'), 10) || 0
+      position.y = parseInt(event.target.getAttribute('data-y'), 10) || 0
     },
-  })
+    move (event) {
+      const position = dragPositions[event.target.id]
+      position.x += event.dx
+      position.y += event.dy
+
+      if (transformProp) {
+        event.target.style[transformProp] = 'translate(' + position.x + 'px, ' + position.y + 'px)'
+      } else {
+        event.target.style.left = position.x + 'px'
+        event.target.style.top = position.y + 'px'
+      }
+    },
+    end (event) {
+      const position = dragPositions[event.target.id]
+      event.target.setAttribute('data-x', position.x)
+      event.target.setAttribute('data-y', position.y)
+    },
+  },
+})
 
 // setup drop areas.
 // dropzone #1 accepts draggable #1
@@ -90,7 +87,7 @@ function setupDropzone (target, accept) {
     })
     .on('dragenter', event => {
       addClass(event.target, '-drop-over')
-      event.relatedTarget.textContent = 'I\'m in'
+      event.relatedTarget.textContent = "I'm in"
     })
     .on('dragleave', event => {
       removeClass(event.target, '-drop-over')
@@ -105,8 +102,7 @@ function setupDropzone (target, accept) {
 function addClass (element, className) {
   if (element.classList) {
     return element.classList.add(className)
-  }
-  else {
+  } else {
     element.className += ' ' + className
   }
 }
@@ -114,19 +110,24 @@ function addClass (element, className) {
 function removeClass (element, className) {
   if (element.classList) {
     return element.classList.remove(className)
-  }
-  else {
+  } else {
     element.className = element.className.replace(new RegExp(className + ' *', 'g'), '')
   }
 }
 
 /* eslint-disable multiline-ternary */
 interact(document).on('ready', () => {
-  transformProp = 'transform' in document.body.style
-    ? 'transform' : 'webkitTransform' in document.body.style
-      ? 'webkitTransform' : 'mozTransform' in document.body.style
-        ? 'mozTransform' : 'oTransform' in document.body.style
-          ? 'oTransform' : 'msTransform' in document.body.style
-            ? 'msTransform' : null
+  transformProp =
+    'transform' in document.body.style
+      ? 'transform'
+      : 'webkitTransform' in document.body.style
+        ? 'webkitTransform'
+        : 'mozTransform' in document.body.style
+          ? 'mozTransform'
+          : 'oTransform' in document.body.style
+            ? 'oTransform'
+            : 'msTransform' in document.body.style
+              ? 'msTransform'
+              : null
 })
 /* eslint-enable multiline-ternary */

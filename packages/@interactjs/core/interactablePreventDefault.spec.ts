@@ -6,17 +6,11 @@ import interactablePreventDefault from './interactablePreventDefault'
 import * as helpers from './tests/_helpers'
 
 test('interactablePreventDefault', t => {
-  const {
-    scope,
-    interactable,
-  } = helpers.testEnv({
+  const { scope, interactable } = helpers.testEnv({
     plugins: [interactablePreventDefault, autoStart, drag],
   })
 
-  const {
-    MouseEvent,
-    Event,
-  } = scope.window as any
+  const { MouseEvent, Event } = scope.window as any
 
   interactable.draggable({})
 

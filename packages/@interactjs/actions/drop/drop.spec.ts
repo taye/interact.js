@@ -4,9 +4,7 @@ import * as helpers from '@interactjs/core/tests/_helpers'
 import drop from '../drop/plugin'
 
 test('actions/drop options', t => {
-  const {
-    interactable,
-  } = helpers.testEnv({ plugins: [drop] })
+  const { interactable } = helpers.testEnv({ plugins: [drop] })
 
   const funcs = Object.freeze({
     drop () {},
@@ -32,14 +30,7 @@ test('actions/drop options', t => {
 })
 
 test('actions/drop start', t => {
-  const {
-    scope,
-    interactable,
-    down,
-    start,
-    move,
-    interaction,
-  } = helpers.testEnv({ plugins: [drop] })
+  const { scope, interactable, down, start, move, interaction } = helpers.testEnv({ plugins: [drop] })
 
   interactable.draggable({})
   const dropzone = scope.interactables.new('[data-drop]').dropzone({})
@@ -94,17 +85,16 @@ test('actions/drop start', t => {
   t.deepEqual(
     interaction.dropState.activeDrops.map(d => d.element.dataset.drop),
     ['1', '2'],
-    'rejected dropzones are removed from activeDrops')
+    'rejected dropzones are removed from activeDrops',
+  )
 
-  t.deepEqual(
-    activated,
-    ['1', '2'],
-    'actions/drop:start is fired with activeDrops')
+  t.deepEqual(activated, ['1', '2'], 'actions/drop:start is fired with activeDrops')
 
   t.deepEqual(
     deactivated.map(d => d.dataset.drop),
     ['0'],
-    'rejected dropzones are deactivated')
+    'rejected dropzones are deactivated',
+  )
 
   interaction.end()
 

@@ -13,10 +13,7 @@ const testAction = { name: 'TEST' as ActionName }
 test('reflow', t => {
   const rect = Object.freeze({ top: 100, left: 200, bottom: 300, right: 400 })
 
-  const {
-    scope,
-    interactable,
-  } = helpers.testEnv({ plugins: [reflow], rect })
+  const { scope, interactable } = helpers.testEnv({ plugins: [reflow], rect })
 
   Object.assign(scope.actions, { TEST: {}, names: ['TEST'] })
 
@@ -28,8 +25,10 @@ test('reflow', t => {
   const fired: InteractEvent[] = []
   let beforeReflowDelta: Point
 
-  interactable.fire = ((iEvent: any) => { fired.push(iEvent) }) as any
-  (interactable.target as any) = {}
+  interactable.fire = ((iEvent: any) => {
+    fired.push(iEvent)
+  }) as any
+  ;(interactable.target as any) = {}
   ;(interactable.options as any).TEST = { enabled: true }
   interactable.rectChecker(() => ({ ...rect }))
 
@@ -68,33 +67,15 @@ test('reflow', t => {
 
   const reflowMove = fired[2]
 
-  t.deepEqual(
-    beforeReflowDelta,
-    { x: 0, y: 0 },
-    'interaction delta is zero before-action-reflow',
-  )
+  t.deepEqual(beforeReflowDelta, { x: 0, y: 0 }, 'interaction delta is zero before-action-reflow')
 
-  t.deepEqual(
-    reflowMove.delta,
-    { x: 100, y: -50 },
-    'move delta is correct with modified interaction coords',
-  )
+  t.deepEqual(reflowMove.delta, { x: 100, y: -50 }, 'move delta is correct with modified interaction coords')
 
-  t.notOk(
-    interaction.pointerIsDown,
-    'reflow pointer was lifted',
-  )
+  t.notOk(interaction.pointerIsDown, 'reflow pointer was lifted')
 
-  t.equal(
-    interaction.pointers.length,
-    0,
-    'reflow pointer was removed from interaction',
-  )
+  t.equal(interaction.pointers.length, 0, 'reflow pointer was removed from interaction')
 
-  t.notOk(
-    scope.interactions.list.includes(interaction),
-    'interaction is removed from list',
-  )
+  t.notOk(scope.interactions.list.includes(interaction), 'interaction is removed from list')
 
   t.end()
 })
@@ -110,8 +91,10 @@ test('async reflow', async t => {
   const interactable = scope.interactables.new(scope.window)
   const rect = Object.freeze({ top: 100, left: 200, bottom: 300, right: 400 })
   interactable.rectChecker(() => ({ ...rect }))
-  interactable.fire = ((iEvent: any) => { reflowEvent = iEvent }) as any
-  (interactable.options as any).TEST = { enabled: true }
+  interactable.fire = ((iEvent: any) => {
+    reflowEvent = iEvent
+  }) as any
+  ;(interactable.options as any).TEST = { enabled: true }
 
   // test with Promise implementation
   ;(scope.window as any).Promise = PromisePolyfill
@@ -126,7 +109,10 @@ test('async reflow', async t => {
   // block the end of the reflow interaction and stop it after a timeout
   scope.addListeners({
     'interactions:before-action-end': ({ interaction }) => {
-      setTimeout(() => { interaction.stop(); stoppedFromTimeout = true }, 0)
+      setTimeout(() => {
+        interaction.stop()
+        stoppedFromTimeout = true
+      }, 0)
       return false
     },
   })
@@ -134,9 +120,15 @@ test('async reflow', async t => {
   stoppedFromTimeout = false
   promise = interactable.reflow(testAction)
 
-  t.ok(reflowEvent.interaction.interacting() && !stoppedFromTimeout, 'interaction continues if end is blocked')
+  t.ok(
+    reflowEvent.interaction.interacting() && !stoppedFromTimeout,
+    'interaction continues if end is blocked',
+  )
   await promise
-  t.notOk(reflowEvent.interaction.interacting() && stoppedFromTimeout, 'interaction is stopped after promise is resolved')
+  t.notOk(
+    reflowEvent.interaction.interacting() && stoppedFromTimeout,
+    'interaction is stopped after promise is resolved',
+  )
 
   // test without Promise implementation
   stoppedFromTimeout = false
@@ -144,10 +136,16 @@ test('async reflow', async t => {
 
   promise = interactable.reflow(testAction)
   t.equal(promise, null, 'method returns null if no Proise is avilable')
-  t.ok(reflowEvent.interaction.interacting() && !stoppedFromTimeout, 'interaction continues if end is blocked without Promise')
+  t.ok(
+    reflowEvent.interaction.interacting() && !stoppedFromTimeout,
+    'interaction continues if end is blocked without Promise',
+  )
 
   setTimeout(() => {
-    t.notOk(reflowEvent.interaction.interacting() || !stoppedFromTimeout, 'interaction is stopped after timeout without Promised')
+    t.notOk(
+      reflowEvent.interaction.interacting() || !stoppedFromTimeout,
+      'interaction is stopped after timeout without Promised',
+    )
   }, 0)
 
   t.end()

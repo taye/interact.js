@@ -13,10 +13,6 @@ if (typeof window === 'undefined') {
 
 domator.setDocument(doc)
 
-export {
-  domator,
-  doc,
-  JSDOM,
-}
+export { domator, doc, JSDOM }
 
 export default domator

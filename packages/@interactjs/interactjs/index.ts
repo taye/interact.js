@@ -63,8 +63,9 @@ if (process.env.NODE_ENV !== 'production') {
 export default interact
 
 if (typeof module === 'object' && !!module) {
-  try { module.exports = interact }
-  catch {}
+  try {
+    module.exports = interact
+  } catch {}
 }
 
-(interact as any).default = interact
+;(interact as any).default = interact

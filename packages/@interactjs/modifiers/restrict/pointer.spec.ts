@@ -6,9 +6,7 @@ import { restrict } from '../restrict/pointer'
 test('restrict larger than restriction', t => {
   const edges = { left: 0, top: 0, right: 200, bottom: 200 }
   const rect = { ...edges, width: 200, height: 200 }
-  const {
-    interaction,
-  } = helpers.testEnv({ rect })
+  const { interaction } = helpers.testEnv({ rect })
 
   const restriction = { left: 100, top: 50, right: 150, bottom: 150 }
   const options = {
@@ -37,11 +35,7 @@ test('restrict larger than restriction', t => {
 
   arg.coords = { x: 0, y: 0 }
   restrict.set(arg)
-  t.deepEqual(
-    arg.coords,
-    { x: 0, y: 0 },
-    'allows top and left edge values to be lower than the restriction',
-  )
+  t.deepEqual(arg.coords, { x: 0, y: 0 }, 'allows top and left edge values to be lower than the restriction')
 
   arg.coords = { x: restriction.left + 10, y: restriction.top + 10 }
   restrict.set(arg)

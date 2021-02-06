@@ -11,11 +11,7 @@ function fixImportSource ({ node: { source } }, { filename }) {
   let resolvedShort = ''
 
   try {
-    const paths = [
-      filename && path.dirname(filename),
-      __dirname,
-      process.cwd(),
-    ].filter(p => !!p)
+    const paths = [filename && path.dirname(filename), __dirname, process.cwd()].filter(p => !!p)
 
     const resolved = require.resolve(source.value, { paths })
 
@@ -27,7 +23,9 @@ function fixImportSource ({ node: { source } }, { filename }) {
 function babelPluginInteractjsProd () {
   if (process.env.NODE_ENV === 'development') {
     // eslint-disable-next-line no-console
-    console.warn('[@interactjs/dev-tools] You\'re using the production plugin in the development environment. You might lose out on some helpful hints!')
+    console.warn(
+      "[@interactjs/dev-tools] You're using the production plugin in the development environment. You might lose out on some helpful hints!",
+    )
   }
 
   return {
@@ -41,12 +39,14 @@ function babelPluginInteractjsProd () {
 }
 
 function shouldIgnoreImport (source) {
-  return !source ||
-      // only change @interactjs scoped imports
-      !source.value.startsWith('@interactjs/') ||
-      // ignore imports of prod files
-      source.value.endsWith(PROD_EXT) ||
-      source.value.endsWith(PROD_EXT + '.js')
+  return (
+    !source ||
+    // only change @interactjs scoped imports
+    !source.value.startsWith('@interactjs/') ||
+    // ignore imports of prod files
+    source.value.endsWith(PROD_EXT) ||
+    source.value.endsWith(PROD_EXT + '.js')
+  )
 }
 
 module.exports = babelPluginInteractjsProd

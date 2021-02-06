@@ -11,18 +11,14 @@ import restrictSize from './size'
 
 test('restrictSize', t => {
   const rect = rectUtils.xywhToTlbr({ left: 0, top: 0, right: 200, bottom: 300 })
-  const {
-    interaction,
-    interactable,
-    coords,
-    down,
-    start,
-    move,
-  } = helpers.testEnv({ plugins: [modifiersBase, resize], rect })
+  const { interaction, interactable, coords, down, start, move } = helpers.testEnv({
+    plugins: [modifiersBase, resize],
+    rect,
+  })
   const edges = { left: true, top: true }
   const action: any = { name: 'resize', edges }
   const options = {
-    min: { width:  60, height:  50 } as any,
+    min: { width: 60, height: 50 } as any,
     max: { width: 300, height: 350 } as any,
   }
   let latestEvent: ResizeEvent = null
@@ -31,7 +27,9 @@ test('restrictSize', t => {
     .resizable({
       modifiers: [restrictSize(options)],
     })
-    .on('resizestart resizemove resizeend', e => { latestEvent = e })
+    .on('resizestart resizemove resizeend', e => {
+      latestEvent = e
+    })
 
   down()
   start(action)

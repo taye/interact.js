@@ -24,27 +24,26 @@ const browser = {
 
 function init (window: any) {
   const Element = domObjects.Element
-  const navigator  = win.window.navigator
+  const navigator = win.window.navigator
 
   // Does the browser support touch input?
-  browser.supportsTouch = ('ontouchstart' in window) ||
+  browser.supportsTouch =
+    'ontouchstart' in window ||
     (is.func(window.DocumentTouch) && domObjects.document instanceof window.DocumentTouch)
 
   // Does the browser support PointerEvents
   browser.supportsPointerEvent = navigator.pointerEnabled !== false && !!domObjects.PointerEvent
 
-  browser.isIOS = (/iP(hone|od|ad)/.test(navigator.platform))
+  browser.isIOS = /iP(hone|od|ad)/.test(navigator.platform)
 
   // scrolling doesn't change the result of getClientRects on iOS 7
-  browser.isIOS7 = (/iP(hone|od|ad)/.test(navigator.platform) &&
-           /OS 7[^\d]/.test(navigator.appVersion))
+  browser.isIOS7 = /iP(hone|od|ad)/.test(navigator.platform) && /OS 7[^\d]/.test(navigator.appVersion)
 
   browser.isIe9 = /MSIE 9/.test(navigator.userAgent)
 
   // Opera Mobile must be handled differently
-  browser.isOperaMobile = (navigator.appName === 'Opera' &&
-    browser.supportsTouch &&
-    /Presto/.test(navigator.userAgent))
+  browser.isOperaMobile =
+    navigator.appName === 'Opera' && browser.supportsTouch && /Presto/.test(navigator.userAgent)
 
   // prefix matchesSelector
   browser.prefixedMatchesSelector = ('matches' in Element.prototype
@@ -57,25 +56,25 @@ function init (window: any) {
           ? 'oMatchesSelector'
           : 'msMatchesSelector') as 'matches'
 
-  browser.pEventTypes = (browser.supportsPointerEvent
-    ? (domObjects.PointerEvent === window.MSPointerEvent
+  browser.pEventTypes = browser.supportsPointerEvent
+    ? domObjects.PointerEvent === window.MSPointerEvent
       ? {
-        up:     'MSPointerUp',
-        down:   'MSPointerDown',
-        over:   'mouseover',
-        out:    'mouseout',
-        move:   'MSPointerMove',
+        up: 'MSPointerUp',
+        down: 'MSPointerDown',
+        over: 'mouseover',
+        out: 'mouseout',
+        move: 'MSPointerMove',
         cancel: 'MSPointerCancel',
       }
       : {
-        up:     'pointerup',
-        down:   'pointerdown',
-        over:   'pointerover',
-        out:    'pointerout',
-        move:   'pointermove',
+        up: 'pointerup',
+        down: 'pointerdown',
+        over: 'pointerover',
+        out: 'pointerout',
+        move: 'pointermove',
         cancel: 'pointercancel',
-      })
-    : null)
+      }
+    : null
 
   // because Webkit and Opera still use 'mousewheel' event type
   browser.wheelEvent = 'onmousewheel' in domObjects.document ? 'mousewheel' : 'wheel'

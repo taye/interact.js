@@ -15,7 +15,7 @@ export default class PointerEvent<T extends string = any> extends BaseEvent<null
   clientX: number
   clientY: number
   dt: number
-  eventable: any
+  eventable: any;
   [key: string]: any
 
   /** */
@@ -34,12 +34,12 @@ export default class PointerEvent<T extends string = any> extends BaseEvent<null
       pointerUtils.pointerExtend(this, pointer)
     }
 
-    this.timeStamp     = timeStamp
+    this.timeStamp = timeStamp
     this.originalEvent = event
-    this.type          = type
-    this.pointerId     = pointerUtils.getPointerId(pointer)
-    this.pointerType   = pointerUtils.getPointerType(pointer)
-    this.target        = eventTarget
+    this.type = type
+    this.pointerId = pointerUtils.getPointerId(pointer)
+    this.pointerType = pointerUtils.getPointerType(pointer)
+    this.target = eventTarget
     this.currentTarget = null
 
     if (type === 'tap') {
@@ -48,19 +48,20 @@ export default class PointerEvent<T extends string = any> extends BaseEvent<null
 
       const interval = this.timeStamp - interaction.tapTime
 
-      this.double = !!(interaction.prevTap &&
+      this.double = !!(
+        interaction.prevTap &&
         interaction.prevTap.type !== 'doubletap' &&
         interaction.prevTap.target === this.target &&
-        interval < 500)
-    }
-    else if (type === 'doubletap') {
+        interval < 500
+      )
+    } else if (type === 'doubletap') {
       this.dt = (pointer as PointerEvent<'tap'>).timeStamp - interaction.tapTime
     }
   }
 
   _subtractOrigin ({ x: originX, y: originY }: Point) {
-    this.pageX   -= originX
-    this.pageY   -= originY
+    this.pageX -= originX
+    this.pageY -= originY
     this.clientX -= originX
     this.clientY -= originY
 
@@ -68,8 +69,8 @@ export default class PointerEvent<T extends string = any> extends BaseEvent<null
   }
 
   _addOrigin ({ x: originX, y: originY }: Point) {
-    this.pageX   += originX
-    this.pageY   += originY
+    this.pageX += originX
+    this.pageY += originY
     this.clientX += originX
     this.clientY += originY
 

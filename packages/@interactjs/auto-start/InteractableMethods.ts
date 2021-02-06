@@ -156,12 +156,14 @@ function defaultActionChecker (
   scope: Scope,
 ) {
   const rect = interactable.getRect(element)
-  const buttons = (event as MouseEvent).buttons || ({
-    0: 1,
-    1: 4,
-    3: 8,
-    4: 16,
-  })[(event as MouseEvent).button as 0 | 1 | 3 | 4]
+  const buttons =
+    (event as MouseEvent).buttons ||
+    {
+      0: 1,
+      1: 4,
+      3: 8,
+      4: 16,
+    }[(event as MouseEvent).button as 0 | 1 | 3 | 4]
   const arg = {
     action: null,
     interactable,
@@ -176,8 +178,8 @@ function defaultActionChecker (
   return arg.action
 }
 
-function styleCursor (this: Interactable): boolean
-function styleCursor (this: Interactable, newValue: boolean): typeof this
+function styleCursor(this: Interactable): boolean
+function styleCursor(this: Interactable, newValue: boolean): typeof this
 function styleCursor (this: Interactable, newValue?: boolean) {
   if (is.bool(newValue)) {
     this.options.styleCursor = newValue

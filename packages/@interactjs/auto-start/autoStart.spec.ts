@@ -6,13 +6,7 @@ import autoStart from './base'
 
 test('autoStart', t => {
   const rect = { top: 100, left: 200, bottom: 300, right: 400 }
-  const {
-    interaction,
-    interactable,
-    event,
-    coords,
-    target: element,
-  } = helpers.testEnv({
+  const { interaction, interactable, event, coords, target: element } = helpers.testEnv({
     plugins: [autoStart, drag],
     rect,
   })
@@ -23,11 +17,7 @@ test('autoStart', t => {
 
   interaction.pointerDown(event, event, element)
 
-  t.deepEqual(
-    interaction.prepared,
-    { name: 'drag', axis: 'xy', edges: undefined },
-    'prepares action',
-  )
+  t.deepEqual(interaction.prepared, { name: 'drag', axis: 'xy', edges: undefined }, 'prepares action')
 
   t.deepEqual(
     interaction.rect,

@@ -17,9 +17,7 @@ declare module '@interactjs/core/Interaction' {
 }
 
 function install (scope: Scope) {
-  const {
-    defaults,
-  } = scope
+  const { defaults } = scope
 
   scope.usePlugin(basePlugin)
 
@@ -30,7 +28,9 @@ function install (scope: Scope) {
 function getHoldDuration (interaction: Interaction) {
   const actionName = interaction.prepared && interaction.prepared.name
 
-  if (!actionName) { return null }
+  if (!actionName) {
+    return null
+  }
 
   const options = interaction.interactable.options
 

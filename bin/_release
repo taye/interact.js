@@ -1,7 +1,9 @@
 #!/usr/bin/env node
 const fs = require('fs')
-const glob = require('util').promisify(require('glob'))
 const path = require('path')
+const { promisify } = require('util')
+
+const glob = promisify(require('glob'))
 const shell = require('shelljs')
 
 const { getPackages } = require('../scripts/utils')
@@ -20,8 +22,7 @@ ensureCleanIndex()
 const { gitTag } = checkVersion()
 
 let packages
-
-(async ps => {
+;(async ps => {
   packages = await getPackages()
 
   gitDetatch()
@@ -117,7 +118,7 @@ function pushAndPublish () {
 
   shell.exec('_set_git_head')
 
-  const npmPublishCommand = 'npm publish' +  (NPM_TAG ? ` --tag ${NPM_TAG}` : '')
+  const npmPublishCommand = 'npm publish' + (NPM_TAG ? ` --tag ${NPM_TAG}` : '')
 
   for (const pkg of packages) {
     shell.exec(npmPublishCommand, { cwd: path.resolve(pkg) })

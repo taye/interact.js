@@ -1,16 +1,11 @@
 #!/usr/bin/env node
 const path = require('path')
-const headers = require('../scripts/headers')
-const writer = require('../scripts/bundleWriter')
-const { getPackageDir, resolveImport } = require('../scripts/utils')
-const bundler = require('../scripts/bundler')
 
-const [
-  ,,
-  entry = 'packages/interactjs',
-  standalone = 'interact',
-  name = standalone,
-] = process.argv
+const writer = require('../scripts/bundleWriter')
+const bundler = require('../scripts/bundler')
+const headers = require('../scripts/headers')
+
+const [, , entry = 'packages/interactjs', standalone = 'interact', name = standalone] = process.argv
 const entryPkgDir = path.join(process.cwd(), entry)
 
 const options = {
@@ -21,7 +16,7 @@ const options = {
   name,
   browserify: {
     bare: true,
-  }
+  },
 }
 
 process.stdout.write('Bundling...')

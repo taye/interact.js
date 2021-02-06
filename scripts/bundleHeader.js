@@ -11,19 +11,24 @@ module.exports = function combine (options) {
   const combinedCode = headerContent + options.code
   const offset = { line: newlinesIn(headerContent) }
 
-  combiner.addFile({
-    sourceFile: '_header.js',
-    source: headerContent,
-  }, { line: 1 })
+  combiner.addFile(
+    {
+      sourceFile: '_header.js',
+      source: headerContent,
+    },
+    { line: 1 },
+  )
 
   if (options.map) {
     combiner._addExistingMap('', combinedCode, options.map, offset)
-  }
-  else if (headerContent) {
-    combiner.addFile({
-      sourceFile: '',
-      source: combinedCode,
-    }, offset)
+  } else if (headerContent) {
+    combiner.addFile(
+      {
+        sourceFile: '',
+        source: combinedCode,
+      },
+      offset,
+    )
   }
 
   const newMap = combiner.generator.toJSON()
@@ -32,9 +37,7 @@ module.exports = function combine (options) {
   newMap.sources = newMap.sources.map(source => {
     const absolute = path.join(process.cwd(), source)
     try {
-      const {
-        result,
-      } = getRelativeToRoot(absolute, [process.cwd(), path.join(__dirname, '..')], '')
+      const { result } = getRelativeToRoot(absolute, [process.cwd(), path.join(__dirname, '..')], '')
 
       return result
     } catch {
@@ -51,7 +54,9 @@ module.exports = function combine (options) {
 }
 
 function newlinesIn (src) {
-  if (!src) { return 0 }
+  if (!src) {
+    return 0
+  }
 
   const newlines = src.match(/\n/g)
 

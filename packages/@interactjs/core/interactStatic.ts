@@ -25,9 +25,12 @@ export interface InteractStatic {
   /** @internal */ globalEvents: any
   version: string
   /** @internal */ scope: Scope
-  use(plugin: Plugin, options?: {
-    [key: string]: any
-  }): any
+  use(
+    plugin: Plugin,
+    options?: {
+      [key: string]: any
+    },
+  ): any
   isSet(target: Element, options?: any): boolean
   on(type: string | EventTypes, listener: ListenersArg, options?: object): any
   off(type: EventTypes, listener: any, options?: object): any
@@ -94,10 +97,10 @@ export function createInteractStatic (scope: Scope): InteractStatic {
   interact.version = process.env.npm_package_version
   interact.scope = scope
   /**
-  * Use a plugin
-  *
-  * @alias module:interact.use
-  *
+   * Use a plugin
+   *
+   * @alias module:interact.use
+   *
    */
   interact.use = function (plugin, options) {
     this.scope.usePlugin(plugin, options)
@@ -138,7 +141,7 @@ export function createInteractStatic (scope: Scope): InteractStatic {
     }
 
     if (is.array(type)) {
-      for (const eventType of (type as any[])) {
+      for (const eventType of type as any[]) {
         this.on(eventType, listener, options)
       }
 
@@ -158,8 +161,7 @@ export function createInteractStatic (scope: Scope): InteractStatic {
       // if this type of event was never bound
       if (!this.globalEvents[type]) {
         this.globalEvents[type] = [listener]
-      }
-      else {
+      } else {
         this.globalEvents[type].push(listener)
       }
     }
@@ -208,12 +210,10 @@ export function createInteractStatic (scope: Scope): InteractStatic {
     if (isNonNativeEvent(type, this.scope.actions)) {
       let index: number
 
-      if (type in this.globalEvents &&
-            (index = this.globalEvents[type].indexOf(listener)) !== -1) {
+      if (type in this.globalEvents && (index = this.globalEvents[type].indexOf(listener)) !== -1) {
         this.globalEvents[type].splice(index, 1)
       }
-    }
-    else {
+    } else {
       this.scope.events.remove(this.scope.document, type, listener, options)
     }
 

@@ -7,16 +7,10 @@ import extend from '@interactjs/utils/extend'
 import inertia from './plugin'
 
 test('inertia', t => {
-  const {
-    scope,
-    interaction,
-    down,
-    start,
-    move,
-    up,
-    interactable,
-    coords,
-  } = helpers.testEnv({ plugins: [inertia, drag], rect: { left: 0, top: 0, bottom: 100, right: 100 } })
+  const { scope, interaction, down, start, move, up, interactable, coords } = helpers.testEnv({
+    plugins: [inertia, drag],
+    rect: { left: 0, top: 0, bottom: 100, right: 100 },
+  })
 
   const state = interaction.inertia
   const modifierChange = 5
@@ -36,9 +30,10 @@ test('inertia', t => {
 
   coords.client = coords.page
   scope.now = () => coords.timeStamp
-  interactable
-    .draggable({ inertia: true })
-    .on(Object.keys(scope.actions.phases).map(p => `drag${p}`), e => fired.push(e))
+  interactable.draggable({ inertia: true }).on(
+    Object.keys(scope.actions.phases).map(p => `drag${p}`),
+    e => fired.push(e),
+  )
 
   // test inertia without modifiers or throw
   downStartMoveUp({ x: 100, y: 0, dt: 1000 })
@@ -52,7 +47,11 @@ test('inertia', t => {
 
   // test inertia with { endOnly: false } modifier and with throw
   downStartMoveUp({ x: 100, y: 0, dt: 10 })
-  t.deepEqual(modifierCallPhases, ['move', 'inertiastart', 'inertiastart'], '{ endOnly: false } && thrown: modifier is called from pointerUp inertia calc and phase')
+  t.deepEqual(
+    modifierCallPhases,
+    ['move', 'inertiastart', 'inertiastart'],
+    '{ endOnly: false } && thrown: modifier is called from pointerUp inertia calc and phase',
+  )
   t.deepEqual(
     fired.map(({ page, type }) => ({ ...page, type })),
     [
@@ -66,7 +65,11 @@ test('inertia', t => {
   // test inertia with { endOnly: true } modifier and with throw
   changeModifier.options.endOnly = true
   downStartMoveUp({ x: 100, y: 0, dt: 10 })
-  t.deepEqual(modifierCallPhases, ['inertiastart'], '{ endOnly: true } && thrown: modifier is called from pointerUp inertia calc')
+  t.deepEqual(
+    modifierCallPhases,
+    ['inertiastart'],
+    '{ endOnly: true } && thrown: modifier is called from pointerUp inertia calc',
+  )
   t.deepEqual(
     state.modifiedOffset,
     {
@@ -81,34 +84,41 @@ test('inertia', t => {
   changeModifier.options.endOnly = false
   downStartMoveUp({ x: 1, y: 0, dt: 1000 })
   t.notOk(state.active, '{ endOnly: false } && !thrown: inertia smoothEnd is not activated')
-  t.deepEqual(modifierCallPhases, ['move', 'inertiastart'], '{ endOnly: false } && !thrown: modifier is called from pointerUp')
+  t.deepEqual(
+    modifierCallPhases,
+    ['move', 'inertiastart'],
+    '{ endOnly: false } && !thrown: modifier is called from pointerUp',
+  )
 
   // test smoothEnd with { endOnly: true } modifier
   changeModifier.options.endOnly = true
   downStartMoveUp({ x: 1, y: 0, dt: 1000 })
   t.ok(state.active, '{ endOnly: true } && !thrown: inertia smoothEnd is activated')
-  t.deepEqual(modifierCallPhases, ['inertiastart'], '{ endOnly: true } && !thrown: modifier is called from pointerUp smooth end check')
+  t.deepEqual(
+    modifierCallPhases,
+    ['inertiastart'],
+    '{ endOnly: true } && !thrown: modifier is called from pointerUp smooth end check',
+  )
 
   interactable.draggable({
-    modifiers: [{
-      options: { endOnly: true },
-      methods: {
-        set ({ coords: modifiedCoords, phase }) {
-          extend(modifiedCoords, { x: 300, y: 400 })
-          modifierCallPhases.push(phase)
+    modifiers: [
+      {
+        options: { endOnly: true },
+        methods: {
+          set ({ coords: modifiedCoords, phase }) {
+            extend(modifiedCoords, { x: 300, y: 400 })
+            modifierCallPhases.push(phase)
+          },
         },
+        enable: null,
+        disable: null,
       },
-      enable: null,
-      disable: null,
-    }],
+    ],
   })
 
   downStartMoveUp({ x: 50, y: 70, dt: 1000 })
   coords.timeStamp = 100
-  t.deepEqual(
-    state.targetOffset,
-    { x: 250, y: 330 },
-  )
+  t.deepEqual(state.targetOffset, { x: 250, y: 330 })
 
   extend(coords.page, { x: 50, y: 100 })
   down()
@@ -118,11 +128,7 @@ test('inertia', t => {
     { coords: coords.page, rect: { left: 50, top: 70, right: 150, bottom: 170, width: 100, height: 100 } },
     'interaction coords are updated to down coords on resume',
   )
-  t.deepEqual(
-    lastEvent().page,
-    coords.page,
-    'action resume event coords are set correctly',
-  )
+  t.deepEqual(lastEvent().page, coords.page, 'action resume event coords are set correctly')
 
   move()
   t.deepEqual(
@@ -151,7 +157,11 @@ test('inertia', t => {
   )
   t.deepEqual(
     helpers.getProps(lastEvent(), ['type', 'page', 'rect'] as const),
-    { type: 'draginertiastart', page: coords.page, rect: { left: 200, top: 220, right: 300, bottom: 320, width: 100, height: 100 } },
+    {
+      type: 'draginertiastart',
+      page: coords.page,
+      rect: { left: 200, top: 220, right: 300, bottom: 320, width: 100, height: 100 },
+    },
     'inertiastart is fired at non preEnd modified coords',
   )
 
@@ -165,7 +175,11 @@ test('inertia', t => {
   )
   t.deepEqual(
     helpers.getProps(lastEvent(), ['type', 'page', 'rect'] as const),
-    { type: 'dragmove', page: coords.page, rect: { left: 150, top: 370, right: 250, bottom: 470, width: 100, height: 100 } },
+    {
+      type: 'dragmove',
+      page: coords.page,
+      rect: { left: 150, top: 370, right: 250, bottom: 470, width: 100, height: 100 },
+    },
     'action move event after second resume is fired at non preEnd modified coords',
   )
 

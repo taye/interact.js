@@ -23,10 +23,10 @@ export default (grid: GridOptions) => {
     const {
       range,
       limits = {
-        left  : -Infinity,
-        right :  Infinity,
-        top   : -Infinity,
-        bottom:  Infinity,
+        left: -Infinity,
+        right: Infinity,
+        top: -Infinity,
+        bottom: Infinity,
       },
       offset = { x: 0, y: 0 },
     } = grid

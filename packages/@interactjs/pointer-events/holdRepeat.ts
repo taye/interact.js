@@ -25,9 +25,7 @@ declare module '@interactjs/pointer-events/base' {
 function install (scope: Scope) {
   scope.usePlugin(basePlugin)
 
-  const {
-    pointerEvents,
-  } = scope
+  const { pointerEvents } = scope
 
   // don't repeat by default
   pointerEvents.defaults.holdRepeatInterval = 0
@@ -35,7 +33,7 @@ function install (scope: Scope) {
 }
 
 function onNew ({ pointerEvent }: { pointerEvent: PointerEvent<any> }) {
-  if (pointerEvent.type !== 'hold') { return }
+  if (pointerEvent.type !== 'hold') return
 
   pointerEvent.count = (pointerEvent.count || 0) + 1
 }
@@ -44,23 +42,26 @@ function onFired (
   { interaction, pointerEvent, eventTarget, targets }: SignalArgs['pointerEvents:fired'],
   scope: Scope,
 ) {
-  if (pointerEvent.type !== 'hold' || !targets.length) { return }
+  if (pointerEvent.type !== 'hold' || !targets.length) return
 
   // get the repeat interval from the first eventable
   const interval = targets[0].eventable.options.holdRepeatInterval
 
   // don't repeat if the interval is 0 or less
-  if (interval <= 0) { return }
+  if (interval <= 0) return
 
   // set a timeout to fire the holdrepeat event
   interaction.holdIntervalHandle = setTimeout(() => {
-    scope.pointerEvents.fire({
-      interaction,
-      eventTarget,
-      type: 'hold',
-      pointer: pointerEvent,
-      event: pointerEvent,
-    }, scope)
+    scope.pointerEvents.fire(
+      {
+        interaction,
+        eventTarget,
+        type: 'hold',
+        pointer: pointerEvent,
+        event: pointerEvent,
+      },
+      scope,
+    )
   }, interval)
 }
 
@@ -78,7 +79,7 @@ const holdRepeat: Plugin = {
   install,
   listeners: ['move', 'up', 'cancel', 'endall'].reduce(
     (acc, enderTypes) => {
-      (acc as any)[`pointerEvents:${enderTypes}`] = endHoldRepeat
+      ;(acc as any)[`pointerEvents:${enderTypes}`] = endHoldRepeat
       return acc
     },
     {

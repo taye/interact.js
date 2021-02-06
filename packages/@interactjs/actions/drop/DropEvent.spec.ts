@@ -4,8 +4,18 @@ import extend from '@interactjs/utils/extend'
 
 import { DropEvent } from '../drop/DropEvent'
 
-const dz1: any = { target: 'dz1', fire (event: any) { this.fired = event } }
-const dz2: any = { target: 'dz2', fire (event: any) { this.fired = event } }
+const dz1: any = {
+  target: 'dz1',
+  fire (event: any) {
+    this.fired = event
+  },
+}
+const dz2: any = {
+  target: 'dz2',
+  fire (event: any) {
+    this.fired = event
+  },
+}
 const el1: any = Symbol('el1')
 const el2: any = Symbol('el2')
 const interactable: any = Symbol('interactable')
@@ -25,7 +35,7 @@ test('DropEvent constructor', t => {
       { dropzone: dz1, element: el1 },
       { dropzone: dz2, element: el2 },
     ],
-    cur : { dropzone: dz1, element: el1 },
+    cur: { dropzone: dz1, element: el1 },
     prev: { dropzone: dz2, element: el2 },
     events: {},
   })
@@ -59,7 +69,7 @@ test('DropEvent.reject()', t => {
       { dropzone: dz1, element: el1 },
       { dropzone: dz2, element: el2 },
     ],
-    cur : { dropzone: null, element: null },
+    cur: { dropzone: null, element: null },
     prev: { dropzone: null, element: null },
     events: {},
   })
@@ -70,23 +80,27 @@ test('DropEvent.reject()', t => {
   dropactivate.target = el1
   dropactivate.reject()
 
-  t.ok(dropactivate.propagationStopped && dropactivate.immediatePropagationStopped,
-    'rejected event propagation is stopped')
+  t.ok(
+    dropactivate.propagationStopped && dropactivate.immediatePropagationStopped,
+    'rejected event propagation is stopped',
+  )
 
   t.equal(dz1.fired.type, 'dropdeactivate', 'dropdeactivate is fired on rejected dropzone')
 
   t.deepEqual(
     interaction.dropState.activeDrops,
     [{ dropzone: dz2, element: el2 }],
-    'activeDrop of rejected dropactivate event is removed')
+    'activeDrop of rejected dropactivate event is removed',
+  )
 
   t.deepEqual(
     interaction.dropState.cur,
     { dropzone: null, element: null },
-    'dropState.cur dropzone and element are set to null after rejecting dropactivate')
+    'dropState.cur dropzone and element are set to null after rejecting dropactivate',
+  )
 
   extend(interaction.dropState, {
-    cur : { dropzone: dz1, element: el1 },
+    cur: { dropzone: dz1, element: el1 },
     prev: { dropzone: null, element: null },
     events: {},
   })
@@ -98,7 +112,8 @@ test('DropEvent.reject()', t => {
   t.deepEqual(
     interaction.dropState.cur,
     { dropzone: dz1, element: el1 },
-    'dropState.cur remains the same after rejecting non activate event')
+    'dropState.cur remains the same after rejecting non activate event',
+  )
 
   t.ok(interaction.dropState.rejected, 'dropState.rejected === true')
 

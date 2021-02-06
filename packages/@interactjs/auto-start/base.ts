@@ -65,10 +65,7 @@ export interface AutoStart {
 }
 
 function install (scope: Scope) {
-  const {
-    interactStatic: interact,
-    defaults,
-  } = scope
+  const { interactStatic: interact, defaults } = scope
 
   scope.usePlugin(InteractableMethods)
 
@@ -79,7 +76,7 @@ function install (scope: Scope) {
     manualStart: false,
     max: Infinity,
     maxPerElement: 1,
-    allowFrom:  null,
+    allowFrom: null,
     ignoreFrom: null,
 
     // only allow left button by default
@@ -108,17 +105,21 @@ function install (scope: Scope) {
   }
 }
 
-function prepareOnDown ({ interaction, pointer, event, eventTarget }: SignalArgs['interactions:down'], scope: Scope) {
-  if (interaction.interacting()) { return }
+function prepareOnDown (
+  { interaction, pointer, event, eventTarget }: SignalArgs['interactions:down'],
+  scope: Scope,
+) {
+  if (interaction.interacting()) return
 
   const actionInfo = getActionInfo(interaction, pointer, event, eventTarget, scope)
   prepare(interaction, actionInfo, scope)
 }
 
-function prepareOnMove ({ interaction, pointer, event, eventTarget }: SignalArgs['interactions:move'], scope: Scope) {
-  if (interaction.pointerType !== 'mouse' ||
-      interaction.pointerIsDown ||
-      interaction.interacting()) { return }
+function prepareOnMove (
+  { interaction, pointer, event, eventTarget }: SignalArgs['interactions:move'],
+  scope: Scope,
+) {
+  if (interaction.pointerType !== 'mouse' || interaction.pointerIsDown || interaction.interacting()) return
 
   const actionInfo = getActionInfo(interaction, pointer, event, eventTarget as Element, scope)
   prepare(interaction, actionInfo, scope)
@@ -127,10 +128,12 @@ function prepareOnMove ({ interaction, pointer, event, eventTarget }: SignalArgs
 function startOnMove (arg: SignalArgs['interactions:move'], scope: Scope) {
   const { interaction } = arg
 
-  if (!interaction.pointerIsDown ||
-      interaction.interacting() ||
-      !interaction.pointerWasMoved ||
-      !interaction.prepared.name) {
+  if (
+    !interaction.pointerIsDown ||
+    interaction.interacting() ||
+    !interaction.pointerWasMoved ||
+    !interaction.prepared.name
+  ) {
     return
   }
 
@@ -141,11 +144,12 @@ function startOnMove (arg: SignalArgs['interactions:move'], scope: Scope) {
 
   if (actionName && interactable) {
     // check manualStart and interaction limit
-    if (interactable.options[actionName].manualStart ||
-        !withinInteractionLimit(interactable, interaction.element, interaction.prepared, scope)) {
+    if (
+      interactable.options[actionName].manualStart ||
+      !withinInteractionLimit(interactable, interaction.element, interaction.prepared, scope)
+    ) {
       interaction.stop()
-    }
-    else {
+    } else {
       interaction.start(interaction.prepared, interactable, interaction.element)
       setInteractionCursor(interaction, scope)
     }
@@ -169,9 +173,11 @@ function validateAction<T extends ActionName> (
   eventTarget: Node,
   scope: Scope,
 ) {
-  if (interactable.testIgnoreAllow(interactable.options[action.name], element, eventTarget) &&
-      interactable.options[action.name].enabled &&
-      withinInteractionLimit(interactable, element, action, scope)) {
+  if (
+    interactable.testIgnoreAllow(interactable.options[action.name], element, eventTarget) &&
+    interactable.options[action.name].enabled &&
+    withinInteractionLimit(interactable, element, action, scope)
+  ) {
     return action
   }
 
@@ -192,14 +198,11 @@ function validateMatches (
     const matchElement = matchElements[i]
     const matchAction = match.getAction(pointer, event, interaction, matchElement)
 
-    if (!matchAction) { continue }
+    if (!matchAction) {
+      continue
+    }
 
-    const action = validateAction<ActionName>(
-      matchAction,
-      match,
-      matchElement,
-      eventTarget,
-      scope)
+    const action = validateAction<ActionName>(matchAction, match, matchElement, eventTarget, scope)
 
     if (action) {
       return {
@@ -236,10 +239,17 @@ function getActionInfo (
 
     scope.interactables.forEachMatch(element, pushMatches)
 
-    const actionInfo = validateMatches(interaction, pointer, event, matches, matchElements, eventTarget, scope)
+    const actionInfo = validateMatches(
+      interaction,
+      pointer,
+      event,
+      matches,
+      matchElements,
+      eventTarget,
+      scope,
+    )
 
-    if (actionInfo.action &&
-      !actionInfo.interactable.options[actionInfo.action.name].manualStart) {
+    if (actionInfo.action && !actionInfo.interactable.options[actionInfo.action.name].manualStart) {
       return actionInfo
     }
 
@@ -251,7 +261,11 @@ function getActionInfo (
 
 function prepare (
   interaction: Interaction,
-  { action, interactable, element }: {
+  {
+    action,
+    interactable,
+    element,
+  }: {
     action: ActionProps<any>
     interactable: Interactable
     element: Element
@@ -264,9 +278,7 @@ function prepare (
   interaction.element = element
   copyAction(interaction.prepared, action)
 
-  interaction.rect = interactable && action.name
-    ? interactable.getRect(element)
-    : null
+  interaction.rect = interactable && action.name ? interactable.getRect(element) : null
 
   setInteractionCursor(interaction, scope)
 
@@ -288,12 +300,16 @@ function withinInteractionLimit<T extends ActionName> (
   let elementCount = 0
 
   // no actions if any of these values == 0
-  if (!(maxActions && maxPerElement && autoStartMax)) { return false }
+  if (!(maxActions && maxPerElement && autoStartMax)) {
+    return false
+  }
 
   for (const interaction of scope.interactions.list) {
     const otherAction = interaction.prepared.name
 
-    if (!interaction.interacting()) { continue }
+    if (!interaction.interacting()) {
+      continue
+    }
 
     activeInteractions++
 
@@ -301,7 +317,9 @@ function withinInteractionLimit<T extends ActionName> (
       return false
     }
 
-    if (interaction.interactable !== interactable) { continue }
+    if (interaction.interactable !== interactable) {
+      continue
+    }
 
     interactableCount += otherAction === action.name ? 1 : 0
 
@@ -362,8 +380,7 @@ function setInteractionCursor<T extends ActionName> (interaction: Interaction<T>
 
     if (is.func(cursorChecker)) {
       cursor = cursorChecker(prepared, interactable, element, interaction._interacting)
-    }
-    else {
+    } else {
       cursor = scope.actions.map[prepared.name].getCursor(prepared)
     }
   }

@@ -27,11 +27,7 @@ declare module '@interactjs/core/defaultOptions' {
   }
 }
 
-export interface Modifier<
-  Defaults = any,
-  State extends ModifierState = any,
-  Name extends string = any
-> {
+export interface Modifier<Defaults = any, State extends ModifierState = any, Name extends string = any> {
   options?: Defaults
   methods: {
     start?: (arg: ModifierArg<State>) => void
@@ -71,21 +67,18 @@ export interface ModifierArg<State extends ModifierState = ModifierState> {
   preEnd?: boolean
 }
 
-export interface ModifierModule<
-  Defaults extends { enabled?: boolean },
-  State extends ModifierState,
-> {
+export interface ModifierModule<Defaults extends { enabled?: boolean }, State extends ModifierState> {
   defaults?: Defaults
-  start? (arg: ModifierArg<State>): void
-  set? (arg: ModifierArg<State>): any
-  beforeEnd? (arg: ModifierArg<State>): Point | void
-  stop? (arg: ModifierArg<State>): void
+  start?(arg: ModifierArg<State>): void
+  set?(arg: ModifierArg<State>): any
+  beforeEnd?(arg: ModifierArg<State>): Point | void
+  stop?(arg: ModifierArg<State>): void
 }
 
-export interface ModifierFunction <
+export interface ModifierFunction<
   Defaults extends { enabled?: boolean },
   State extends ModifierState,
-  Name extends string,
+  Name extends string
 > {
   (_options?: Partial<Defaults>): Modifier<Defaults, State, Name>
   _defaults: Defaults
@@ -96,10 +89,7 @@ export function makeModifier<
   Defaults extends { enabled?: boolean },
   State extends ModifierState,
   Name extends string
-> (
-  module: ModifierModule<Defaults, State>,
-  name?: Name,
-) {
+> (module: ModifierModule<Defaults, State>, name?: Name) {
   const { defaults } = module
   const methods = {
     start: module.start,
@@ -146,7 +136,12 @@ export function makeModifier<
   return modifier
 }
 
-export function addEventModifiers ({ iEvent, interaction: { modification: { result } } }: {
+export function addEventModifiers ({
+  iEvent,
+  interaction: {
+    modification: { result },
+  },
+}: {
   iEvent: InteractEvent<any>
   interaction: Interaction<any>
 }) {

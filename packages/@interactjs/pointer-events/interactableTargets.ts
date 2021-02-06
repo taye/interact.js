@@ -38,12 +38,7 @@ const plugin: Plugin = {
   id: 'pointer-events/interactableTargets',
   install,
   listeners: {
-    'pointerEvents:collect-targets': ({
-      targets,
-      node,
-      type,
-      eventTarget,
-    }, scope) => {
+    'pointerEvents:collect-targets': ({ targets, node, type, eventTarget }, scope) => {
       scope.interactables.forEachMatch(node, (interactable: Interactable) => {
         const eventable = interactable.events
         const options = eventable.options
@@ -51,7 +46,8 @@ const plugin: Plugin = {
         if (
           eventable.types[type] &&
           eventable.types[type].length &&
-        interactable.testIgnoreAllow(options, node, eventTarget)) {
+          interactable.testIgnoreAllow(options, node, eventTarget)
+        ) {
           targets.push({
             node,
             eventable,
