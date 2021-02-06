@@ -142,7 +142,7 @@ function doOnInteractions (method: string, scope: Scope) {
 
     const pointerType = pointerUtils.getPointerType(event)
     const [eventTarget, curEventTarget] = pointerUtils.getEventTargets(event)
-    const matches = [] // [ [pointer, interaction], ...]
+    const matches: any[] = [] // [ [pointer, interaction], ...]
 
     if (/^touch/.test(event.type)) {
       scope.prevTouchTime = scope.now()

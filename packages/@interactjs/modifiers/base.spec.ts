@@ -21,7 +21,7 @@ test('modifiers/base', t => {
   const startCoords = { x: 100, y: 200 }
   const moveCoords = { x: 400, y: 500 }
   const options: any = { target: { x: 100, y: 100 }, setStart: true }
-  let firedEvents = []
+  let firedEvents: any[] = []
 
   interactable.rectChecker(() => ({ top: 0, left: 0, bottom: 50, right: 50 }))
   interactable.on('teststart testmove testend', e => firedEvents.push(e))

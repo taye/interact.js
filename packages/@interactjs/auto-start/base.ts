@@ -21,7 +21,9 @@ declare module '@interactjs/core/scope' {
   }
 
   interface SignalArgs {
-    'autoStart:before-start': SignalArgs['interactions:move']
+    'autoStart:before-start': Omit<SignalArgs['interactions:move'], 'interaction'> & {
+      interaction: Interaction<ActionName>
+    }
     'autoStart:prepared': { interaction: Interaction }
     'auto-start:check': CheckSignalArg
   }

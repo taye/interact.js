@@ -36,7 +36,7 @@ interface DocSignalArg {
   doc: Document
   window: Window
   scope: Scope
-  options?: { [index: string]: any }
+  options: Record<string, any>
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface

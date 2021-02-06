@@ -18,9 +18,9 @@ export interface ModificationResult {
 
 interface MethodArg {
   phase: EventPhase
-  pageCoords?: Point
-  rect?: FullRect
-  coords?: Point
+  pageCoords: Point
+  rect: FullRect
+  coords: Point
   preEnd?: boolean
   skipModifiers?: number
 }
@@ -28,10 +28,10 @@ interface MethodArg {
 export default class Modification {
   states: ModifierState[] = []
   startOffset: Rect = { left: 0, right: 0, top: 0, bottom: 0 }
-  startDelta: Point = null
-  result?: ModificationResult = null
-  endResult?: Point = null
-  edges: EdgeOptions
+  startDelta!: Point
+  result!: ModificationResult
+  endResult!: Point
+  edges!: EdgeOptions
   readonly interaction: Readonly<Interaction>
 
   constructor (interaction: Interaction) {
@@ -39,7 +39,7 @@ export default class Modification {
     this.result = createResult()
   }
 
-  start ({ phase }: MethodArg, pageCoords: Point) {
+  start ({ phase }: { phase: EventPhase }, pageCoords: Point) {
     const { interaction } = this
     const modifierList = getModifierList(interaction)
     this.prepareStates(modifierList)
@@ -48,11 +48,11 @@ export default class Modification {
     this.startOffset = getRectOffset(interaction.rect, pageCoords)
     this.startDelta = { x: 0, y: 0 }
 
-    const arg: MethodArg = {
+    const arg = this.fillArg({
       phase,
       pageCoords,
       preEnd: false,
-    }
+    })
 
     this.result = createResult()
     this.startAll(arg)
@@ -71,11 +71,11 @@ export default class Modification {
     arg.rect = arg.rect || interaction.rect
     arg.edges = this.edges
     arg.startOffset = this.startOffset
+
+    return arg as ModifierArg
   }
 
   startAll (arg: MethodArg & Partial<ModifierArg>) {
-    this.fillArg(arg)
-
     for (const state of this.states) {
       if (state.methods.start) {
         arg.state = state
@@ -85,8 +85,6 @@ export default class Modification {
   }
 
   setAll (arg: MethodArg & Partial<ModifierArg>): ModificationResult {
-    this.fillArg(arg)
-
     const { phase, preEnd, skipModifiers, rect: unmodifiedRect } = arg
 
     arg.coords = extend({}, arg.pageCoords)
@@ -101,9 +99,9 @@ export default class Modification {
       const lastModifierCoords = extend({}, arg.coords)
       let returnValue = null
 
-      if (state.methods.set && this.shouldDo(options, preEnd, phase)) {
+      if (state.methods?.set && this.shouldDo(options, preEnd, phase)) {
         arg.state = state
-        returnValue = state.methods.set(arg as ModifierArg)
+        returnValue = state.methods.set(arg as ModifierArg<never>)
 
         rectUtils.addEdges(this.interaction.edges, arg.rect, {
           x: arg.coords.x - lastModifierCoords.x,
@@ -184,11 +182,13 @@ export default class Modification {
     const { interaction } = this
     const { phase, preEnd, skipModifiers } = arg
 
-    const result = this.setAll({
-      preEnd,
-      phase,
-      pageCoords: arg.modifiedCoords || interaction.coords.cur.page,
-    })
+    const result = this.setAll(
+      this.fillArg({
+        preEnd,
+        phase,
+        pageCoords: arg.modifiedCoords || interaction.coords.cur.page,
+      }),
+    )
 
     this.result = result
 

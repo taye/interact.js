@@ -49,7 +49,7 @@ export type PointerArgProps<T extends {} = {}> = {
   eventTarget: Node
   pointerIndex: number
   pointerInfo: PointerInfo
-  interaction: Interaction<null>
+  interaction: Interaction<never>
 } & T
 
 export interface DoPhaseArg<T extends ActionName, P extends EventPhase> {
@@ -87,7 +87,7 @@ declare module '@interactjs/core/scope' {
       down: boolean
     }>
     'interactions:remove-pointer': PointerArgProps
-    'interactions:blur': { interaction: Interaction, event: Event, type: 'blur' }
+    'interactions:blur': { interaction: Interaction<never>, event: Event, type: 'blur' }
     'interactions:before-action-start': Omit<DoAnyPhaseArg, 'iEvent'>
     'interactions:action-start': DoAnyPhaseArg
     'interactions:after-action-start': DoAnyPhaseArg
@@ -101,14 +101,14 @@ declare module '@interactjs/core/scope' {
   }
 }
 
-export type InteractionProxy<T extends ActionName = ActionName> = Pick<
+export type InteractionProxy<T extends ActionName | null = never> = Pick<
 Interaction<T>,
 keyof typeof _ProxyValues | keyof typeof _ProxyMethods
 >
 
 let idCounter = 0
 
-export class Interaction<T extends ActionName = ActionName> {
+export class Interaction<T extends ActionName | null = ActionName> {
   // current interactable being interacted with
   interactable: Interactable = null
 
@@ -415,7 +415,11 @@ export class Interaction<T extends ActionName = ActionName> {
 
   documentBlur (event: Event) {
     this.end(event as any)
-    this._scopeFire('interactions:blur', { event, type: 'blur', interaction: this })
+    this._scopeFire('interactions:blur', {
+      event,
+      type: 'blur',
+      interaction: (this as unknown) as Interaction<never>,
+    })
   }
 
   /**

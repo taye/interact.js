@@ -52,7 +52,7 @@ function start (arg: ModifierArg<SnapState>) {
   return snapSize.start(arg)
 }
 
-const snapEdges: ModifierModule<SnapEdgesOptions, SnapState> = {
+const snapEdges: ModifierModule<SnapEdgesOptions, SnapState, ReturnType<typeof snapSize.set>> = {
   start,
   set: snapSize.set,
   defaults: extend(clone(snapSize.defaults), {

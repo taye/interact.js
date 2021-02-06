@@ -67,7 +67,7 @@ test('reflow', t => {
 
   const reflowMove = fired[2]
 
-  t.deepEqual(beforeReflowDelta, { x: 0, y: 0 }, 'interaction delta is zero before-action-reflow')
+  t.deepEqual(beforeReflowDelta!, { x: 0, y: 0 }, 'interaction delta is zero before-action-reflow')
 
   t.deepEqual(reflowMove.delta, { x: 100, y: -50 }, 'move delta is correct with modified interaction coords')
 

@@ -27,24 +27,25 @@ declare module '@interactjs/core/defaultOptions' {
   }
 }
 
-export interface Modifier<Defaults = any, State extends ModifierState = any, Name extends string = any> {
-  options?: Defaults
+export interface Modifier<
+  Defaults = any,
+  State extends ModifierState = any,
+  Name extends string = any,
+  Result = any
+> {
+  options: Defaults
   methods: {
     start?: (arg: ModifierArg<State>) => void
-    set: (arg: ModifierArg<State>) => void
+    set?: (arg: ModifierArg<State>) => Result
     beforeEnd?: (arg: ModifierArg<State>) => Point | void
     stop?: (arg: ModifierArg<State>) => void
   }
   name?: Name
-  enable: () => Modifier<Defaults, State, Name>
-  disable: () => Modifier<Defaults, State, Name>
+  enable: () => Modifier<Defaults, State, Name, Result>
+  disable: () => Modifier<Defaults, State, Name, Result>
 }
 
-export type ModifierState<
-  Defaults = {},
-  StateProps extends { [prop: string]: any } = {},
-  Name extends string = any
-> = {
+export type ModifierState<Defaults = unknown, StateProps = unknown, Name extends string = any> = {
   options: Defaults
   methods?: Modifier<Defaults>['methods']
   index?: number
@@ -57,20 +58,24 @@ export interface ModifierArg<State extends ModifierState = ModifierState> {
   phase: EventPhase
   rect: FullRect
   edges: EdgeOptions
-  state?: State
+  state: State
   element: Element
-  pageCoords?: Point
-  prevCoords?: Point
+  pageCoords: Point
+  prevCoords: Point
   prevRect?: FullRect
-  coords?: Point
-  startOffset?: Rect
+  coords: Point
+  startOffset: Rect
   preEnd?: boolean
 }
 
-export interface ModifierModule<Defaults extends { enabled?: boolean }, State extends ModifierState> {
+export interface ModifierModule<
+  Defaults extends { enabled?: boolean },
+  State extends ModifierState,
+  Result = unknown
+> {
   defaults?: Defaults
   start?(arg: ModifierArg<State>): void
-  set?(arg: ModifierArg<State>): any
+  set?(arg: ModifierArg<State>): Result
   beforeEnd?(arg: ModifierArg<State>): Point | void
   stop?(arg: ModifierArg<State>): void
 }
@@ -88,8 +93,9 @@ export interface ModifierFunction<
 export function makeModifier<
   Defaults extends { enabled?: boolean },
   State extends ModifierState,
-  Name extends string
-> (module: ModifierModule<Defaults, State>, name?: Name) {
+  Name extends string,
+  Result
+> (module: ModifierModule<Defaults, State, Result>, name?: Name) {
   const { defaults } = module
   const methods = {
     start: module.start,
@@ -99,18 +105,18 @@ export function makeModifier<
   }
 
   const modifier = (_options?: Partial<Defaults>) => {
-    const options: Defaults = (_options || {}) as Defaults
+    const options = (_options || {}) as Defaults
 
     options.enabled = options.enabled !== false
 
     // add missing defaults to options
     for (const prop in defaults) {
       if (!(prop in options)) {
-        options[prop] = defaults[prop]
+        ;(options as any)[prop] = defaults[prop]
       }
     }
 
-    const m: Modifier<Defaults, State, Name> = {
+    const m: Modifier<Defaults, State, Name, Result> = {
       options,
       methods,
       name,
@@ -138,13 +144,13 @@ export function makeModifier<
 
 export function addEventModifiers ({
   iEvent,
-  interaction: {
-    modification: { result },
-  },
+  interaction,
 }: {
   iEvent: InteractEvent<any>
   interaction: Interaction<any>
 }) {
+  const result = interaction.modification!.result
+
   if (result) {
     iEvent.modifiers = result.eventProps
   }
@@ -162,7 +168,7 @@ const modifiersBase: Plugin = {
     },
 
     'interactions:before-action-start': arg => {
-      const { modification } = arg.interaction
+      const modification = arg.interaction.modification!
 
       modification.start(arg, arg.interaction.coords.start.page)
       arg.interaction.edges = modification.edges

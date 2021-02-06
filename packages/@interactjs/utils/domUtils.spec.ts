@@ -4,6 +4,14 @@ import test from '@interactjs/_dev/test/test'
 import domObjects from './domObjects'
 import { indexOfDeepestElement } from './domUtils'
 
+interface MockNode {
+  name: string
+  lastChild: any
+  parentNode: MockNode | null
+  ownerDocument: MockNode | null
+  host?: MockNode
+}
+
 test('utils/domUtils/indexOfDeepestElement', t => {
   const doc1: Document = new JSDOM(`<div id="topDiv">
     <div id="sib0"></div>
@@ -13,36 +21,44 @@ test('utils/domUtils/indexOfDeepestElement', t => {
 
   domObjects.init(doc1.defaultView)
 
-  const ownerDocument = {
+  const ownerDocument: MockNode = {
     name: 'Owner Document',
-    lastChild: null,
+    lastChild: null as any,
+    parentNode: null,
+    ownerDocument: null,
   }
-  const html = {
+  const html: MockNode = {
     name: 'html',
-    lastChild: null,
+    lastChild: null as any,
     ownerDocument,
     parentNode: ownerDocument,
   }
 
-  const body: any = { name: 'body', lastChild: null, ownerDocument, parentNode: html }
+  const body: MockNode = { name: 'body', lastChild: null, ownerDocument, parentNode: html }
 
-  const wrapper = { name: 'wrapper', ownerDocument, parentNode: body, lastChild: null }
+  const wrapper: MockNode = { name: 'wrapper', ownerDocument, parentNode: body, lastChild: null }
 
-  const a = { name: 'a', ownerDocument, parentNode: wrapper, lastChild: null }
+  const a: MockNode = { name: 'a', ownerDocument, parentNode: wrapper, lastChild: null }
 
-  const b1 = { name: 'b1', ownerDocument, parentNode: a, lastChild: null }
+  const b1: MockNode = { name: 'b1', ownerDocument, parentNode: a, lastChild: null }
 
-  const b2 = { name: 'b2', ownerDocument, parentNode: a, lastChild: null }
+  const b2: MockNode = { name: 'b2', ownerDocument, parentNode: a, lastChild: null }
 
-  const c1 = { name: 'c1', ownerDocument, parentNode: b1, lastChild: null }
+  const c1: MockNode = { name: 'c1', ownerDocument, parentNode: b1, lastChild: null }
 
-  const c2 = { name: 'c2', ownerDocument, parentNode: b1, lastChild: null }
+  const c2: MockNode = { name: 'c2', ownerDocument, parentNode: b1, lastChild: null }
 
-  const d1 = { name: 'd1', ownerDocument, parentNode: c1, lastChild: null }
+  const d1: MockNode = { name: 'd1', ownerDocument, parentNode: c1, lastChild: null }
 
-  const d1Comp = { name: 'd1_comp', ownerDocument, parentNode: d1, lastChild: null }
+  const d1Comp: MockNode = { name: 'd1_comp', ownerDocument, parentNode: d1, lastChild: null }
 
-  const d2Shadow = { name: 'd2_shadow', ownerDocument, parentNode: null, lastChild: null, host: d1Comp }
+  const d2Shadow: MockNode = {
+    name: 'd2_shadow',
+    ownerDocument,
+    parentNode: null,
+    lastChild: null,
+    host: d1Comp,
+  }
 
   ownerDocument.lastChild = html
   html.lastChild = body

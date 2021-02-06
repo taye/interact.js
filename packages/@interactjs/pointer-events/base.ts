@@ -125,7 +125,7 @@ function fire<T extends string> (
     pointer: PointerType | PointerEvent<any>
     event: PointerEventType | PointerEvent<any>
     eventTarget: Node
-    interaction: Interaction<null>
+    interaction: Interaction<never>
     type: T
     targets?: EventTargetList
   },

@@ -71,22 +71,22 @@ export class InertiaState {
   smoothEnd = false
   allowResume = false
 
-  modification: Modification = null
+  modification!: Modification
   modifierCount = 0
-  modifierArg: modifiers.ModifierArg = null
+  modifierArg!: modifiers.ModifierArg
 
-  startCoords: Point = null
+  startCoords!: Point
   t0 = 0
   v0 = 0
 
   te = 0
-  targetOffset: Point = null
-  modifiedOffset: Point = null
-  currentOffset: Point = null
+  targetOffset!: Point
+  modifiedOffset!: Point
+  currentOffset!: Point
 
   lambda_v0? = 0 // eslint-disable-line camelcase
   one_ve_v0? = 0 // eslint-disable-line camelcase
-  timeout: number = null
+  timeout!: number
   readonly interaction: Interaction
 
   constructor (interaction: Interaction) {
@@ -113,16 +113,11 @@ export class InertiaState {
     this.currentOffset = { x: 0, y: 0 }
     this.startCoords = interaction.coords.cur.page
 
-    this.modifierArg = {
-      interaction,
-      interactable: interaction.interactable,
-      element: interaction.element,
-      rect: interaction.rect,
-      edges: interaction.edges,
+    this.modifierArg = modification.fillArg({
       pageCoords: this.startCoords,
       preEnd: true,
       phase: 'inertiastart',
-    }
+    })
 
     const thrown =
       this.t0 - interaction.coords.cur.timeStamp < 50 &&

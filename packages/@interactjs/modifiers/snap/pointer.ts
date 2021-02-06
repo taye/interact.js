@@ -1,4 +1,5 @@
 import type { Interaction, InteractionProxy } from '@interactjs/core/Interaction'
+import type { ActionName } from '@interactjs/core/scope'
 import type { Point, RectResolvable, Element } from '@interactjs/types/index'
 import extend from '@interactjs/utils/extend'
 import getOriginXY from '@interactjs/utils/getOriginXY'
@@ -13,7 +14,7 @@ export interface Offset {
   x: number
   y: number
   index: number
-  relativePoint?: Point
+  relativePoint?: Point | null
 }
 
 export interface SnapPosition {
@@ -27,21 +28,21 @@ export interface SnapPosition {
 export type SnapFunction = (
   x: number,
   y: number,
-  interaction: InteractionProxy,
+  interaction: InteractionProxy<ActionName>,
   offset: Offset,
   index: number,
 ) => SnapPosition
 export type SnapTarget = SnapPosition | SnapFunction
 export interface SnapOptions {
-  targets: SnapTarget[]
+  targets: SnapTarget[] | null
   // target range
   range: number
   // self points for snapping. [0,0] = top left, [1,1] = bottom right
-  relativePoints: Point[]
+  relativePoints: Point[] | null
   // startCoords = offset snapping from drag start page position
-  offset: Point | RectResolvable<[Interaction]> | 'startCoords'
+  offset: Point | RectResolvable<[Interaction]> | 'startCoords' | null
   offsetWithOrigin?: boolean
-  origin: RectResolvable<[Element]> | Point
+  origin: RectResolvable<[Element]> | Point | null
   endOnly?: boolean
   enabled?: boolean
 }
@@ -86,13 +87,12 @@ function start (arg: ModifierArg<SnapState>) {
         y: startOffset.top - rect.height * relativePoint.y + snapOffset.y,
       }))
       : [
-        extend(
-          {
-            index: 0,
-            relativePoint: null,
-          },
-          snapOffset,
-        ),
+        {
+          index: 0,
+          relativePoint: null,
+          x: snapOffset.x,
+          y: snapOffset.y,
+        },
       ]
 }
 

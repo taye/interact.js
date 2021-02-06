@@ -90,7 +90,7 @@ export function getClientXY (pointer: PointerType, client: Point) {
 }
 
 export function getPointerId (pointer: { pointerId?: number, identifier?: number, type?: string }) {
-  return is.number(pointer.pointerId) ? pointer.pointerId : pointer.identifier
+  return is.number(pointer.pointerId) ? pointer.pointerId! : pointer.identifier!
 }
 
 export function setCoords (dest: CoordsSetMember, pointers: any[], timeStamp: number) {
@@ -202,10 +202,10 @@ export function getPointerType (pointer: { pointerType?: string, identifier?: nu
   return is.string(pointer.pointerType)
     ? pointer.pointerType
     : is.number(pointer.pointerType)
-      ? [undefined, undefined, 'touch', 'pen', 'mouse'][pointer.pointerType]
+      ? [undefined, undefined, 'touch', 'pen', 'mouse'][pointer.pointerType]!
       : // if the PointerEvent API isn't available, then the "pointer" must
     // be either a MouseEvent, TouchEvent, or Touch object
-      /touch/.test(pointer.type) || pointer instanceof dom.Touch
+      /touch/.test(pointer.type || '') || pointer instanceof dom.Touch
         ? 'touch'
         : 'mouse'
 }
