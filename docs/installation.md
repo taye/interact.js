@@ -5,11 +5,11 @@ title: Installation
 interact.js offers two sets of free packages that you can add to your project:
 
  1. To get started quickly, you can use the package named `interactjs` on npm.
-    This package contains all the features of the library already pre-bundled.
+    This package contains all the features of the library as an *ES5 bundled*.
  2. If you'd like to keep your JS payload small, there are npm packages under
     the `@interactjs/` scope which let you choose which features to include.
-    These packages are distributed as ES6 modules and may need to be transpiled
-    for older browsers.
+    These packages are distributed as *ES6 modules* and may need to be
+    transpiled for older browsers.
 
 ### npm pre-bundled
 
