@@ -1,0 +1,20 @@
+{
+	"version": 3,
+	"sources": [
+		"plugin.ts"
+	],
+	"names": [
+		"pointerEvents",
+		"holdRepeat",
+		"interactableTargets",
+		"plugin",
+		"id",
+		"install",
+		"scope",
+		"usePlugin"
+	],
+	"mappings": "AAEA,OAAO,KAAKA,aAAZ,MAA+B,WAA/B;AACA,OAAOC,UAAP,MAAuB,iBAAvB;AACA,OAAOC,mBAAP,MAAgC,0BAAhC;AAEA,MAAMC,MAAc,GAAG;AACrBC,EAAAA,EAAE,EAAE,gBADiB;;AAErBC,EAAAA,OAAO,CAAEC,KAAF,EAAS;AACdA,IAAAA,KAAK,CAACC,SAAN,CAAgBP,aAAhB;AACAM,IAAAA,KAAK,CAACC,SAAN,CAAgBN,UAAhB;AACAK,IAAAA,KAAK,CAACC,SAAN,CAAgBL,mBAAhB;AACD;;AANoB,CAAvB;AASA,eAAeC,MAAf",
+	"sourcesContent": [
+		"import type { Plugin } from '@interactjs/core/scope'\n\nimport * as pointerEvents from './base'\nimport holdRepeat from './holdRepeat'\nimport interactableTargets from './interactableTargets'\n\nconst plugin: Plugin = {\n  id: 'pointer-events',\n  install (scope) {\n    scope.usePlugin(pointerEvents)\n    scope.usePlugin(holdRepeat)\n    scope.usePlugin(interactableTargets)\n  },\n}\n\nexport default plugin\n"
+	]
+}

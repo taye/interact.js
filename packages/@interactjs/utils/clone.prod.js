@@ -1,0 +1,2 @@
+import*as r from"./arr.prod.js";import o from"./is.prod.js";export default function t(n){const s={};for(const a in n){const f=n[a];o.plainObject(f)?s[a]=t(f):o.array(f)?s[a]=r.from(f):s[a]=f}return s}
+//# sourceMappingURL=clone.prod.js.map
