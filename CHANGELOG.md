@@ -1,3 +1,8 @@
+## v1.10.3
+
+ - fixed issue with TS strict null checks (#882)
+ - fixed issue with type imports being emitted in JS modules (#881)
+
 ## v1.10.2
 
  - marked interact.{on,off} methods as deprecated

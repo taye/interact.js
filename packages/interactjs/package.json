@@ -1,6 +1,6 @@
 {
   "name": "interactjs",
-  "version": "1.10.2",
+  "version": "1.10.3",
   "main": "dist/interact.min.js",
   "typings": "index.d.ts",
   "license": "MIT",
@@ -39,7 +39,7 @@
     "test": "cd ../; npm test"
   },
   "dependencies": {
-    "@interactjs/types": "1.10.2"
+    "@interactjs/types": "1.10.3"
   },
   "sideEffects": [
     "**/index.js",
