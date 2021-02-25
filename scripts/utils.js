@@ -95,7 +95,9 @@ async function getPackages (options) {
 }
 
 function shouldIgnoreImport (sourceValue, filename, moduleDirectory) {
-  return !/^(\.{1-2}|(@interactjs))\//.test(sourceValue) && !moduleDirectory.some((d) => filename.startsWith(d))
+  return (
+    !/^(\.{1-2}|(@interactjs))[\\/]/.test(sourceValue) && !moduleDirectory.some((d) => filename.startsWith(d))
+  )
 }
 
 function isPro () {
@@ -107,8 +109,6 @@ function extensionsWithStubs (extensions) {
 }
 
 function transformImportsToRelative () {
-  const resolve = require('resolve')
-
   const fixImportSource = ({ node: { source } }, { opts, filename }) => {
     if (!source || (opts.ignore && opts.ignore(filename))) return
 
@@ -123,7 +123,7 @@ function transformImportsToRelative () {
 
     for (const root of moduleDirectory) {
       try {
-        resolvedImport = resolve.sync(source.value, {
+        resolvedImport = resolveSync(source.value, {
           extensions: extensionsWithStubs(['.ts', '.tsx']),
           basedir: path.join(root, basedir),
           moduleDirectory,
@@ -138,9 +138,9 @@ function transformImportsToRelative () {
 
     const relativeImport = path.relative(basedir, getRelativeToRoot(resolvedImport, moduleDirectory).result)
 
-    const importWithDir = /^[./]/.test(relativeImport) ? relativeImport : `/${relativeImport}`
+    const importWithDir = /^[./\\]/.test(relativeImport) ? relativeImport : `${path.sep}${relativeImport}`
 
-    source.value = importWithDir.replace(/^\//, './').replace(/\.tsx?$/, extension)
+    source.value = importWithDir.replace(/^\//, `.${path.sep}`).replace(/\.tsx?$/, extension)
   }
 
   return {
@@ -153,8 +153,6 @@ function transformImportsToRelative () {
 }
 
 function transformImportsToAbsolute () {
-  const resolve = require('resolve')
-
   const fixImportSource = ({ node: { source } }, { opts, filename }) => {
     if (!source || (opts.ignore && opts.ignore(filename, source.value))) return
 
@@ -167,7 +165,7 @@ function transformImportsToAbsolute () {
 
     let resolvedImport = ''
 
-    resolvedImport = resolve.sync(source.value, {
+    resolvedImport = resolveSync(source.value, {
       extensions: extensionsWithStubs(['.ts', '.tsx', '.js']),
       basedir,
       moduleDirectory,
@@ -178,7 +176,7 @@ function transformImportsToAbsolute () {
 
       source.value = extension === null ? unrootedImport : unrootedImport.replace(/\.[jt]sx?$/, extension)
     } catch (error) {
-      source.value = resolve.sync(source.value, {
+      source.value = resolveSync(source.value, {
         basedir,
         moduleDirectory,
       })
