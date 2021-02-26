@@ -96,5 +96,9 @@ test('utils/domUtils/indexOfDeepestElement', t => {
 
   t.equal(indexOfDeepestElement(siblings), 1, 'sibling with higher z-index is selected')
 
+  const nodeWithoutParent: MockNode = { name: 'd1', ownerDocument, parentNode: undefined, lastChild: null }
+  const brokenElementCollection = ([nodeWithoutParent, d1, c2] as unknown) as HTMLElement[]
+  t.equal(indexOfDeepestElement(brokenElementCollection), 0, 'does not break with a node without parent')
+
   t.end()
 })
