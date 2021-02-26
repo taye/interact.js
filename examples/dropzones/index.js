@@ -62,7 +62,7 @@ function setupDropzone (target, accept) {
         removeClass(event.relatedTarget, '-drop-possible')
       },
     })
-    .on('dropactivate', event => {
+    .on('dropactivate', (event) => {
       const active = event.target.getAttribute('active') | 0
 
       // change style if it was previously not active
@@ -73,7 +73,7 @@ function setupDropzone (target, accept) {
 
       event.target.setAttribute('active', active + 1)
     })
-    .on('dropdeactivate', event => {
+    .on('dropdeactivate', (event) => {
       const active = event.target.getAttribute('active') | 0
 
       // change style if it was previously active
@@ -85,15 +85,15 @@ function setupDropzone (target, accept) {
 
       event.target.setAttribute('active', active - 1)
     })
-    .on('dragenter', event => {
+    .on('dragenter', (event) => {
       addClass(event.target, '-drop-over')
       event.relatedTarget.textContent = "I'm in"
     })
-    .on('dragleave', event => {
+    .on('dragleave', (event) => {
       removeClass(event.target, '-drop-over')
       event.relatedTarget.textContent = 'Drag me…'
     })
-    .on('drop', event => {
+    .on('drop', (event) => {
       removeClass(event.target, '-drop-over')
       event.relatedTarget.textContent = 'Dropped'
     })

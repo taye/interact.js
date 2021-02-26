@@ -39,9 +39,9 @@ function getBabelrc () {
   let babelrc
 
   try {
-    babelrc = require(path.join(process.cwd(), '.babelrc'))
+    babelrc = require(path.join(process.cwd(), 'babel.config.js'))
   } catch (e) {
-    babelrc = require('../.babelrc')
+    babelrc = require('../babel.config.js')
   }
 
   return babelrc
@@ -53,6 +53,7 @@ function getBabelOptions () {
   return {
     ignore: babelrc.ignore,
     babelrc: false,
+    configFile: false,
     sourceMaps: true,
     presets: [
       [
@@ -64,9 +65,9 @@ function getBabelOptions () {
       ],
     ],
     plugins: [
-      [require('@babel/plugin-proposal-class-properties'), { loose: true }],
-      [require('@babel/plugin-proposal-optional-chaining').default, { loose: true }],
-      require('@babel/plugin-proposal-optional-catch-binding').default,
+      [require.resolve('@babel/plugin-proposal-class-properties'), { loose: true }],
+      [require.resolve('@babel/plugin-proposal-optional-chaining'), { loose: true }],
+      require.resolve('@babel/plugin-proposal-optional-catch-binding'),
     ],
   }
 }
@@ -80,11 +81,7 @@ function getModuleName (tsName) {
 }
 
 function getModuleDirectories () {
-  return [
-    path.join(process.cwd(), 'packages'),
-    path.join(process.cwd(), 'node_modules'),
-    path.join(__dirname, '..', 'packages'),
-  ]
+  return [path.join(__dirname, '..', 'packages'), path.join(process.cwd(), 'node_modules')]
 }
 
 async function getPackages (options) {
@@ -92,13 +89,21 @@ async function getPackages (options) {
     ignore: commonIgnoreGlobs,
     ...options,
   })
-  const packageDirs = packageJsonPaths.map(p => path.join(p, '..'))
+  const packageDirs = packageJsonPaths.map((p) => path.join(p, '..'))
 
   return [...new Set(packageDirs)]
 }
 
 function shouldIgnoreImport (sourceValue, filename, moduleDirectory) {
-  return !/^(\.{1-2}|(@interactjs))\//.test(sourceValue) && !moduleDirectory.some(d => filename.startsWith(d))
+  return !/^(\.{1-2}|(@interactjs))\//.test(sourceValue) && !moduleDirectory.some((d) => filename.startsWith(d))
+}
+
+function isPro () {
+  return process.env.INTERACTJS_TIER === 'pro'
+}
+
+function extensionsWithStubs (extensions) {
+  return isPro() ? extensions : [...extensions.map((ext) => `.stub${ext}`), ...extensions]
 }
 
 function transformImportsToRelative () {
@@ -107,7 +112,7 @@ function transformImportsToRelative () {
   const fixImportSource = ({ node: { source } }, { opts, filename }) => {
     if (!source || (opts.ignore && opts.ignore(filename))) return
 
-    const { moduleDirectory } = opts
+    const { moduleDirectory = getModuleDirectories() } = opts
 
     if (shouldIgnoreImport(source.value, filename, moduleDirectory)) return
 
@@ -119,7 +124,7 @@ function transformImportsToRelative () {
     for (const root of moduleDirectory) {
       try {
         resolvedImport = resolve.sync(source.value, {
-          extensions: ['.ts', '.tsx'],
+          extensions: extensionsWithStubs(['.ts', '.tsx']),
           basedir: path.join(root, basedir),
           moduleDirectory,
         })
@@ -153,7 +158,7 @@ function transformImportsToAbsolute () {
   const fixImportSource = ({ node: { source } }, { opts, filename }) => {
     if (!source || (opts.ignore && opts.ignore(filename, source.value))) return
 
-    const { moduleDirectory } = opts
+    const { moduleDirectory = getModuleDirectories() } = opts
 
     if (shouldIgnoreImport(source.value, filename, moduleDirectory)) return
 
@@ -163,7 +168,7 @@ function transformImportsToAbsolute () {
     let resolvedImport = ''
 
     resolvedImport = resolve.sync(source.value, {
-      extensions: ['.ts', '.tsx', '.js'],
+      extensions: extensionsWithStubs(['.ts', '.tsx', '.js']),
       basedir,
       moduleDirectory,
     })
@@ -240,7 +245,7 @@ function getPackageDir (filename) {
 function getRelativeToRoot (filename, moduleDirectory, prefix = '/') {
   filename = path.normalize(filename)
 
-  const ret = withBestRoot(root => {
+  const ret = withBestRoot((root) => {
     const valid = filename.startsWith(root)
     const result = valid && path.join(prefix, path.relative(root, filename))
     const priority = valid && -result.length
@@ -259,7 +264,7 @@ function getRelativeToRoot (filename, moduleDirectory, prefix = '/') {
  * use the result of `func` most shallow valid root
  */
 function withBestRoot (func, moduleDirectory) {
-  const roots = moduleDirectory.map(path.normalize).map(root => path.normalize(root))
+  const roots = moduleDirectory.map(path.normalize)
 
   return (
     roots.reduce((best, root) => {
@@ -283,7 +288,15 @@ function resolveImport (specifier, basedir, moduleDirectory) {
     specifier = path.join(basedir, specifier)
   }
 
-  return resolveSync(specifier, { extensions: ['.ts', '.tsx'], moduleDirectory })
+  return resolveSync(specifier, { extensions: extensionsWithStubs(['.ts', '.tsx']), moduleDirectory })
+}
+
+function getShims () {
+  try {
+    return require('../scripts/shims')
+  } catch {
+    return []
+  }
 }
 
 module.exports = {
@@ -305,7 +318,10 @@ module.exports = {
   getRelativeToRoot,
   withBestRoot,
   resolveImport,
+  extensionsWithStubs,
+  isPro,
   transformImportsToRelative,
   transformImportsToAbsolute,
   transformInlineEnvironmentVariables,
+  getShims,
 }

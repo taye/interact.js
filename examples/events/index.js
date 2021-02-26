@@ -5,7 +5,7 @@ const dirs = ['up', 'down', 'left', 'right']
 
 interact('#swipe')
   .draggable(true)
-  .on('dragend', event => {
+  .on('dragend', (event) => {
     if (!event.swipe) {
       return
     }

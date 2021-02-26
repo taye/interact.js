@@ -7,7 +7,7 @@ const { sourcesGlob, sourcesIgnoreGlobs } = require('../scripts/utils')
 const root = path.join(__dirname, '..')
 const include = glob
   .sync(sourcesGlob, { cwd: root, ignore: sourcesIgnoreGlobs })
-  .map(source => path.join(root, source))
+  .map((source) => path.join(root, source))
 
 module.exports = {
   source: {
@@ -26,7 +26,9 @@ module.exports = {
   babel: {
     extensions: ['js', 'ts'],
     babelrc: false,
+    configFile: false,
     presets: ['@babel/preset-typescript'],
+    plugins: [require('@vue/babel-plugin-jsx')],
   },
 
   markdown: {

@@ -34,7 +34,7 @@ module.exports = function combine (options) {
   const newMap = combiner.generator.toJSON()
   newMap.file = filename
 
-  newMap.sources = newMap.sources.map(source => {
+  newMap.sources = newMap.sources.map((source) => {
     const absolute = path.join(process.cwd(), source)
     try {
       const { result } = getRelativeToRoot(absolute, [process.cwd(), path.join(__dirname, '..')], '')

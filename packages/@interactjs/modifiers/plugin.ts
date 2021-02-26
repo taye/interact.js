@@ -4,7 +4,7 @@ import snappers from '@interactjs/snappers/plugin'
 import all from './all'
 import base from './base'
 
-declare module '@interactjs/core/interactStatic' {
+declare module '@interactjs/core/InteractStatic' {
   export interface InteractStatic {
     modifiers: typeof all
   }

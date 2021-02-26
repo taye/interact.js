@@ -62,7 +62,7 @@ function install (scope: Scope) {
 
   function add (eventTarget: EventTarget, type: string, listener: Listener, optionalArg?: boolean | any) {
     const options = getOptions(optionalArg)
-    let target = arr.find(targets, t => t.eventTarget === eventTarget)
+    let target = arr.find(targets, (t) => t.eventTarget === eventTarget)
 
     if (!target) {
       target = {
@@ -94,7 +94,7 @@ function install (scope: Scope) {
     optionalArg?: boolean | any,
   ) {
     const options = getOptions(optionalArg)
-    const targetIndex = arr.findIndex(targets, t => t.eventTarget === eventTarget)
+    const targetIndex = arr.findIndex(targets, (t) => t.eventTarget === eventTarget)
     const target = targets[targetIndex]
 
     if (!target || !target.events) {
@@ -158,7 +158,7 @@ function install (scope: Scope) {
     }
 
     const delegates = delegatedEvents[type]
-    let delegate = arr.find(delegates, d => d.selector === selector && d.context === context)
+    let delegate = arr.find(delegates, (d) => d.selector === selector && d.context === context)
 
     if (!delegate) {
       delegate = { selector, context, listeners: [] }

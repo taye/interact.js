@@ -40,8 +40,8 @@ if (!module.parent) {
 
       pkg.version = currentVersion
 
-      for (const deps of depFields.map(f => pkg[f]).filter(Boolean)) {
-        for (const name of Object.keys(deps).filter(n => /@?interactjs\//.test(n))) {
+      for (const deps of depFields.map((f) => pkg[f]).filter(Boolean)) {
+        for (const name of Object.keys(deps).filter((n) => /@?interactjs\//.test(n))) {
           if (deps[name] === previousVersion) {
             deps[name] = currentVersion
           } else {

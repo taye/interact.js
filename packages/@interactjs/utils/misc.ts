@@ -23,3 +23,5 @@ export function copyAction<T extends ActionName> (dest: ActionProps<any>, src: A
 
   return dest
 }
+
+export const sign = (n: number) => (n >= 0 ? 1 : -1)

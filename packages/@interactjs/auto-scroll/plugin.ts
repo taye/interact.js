@@ -20,7 +20,7 @@ declare module '@interactjs/core/Interaction' {
   }
 }
 
-declare module '@interactjs/core/defaultOptions' {
+declare module '@interactjs/core/options' {
   interface PerActionDefaults {
     autoScroll?: AutoScrollOptions
   }

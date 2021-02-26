@@ -2,6 +2,7 @@
 
 const { existsSync } = require('fs')
 
+const { ESLint } = require('eslint')
 const yargs = require('yargs')
 
 const { lintSourcesGlob, lintIgnoreGlobs } = require('../scripts/utils')
@@ -30,10 +31,8 @@ function getSources () {
     silent: true,
   })
 
-  return sources.filter(source => isNotGenerated(source))
+  return sources.filter((source) => isNotGenerated(source))
 }
-
-const { ESLint } = require(require.resolve('eslint', { basedir: process.cwd() }))
 
 console.log('Linting...')
 
@@ -55,7 +54,7 @@ const sources = argv._.length ? argv._ : getSources()
 
   console.log(formatter.format(results))
 
-  const hasUnfixedError = results.some(r => r.errorCount > r.fixableErrorCount)
+  const hasUnfixedError = results.some((r) => r.errorCount > r.fixableErrorCount)
 
   if (hasUnfixedError) {
     process.exit(1)

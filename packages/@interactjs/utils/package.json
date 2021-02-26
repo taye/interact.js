@@ -1,12 +1,17 @@
 {
   "name": "@interactjs/utils",
   "version": "1.10.3",
-  "license": "MIT",
+  "peerDependencies": {
+    "@interactjs/feedback": "1.10.3",
+    "@interactjs/symbol-tree": "1.10.3"
+  },
   "publishConfig": {
-    "access": "public"
+    "access": "public",
+    "registry": "https://registry.interactjs.io"
   },
   "sideEffects": [
     "**/index.js",
     "**/index.prod.js"
-  ]
+  ],
+  "license": "MIT"
 }

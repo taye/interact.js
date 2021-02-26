@@ -1,7 +1,6 @@
 {
   "name": "@interactjs/inertia",
   "version": "1.10.3",
-  "license": "MIT",
   "dependencies": {
     "@interactjs/offset": "1.10.3"
   },
@@ -19,5 +18,6 @@
   "sideEffects": [
     "**/index.js",
     "**/index.prod.js"
-  ]
+  ],
+  "license": "MIT"
 }

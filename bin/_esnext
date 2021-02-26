@@ -1,4 +1,11 @@
 #!/usr/bin/env node
+const path = require('path')
+
+const generate = require('../scripts/esnext')
+const minify = require('../scripts/minify')
+const bundleShim = require('../scripts/shimBundler')
+const { getBabelOptions, getSources, getShims } = require('../scripts/utils')
+
 const [, , ...args] = process.argv
 
 const fileArgs = []
@@ -11,12 +18,39 @@ for (const arg of args) {
   } else if (arg === '--serve') {
     serve = true
   } else {
-    fileArgs.push(arg)
+    fileArgs.push(path.resolve(arg))
   }
 }
 
-require('../scripts/esnext')({
-  sources: fileArgs.length ? fileArgs : undefined,
-  watch,
-  serve,
+const babelOptions = getBabelOptions()
+const shims = getShims()
+
+babelOptions.plugins.push(require('@vue/babel-plugin-jsx'))
+
+const cwd = process.cwd()
+
+const sourcesPromise = fileArgs.length
+  ? Promise.resolve(fileArgs)
+  : getSources({ cwd })
+
+sourcesPromise.then(async (sources) => {
+  await generate({
+    sources,
+    async shim (filename) {
+      const shimConfig = shims.find((s) => filename.endsWith(s.source))
+
+      if (shimConfig) {
+        const bundleCode = await bundleShim(shimConfig)
+
+        const { code, map, error } = await minify({ code: bundleCode, modern: true })
+
+        if (error) { throw error }
+
+        return { code, map }
+      }
+    },
+    babelOptions,
+    watch,
+    serve,
+  })
 })

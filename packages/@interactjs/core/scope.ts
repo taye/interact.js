@@ -9,14 +9,14 @@ import * as win from '@interactjs/utils/window'
 import { Eventable } from './Eventable'
 import type { PhaseMap } from './InteractEvent'
 import { InteractEvent } from './InteractEvent'
+import { createInteractStatic } from './InteractStatic'
 import type { Interactable } from './Interactable'
 import { Interactable as InteractableBase } from './Interactable'
 import { InteractableSet } from './InteractableSet'
-import type { OptionsArg } from './defaultOptions'
-import { defaults } from './defaultOptions'
 import events from './events'
-import { createInteractStatic } from './interactStatic'
 import interactions from './interactions'
+import type { OptionsArg } from './options'
+import { defaults } from './options'
 
 export interface SignalArgs {
   'scope:add-document': DocSignalArg

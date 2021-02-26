@@ -23,7 +23,7 @@ declare module '@interactjs/core/Interaction' {
   }
 }
 
-declare module '@interactjs/core/defaultOptions' {
+declare module '@interactjs/core/options' {
   interface PerActionDefaults {
     inertia?: {
       enabled?: boolean
@@ -382,7 +382,7 @@ const inertia: Plugin = {
     'interactions:down': resume,
     'interactions:stop': stop,
 
-    'interactions:before-action-resume': arg => {
+    'interactions:before-action-resume': (arg) => {
       const { modification } = arg.interaction
 
       modification.stop(arg)
@@ -390,12 +390,12 @@ const inertia: Plugin = {
       modification.applyToInteraction(arg)
     },
 
-    'interactions:before-action-inertiastart': arg => arg.interaction.modification.setAndApply(arg),
+    'interactions:before-action-inertiastart': (arg) => arg.interaction.modification.setAndApply(arg),
     'interactions:action-resume': modifiers.addEventModifiers,
     'interactions:action-inertiastart': modifiers.addEventModifiers,
-    'interactions:after-action-inertiastart': arg =>
+    'interactions:after-action-inertiastart': (arg) =>
       arg.interaction.modification.restoreInteractionCoords(arg),
-    'interactions:after-action-resume': arg => arg.interaction.modification.restoreInteractionCoords(arg),
+    'interactions:after-action-resume': (arg) => arg.interaction.modification.restoreInteractionCoords(arg),
   },
 }
 

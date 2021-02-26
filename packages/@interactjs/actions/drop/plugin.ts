@@ -49,7 +49,7 @@ declare module '@interactjs/core/InteractEvent' {
   }
 }
 
-declare module '@interactjs/core/defaultOptions' {
+declare module '@interactjs/core/options' {
   interface ActionDefaults {
     drop: DropzoneOptions
   }
@@ -71,8 +71,8 @@ declare module '@interactjs/core/scope' {
   }
 }
 
-declare module '@interactjs/core/interactStatic' {
-  export interface InteractStatic {
+declare module '@interactjs/core/InteractStatic' {
+  interface InteractStatic {
     dynamicDrop: (this: InteractStatic, newValue?: boolean) => boolean | this
   }
 }

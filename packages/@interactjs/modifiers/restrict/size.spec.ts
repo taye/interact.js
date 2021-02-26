@@ -1,4 +1,3 @@
-import test from '@interactjs/_dev/test/test'
 import type { ResizeEvent } from '@interactjs/actions/resize/plugin'
 import resize from '@interactjs/actions/resize/plugin'
 import * as helpers from '@interactjs/core/tests/_helpers'
@@ -9,7 +8,7 @@ import modifiersBase from '../base'
 
 import restrictSize from './size'
 
-test('restrictSize', t => {
+test('restrictSize', () => {
   const rect = rectUtils.xywhToTlbr({ left: 0, top: 0, right: 200, bottom: 300 })
   const { interaction, interactable, coords, down, start, move } = helpers.testEnv({
     plugins: [modifiersBase, resize],
@@ -27,7 +26,7 @@ test('restrictSize', t => {
     .resizable({
       modifiers: [restrictSize(options)],
     })
-    .on('resizestart resizemove resizeend', e => {
+    .on('resizestart resizemove resizeend', (e) => {
       latestEvent = e
     })
 
@@ -36,17 +35,20 @@ test('restrictSize', t => {
 
   extend(coords.page, { x: -50, y: -40 })
   move()
-  t.deepEqual(latestEvent.page, coords.page, 'within both min and max')
+  // within both min and max
+  expect(latestEvent.page).toEqual(coords.page)
 
   extend(coords.page, { x: -200, y: -300 })
   move()
 
-  t.deepEqual(latestEvent.page, { x: -100, y: -50 }, 'outside max')
+  // outside max
+  expect(latestEvent.page).toEqual({ x: -100, y: -50 })
 
   extend(coords.page, { x: 250, y: 320 })
   move()
 
-  t.deepEqual(latestEvent.page, { x: 140, y: 250 }, 'outside min')
+  // outside min
+  expect(latestEvent.page).toEqual({ x: 140, y: 250 })
 
   // min and max function restrictions
   let minFuncArgs: any[]
@@ -61,17 +63,9 @@ test('restrictSize', t => {
 
   move()
 
-  t.deepEqual(
-    minFuncArgs,
-    [coords.page.x, coords.page.y, interaction],
-    'correct args are passed to min function restriction',
-  )
+  // correct args are passed to min function restriction
+  expect(minFuncArgs).toEqual([coords.page.x, coords.page.y, interaction])
 
-  t.deepEqual(
-    maxFuncArgs,
-    [coords.page.x, coords.page.y, interaction],
-    'correct args are passed to max function restriction',
-  )
-
-  t.end()
+  // correct args are passed to max function restriction
+  expect(maxFuncArgs).toEqual([coords.page.x, coords.page.y, interaction])
 })

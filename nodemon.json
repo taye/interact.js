@@ -1,0 +1,14 @@
+{
+  "ignore": [
+    ".git",
+    "node_modules/**/node_modules"
+  ],
+  "watch": [
+    "**/*.ts",
+    "**/*.tsx"
+  ],
+  "ext": "ts,tsx,json",
+  "env": {
+    "TS_NODE_TRANSPILE_ONLY": 1
+  }
+}

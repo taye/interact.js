@@ -1,5 +1,5 @@
 import type { Interactable } from '@interactjs/core/Interactable'
-import type { OptionsArg, Options } from '@interactjs/core/defaultOptions'
+import type { OptionsArg, Options } from '@interactjs/core/options'
 import type { Scope } from '@interactjs/core/scope'
 import type { Target, Context } from '@interactjs/types/index'
 import * as arr from '@interactjs/utils/arr'
@@ -42,7 +42,7 @@ export class InteractableSet {
           ? this.selectorMap[target]
           : (target as any)[this.scope.id]
 
-        const targetIndex = arr.findIndex(targetMappings, m => m.context === context)
+        const targetIndex = arr.findIndex(targetMappings, (m) => m.context === context)
         if (targetMappings[targetIndex]) {
           // Destroying mappingInfo's context and interactable
           targetMappings[targetIndex].context = null
@@ -102,7 +102,7 @@ export class InteractableSet {
 
     const found = arr.find(
       targetMappings,
-      m => m.context === context && (isSelector || m.interactable.inContext(target as any)),
+      (m) => m.context === context && (isSelector || m.interactable.inContext(target as any)),
     )
 
     return found && found.interactable

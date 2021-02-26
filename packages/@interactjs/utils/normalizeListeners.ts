@@ -37,7 +37,7 @@ export default function normalize (
     }
   } else if (is.object(listeners)) {
     for (const prefix in listeners) {
-      const combinedTypes = split(prefix).map(p => `${type}${p}`)
+      const combinedTypes = split(prefix).map((p) => `${type}${p}`)
 
       normalize(combinedTypes, listeners[prefix], result)
     }

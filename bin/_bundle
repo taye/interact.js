@@ -22,11 +22,11 @@ const options = {
 process.stdout.write('Bundling...')
 
 bundler(options)
-  .then(async code => {
+  .then(async (code) => {
     await writer(code, options)
     console.log(' done.')
   })
-  .catch(error => {
+  .catch((error) => {
     console.error(error)
     process.exit(1)
   })

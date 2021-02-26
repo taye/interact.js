@@ -17,6 +17,7 @@ class Rectangle {
     this.y = y
     this.w = w
     this.h = h
+    this.scale = 1.0
     this.stroke = 5
     this.el = document.createElementNS(svgNS, 'rect')
 
@@ -50,6 +51,7 @@ class Rectangle {
     this.el.setAttribute('width', Math.max(w, 10) - this.stroke)
     this.el.setAttribute('height', Math.max(h, 10) - this.stroke)
     this.el.setAttribute('stroke-width', this.stroke)
+    this.el.style.transform = `scale(${this.scale})`
 
     this.el.setAttribute('class', cssClass)
   }
@@ -58,16 +60,19 @@ class Rectangle {
 interact('.edit-rectangle')
   // change how interact gets the
   // dimensions of '.edit-rectangle' elements
-  .rectChecker(element => {
+  .rectChecker((element) => {
     // find the Rectangle object that the element belongs to
-    const { x, y, w, h } = rectangles[element.getAttribute('data-index')]
+    const { x, y, w, h, scale } = rectangles[element.getAttribute('data-index')]
 
     // return a suitable object for interact.js
+    const left = x * scale
+    const top = y * scale
+
     return {
-      left: x,
-      top: y,
-      right: x + w,
-      bottom: y + h,
+      left,
+      top,
+      right: left + w * scale,
+      bottom: top + h * scale,
     }
   })
   .draggable({
@@ -79,6 +84,7 @@ interact('.edit-rectangle')
         // only restrict before ending the drag
         endOnly: true,
       }),
+      interact.modifiers.transform(),
     ],
     onmove: function (event) {
       const rectangle = rectangles[event.target.getAttribute('data-index')]
@@ -92,6 +98,7 @@ interact('.edit-rectangle')
     edges: { left: true, right: true, top: true, bottom: true },
     invert: 'reposition',
     modifiers: [
+      interact.modifiers.transform(),
       interact.modifiers.restrictEdges({
         restriction: 'svg',
       }),
@@ -114,7 +121,7 @@ for (let i = 0; i < 5; i++) {
   svgCanvas.appendChild(r.el)
 }
 
-interact('#invert').on('input change', event => {
+interact('#invert').on('input change', (event) => {
   interact('.edit-rectangle').resizable({ invert: event.target.value })
   console.log(event.target.value)
 })

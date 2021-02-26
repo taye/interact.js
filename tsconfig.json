@@ -1,18 +1,22 @@
 {
+  "include": [
+    "packages",
+    "shims.d.ts",
+    "scripts",
+    "jsdoc"
+  ],
   "exclude": [
-    "test/fixtures"
+    "test/fixtures",
+    "_angular"
   ],
   "compilerOptions": {
     "target": "esnext",
     "module": "esnext",
-    "lib": [
-      "esnext",
-      "dom"
-    ],
     "moduleResolution": "node",
     "esModuleInterop": true,
 
     "allowJs": false,
+    "skipLibCheck": true,
     "noEmit": true,
 
     "strict": false,
@@ -20,11 +24,20 @@
     "noUnusedParameters": true,
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
+    "jsx": "preserve",
+    "experimentalDecorators": true,
+
+    "lib": [
+      "esnext",
+      "dom"
+    ],
 
     "baseUrl": ".",
     "paths": {
       "@interactjs/_dev/*": ["./*"],
-      "@interactjs/*": ["./packages/@interactjs/*"]
+      "@interactjs/*": [
+        "./packages/@interactjs/*"
+      ]
     }
   }
 }

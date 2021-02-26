@@ -3,7 +3,7 @@ import type { Scope, Plugin } from '@interactjs/core/scope'
 
 import basePlugin from './base'
 
-declare module '@interactjs/core/defaultOptions' {
+declare module '@interactjs/core/options' {
   interface PerActionDefaults {
     hold?: number
     delay?: number

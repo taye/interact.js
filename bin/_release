@@ -22,7 +22,7 @@ ensureCleanIndex()
 const { gitTag } = checkVersion()
 
 let packages
-;(async ps => {
+;(async (ps) => {
   packages = await getPackages()
 
   gitDetatch()
@@ -35,7 +35,7 @@ let packages
 
   commitAndTag()
   pushAndPublish()
-})().catch(error => {
+})().catch((error) => {
   console.error(error)
 
   process.exit(1)

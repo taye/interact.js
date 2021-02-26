@@ -1,6 +1,12 @@
 /* eslint-disable import/no-absolute-path */
-import interact from '/@interactjs/interactjs/index.js'
+import interact from '/@interactjs/interact/index.js'
+import '/@interactjs/actions/index.js'
+import '/@interactjs/modifiers/index.js'
+import '/@interactjs/inertia/index.js'
+import '/@interactjs/auto-start/index.js'
+import '/@interactjs/dev-tools/index.js'
 
+window.interact = interact
 let canvas
 let context
 let guidesCanvas
@@ -124,7 +130,7 @@ function circle (x, y, radius, color) {
 window.CanvasRenderingContext2D.prototype.circle = circle
 
 function dragMove (event) {
-  const snap = event._interaction.modification.states.find(m => m.name === 'snap')
+  const snap = event._interaction.modification.states.find((m) => m.name === 'snap')
   const closest = snap && snap.closest
   const rect = interact.getElementRect(canvas)
 
@@ -276,7 +282,7 @@ interact(document).on('DOMContentLoaded', () => {
   context = canvas.getContext('2d')
 
   interact(canvas)
-    .on('move down', event => {
+    .on('move down', (event) => {
       if ((event.type === 'down' || !event.interaction.pointerIsDown) && status.relative.checked) {
         const rect = interact.getElementRect(canvas)
 

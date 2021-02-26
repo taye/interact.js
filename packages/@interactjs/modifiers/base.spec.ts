@@ -1,4 +1,3 @@
-import test from '@interactjs/_dev/test/test'
 import type { ActionName } from '@interactjs/core/scope'
 import * as helpers from '@interactjs/core/tests/_helpers'
 import type { Element } from '@interactjs/types/index'
@@ -7,12 +6,13 @@ import is from '@interactjs/utils/is'
 
 import modifiersBase from './base'
 
-test('modifiers/base', t => {
+test('modifiers/base', () => {
   const { scope, target, interaction, interactable, coords, event } = helpers.testEnv({
     plugins: [modifiersBase],
   })
 
-  t.ok(is.object(interaction.modification), 'modifiers prop is added new Interaction')
+  // modifiers prop is added new Interaction
+  expect(is.object(interaction.modification)).toBe(true)
 
   coords.client = coords.page
 
@@ -24,7 +24,7 @@ test('modifiers/base', t => {
   let firedEvents: any[] = []
 
   interactable.rectChecker(() => ({ top: 0, left: 0, bottom: 50, right: 50 }))
-  interactable.on('teststart testmove testend', e => firedEvents.push(e))
+  interactable.on('teststart testmove testend', (e) => firedEvents.push(e))
 
   extend(coords.page, startCoords)
   interaction.pointerDown(event, event, element)
@@ -40,53 +40,43 @@ test('modifiers/base', t => {
 
   interaction.start(testAction, interactable, element)
 
-  t.ok(options.started, 'modifier methods.start() was called')
+  // modifier methods.start() was called
+  expect(options.started).toBe(true)
 
-  t.ok(options.setted, 'modifier methods.set() was called')
+  // modifier methods.set() was called
+  expect(options.setted).toBe(true)
 
-  t.deepEqual(interaction.prevEvent.page, options.target, 'start event coords are modified')
+  // start event coords are modified
+  expect(interaction.prevEvent.page).toEqual(options.target)
 
-  t.deepEqual(
-    interaction.coords.start.page,
-    startCoords,
-    'interaction.coords.start are restored after action start phase',
-  )
+  // interaction.coords.start are restored after action start phase
+  expect(interaction.coords.start.page).toEqual(startCoords)
 
-  t.deepEqual(
-    interaction.coords.cur.page,
-    startCoords,
-    'interaction.coords.cur are restored after action start phase',
-  )
+  // interaction.coords.cur are restored after action start phase
+  expect(interaction.coords.cur.page).toEqual(startCoords)
 
   extend(coords.page, moveCoords)
   interaction.pointerMove(event, event, element)
 
-  t.deepEqual(
-    interaction.coords.cur.page,
-    moveCoords,
-    'interaction.coords.cur are restored after action move phase',
-  )
+  // interaction.coords.cur are restored after action move phase
+  expect(interaction.coords.cur.page).toEqual(moveCoords)
 
-  t.deepEqual(
-    interaction.coords.start.page,
-    startCoords,
-    'interaction.coords.start are restored after action move phase',
-  )
+  // interaction.coords.start are restored after action move phase
+  expect(interaction.coords.start.page).toEqual(startCoords)
 
-  t.deepEqual(
-    { x: interaction.prevEvent.x0, y: interaction.prevEvent.y0 },
-    { x: 100, y: 100 },
-    'move event start coords are modified',
-  )
+  // move event start coords are modified
+  expect({ x: interaction.prevEvent.x0, y: interaction.prevEvent.y0 }).toEqual({ x: 100, y: 100 })
 
   firedEvents = []
   scope.interactions.pointerMoveTolerance = 0
   interaction.pointerMove(event, event, element)
-  t.equal(firedEvents.length, 0, 'duplicate result coords are ignored')
+  // duplicate result coords are ignored
+  expect(firedEvents).toHaveLength(0)
 
   interaction.stop()
 
-  t.ok(options.stopped, 'modifier methods.stop() was called')
+  // modifier methods.stop() was called
+  expect(options.stopped).toBe(true)
 
   // don't set start
   options.setStart = null
@@ -100,46 +90,37 @@ test('modifiers/base', t => {
   interaction.pointerDown(event, event, element)
   interaction.start(testAction, interactable, element)
 
-  t.notOk(options.setted, 'modifier methods.set() was not called on start phase without options.setStart')
+  // modifier methods.set() was not called on start phase without options.setStart
+  expect(options.setted).toBeUndefined()
 
-  t.deepEqual(
-    interaction.prevEvent.page,
-    { x: 100, y: 200 },
-    'start event coords are not modified without options.setStart',
-  )
+  // start event coords are not modified without options.setStart
+  expect(interaction.prevEvent.page).toEqual({ x: 100, y: 200 })
 
-  t.deepEqual(
-    interaction.coords.start.page,
-    { x: 100, y: 200 },
-    'interaction.coords.start are not modified without options.setStart',
-  )
+  // interaction.coords.start are not modified without options.setStart
+  expect(interaction.coords.start.page).toEqual({ x: 100, y: 200 })
 
   extend(coords.page, moveCoords)
   interaction.pointerMove(event, event, element)
 
-  t.deepEqual(
-    interaction.prevEvent.page,
-    { x: 200, y: 200 },
-    'move event coords are modified by all modifiers',
-  )
+  // move event coords are modified by all modifiers
+  expect(interaction.prevEvent.page).toEqual({ x: 200, y: 200 })
 
   interaction.pointerMove(event, event, element)
 
-  t.doesNotThrow(() => {
+  expect(() => {
     interaction._scopeFire('interactions:action-resume', {
       interaction,
       phase: 'resume',
       iEvent: {} as any,
       event,
     })
-  }, "action-resume doesn't throw errors")
+  }).not.toThrow()
 
   interaction.stop()
 
   interaction.pointerUp(event, event, element, element)
-  t.deepEqual(interaction.coords.cur.page, moveCoords, 'interaction coords after stopping are as expected')
-
-  t.end()
+  // interaction coords after stopping are as expected
+  expect(interaction.coords.cur.page).toEqual(moveCoords)
 })
 
 const targetModifier = {

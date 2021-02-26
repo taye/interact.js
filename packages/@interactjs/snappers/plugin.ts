@@ -3,7 +3,7 @@ import extend from '@interactjs/utils/extend'
 
 import * as allSnappers from './all'
 
-declare module '@interactjs/core/interactStatic' {
+declare module '@interactjs/core/InteractStatic' {
   export interface InteractStatic {
     snappers: typeof allSnappers
     createSnapGrid: typeof allSnappers.grid

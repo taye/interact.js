@@ -1,9 +1,8 @@
-import test from '@interactjs/_dev/test/test'
 import * as helpers from '@interactjs/core/tests/_helpers'
 
 import { snapSize } from '../snap/size'
 
-test('modifiers/snapSize', t => {
+test('modifiers/snapSize', () => {
   const { interaction, interactable } = helpers.testEnv()
   interaction.interactable = interactable
   interactable.getRect = () => ({ top: 0, left: 0, bottom: 100, right: 100 } as any)
@@ -32,7 +31,6 @@ test('modifiers/snapSize', t => {
   snapSize.start(arg as any)
   snapSize.set(arg)
 
-  t.deepEqual(arg.coords, target0, 'snapSize.set single target, zereo offset')
-
-  t.end()
+  // snapSize.set single target, zereo offset
+  expect(arg.coords).toEqual(target0)
 })

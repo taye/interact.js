@@ -1,15 +1,16 @@
 {
   "per-file": false,
-  "statements": 64,
+  "statements": 59,
   "branches": 48,
   "functions": 58,
-  "lines": 64,
+  "lines": 59,
   "include": [
-    "packages/@interactjs/**/*.{t,j}s{,x}"
+    "**/@interactjs/**/*.{t,j}s{,x}"
   ],
   "exclude": [
     "**/*.spec.ts",
-    "**/_*"
+    "**/_*",
+    "**/@interactjs/{rebound,symbol-tree}/**"
   ],
   "extension": [
     ".ts",

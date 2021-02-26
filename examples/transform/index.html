@@ -1,0 +1,53 @@
+<head>
+<title>interact.js transforms modifier demo</title>
+<script type="module" src="./index.js"></script>
+<link rel="stylesheet" href="../../node_modules/bulma/css/bulma.css">
+
+</head>
+<body>
+<div id="container" _class="container box">
+  <div id="item1" class="item card">
+    <div class="card-content">item 1</div>
+  </div>
+  <div id="item2" class="item card">
+    <div class="card-content">item 2</div>
+  </div>
+  <div id="item3" class="item card">
+    <div class="card-content">item 3</div>
+  </div>
+  <div id="item4" class="item card">
+    <div class="card-content">item 4</div>
+  </div>
+</div>
+
+<style>
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+}
+
+#container {
+  margin: 0;
+  transform-origin: 0 0;
+  transform: rotate(0deg) scale(2);
+  _transform: rotate(10deg);
+  width: 25vw;
+}
+
+.item {
+  background-color: #29e;
+  max-width: none;
+  touch-action: none;
+  user-select: none;
+}
+
+#item2 {
+  width: 200px;
+  height: 200px;
+}
+
+</style>
+</body>

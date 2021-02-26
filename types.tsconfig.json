@@ -19,6 +19,7 @@
     "declarationMap": false,
     "emitDeclarationOnly": true,
     "stripInternal": true,
+    "skipLibCheck": true,
 
     "strict": false,
 

@@ -1,4 +1,4 @@
-import type { PerActionDefaults } from '@interactjs/core/defaultOptions'
+import type { PerActionDefaults } from '@interactjs/core/options'
 import type { ActionName } from '@interactjs/core/scope'
 import type { HasGetRect } from '@interactjs/types/index'
 

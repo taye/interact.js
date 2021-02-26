@@ -1,15 +1,13 @@
+/** @jest-environment node */
 import path from 'path'
 
 import mkdirp from 'mkdirp'
 import * as shell from 'shelljs'
 import temp from 'temp'
 
-import test from '@interactjs/_dev/test/test'
+test('typings', async () => {
+  shell.config.fatal = true
 
-shell.config.verbose = true
-shell.config.fatal = true
-
-test('typings', async t => {
   const tempDir = temp.track().mkdirSync('testProject')
   const modulesDir = path.join(tempDir, 'node_modules')
   const tempTypesDir = path.join(modulesDir, '@interactjs', 'types')
@@ -17,19 +15,19 @@ test('typings', async t => {
 
   await mkdirp(interactDir)
 
-  t.doesNotThrow(() => {
-    shell.exec(`_types ${modulesDir}`)
-    shell.cp('packages/interactjs/{*.d.ts,package.json}', interactDir)
-    shell.cp('packages/@interactjs/types/{*.d.ts,package.json}', tempTypesDir)
-    shell.cp('-R', path.join(process.cwd(), 'test', 'fixtures', 'dependentTsProject', '*'), tempDir)
-    shell.exec('tsc -b', { cwd: tempDir })
+  // run .d.ts generation script with output to temp dir
+  shell.exec(`${getBin('_types')} ${modulesDir}`)
 
-    const error = shell.error()
+  // copy .d.ts and package.json files of deps to temp dir
+  shell.cp(path.join('packages', 'interactjs', '{*.d.ts,package.json}'), interactDir)
+  shell.cp(path.join('packages', '@interactjs', 'types', '{*.d.ts,package.json}'), tempTypesDir)
+  shell.cp('-R', path.join(process.cwd(), 'test', 'fixtures', 'dependentTsProject', '*'), tempDir)
 
-    if (error) {
-      throw error
-    }
-  }, 'dependent typescript project compiles successfuly')
-
-  t.end()
+  expect(() => {
+    shell.exec(`${getBin('tsc')} -b`, { cwd: tempDir })
+  }).not.toThrow()
+  shell.config.reset()
 })
+
+const nodeBins = path.join(process.cwd(), 'node_modules', '.bin')
+const getBin = (name: string) => path.join(nodeBins, name)

@@ -1,103 +1,90 @@
-import test from '@interactjs/_dev/test/test'
-
 import Interaction from './Interaction'
 import interactions from './interactions'
 import * as helpers from './tests/_helpers'
 
-test('interactions', t => {
-  let scope = helpers.mockScope()
+describe('core/interactions', () => {
+  test('interactions', () => {
+    let scope = helpers.mockScope()
 
-  const interaction = scope.interactions.new({ pointerType: 'TEST' })
+    const interaction = scope.interactions.new({ pointerType: 'TEST' })
 
-  t.equal(scope.interactions.list[0], interaction, 'new Interaction is pushed to scope.interactions')
+    // new Interaction is pushed to scope.interactions
+    expect(scope.interactions.list[0]).toBe(interaction)
+    // interactions object added to scope
+    expect(scope.interactions).toBeInstanceOf(Object)
 
-  t.ok(scope.interactions instanceof Object, 'interactions object added to scope')
+    const listeners = scope.interactions.listeners
 
-  const listeners = scope.interactions.listeners
+    expect(interactions.methodNames.every((m: string) => typeof listeners[m] === 'function')).toBe(true)
 
-  t.ok(
-    interactions.methodNames.reduce(
-      (acc: boolean, m: string) => acc && typeof listeners[m] === 'function',
-      true,
-    ),
-    'interactions object added to scope',
-  )
+    scope = helpers.mockScope()
 
-  scope = helpers.mockScope()
+    const newInteraction = scope.interactions.new({})
 
-  const newInteraction = scope.interactions.new({})
+    expect(typeof scope.interactions).toBe('object')
+    expect(typeof scope.interactions.new).toBe('function')
+    expect(newInteraction instanceof Interaction).toBe(true)
+    expect(typeof newInteraction._scopeFire).toBe('function')
 
-  t.equal(typeof scope.interactions, 'object')
-  t.equal(typeof scope.interactions.new, 'function')
-  t.assert(newInteraction instanceof Interaction)
-  t.equal(typeof newInteraction._scopeFire, 'function')
+    expect(scope.actions).toBeInstanceOf(Object)
+    expect(scope.actions.map).toEqual({})
+    expect(scope.actions.methodDict).toEqual({})
+  })
 
-  t.assert(typeof scope.actions === 'object')
-  t.deepEqual(scope.actions.map, {})
-  t.deepEqual(scope.actions.methodDict, {})
+  test('interactions document event options', () => {
+    const { scope } = helpers.testEnv()
+    const doc = scope.document
 
-  t.end()
-})
+    let options = {}
+    scope.browser = { isIOS: false } as any
+    scope.fire('scope:add-document', { doc, scope, options } as any)
 
-test('interactions document event options', t => {
-  const { scope } = helpers.testEnv()
-  const doc = scope.document
+    // no doc options.event.passive is added when not iOS
+    expect(options).toEqual({})
 
-  let options = {}
-  scope.browser = { isIOS: false } as any
-  scope.fire('scope:add-document', { doc, scope, options } as any)
+    options = {}
 
-  t.deepEqual(options, {}, 'no doc options.event.passive is added when not iOS')
+    scope.browser.isIOS = true
+    scope.fire('scope:add-document', { doc, scope, options } as any)
 
-  options = {}
+    // doc options.event.passive is set to false for iOS
+    expect(options).toEqual({ events: { passive: false } })
+  })
 
-  scope.browser.isIOS = true
-  scope.fire('scope:add-document', { doc, scope, options } as any)
+  test('interactions removes pointers on targeting removed elements', () => {
+    const { interaction, scope } = helpers.testEnv()
 
-  t.deepEqual(options, { events: { passive: false } }, 'doc options.event.passive is set to false for iOS')
+    const {
+      TouchEvent,
+      Touch = function (_t: any) {
+        return _t
+      },
+    } = scope.window as any
+    const div1 = scope.document.body.appendChild(scope.document.createElement('div'))
+    const div2 = scope.document.body.appendChild(scope.document.createElement('div'))
 
-  t.end()
-})
+    const touch1Init = { bubbles: true, changedTouches: [new Touch({ identifier: 1, target: div1 })] }
+    const touch2Init = { bubbles: true, changedTouches: [new Touch({ identifier: 2, target: div2 })] }
 
-test('interactions removes pointers on targeting removed elements', t => {
-  const { interaction, scope } = helpers.testEnv()
+    interaction.pointerType = 'touch'
+    div1.dispatchEvent(new TouchEvent('touchstart', touch1Init))
+    div1.dispatchEvent(new TouchEvent('touchmove', touch1Init))
 
-  const {
-    TouchEvent,
-    Touch = function (_t: any) {
-      return _t
-    },
-  } = scope.window as any
-  const div1 = scope.document.body.appendChild(scope.document.createElement('div'))
-  const div2 = scope.document.body.appendChild(scope.document.createElement('div'))
+    expect(scope.interactions.list).toHaveLength(1)
 
-  const touch1Init = { bubbles: true, changedTouches: [new Touch({ identifier: 1, target: div1 })] }
-  const touch2Init = { bubbles: true, changedTouches: [new Touch({ identifier: 2, target: div2 })] }
+    // down pointer added to interaction
+    expect(interaction.pointers).toHaveLength(1)
+    // _latestPointer target is down target
+    expect(interaction._latestPointer.eventTarget).toBe(div1)
 
-  interaction.pointerType = 'touch'
-  div1.dispatchEvent(new TouchEvent('touchstart', touch1Init))
-  div1.dispatchEvent(new TouchEvent('touchmove', touch1Init))
+    div1.remove()
 
-  t.equal(scope.interactions.list.length, 1)
+    div2.dispatchEvent(new TouchEvent('touchstart', touch2Init))
 
-  t.equal(interaction.pointers.length, 1, 'down pointer added to interaction')
-  t.equal(interaction._latestPointer.eventTarget, div1, '_latestPointer target is down target')
+    // interaction with removed element is reused for new pointer
+    expect(scope.interactions.list).toEqual([interaction])
 
-  div1.remove()
-
-  div2.dispatchEvent(new TouchEvent('touchstart', touch2Init))
-
-  t.deepEqual(
-    scope.interactions.list,
-    [interaction],
-    'interaction with removed element is reused for new pointer',
-  )
-
-  t.equal(
-    interaction.pointers.length,
-    1,
-    'pointer on removed element is removed from existing interaction and new pointerdown is added',
-  )
-
-  t.end()
+    // pointer on removed element is removed from existing interaction and new pointerdown is added
+    expect(interaction.pointers).toHaveLength(1)
+  })
 })

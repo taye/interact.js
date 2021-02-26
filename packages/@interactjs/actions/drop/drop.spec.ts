@@ -1,102 +1,103 @@
-import test from '@interactjs/_dev/test/test'
+import type Interaction from '@interactjs/core/Interaction'
 import * as helpers from '@interactjs/core/tests/_helpers'
 
 import drop from '../drop/plugin'
 
-test('actions/drop options', t => {
-  const { interactable } = helpers.testEnv({ plugins: [drop] })
+describe('actions/drop', () => {
+  test('options', () => {
+    const { interactable } = helpers.testEnv({ plugins: [drop] })
 
-  const funcs = Object.freeze({
-    drop () {},
-    activate () {},
-    deactivate () {},
-    dropmove () {},
-    dragenter () {},
-    dragleave () {},
+    const funcs = Object.freeze({
+      drop () {},
+      activate () {},
+      deactivate () {},
+      dropmove () {},
+      dragenter () {},
+      dragleave () {},
+    })
+
+    interactable.dropzone({
+      listeners: [funcs],
+    })
+
+    expect(interactable.events.types.drop[0]).toBe(funcs.drop)
+    expect(interactable.events.types.dropactivate[0]).toBe(funcs.activate)
+    expect(interactable.events.types.dropdeactivate[0]).toBe(funcs.deactivate)
+    expect(interactable.events.types.dropmove[0]).toBe(funcs.dropmove)
+    expect(interactable.events.types.dragenter[0]).toBe(funcs.dragenter)
+    expect(interactable.events.types.dragleave[0]).toBe(funcs.dragleave)
   })
 
-  interactable.dropzone({
-    listeners: [funcs],
+  test('dynamicDrop', () => {
+    const { scope, interactable, down, start, move, interaction } = helpers.testEnv({ plugins: [drop] })
+    interactable.draggable({})
+
+    // no error with dynamicDrop === false
+    expect(() => {
+      scope.interactStatic.dynamicDrop(false)
+
+      down()
+      start({ name: 'drag' })
+      move()
+      interaction.end()
+    }).not.toThrow()
+
+    //  no error with dynamicDrop === true
+    expect(() => {
+      scope.interactStatic.dynamicDrop(true)
+      down()
+      start({ name: 'drag' })
+      move()
+      interaction.end()
+    }).not.toThrow()
   })
 
-  t.equal(interactable.events.types.drop[0], funcs.drop)
-  t.equal(interactable.events.types.dropactivate[0], funcs.activate)
-  t.equal(interactable.events.types.dropdeactivate[0], funcs.deactivate)
-  t.equal(interactable.events.types.dropmove[0], funcs.dropmove)
-  t.equal(interactable.events.types.dragenter[0], funcs.dragenter)
-  t.equal(interactable.events.types.dragleave[0], funcs.dragleave)
+  test('start', () => {
+    const { scope, interactable, down, start, move, interaction } = helpers.testEnv({ plugins: [drop] })
 
-  t.end()
-})
+    interactable.draggable({})
+    const dropzone = scope.interactables.new('[data-drop]').dropzone({})
 
-test('actions/drop start', t => {
-  const { scope, interactable, down, start, move, interaction } = helpers.testEnv({ plugins: [drop] })
+    const [dropEl1, dropEl2, dropEl3] = ['a', 'b', 'c'].map((id) => {
+      const dropEl = scope.document.createElement('div')
 
-  interactable.draggable({})
-  const dropzone = scope.interactables.new('[data-drop]').dropzone({})
+      dropEl.dataset.drop = id
+      scope.document.body.appendChild(dropEl)
 
-  t.doesNotThrow(() => {
-    scope.interactStatic.dynamicDrop(false)
+      return dropEl
+    })
+
+    // rejet imeediately on activate
+    dropzone.on('dropactivate', (event) => {
+      if (event.target === dropEl1 || event.target === dropEl2) {
+        event.reject()
+      }
+    })
+
+    const onActionsDropStart = jest.fn((arg: { interaction: Interaction }) => {
+      const activeDrops = [...arg.interaction.dropState.activeDrops]
+      // actions/drop:start is fired with all activeDrops
+      expect(activeDrops.map((activeDrop) => activeDrop.element)).toEqual([dropEl3])
+    })
+
+    scope.addListeners({ 'actions/drop:start': onActionsDropStart })
+
+    const onDeactivate = jest.fn()
+    dropzone.on('dropdeactivate', onDeactivate)
 
     down()
     start({ name: 'drag' })
     move()
+
+    expect(onActionsDropStart).toHaveBeenCalledTimes(1)
+
+    // rejected dropzones are removed from activeDrops,
+    expect(interaction.dropState.activeDrops.map((d) => d.element)).toEqual([dropEl3])
+
+    // rejected dropzones are deactivated,
+    expect(onDeactivate).toHaveBeenNthCalledWith(1, expect.objectContaining({ target: dropEl1 }))
+    expect(onDeactivate).toHaveBeenNthCalledWith(2, expect.objectContaining({ target: dropEl2 }))
+
     interaction.end()
-  }, 'no error with dynamicDrop === false')
-
-  t.doesNotThrow(() => {
-    scope.interactStatic.dynamicDrop(true)
-    down()
-    start({ name: 'drag' })
-    move()
-    interaction.end()
-  }, 'no error with dynamicDrop === true')
-
-  for (const i of [0, 1, 2]) {
-    const dropEl = scope.document.createElement('div')
-
-    dropEl.dataset.drop = `${i}`
-    scope.document.body.appendChild(dropEl)
-  }
-
-  dropzone.on('dropactivate', event => {
-    if (event.target.dataset.drop === '0') {
-      event.reject()
-    }
   })
-
-  let activated = []
-  const deactivated = []
-
-  scope.addListeners({
-    'actions/drop:start' ({ interaction: { dropState } }) {
-      activated = dropState.activeDrops.map(d => d.element.dataset.drop)
-    },
-  })
-
-  dropzone.on('dropdeactivate', event => {
-    deactivated.push(event.target)
-  })
-
-  down()
-  start({ name: 'drag' })
-  move()
-
-  t.deepEqual(
-    interaction.dropState.activeDrops.map(d => d.element.dataset.drop),
-    ['1', '2'],
-    'rejected dropzones are removed from activeDrops',
-  )
-
-  t.deepEqual(activated, ['1', '2'], 'actions/drop:start is fired with activeDrops')
-
-  t.deepEqual(
-    deactivated.map(d => d.dataset.drop),
-    ['0'],
-    'rejected dropzones are deactivated',
-  )
-
-  interaction.end()
-
-  t.end()
 })

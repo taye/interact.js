@@ -258,8 +258,8 @@ const interactions: Plugin = {
   id: 'core/interactions',
   install,
   listeners: {
-    'scope:add-document': arg => onDocSignal(arg, 'add'),
-    'scope:remove-document': arg => onDocSignal(arg, 'remove'),
+    'scope:add-document': (arg) => onDocSignal(arg, 'add'),
+    'scope:remove-document': (arg) => onDocSignal(arg, 'remove'),
     'interactable:unset': ({ interactable }, scope) => {
       // Stop and destroy related interactions when an Interactable is unset
       for (let i = scope.interactions.list.length - 1; i >= 0; i--) {

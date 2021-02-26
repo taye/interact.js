@@ -3,9 +3,9 @@ const path = require('path')
 
 const mkdirp = require('mkdirp')
 
-module.exports = plugins => {
+module.exports = (plugins) => {
   return Promise.all(
-    plugins.map(async modulePath => {
+    plugins.map(async (modulePath) => {
       const [scopePath] = modulePath.split('/')
       const packagePath = path.join('packages', '@interactjs', scopePath)
       const pluginPath = path.join('packages', '@interactjs', modulePath)

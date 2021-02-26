@@ -1,4 +1,3 @@
-import test from '@interactjs/_dev/test/test'
 import { Eventable } from '@interactjs/core/Eventable'
 import type { Scope } from '@interactjs/core/scope'
 import * as helpers from '@interactjs/core/tests/_helpers'
@@ -8,25 +7,19 @@ import type { EventTargetList } from './base'
 import pointerEvents from './base'
 import interactableTargets from './interactableTargets'
 
-test('pointerEvents.types', t => {
-  t.deepEqual(
-    pointerEvents.types,
-    {
-      down: true,
-      move: true,
-      up: true,
-      cancel: true,
-      tap: true,
-      doubletap: true,
-      hold: true,
-    },
-    'pointerEvents.types is as expected',
-  )
-
-  t.end()
+test('pointerEvents.types', () => {
+  expect(pointerEvents.types).toEqual({
+    down: true,
+    move: true,
+    up: true,
+    cancel: true,
+    tap: true,
+    doubletap: true,
+    hold: true,
+  })
 })
 
-test('pointerEvents.fire', t => {
+test('pointerEvents.fire', () => {
   const { scope, interaction, event, coords } = helpers.testEnv({ plugins: [pointerEvents] })
 
   const eventable = new Eventable(pointerEvents.defaults)
@@ -45,7 +38,7 @@ test('pointerEvents.fire', t => {
     },
   ]
 
-  eventable.on(type, e => {
+  eventable.on(type, (e) => {
     firedEvent = e
   })
 
@@ -61,14 +54,16 @@ test('pointerEvents.fire', t => {
     scope,
   )
 
-  t.ok(
-    firedEvent instanceof pointerEvents.PointerEvent,
-    'Fired event is an instance of pointerEvents.PointerEvent',
-  )
-  t.equal(firedEvent.type, type, 'Fired event type is correct')
-  t.equal(firedEvent.currentTarget, element, 'Fired event currentTarget is correct')
-  t.equal(firedEvent.target, eventTarget, 'Fired event target is correct')
-  t.equal(firedEvent.TEST_PROP, TEST_PROP, 'Fired event has props from target.props')
+  // Fired event is an instance of pointerEvents.PointerEvent
+  expect(firedEvent instanceof pointerEvents.PointerEvent).toBe(true)
+  // Fired event type is correct
+  expect(firedEvent.type).toBe(type)
+  // Fired event currentTarget is correct
+  expect(firedEvent.currentTarget).toBe(element)
+  // Fired event target is correct
+  expect(firedEvent.target).toBe(eventTarget)
+  // Fired event has props from target.props
+  expect(firedEvent.TEST_PROP).toBe(TEST_PROP)
 
   scope.now = () => coords.timeStamp
 
@@ -77,13 +72,13 @@ test('pointerEvents.fire', t => {
   coords.timeStamp = 500
   interaction.pointerUp(event, event, scope.document, scope.document)
 
-  t.equal(interaction.tapTime, 500, 'interaction.tapTime is updated')
-  t.equal(interaction.prevTap.type, 'tap', 'interaction.prevTap is updated')
-
-  t.end()
+  // interaction.tapTime is updated
+  expect(interaction.tapTime).toBe(500)
+  // interaction.prevTap is updated
+  expect(interaction.prevTap.type).toBe('tap')
 })
 
-test('pointerEvents.collectEventTargets', t => {
+test('pointerEvents.collectEventTargets', () => {
   const { scope, interaction } = helpers.testEnv()
 
   const type = 'TEST'
@@ -116,12 +111,10 @@ test('pointerEvents.collectEventTargets', t => {
     scope,
   )
 
-  t.deepEqual(collectedTargets, [target])
-
-  t.end()
+  expect(collectedTargets).toEqual([target])
 })
 
-test('pointerEvents Interaction update-pointer signal', t => {
+test('pointerEvents Interaction update-pointer signal', () => {
   const scope: Scope = helpers.mockScope()
 
   scope.usePlugin(pointerEvents)
@@ -131,30 +124,19 @@ test('pointerEvents Interaction update-pointer signal', t => {
   const event = {} as PointerEventType
 
   interaction.updatePointer(helpers.newPointer(0), event, null, false)
-  t.deepEqual(
-    interaction.pointers.map(p => p.hold),
-    [initialHold],
-    'set hold info for move on new pointer',
-  )
+  // set hold info for move on new pointer
+  expect(interaction.pointers.map((p) => p.hold)).toEqual([initialHold])
 
   interaction.removePointer(helpers.newPointer(0), event)
 
   interaction.updatePointer(helpers.newPointer(0), event, null, true)
-  t.deepEqual(
-    interaction.pointers.map(p => p.hold),
-    [initialHold],
-  )
+  expect(interaction.pointers.map((p) => p.hold)).toEqual([initialHold])
 
   interaction.updatePointer(helpers.newPointer(5), event, null, true)
-  t.deepEqual(
-    interaction.pointers.map(p => p.hold),
-    [initialHold, initialHold],
-  )
-
-  t.end()
+  expect(interaction.pointers.map((p) => p.hold)).toEqual([initialHold, initialHold])
 })
 
-test('pointerEvents Interaction remove-pointer signal', t => {
+test('pointerEvents Interaction remove-pointer signal', () => {
   const scope: Scope = helpers.mockScope()
 
   scope.usePlugin(pointerEvents)
@@ -183,17 +165,12 @@ test('pointerEvents Interaction remove-pointer signal', t => {
   for (const removal of removals) {
     interaction.removePointer({ pointerId: removal.id } as any, null)
 
-    t.deepEqual(
-      interaction.pointers.map(p => (p.hold as unknown) as number),
-      removal.remain,
-      `${removal.message} - remaining interaction.pointers[i].hold are correct`,
-    )
+    // `${removal.message} - remaining interaction.pointers[i].hold are correct`
+    expect(interaction.pointers.map((p) => (p.hold as unknown) as number)).toEqual(removal.remain)
   }
-
-  t.end()
 })
 
-test('pointerEvents down hold up tap', async t => {
+test('pointerEvents down hold up tap', async () => {
   const { interaction, event, interactable } = helpers.testEnv({
     plugins: [pointerEvents, interactableTargets],
   })
@@ -201,31 +178,24 @@ test('pointerEvents down hold up tap', async t => {
   const fired: PointerEvent[] = []
 
   for (const type in pointerEvents.types) {
-    interactable.on(type, e => fired.push(e))
+    interactable.on(type, (e) => fired.push(e))
   }
 
   interaction.pointerDown(event, event, event.target)
   interaction.pointerMove(event, event, event.target)
 
-  t.deepEqual(
-    fired.map(e => e.type),
-    ['down'],
-    'duplicate move event is not fired',
-  )
+  // duplicate move event is not fired
+  expect(fired.map((e) => e.type)).toEqual(['down'])
 
   const holdTimer = interaction.pointers[0].hold
 
-  t.ok(!!holdTimer.timeout, 'hold timeout is set')
+  // hold timeout is set
+  expect(holdTimer.timeout).toBeTruthy()
 
   await helpers.timeout(holdTimer.duration)
 
   interaction.pointerUp(event, event, event.target, event.target)
 
-  t.deepEqual(
-    fired.map(e => e.type),
-    ['down', 'hold', 'up', 'tap'],
-    'tap event is fired after down, hold and up events',
-  )
-
-  t.end()
+  // tap event is fired after down, hold and up events
+  expect(fired.map((e) => e.type)).toEqual(['down', 'hold', 'up', 'tap'])
 })

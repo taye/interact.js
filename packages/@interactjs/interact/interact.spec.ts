@@ -1,23 +1,26 @@
-import { JSDOM } from '@interactjs/_dev/test/domator'
-import test from '@interactjs/_dev/test/test'
+import { JSDOM } from 'jsdom'
+
 import { Scope } from '@interactjs/core/scope'
 
-test('interact export', t => {
+test('interact export', () => {
   const scope = new Scope()
   const interact = scope.interactStatic
 
   scope.init(new JSDOM('').window)
 
   const interactable1 = interact('selector')
-  t.assert(interactable1 instanceof scope.Interactable, 'interact function returns Interactable instance')
-  t.equal(interact('selector'), interactable1, 'same interactable is returned with same target and context')
-  t.equal(scope.interactables.list.length, 1, 'new interactables are added to list')
+  // interact function returns Interactable instance
+  expect(interactable1).toBeInstanceOf(scope.Interactable)
+  // same interactable is returned with same target and context
+  expect(interact('selector')).toBe(interactable1)
+  // new interactables are added to list
+  expect(scope.interactables.list).toHaveLength(1)
 
   interactable1.unset()
-  t.equal(scope.interactables.list.length, 0, 'unset interactables are removed')
-  t.strictEqual(scope.interactions.list.length, 0, 'unset interactions are removed')
-
-  const constructsUniqueMessage = 'unique contexts make unique interactables with identical targets'
+  // unset interactables are removed
+  expect(scope.interactables.list).toHaveLength(0)
+  // unset interactions are removed
+  expect(scope.interactions.list).toHaveLength(0)
 
   const doc1 = new JSDOM('').window.document
   const doc2 = new JSDOM('').window.document
@@ -29,42 +32,31 @@ test('interact export', t => {
   ].reduce((acc, [target, context]) => {
     const interactable = interact(target, { context })
 
-    if (acc.includes(interactable)) {
-      t.fail(constructsUniqueMessage)
-    }
+    // unique contexts make unique interactables with identical targets
+    expect(acc.some((e) => e.interactable === interactable)).toBe(false)
 
     acc.push({ interactable, target, context })
     return acc
   }, [])
 
-  t.pass(constructsUniqueMessage)
-
-  const getsUniqueMessage =
-    'interactions.get returns correct result with identical targets and different contexts'
-
   for (const { interactable, target, context } of results) {
-    if (scope.interactables.get(target, { context }) !== interactable) {
-      t.fail(getsUniqueMessage)
-    }
+    // interactions.get returns correct result with identical targets and different contexts
+    expect(scope.interactables.get(target, { context })).toBe(interactable)
   }
-
-  t.pass(getsUniqueMessage)
 
   const doc3 = new JSDOM('').window.document
 
   const prevDocCount = scope.documents.length
 
   interact.addDocument(doc3, { events: { passive: false } })
-  t.deepEqual(
-    scope.documents[prevDocCount],
-    { doc: doc3, options: { events: { passive: false } } },
-    'interact.addDocument() adds to scope with options',
-  )
+  // interact.addDocument() adds to scope with options
+  expect(scope.documents[prevDocCount]).toEqual({ doc: doc3, options: { events: { passive: false } } })
 
   interact.removeDocument(doc3)
-  t.equal(scope.documents.length, prevDocCount, 'interact.removeDocument() removes document from scope')
+  // interact.removeDocument() removes document from scope
+  expect(scope.documents).toHaveLength(prevDocCount)
 
-  scope.interactables.list.forEach(i => i.unset())
+  scope.interactables.list.forEach((i) => i.unset())
 
   const plugin1 = {
     id: 'test-1',
@@ -84,13 +76,14 @@ test('interact export', t => {
   interact.use(plugin1)
   interact.use(plugin2)
 
-  t.deepEqual([plugin1.count, plugin2.count], [1, 1], 'new plugin install methods are called')
+  // new plugin install methods are called
+  expect([plugin1.count, plugin2.count]).toEqual([1, 1])
 
   interact.use({ ...plugin1 })
-  t.deepEqual([plugin1.count, plugin2.count], [1, 1], 'different plugin object with same id not installed')
+  // different plugin object with same id not installed
+  expect([plugin1.count, plugin2.count]).toEqual([1, 1])
 
   interact.use(plugin2)
-  t.deepEqual([plugin1.count, plugin2.count], [1, 1], 'plugin without id not re-installed')
-
-  t.end()
+  // plugin without id not re-installed
+  expect([plugin1.count, plugin2.count]).toEqual([1, 1])
 })

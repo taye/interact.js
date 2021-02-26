@@ -55,7 +55,7 @@ async function write ({ destDir, filename, code, map }, env) {
     }))
   }
 
-  map.sources = map.sources.map(source => path.relative(process.cwd(), source))
+  map.sources = map.sources.map((source) => path.relative(process.cwd(), source))
   map.file = filename
 
   const codeFilename = path.join(destDir, filename)
