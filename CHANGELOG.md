@@ -1,7 +1,12 @@
+## v1.10.4
+
+ - fix NPE in indexOfDeepestElement if first element has no parent #887
+ - improve babel-plugin-prod on windows #885
+
 ## v1.10.3
 
- - fixed issue with TS strict null checks (#882)
- - fixed issue with type imports being emitted in JS modules (#881)
+ - fixed issue with TS strict null checks #882
+ - fixed issue with type imports being emitted in JS modules #881
 
 ## v1.10.2
 
@@ -9,28 +14,28 @@
 
 ## v1.10.1
 
- - fixed mouseButtons option typings (#865)
+ - fixed mouseButtons option typings #865
  - removed plugin index module warnings
 
 ## v1.10.0
 
- - changed production files extension from '.min.js' to '.prod.js' (#857)
+ - changed production files extension from '.min.js' to '.prod.js' #857
  - added experimental `@interactjs/dev-tools/babel-plugin-prod` babel plugin to
    change `@interactjs/*` imports to production versions
  - added `sideEffects` fields to package.json files
 
 ## v1.9.22
 
- - fixed inertia issue with arbitrary plugin order (#834)
- - fixed inertia regression (#853)
+ - fixed inertia issue with arbitrary plugin order #834
+ - fixed inertia regression #853
 
 ## v1.9.21
 
- - used findIndex polyfill to support 1E11 (#852)
- - fixed issue where resize reflow increased element size (#817)
- - fixed drop event order: fire `dropmove` after `dragenter` (#841) and final
-   drop events before `dragend` (#842)
- - updated docs (#844) (#829)
+ - used findIndex polyfill to support 1E11 #852
+ - fixed issue where resize reflow increased element size #817
+ - fixed drop event order: fire `dropmove` after `dragenter` #841 and final
+   drop events before `dragend` #842
+ - updated docs #844 #829
 
 ## v1.9.20
 
@@ -58,15 +63,15 @@
 
 ## v1.9.15
 
- - fixed further regression breaking typescript builds (#816)
+ - fixed further regression breaking typescript builds #816
 
 ## v1.9.14
 
- - fixed regression breaking typescript builds (#816)
+ - fixed regression breaking typescript builds #816
 
 ## v1.9.13
 
- - fixed regression breaking es5 compatibility of .min.js bundle (#814)
+ - fixed regression breaking es5 compatibility of .min.js bundle #814
 
 ## v1.9.12
 
@@ -76,7 +81,7 @@
 
  - fixed issue with missing width/height on rectChecker result
  - fixed resize checker with negative sizes
- - moved generated plugin use modules to @interactjs/*/{use/,}*/index.ts (#800)
+ - moved generated plugin use modules to @interactjs/*/{use/,}*/index.ts #800
  - changed snap function args to provide interaction proxy
  - restored dev-tools helpers in development bundle
 
