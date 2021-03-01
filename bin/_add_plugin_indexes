@@ -1,23 +1,29 @@
 #!/usr/bin/env node
+const { isPro } = require('../scripts/utils')
+
 require('../scripts/addPluginIndexes')([
   'actions/plugin',
   'actions/drag/plugin',
   'actions/drop/plugin',
   'actions/resize/plugin',
   'actions/gesture/plugin',
-  'arrange/plugin',
   'auto-scroll/plugin',
   'auto-start/plugin',
-  'clone/plugin',
   'dev-tools/plugin',
-  'feedback/plugin',
-  'iframes/plugin',
   'inertia/plugin',
   'modifiers/plugin',
-  'multi-target/plugin',
   'pointer-events/plugin',
-  'react/plugin',
   'reflow/plugin',
   'snappers/plugin',
-  'vue/plugin',
+  ...isPro
+    ? [
+      'react/plugin',
+      'vue/plugin',
+      'multi-target/plugin',
+      'feedback/plugin',
+      'clone/plugin',
+      'arrange/plugin',
+      'iframes/plugin',
+    ]
+    : [],
 ])

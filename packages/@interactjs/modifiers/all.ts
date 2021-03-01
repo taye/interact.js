@@ -1,19 +1,15 @@
 /* eslint-disable node/no-extraneous-import, import/no-unresolved */
 import aspectRatio from './aspectRatio'
-// @ts-ignore
 import avoid from './avoid/avoid'
 import restrictEdges from './restrict/edges'
 import restrict from './restrict/pointer'
 import restrictRect from './restrict/rect'
 import restrictSize from './restrict/size'
-// @ts-ignore
 import rubberband from './rubberband/rubberband'
 import snapEdges from './snap/edges'
 import snap from './snap/pointer'
 import snapSize from './snap/size'
-// @ts-ignore
 import spring from './spring/spring'
-// @ts-ignore
 import transform from './transform/transform'
 
 export default {
