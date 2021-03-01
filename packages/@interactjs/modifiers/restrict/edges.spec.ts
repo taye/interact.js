@@ -1,9 +1,8 @@
-import test from '@interactjs/_dev/test/test'
 import * as helpers from '@interactjs/core/tests/_helpers'
 
 import { restrictEdges } from '../restrict/edges'
 
-test('restrictEdges', t => {
+test('restrictEdges', () => {
   const { interaction } = helpers.testEnv()
   const edges = { top: true, bottom: true, left: true, right: true }
   interaction.prepared = {} as any
@@ -24,7 +23,8 @@ test('restrictEdges', t => {
   options.outer = { top: 100, left: 100, bottom: 200, right: 200 }
   restrictEdges.set(arg)
 
-  t.deepEqual(arg.coords, { x: coords.y + 60, y: coords.y + 60 }, 'outer restriction is applied correctly')
+  // outer restriction is applied correctly
+  expect(arg.coords).toEqual({ x: coords.y + 60, y: coords.y + 60 })
 
   arg.coords = { ...coords }
 
@@ -33,7 +33,8 @@ test('restrictEdges', t => {
   options.inner = { top: 0, left: 0, bottom: 10, right: 10 }
   restrictEdges.set(arg)
 
-  t.deepEqual(arg.coords, { x: coords.x - 40, y: coords.y - 40 }, 'inner restriction is applied correctly')
+  // inner restriction is applied correctly
+  expect(arg.coords).toEqual({ x: coords.x - 40, y: coords.y - 40 })
 
   // offset
   Object.assign(offset, {
@@ -48,11 +49,8 @@ test('restrictEdges', t => {
   options.inner = null
   restrictEdges.set(arg)
 
-  t.deepEqual(
-    arg.coords,
-    { x: coords.x + 160, y: coords.x + 160 },
-    'outer restriction is applied correctly with offset',
-  )
+  // outer restriction is applied correctly with offset
+  expect(arg.coords).toEqual({ x: coords.x + 160, y: coords.x + 160 })
 
   // start
   interaction.modification = {} as any
@@ -66,11 +64,6 @@ test('restrictEdges', t => {
   options.offset = 'self'
   restrictEdges.start(arg)
 
-  t.deepEqual(
-    arg.state.offset,
-    { top: 505, left: 910, bottom: 508, right: 916 },
-    'start gets x/y from selector string',
-  )
-
-  t.end()
+  // start gets x/y from selector string
+  expect(arg.state.offset).toEqual({ top: 505, left: 910, bottom: 508, right: 916 })
 })

@@ -6,7 +6,7 @@ import hypot from '@interactjs/utils/hypot'
 
 import { BaseEvent } from './BaseEvent'
 import type { Interaction } from './Interaction'
-import { defaults } from './defaultOptions'
+import { defaults } from './options'
 
 export type EventPhase = keyof PhaseMap
 

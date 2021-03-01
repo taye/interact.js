@@ -1,0 +1,38 @@
+<title>interact.js Sortable and Swappable demo</title>
+
+<link rel="stylesheet" href="/node_modules/bulma/css/bulma.css">
+<link rel="stylesheet" href="./style.css">
+
+<body>
+
+  <div id="react-app"></div>
+
+  <div id="vue-app">
+    <div v-for="list of lists" class="box">
+      <h1>{{ list.title }}</h1>
+
+      <pre>{{ list.items }}</pre>
+
+      <sortable class="container" :options="sortableOptions" v-model="list.items">
+        <div v-for="(item, index) of list.items" :key="index" disabled="!!(index % 2)" :id="`item-${index}-${item}`" class="item card">
+          <div class="card-content">{{ index }}. {{ item }}</div>
+        </div>
+      </sortable>
+    </div>
+
+    <pre>[ {{ tags.join(', ') }} ]</pre>
+
+    <swappable class="tags" v-model="tags" :options="swappableOptions">
+      <div v-for="tag of tags" :id="'tag-' + tag" class="tag is-info is-large">{{ tag }}</div>
+    </swappable>
+
+  </div>
+
+  <div id="no-parent"></div>
+
+</body>
+
+<script crossorigin src="https://unpkg.com/react@16/umd/react.development.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
+<script type="module" src="./vue.js"></script>
+<script type="module" src="./react.js"></script>

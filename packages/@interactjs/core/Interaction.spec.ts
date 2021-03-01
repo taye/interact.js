@@ -1,4 +1,3 @@
-import test from '@interactjs/_dev/test/test'
 import drag from '@interactjs/actions/drag/plugin'
 import drop from '@interactjs/actions/drop/plugin'
 import autoStart from '@interactjs/auto-start/base'
@@ -11,96 +10,83 @@ import { InteractEvent } from './InteractEvent'
 import { Interaction } from './Interaction'
 import * as helpers from './tests/_helpers'
 
-test('Interaction constructor', t => {
-  const testType = 'test'
-  const dummyScopeFire = () => {}
-  const interaction = new Interaction({
-    pointerType: testType,
-    scopeFire: dummyScopeFire,
-  })
-  const zeroCoords = {
-    page: { x: 0, y: 0 },
-    client: { x: 0, y: 0 },
-    timeStamp: 0,
-  }
+describe('core/Interaction', () => {
+  test('constructor', () => {
+    const testType = 'test'
+    const dummyScopeFire = () => {}
+    const interaction = new Interaction({
+      pointerType: testType,
+      scopeFire: dummyScopeFire,
+    })
+    const zeroCoords = {
+      page: { x: 0, y: 0 },
+      client: { x: 0, y: 0 },
+      timeStamp: 0,
+    }
 
-  t.equal(
-    interaction._scopeFire,
-    dummyScopeFire,
-    'scopeFire option is set assigned to interaction._scopeFire',
-  )
+    // scopeFire option is set assigned to interaction._scopeFire
+    expect(interaction._scopeFire).toBe(dummyScopeFire)
 
-  t.ok(interaction.prepared instanceof Object, 'interaction.prepared is an object')
-  t.ok(interaction.downPointer instanceof Object, 'interaction.downPointer is an object')
+    expect(interaction.prepared).toEqual(expect.any(Object))
+    expect(interaction.downPointer).toEqual(expect.any(Object))
 
-  for (const coordField in interaction.coords) {
-    t.deepEqual(
-      interaction.coords[coordField as keyof typeof interaction.coords],
-      zeroCoords,
-      `interaction.coords.${coordField} set to zero`,
-    )
-  }
+    // `interaction.coords.${coordField} set to zero`
+    expect(interaction.coords).toEqual({
+      start: zeroCoords,
+      cur: zeroCoords,
+      prev: zeroCoords,
+      delta: zeroCoords,
+      velocity: zeroCoords,
+    })
 
-  t.equal(interaction.pointerType, testType, 'interaction.pointerType is set')
-
-  // pointerInfo properties
-  t.deepEqual(interaction.pointers, [], 'interaction.pointers is initially an empty array')
-
-  // false properties
-  for (const prop of ['pointerIsDown', 'pointerWasMoved', '_interacting'] as const) {
-    t.false(interaction[prop], `interaction.${prop} is false`)
-  }
-
-  t.notEqual(interaction.pointerType, 'mouse')
-
-  t.end()
-})
-
-test('Interaction destroy', t => {
-  const { interaction } = helpers.testEnv()
-  const pointer = { pointerId: 10 } as any
-  const event = {} as any
-
-  interaction.updatePointer(pointer, event, null)
-
-  interaction.destroy()
-
-  t.strictEqual(interaction._latestPointer.pointer, null, 'interaction._latestPointer.pointer is null')
-
-  t.strictEqual(interaction._latestPointer.event, null, 'interaction._latestPointer.event is null')
-
-  t.strictEqual(
-    interaction._latestPointer.eventTarget,
-    null,
-    'interaction._latestPointer.eventTarget is null',
-  )
-
-  t.end()
-})
-
-test('Interaction.getPointerIndex', t => {
-  const { interaction } = helpers.testEnv()
-
-  interaction.pointers = [2, 4, 5, 0, -1].map(id => ({ id })) as any
-
-  interaction.pointers.forEach(({ id }, index) => {
-    t.equal(interaction.getPointerIndex({ pointerId: id } as any), index)
+    // interaction.pointerType is set
+    expect(interaction.pointerType).toBe(testType)
+    // interaction.pointers is initially an empty array
+    expect(interaction.pointers).toEqual([])
+    // false properties
+    expect(interaction).toMatchObject({ pointerIsDown: false, pointerWasMoved: false, _interacting: false })
+    expect(interaction.pointerType).not.toBe('mouse')
   })
 
-  t.end()
-})
-
-test('Interaction.updatePointer', t => {
-  t.test('no existing pointers', st => {
+  test('Interaction destroy', () => {
     const { interaction } = helpers.testEnv()
     const pointer = { pointerId: 10 } as any
     const event = {} as any
 
-    const ret = interaction.updatePointer(pointer, event, null)
+    interaction.updatePointer(pointer, event, null)
 
-    st.deepEqual(
-      interaction.pointers,
-      [
+    interaction.destroy()
+
+    // interaction._latestPointer.pointer is null
+    expect(interaction._latestPointer.pointer).toBeNull()
+
+    // interaction._latestPointer.event is null
+    expect(interaction._latestPointer.event).toBeNull()
+
+    // interaction._latestPointer.eventTarget is null
+    expect(interaction._latestPointer.eventTarget).toBeNull()
+  })
+
+  test('Interaction.getPointerIndex', () => {
+    const { interaction } = helpers.testEnv()
+
+    interaction.pointers = [2, 4, 5, 0, -1].map((id) => ({ id })) as any
+
+    interaction.pointers.forEach(({ id }, index) => {
+      expect(interaction.getPointerIndex({ pointerId: id } as any)).toBe(index)
+    })
+  })
+
+  describe('Interaction.updatePointer', () => {
+    test('no existing pointers', () => {
+      const { interaction } = helpers.testEnv()
+      const pointer = { pointerId: 10 } as any
+      const event = {} as any
+
+      const ret = interaction.updatePointer(pointer, event, null)
+
+      // interaction.pointers == [{ pointer, ... }]
+      expect(interaction.pointers).toEqual([
         {
           id: pointer.pointerId,
           pointer,
@@ -108,27 +94,23 @@ test('Interaction.updatePointer', t => {
           downTime: null,
           downTarget: null,
         },
-      ],
-      'interaction.pointers == [{ pointer, ... }]',
-    )
-    st.equal(ret, 0, 'new pointer index is returned')
+      ])
+      // new pointer index is returned
+      expect(ret).toBe(0)
+    })
 
-    st.end()
-  })
+    test('new pointer with exisiting pointer', () => {
+      const { interaction } = helpers.testEnv()
+      const existing: any = { pointerId: 0 }
+      const event: any = {}
 
-  t.test('new pointer with exisiting pointer', st => {
-    const { interaction } = helpers.testEnv()
-    const existing: any = { pointerId: 0 }
-    const event: any = {}
+      interaction.updatePointer(existing, event, null)
 
-    interaction.updatePointer(existing, event, null)
+      const newPointer: any = { pointerId: 10 }
+      const ret = interaction.updatePointer(newPointer, event, null)
 
-    const newPointer: any = { pointerId: 10 }
-    const ret = interaction.updatePointer(newPointer, event, null)
-
-    st.deepEqual(
-      interaction.pointers,
-      [
+      // interaction.pointers == [{ pointer: existing, ... }, { pointer: newPointer, ... }]
+      expect(interaction.pointers).toEqual([
         {
           id: existing.pointerId,
           pointer: existing,
@@ -143,160 +125,153 @@ test('Interaction.updatePointer', t => {
           downTime: null,
           downTarget: null,
         },
-      ],
-      'interaction.pointers == [{ pointer: existing, ... }, { pointer: newPointer, ... }]',
-    )
+      ])
 
-    st.equal(ret, 1, 'second pointer index is 1')
-
-    st.end()
-  })
-
-  t.test('update existing pointers', st => {
-    const { interaction } = helpers.testEnv()
-
-    const oldPointers = [-3, 10, 2].map(pointerId => ({ pointerId }))
-    const newPointers = oldPointers.map(pointer => ({ ...pointer, new: true }))
-
-    oldPointers.forEach((pointer: any) => interaction.updatePointer(pointer, pointer, null))
-    newPointers.forEach((pointer: any) => interaction.updatePointer(pointer, pointer, null))
-
-    st.equal(interaction.pointers.length, oldPointers.length, 'number of pointers is unchanged')
-
-    interaction.pointers.forEach((pointerInfo, i) => {
-      st.equal(pointerInfo.id, oldPointers[i].pointerId, `pointer[${i}].id is the same`)
-      st.notEqual(pointerInfo.pointer, oldPointers[i], `new pointer ${i} !== old pointer object`)
+      // second pointer index is 1
+      expect(ret).toBe(1)
     })
 
-    st.end()
+    test('update existing pointers', () => {
+      const { interaction } = helpers.testEnv()
+
+      const oldPointers = [-3, 10, 2].map((pointerId) => ({ pointerId }))
+      const newPointers = oldPointers.map((pointer) => ({ ...pointer, new: true }))
+
+      oldPointers.forEach((pointer: any) => interaction.updatePointer(pointer, pointer, null))
+      newPointers.forEach((pointer: any) => interaction.updatePointer(pointer, pointer, null))
+
+      // number of pointers is unchanged
+      expect(interaction.pointers).toHaveLength(oldPointers.length)
+
+      interaction.pointers.forEach((pointerInfo, i) => {
+        // `pointer[${i}].id is the same`
+        expect(pointerInfo.id).toBe(oldPointers[i].pointerId)
+        // `new pointer ${i} !== old pointer object`
+        expect(pointerInfo.pointer).not.toBe(oldPointers[i])
+      })
+    })
   })
 
-  t.end()
-})
+  test('Interaction.removePointer', () => {
+    const { interaction } = helpers.testEnv()
+    const ids = [0, 1, 2, 3]
+    const removals = [
+      { id: 0, remain: [1, 2, 3], message: 'first of 4' },
+      { id: 2, remain: [1, 3], message: 'middle of 3' },
+      { id: 3, remain: [1], message: 'last of 2' },
+      { id: 1, remain: [], message: 'final' },
+    ]
 
-test('Interaction.removePointer', t => {
-  const { interaction } = helpers.testEnv()
-  const ids = [0, 1, 2, 3]
-  const removals = [
-    { id: 0, remain: [1, 2, 3], message: 'first of 4' },
-    { id: 2, remain: [1, 3], message: 'middle of 3' },
-    { id: 3, remain: [1], message: 'last of 2' },
-    { id: 1, remain: [], message: 'final' },
-  ]
+    ids.forEach((pointerId) => interaction.updatePointer({ pointerId } as any, {} as any, null))
 
-  ids.forEach(pointerId => interaction.updatePointer({ pointerId } as any, {} as any, null))
+    for (const removal of removals) {
+      interaction.removePointer({ pointerId: removal.id } as PointerType, null)
 
-  for (const removal of removals) {
-    interaction.removePointer({ pointerId: removal.id } as PointerType, null)
-
-    t.deepEqual(
-      interaction.pointers.map(p => p.id),
-      removal.remain,
-      `${removal.message} - remaining interaction.pointers is correct`,
-    )
-  }
-
-  t.end()
-})
-
-test('Interaction.pointer{Down,Move,Up} updatePointer', t => {
-  const { scope, interaction } = helpers.testEnv()
-  const eventTarget: any = {}
-  const pointer: any = {
-    target: eventTarget,
-    pointerId: 0,
-  }
-  let info: any = {}
-
-  scope.addListeners({
-    'interactions:update-pointer': arg => {
-      info.updated = arg.pointerInfo
-    },
-    'interactions:remove-pointer': arg => {
-      info.removed = arg.pointerInfo
-    },
+      // `${removal.message} - remaining interaction.pointers is correct`
+      expect(interaction.pointers.map((p) => p.id)).toEqual(removal.remain)
+    }
   })
 
-  interaction.coords.cur.timeStamp = 0
-  const commonPointerInfo: any = {
-    id: 0,
-    pointer,
-    event: pointer,
-    downTime: null,
-    downTarget: null,
-  }
+  test('Interaction.pointer{Down,Move,Up} updatePointer', () => {
+    const { scope, interaction } = helpers.testEnv()
+    const eventTarget: any = {}
+    const pointer: any = {
+      target: eventTarget,
+      pointerId: 0,
+    }
+    let info: any = {}
 
-  interaction.pointerDown(pointer, pointer, eventTarget)
-  t.deepEqual(
-    info.updated,
-    {
+    scope.addListeners({
+      'interactions:update-pointer': (arg) => {
+        info.updated = arg.pointerInfo
+      },
+      'interactions:remove-pointer': (arg) => {
+        info.removed = arg.pointerInfo
+      },
+    })
+
+    interaction.coords.cur.timeStamp = 0
+    const commonPointerInfo: any = {
+      id: 0,
+      pointer,
+      event: pointer,
+      downTime: null,
+      downTarget: null,
+    }
+
+    interaction.pointerDown(pointer, pointer, eventTarget)
+    // interaction.pointerDown updates pointer
+    expect(info.updated).toEqual({
       ...commonPointerInfo,
       downTime: interaction.coords.cur.timeStamp,
       downTarget: eventTarget,
-    },
-    'interaction.pointerDown updates pointer',
-  )
-  t.equal(info.removed, undefined, "interaction.pointerDown doesn't remove pointer")
-  interaction.removePointer(pointer, null)
-  info = {}
+    })
+    // interaction.pointerDown doesn't remove pointer
+    expect(info.removed).toBeUndefined()
+    interaction.removePointer(pointer, null)
+    info = {}
 
-  interaction.pointerMove(pointer, pointer, eventTarget)
-  t.deepEqual(info.updated, commonPointerInfo, 'interaction.pointerMove updates pointer')
-  t.equal(info.removed, undefined, "interaction.pointerMove doesn't remove pointer")
-  info = {}
+    interaction.pointerMove(pointer, pointer, eventTarget)
+    // interaction.pointerMove updates pointer
+    expect(info.updated).toEqual(commonPointerInfo)
+    // interaction.pointerMove doesn't remove pointer
+    expect(info.removed).toBeUndefined()
+    info = {}
 
-  interaction.pointerUp(pointer, pointer, eventTarget, null)
-  t.equal(info.updated, undefined, "interaction.pointerUp doesn't update existing pointer")
-  info = {}
+    interaction.pointerUp(pointer, pointer, eventTarget, null)
+    // interaction.pointerUp doesn't update existing pointer
+    expect(info.updated).toBeUndefined()
+    info = {}
 
-  interaction.pointerUp(pointer, pointer, eventTarget, null)
-  t.deepEqual(info.updated, commonPointerInfo, 'interaction.pointerUp updates non existing pointer')
-  t.deepEqual(info.removed, commonPointerInfo, 'interaction.pointerUp also removes pointer')
-  info = {}
-
-  t.end()
-})
-
-test('Interaction.pointerDown', t => {
-  const { interaction, scope, coords, event, target } = helpers.testEnv()
-  let signalArg: any
-
-  const coordsSet = helpers.newCoordsSet()
-  scope.now = () => coords.timeStamp
-
-  extend(coords, {
-    target,
-    type: 'down',
+    interaction.pointerUp(pointer, pointer, eventTarget, null)
+    // interaction.pointerUp updates non existing pointer
+    expect(info.updated).toEqual(commonPointerInfo)
+    // interaction.pointerUp also removes pointer
+    expect(info.removed).toEqual(commonPointerInfo)
+    info = {}
   })
 
-  const signalListener = (arg: any) => {
-    signalArg = arg
-  }
+  test('Interaction.pointerDown', () => {
+    const { interaction, scope, coords, event, target } = helpers.testEnv()
+    let signalArg: any
 
-  scope.addListeners({
-    'interactions:down': signalListener,
-  })
+    const coordsSet = helpers.newCoordsSet()
+    scope.now = () => coords.timeStamp
 
-  const pointerCoords: any = { page: {}, client: {} }
-  pointerUtils.setCoords(pointerCoords, [event], event.timeStamp)
+    extend(coords, {
+      target,
+      type: 'down',
+    })
 
-  for (const prop in coordsSet) {
-    pointerUtils.copyCoords(
-      interaction.coords[prop as keyof typeof coordsSet],
-      coordsSet[prop as keyof typeof coordsSet],
-    )
-  }
+    const signalListener = (arg: any) => {
+      signalArg = arg
+    }
 
-  t.deepEqual(interaction.downPointer, {} as any, 'downPointer is initially empty')
+    scope.addListeners({
+      'interactions:down': signalListener,
+    })
 
-  // test while interacting
-  interaction._interacting = true
-  interaction.pointerDown(event, event, target)
+    const pointerCoords: any = { page: {}, client: {} }
+    pointerUtils.setCoords(pointerCoords, [event], event.timeStamp)
 
-  t.equal(interaction.downEvent, null, 'downEvent is not updated')
-  t.deepEqual(
-    interaction.pointers,
-    [
+    for (const prop in coordsSet) {
+      pointerUtils.copyCoords(
+        interaction.coords[prop as keyof typeof coordsSet],
+        coordsSet[prop as keyof typeof coordsSet],
+      )
+    }
+
+    // downPointer is initially empty
+    expect(interaction.downPointer).toEqual({} as any)
+
+    // test while interacting
+    interaction._interacting = true
+    interaction.pointerDown(event, event, target)
+
+    // downEvent is not updated
+    expect(interaction.downEvent).toBeNull()
+    // pointer is added
+    expect(interaction.pointers).toEqual([
       {
         id: event.pointerId,
         event,
@@ -304,50 +279,54 @@ test('Interaction.pointerDown', t => {
         downTime: 0,
         downTarget: target,
       },
-    ],
-    'pointer is added',
-  )
+    ])
 
-  t.notDeepEqual(interaction.downPointer, {} as any, 'downPointer is updated')
+    // downPointer is updated
+    expect(interaction.downPointer).not.toEqual({} as any)
 
-  t.deepEqual(interaction.coords.start, coordsSet.start, 'coords.start are not modified')
-  t.deepEqual(interaction.coords.prev, coordsSet.prev, 'coords.prev  are not modified')
+    // coords.start are not modified
+    expect(interaction.coords.start).toEqual(coordsSet.start)
+    // coords.prev  are not modified
+    expect(interaction.coords.prev).toEqual(coordsSet.prev)
 
-  t.deepEqual(
-    interaction.coords.cur,
-    helpers.getProps(event, ['page', 'client', 'timeStamp']),
-    'coords.cur   *are* modified',
-  )
+    // coords.cur   *are* modified
+    expect(interaction.coords.cur).toEqual(helpers.getProps(event, ['page', 'client', 'timeStamp']))
 
-  t.ok(interaction.pointerIsDown, 'pointerIsDown')
-  t.notOk(interaction.pointerWasMoved, '!pointerWasMoved')
+    // pointerIsDown
+    expect(interaction.pointerIsDown).toBe(true)
+    // !pointerWasMoved
+    expect(interaction.pointerWasMoved).toBe(false)
 
-  t.equal(signalArg.pointer, event, 'pointer      in down signal arg')
-  t.equal(signalArg.event, event, 'event        in down signal arg')
-  t.equal(signalArg.eventTarget, target, 'eventTarget  in down signal arg')
-  t.equal(signalArg.pointerIndex, 0, 'pointerIndex in down signal arg')
+    // pointer      in down signal arg
+    expect(signalArg.pointer).toBe(event)
+    // event        in down signal arg
+    expect(signalArg.event).toBe(event)
+    // eventTarget  in down signal arg
+    expect(signalArg.eventTarget).toBe(target)
+    // pointerIndex in down signal arg
+    expect(signalArg.pointerIndex).toBe(0)
 
-  // test while not interacting
-  interaction._interacting = false
-  // reset pointerIsDown
-  interaction.pointerIsDown = false
-  // pretend pointer was moved
-  interaction.pointerWasMoved = true
-  // reset signalArg object
-  signalArg = undefined
+    // test while not interacting
+    interaction._interacting = false
+    // reset pointerIsDown
+    interaction.pointerIsDown = false
+    // pretend pointer was moved
+    interaction.pointerWasMoved = true
+    // reset signalArg object
+    signalArg = undefined
 
-  interaction.removePointer(event, null)
-  interaction.pointerDown(event, event, target)
+    interaction.removePointer(event, null)
+    interaction.pointerDown(event, event, target)
 
-  // timeStamp is assigned with new Date.getTime()
-  // don't let it cause deepEaual to fail
-  pointerCoords.timeStamp = interaction.coords.start.timeStamp
+    // timeStamp is assigned with new Date.getTime()
+    // don't let it cause deepEaual to fail
+    pointerCoords.timeStamp = interaction.coords.start.timeStamp
 
-  t.equal(interaction.downEvent, event, 'downEvent is updated')
+    // downEvent is updated
+    expect(interaction.downEvent).toBe(event)
 
-  t.deepEqual(
-    interaction.pointers,
-    [
+    // interaction.pointers is updated
+    expect(interaction.pointers).toEqual([
       {
         id: event.pointerId,
         event,
@@ -355,143 +334,151 @@ test('Interaction.pointerDown', t => {
         downTime: pointerCoords.timeStamp,
         downTarget: target,
       },
-    ],
-    'interaction.pointers is updated',
-  )
+    ])
 
-  t.deepEqual(interaction.coords.start, pointerCoords, 'coords.start are set to pointer')
-  t.deepEqual(interaction.coords.cur, pointerCoords, 'coords.cur   are set to pointer')
-  t.deepEqual(interaction.coords.prev, pointerCoords, 'coords.prev  are set to pointer')
+    // coords.start are set to pointer
+    expect(interaction.coords.start).toEqual(pointerCoords)
+    // coords.cur   are set to pointer
+    expect(interaction.coords.cur).toEqual(pointerCoords)
+    // coords.prev  are set to pointer
+    expect(interaction.coords.prev).toEqual(pointerCoords)
 
-  t.equal(typeof signalArg, 'object', 'down signal was fired again')
-  t.ok(interaction.pointerIsDown, 'pointerIsDown')
-  t.notOk(interaction.pointerWasMoved, 'pointerWasMoved should always change to false')
-
-  t.end()
-})
-
-test('Interaction.start', t => {
-  const { interaction, interactable, scope, event, target: element, down, stop } = helpers.testEnv({
-    plugins: [drag],
+    // down signal was fired again
+    expect(signalArg).toBeInstanceOf(Object)
+    // pointerIsDown
+    expect(interaction.pointerIsDown).toBe(true)
+    // pointerWasMoved should always change to false
+    expect(interaction.pointerWasMoved).toBe(false)
   })
-  const action = { name: 'drag' } as const
 
-  interaction.start(action, interactable, element)
-  t.equal(interaction.prepared.name, null, 'do nothing if !pointerIsDown')
+  test('Interaction.start', () => {
+    const { interaction, interactable, scope, event, target: element, down, stop } = helpers.testEnv({
+      plugins: [drag],
+    })
+    const action = { name: 'drag' } as const
 
-  // pointers is still empty
-  interaction.pointerIsDown = true
-  interaction.start(action, interactable, element)
-  t.equal(interaction.prepared.name, null, 'do nothing if too few pointers are down')
+    interaction.start(action, interactable, element)
+    // do nothing if !pointerIsDown
+    expect(interaction.prepared.name).toBeNull()
 
-  down()
+    // pointers is still empty
+    interaction.pointerIsDown = true
+    interaction.start(action, interactable, element)
+    // do nothing if too few pointers are down
+    expect(interaction.prepared.name).toBeNull()
 
-  interaction._interacting = true
-  interaction.start(action, interactable, element)
-  t.equal(interaction.prepared.name, null, 'do nothing if already interacting')
+    down()
 
-  interaction._interacting = false
+    interaction._interacting = true
+    interaction.start(action, interactable, element)
+    // do nothing if already interacting
+    expect(interaction.prepared.name).toBeNull()
 
-  interactable.options[action.name] = { enabled: false }
-  interaction.start(action, interactable, element)
-  t.equal(interaction.prepared.name, null, 'do nothing if action is not enabled')
-  interactable.options[action.name] = { enabled: true }
+    interaction._interacting = false
 
-  let signalArg: any
+    interactable.options[action.name] = { enabled: false }
+    interaction.start(action, interactable, element)
+    // do nothing if action is not enabled
+    expect(interaction.prepared.name).toBeNull()
+    interactable.options[action.name] = { enabled: true }
 
-  // let interactingInStartListener
-  const signalListener = (arg: any) => {
-    signalArg = arg
-    // interactingInStartListener = arg.interaction.interacting()
-  }
+    let signalArg: any
 
-  scope.addListeners({
-    'interactions:action-start': signalListener,
+    // let interactingInStartListener
+    const signalListener = (arg: any) => {
+      signalArg = arg
+      // interactingInStartListener = arg.interaction.interacting()
+    }
+
+    scope.addListeners({
+      'interactions:action-start': signalListener,
+    })
+    interaction.start(action, interactable, element)
+
+    // action is prepared
+    expect(interaction.prepared.name).toBe(action.name)
+    // interaction.interactable is updated
+    expect(interaction.interactable).toBe(interactable)
+    // interaction.element is updated
+    expect(interaction.element).toBe(element)
+
+    // t.assert(interactingInStartListener, 'interaction is interacting during action-start signal')
+    // interaction is interacting after start method
+    expect(interaction.interacting()).toBe(true)
+    // interaction in signal arg
+    expect(signalArg.interaction).toBe(interaction)
+    // event (interaction.downEvent) in signal arg
+    expect(signalArg.event).toBe(event)
+
+    stop()
   })
-  interaction.start(action, interactable, element)
 
-  t.equal(interaction.prepared.name, action.name, 'action is prepared')
-  t.equal(interaction.interactable, interactable, 'interaction.interactable is updated')
-  t.equal(interaction.element, element, 'interaction.element is updated')
+  test('interaction move() and stop() from start event', () => {
+    const { interaction, interactable, target, down } = helpers.testEnv({ plugins: [drag, drop, autoStart] })
 
-  // t.assert(interactingInStartListener, 'interaction is interacting during action-start signal')
-  t.assert(interaction.interacting(), 'interaction is interacting after start method')
-  t.equal(signalArg.interaction, interaction, 'interaction in signal arg')
-  t.equal(signalArg.event, event, 'event (interaction.downEvent) in signal arg')
+    let stoppedBeforeStartFired: boolean
 
-  stop()
+    interactable.draggable({
+      listeners: {
+        start (event) {
+          stoppedBeforeStartFired = interaction._stopped
 
-  t.end()
-})
+          // interaction.move() doesn't throw from start event
+          expect(() => event.interaction.move()).not.toThrow()
 
-test('interaction move() and stop() from start event', t => {
-  const { interaction, interactable, target, down } = helpers.testEnv({ plugins: [drag, drop, autoStart] })
-
-  let stoppedBeforeStartFired: boolean
-
-  interactable.draggable({
-    listeners: {
-      start (event) {
-        stoppedBeforeStartFired = interaction._stopped
-
-        t.doesNotThrow(() => event.interaction.move(), "interaction.move() doesn't throw from start event")
-
-        t.doesNotThrow(() => event.interaction.stop(), "interaction.stop() doesn't throw from start event")
+          // interaction.stop() doesn't throw from start event
+          expect(() => event.interaction.stop()).not.toThrow()
+        },
       },
-    },
+    })
+
+    down()
+    interaction.start({ name: 'drag' }, interactable, target as HTMLElement)
+
+    // !interaction._stopped in start listener
+    expect(stoppedBeforeStartFired).toBe(false)
+    // interaction can be stopped from start event listener
+    expect(interaction.interacting()).toBe(false)
+    // interaction._stopped after stop() in start listener
+    expect(interaction._stopped).toBe(true)
   })
 
-  down()
-  interaction.start({ name: 'drag' }, interactable, target as HTMLElement)
+  test('Interaction createPreparedEvent', () => {
+    const { interaction, interactable, target } = helpers.testEnv()
 
-  t.equal(stoppedBeforeStartFired, false, '!interaction._stopped in start listener')
-  t.notOk(interaction.interacting(), 'interaction can be stopped from start event listener')
-  t.ok(interaction._stopped, 'interaction._stopped after stop() in start listener')
+    const action = { name: 'resize' } as const
+    const phase = 'TEST_PHASE' as EventPhase
 
-  t.end()
-})
+    interaction.prepared = action
+    interaction.interactable = interactable
+    interaction.element = target
+    interaction.prevEvent = { page: {}, client: {}, velocity: {} } as any
 
-test('Interaction createPreparedEvent', t => {
-  const { interaction, interactable, target } = helpers.testEnv()
+    const iEvent = interaction._createPreparedEvent({} as any, phase)
 
-  const action = { name: 'resize' } as const
-  const phase = 'TEST_PHASE' as EventPhase
+    expect(iEvent).toBeInstanceOf(InteractEvent)
 
-  interaction.prepared = action
-  interaction.interactable = interactable
-  interaction.element = target
-  interaction.prevEvent = { page: {}, client: {}, velocity: {} } as any
+    expect(iEvent.type).toBe(action.name + phase)
 
-  const iEvent = interaction._createPreparedEvent({} as any, phase)
+    expect(iEvent.interactable).toBe(interactable)
 
-  t.ok(iEvent instanceof InteractEvent, 'InteractEvent is fired')
+    expect(iEvent.target).toBe(interactable.target)
+  })
 
-  t.equal(iEvent.type, action.name + phase, 'event type')
+  test('Interaction fireEvent', () => {
+    const { interaction, interactable } = helpers.testEnv()
+    const iEvent = {} as InteractEvent
 
-  t.equal(iEvent.interactable, interactable, 'event.interactable')
+    // this method should be called from actions.firePrepared
+    interactable.fire = jest.fn()
 
-  t.equal(iEvent.target, interactable.target, 'event.target')
+    interaction.interactable = interactable
+    interaction._fireEvent(iEvent)
 
-  t.end()
-})
+    // target interactable's fire method is called
+    expect(interactable.fire).toHaveBeenCalledWith(iEvent)
 
-test('Interaction fireEvent', t => {
-  const { interaction, interactable } = helpers.testEnv()
-  const iEvent = {} as InteractEvent
-  let firedEvent
-
-  // this method should be called from actions.firePrepared
-  interactable.fire = event => {
-    firedEvent = event
-    return interactable
-  }
-
-  interaction.interactable = interactable
-  interaction._fireEvent(iEvent)
-
-  t.equal(firedEvent, iEvent, "target interactable's fire method is called")
-
-  t.equal(interaction.prevEvent, iEvent, 'interaction.prevEvent is updated')
-
-  t.end()
+    // interaction.prevEvent is updated
+    expect(interaction.prevEvent).toBe(iEvent)
+  })
 })

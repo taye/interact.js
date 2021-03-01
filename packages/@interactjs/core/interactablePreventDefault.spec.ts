@@ -1,11 +1,10 @@
-import test from '@interactjs/_dev/test/test'
 import drag from '@interactjs/actions/drag/plugin'
 import autoStart from '@interactjs/auto-start/base'
 
 import interactablePreventDefault from './interactablePreventDefault'
 import * as helpers from './tests/_helpers'
 
-test('interactablePreventDefault', t => {
+test('core/interactablePreventDefault', () => {
   const { scope, interactable } = helpers.testEnv({
     plugins: [interactablePreventDefault, autoStart, drag],
   })
@@ -16,16 +15,12 @@ test('interactablePreventDefault', t => {
 
   const mouseEvent: MouseEvent = new MouseEvent('mousedown', { bubbles: true })
   const nativeDragStart: Event = new Event('dragstart', { bubbles: true })
-  let nativeDragStartPrevented = false
 
-  nativeDragStart.preventDefault = () => {
-    nativeDragStartPrevented = true
-  }
+  nativeDragStart.preventDefault = jest.fn()
 
   scope.document.body.dispatchEvent(mouseEvent)
   scope.document.body.dispatchEvent(nativeDragStart)
 
-  t.ok(nativeDragStartPrevented, 'native dragstart is prevented on interactable ')
-
-  t.end()
+  // native dragstart is prevented on interactable
+  expect(nativeDragStart.preventDefault).toHaveBeenCalledTimes(1)
 })

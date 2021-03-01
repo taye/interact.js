@@ -20,9 +20,9 @@ import normalizeListeners from '@interactjs/utils/normalizeListeners'
 import { getWindow } from '@interactjs/utils/window'
 
 import { Eventable } from './Eventable'
-import type { ActionDefaults, Defaults, OptionsArg, PerActionDefaults } from './defaultOptions'
-import { Options } from './defaultOptions'
 import isNonNativeEvent from './isNonNativeEvent'
+import type { ActionDefaults, Defaults, OptionsArg, PerActionDefaults } from './options'
+import { Options } from './options'
 
 type IgnoreValue = string | Element | boolean
 type DeltaSource = 'page' | 'client'
@@ -107,7 +107,7 @@ export class Interactable implements Partial<Eventable> {
       }
 
       // if the option value is an array
-      if (is.array<any>(optionValue)) {
+      if (is.array(optionValue)) {
         ;(actionOptions[optionName] as any) = arr.from(optionValue)
       }
       // if the option value is an object
@@ -168,7 +168,7 @@ export class Interactable implements Partial<Eventable> {
     if (is.func(checker)) {
       this._rectChecker = checker
 
-      this.getRect = element => {
+      this.getRect = (element) => {
         const rect = extend({}, this._rectChecker(element))
 
         if (!(('width' in rect) as unknown)) {

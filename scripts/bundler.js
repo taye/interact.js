@@ -12,15 +12,12 @@ require('module')._initPaths()
 
 module.exports = function (options) {
   const browserify = require('browserify')
-  const plugins = options.watch
-    ? [require('watchify'), require('errorify')]
-    : process.env.NODE_ENV === 'production'
-      ? [require('browser-pack-flat/plugin')]
-      : []
+  const plugins = process.env.NODE_ENV === 'production' ? [require('browser-pack-flat/plugin')] : []
 
   const babelrc = extendBabelOptions(
     {
       babelrc: false,
+      configFile: false,
       sourceType: 'module',
       global: true,
       extensions: ['.ts', '.tsx', '.js', '.jsx'],
@@ -36,28 +33,15 @@ module.exports = function (options) {
     plugin: plugins,
     extensions: ['.ts', '.tsx'],
     paths: getModuleDirectories(),
-    ...(options.watch ? { cache: {}, packageCache: {} } : {}),
     ...options.browserify,
   })
 
   b.add(options.entry)
 
-  b.on('error', error => {
+  b.on('error', (error) => {
     console.error(error)
     process.exit(1)
   })
-
-  if (options.watch) {
-    b.on('update', ids => {
-      ids = ids.filter(id => !/\.js$/.test(id))
-
-      if (!ids.length) return
-
-      console.log(ids)
-      update(ids)
-    })
-    b.on('log', msg => console.log(msg))
-  }
 
   function update (ids) {
     if (ids) {
@@ -72,7 +56,7 @@ module.exports = function (options) {
 
     return new Promise((resolve, reject) => {
       b.bundle()
-        .on('data', chunk => {
+        .on('data', (chunk) => {
           bundleCode += chunk
         })
         .on('end', () => resolve(bundleCode))

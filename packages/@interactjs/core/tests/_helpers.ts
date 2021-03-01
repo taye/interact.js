@@ -1,5 +1,6 @@
-/* eslint-disable no-restricted-syntax */
-import { doc } from '@interactjs/_dev/test/domator'
+// eslint-disable-next-line import/no-extraneous-dependencies
+import { JSDOM } from 'jsdom'
+
 import type { ActionProps } from '@interactjs/core/Interaction'
 import type { PointerType, Rect, Target } from '@interactjs/types/index'
 import extend from '@interactjs/utils/extend'
@@ -10,6 +11,8 @@ import type { Plugin, ActionName } from '../scope'
 import { Scope } from '../scope'
 
 let counter = 0
+
+const doc = globalThis.document || new JSDOM('').window.document
 
 export function unique () {
   return counter++
@@ -69,8 +72,7 @@ export function newPointer (n = 50) {
   } as PointerType
 }
 
-export function mockScope (options = {} as any) {
-  const document = options.document || doc
+export function mockScope ({ document = doc } = {} as any) {
   const window = document.defaultView
 
   const scope = new Scope().init(window)
@@ -137,7 +139,7 @@ export function testEnv<T extends Target = HTMLElement> ({
 }
 
 export function timeout (n: number) {
-  return new Promise(resolve => setTimeout(resolve, n))
+  return new Promise((resolve) => setTimeout(resolve, n))
 }
 
 export function ltrbwh (

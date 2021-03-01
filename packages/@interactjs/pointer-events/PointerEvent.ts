@@ -1,8 +1,7 @@
+import { BaseEvent } from '@interactjs/core/BaseEvent'
 import type Interaction from '@interactjs/core/Interaction'
 import type { PointerEventType, PointerType, Point } from '@interactjs/types/index'
 import * as pointerUtils from '@interactjs/utils/pointerUtils'
-
-import { BaseEvent } from '../core/BaseEvent'
 
 export default class PointerEvent<T extends string = any> extends BaseEvent<never> {
   type: T

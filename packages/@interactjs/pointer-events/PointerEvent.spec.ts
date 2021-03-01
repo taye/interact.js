@@ -1,10 +1,9 @@
-import test from '@interactjs/_dev/test/test'
 import * as helpers from '@interactjs/core/tests/_helpers'
 import * as pointerUtils from '@interactjs/utils/pointerUtils'
 
 import PointerEvent from './PointerEvent'
 
-test('PointerEvent constructor', t => {
+test('PointerEvent constructor', () => {
   const type = 'TEST_EVENT'
   const pointerId = -100
   const testPointerProp = ['TEST_POINTER_PROP']
@@ -21,21 +20,28 @@ test('PointerEvent constructor', t => {
   const eventTarget = {} as Element
   const pointerEvent = new PointerEvent(type, pointer, event, eventTarget, interaction as any, 0) as any
 
-  t.equal(pointerEvent.testPointerProp, testPointerProp, 'pointerEvent is extended form pointer')
-  t.equal(pointerEvent.testEventProp, testEventProp, 'pointerEvent is extended form Event')
+  // pointerEvent is extended form pointer
+  expect(pointerEvent.testPointerProp).toBe(testPointerProp)
+  // pointerEvent is extended form Event
+  expect(pointerEvent.testEventProp).toBe(testEventProp)
 
-  t.equal(pointerEvent.type, type, 'type is set correctly')
-  t.equal(pointerEvent.pointerType, pointerUtils.getPointerType(pointer), 'pointerType is set correctly')
-  t.equal(pointerEvent.pointerId, pointerId, 'pointerId is set correctly')
-  t.equal(pointerEvent.originalEvent, event, 'originalEvent is set correctly')
-  t.equal(pointerEvent.interaction, interaction._proxy, 'interaction is set correctly')
-  t.equal(pointerEvent.target, eventTarget, 'target is set correctly')
-  t.equal(pointerEvent.currentTarget, null, 'currentTarget is null')
-
-  t.end()
+  // type is set correctly
+  expect(pointerEvent.type).toBe(type)
+  // pointerType is set correctly
+  expect(pointerEvent.pointerType).toBe(pointerUtils.getPointerType(pointer))
+  // pointerId is set correctly
+  expect(pointerEvent.pointerId).toBe(pointerId)
+  // originalEvent is set correctly
+  expect(pointerEvent.originalEvent).toBe(event)
+  // interaction is set correctly
+  expect(pointerEvent.interaction).toBe(interaction._proxy)
+  // target is set correctly
+  expect(pointerEvent.target).toBe(eventTarget)
+  // currentTarget is null
+  expect(pointerEvent.currentTarget).toBeNull()
 })
 
-test('PointerEvent methods', t => {
+test('PointerEvent methods', () => {
   const methodContexts = {} as any
   const event: any = ['preventDefault', 'stopPropagation', 'stopImmediatePropagation'].reduce(
     (acc, methodName) => {
@@ -49,52 +55,40 @@ test('PointerEvent methods', t => {
   const pointerEvent = new PointerEvent('TEST', {} as any, event, null, {} as any, 0)
 
   pointerEvent.preventDefault()
-  t.equal(
-    methodContexts.preventDefault,
-    event,
-    'PointerEvent.preventDefault() calls preventDefault of originalEvent',
-  )
+  // PointerEvent.preventDefault() calls preventDefault of originalEvent
+  expect(methodContexts.preventDefault).toBe(event)
 
-  t.notOk(pointerEvent.propagationStopped, 'propagationStopped is false before call to stopPropagation')
+  // propagationStopped is false before call to stopPropagation
+  expect(pointerEvent.propagationStopped).toBe(false)
   pointerEvent.stopPropagation()
-  t.ok(pointerEvent.propagationStopped, 'stopPropagation sets propagationStopped to true')
-  t.equal(
-    methodContexts.stopPropagation,
-    undefined,
-    'PointerEvent.stopPropagation() does not call stopPropagation of originalEvent',
-  )
+  // stopPropagation sets propagationStopped to true
+  expect(pointerEvent.propagationStopped).toBe(true)
+  // PointerEvent.stopPropagation() does not call stopPropagation of originalEvent
+  // immediatePropagationStopped is false before call to stopImmediatePropagation
+  expect(methodContexts.stopPropagation).toBeUndefined()
 
-  t.notOk(
-    pointerEvent.immediatePropagationStopped,
-    'immediatePropagationStopped is false before call to stopImmediatePropagation',
-  )
+  expect(pointerEvent.immediatePropagationStopped).toBe(false)
   pointerEvent.stopImmediatePropagation()
-  t.equal(
-    methodContexts.stopImmediatePropagation,
-    undefined,
-    'PointerEvent.stopImmediatePropagation() does not call stopImmediatePropagation of originalEvent',
-  )
-  t.ok(
-    pointerEvent.immediatePropagationStopped,
-    'stopImmediatePropagation sets immediatePropagationStopped to true',
-  )
+  // PointerEvent.stopImmediatePropagation() does not call stopImmediatePropagation of originalEvent
+  expect(methodContexts.stopImmediatePropagation).toBeUndefined()
+  // stopImmediatePropagation sets immediatePropagationStopped to true
+  expect(pointerEvent.immediatePropagationStopped).toBe(true)
 
   const origin = { x: 20, y: 30 }
   pointerEvent._subtractOrigin(origin)
 
-  t.equal(pointerEvent.pageX, event.pageX - origin.x, 'subtractOrigin updates pageX correctly')
-  t.equal(pointerEvent.pageY, event.pageY - origin.y, 'subtractOrigin updates pageY correctly')
-  t.equal(pointerEvent.clientX, event.clientX - origin.x, 'subtractOrigin updates clientX correctly')
-  t.equal(pointerEvent.clientY, event.clientY - origin.y, 'subtractOrigin updates clientY correctly')
+  // subtractOrigin updates pageX correctly
+  expect(pointerEvent.pageX).toBe(event.pageX - origin.x)
+  // subtractOrigin updates pageY correctly
+  expect(pointerEvent.pageY).toBe(event.pageY - origin.y)
+  // subtractOrigin updates clientX correctly
+  expect(pointerEvent.clientX).toBe(event.clientX - origin.x)
+  // subtractOrigin updates clientY correctly
+  expect(pointerEvent.clientY).toBe(event.clientY - origin.y)
 
   pointerEvent._addOrigin(origin)
-  t.ok(
-    ['pageX', 'pageY', 'clientX', 'clientY'].reduce(
-      (allEqual, prop) => allEqual && pointerEvent[prop] === event[prop],
-      true,
-    ),
-    'addOrigin with the subtracted origin reverts to original coordinates',
+  // addOrigin with the subtracted origin reverts to original coordinates
+  expect(['pageX', 'pageY', 'clientX', 'clientY'].every((prop) => pointerEvent[prop] === event[prop])).toBe(
+    true,
   )
-
-  t.end()
 })

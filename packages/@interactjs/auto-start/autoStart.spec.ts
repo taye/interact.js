@@ -1,10 +1,9 @@
-import test from '@interactjs/_dev/test/test'
 import drag from '@interactjs/actions/drag/plugin'
 import * as helpers from '@interactjs/core/tests/_helpers'
 
 import autoStart from './base'
 
-test('autoStart', t => {
+test('autoStart', () => {
   const rect = { top: 100, left: 200, bottom: 300, right: 400 }
   const { interaction, interactable, event, coords, target: element } = helpers.testEnv({
     plugins: [autoStart, drag],
@@ -17,15 +16,14 @@ test('autoStart', t => {
 
   interaction.pointerDown(event, event, element)
 
-  t.deepEqual(interaction.prepared, { name: 'drag', axis: 'xy', edges: undefined }, 'prepares action')
+  // prepares action
+  expect(interaction.prepared).toEqual({ name: 'drag', axis: 'xy', edges: undefined })
 
-  t.deepEqual(
-    interaction.rect,
-    { ...rect, width: rect.right - rect.left, height: rect.bottom - rect.top },
-    'set interaction.rect',
-  )
+  // set interaction.rect
+  expect(interaction.rect).toEqual({ ...rect, width: rect.right - rect.left, height: rect.bottom - rect.top })
 
-  t.equal(element.style.cursor, 'move', 'sets drag cursor')
+  // sets drag cursor
+  expect(element.style.cursor).toBe('move')
 
   let checkerArgs: any[]
 
@@ -39,25 +37,19 @@ test('autoStart', t => {
 
   interaction.pointerDown(event, event, element)
 
-  t.deepEqual(
-    checkerArgs,
-    [{ name: 'drag', axis: 'xy', edges: undefined }, interactable, element, false],
-    'calls cursorChecker with expected args',
-  )
+  // calls cursorChecker with expected args
+  expect(checkerArgs).toEqual([{ name: 'drag', axis: 'xy', edges: undefined }, interactable, element, false])
 
   interaction.pointerDown(event, event, element)
-  t.equal(element.style.cursor, 'custom-cursor', 'uses cursorChecker value')
+  // uses cursorChecker value
+  expect(element.style.cursor).toBe('custom-cursor')
 
   coords.page.x += 10
   coords.client.x += 10
   interaction.pointerMove(event, event, element)
-  t.ok(interaction._interacting, 'down -> move starts action')
+  // down -> move starts action
+  expect(interaction._interacting).toBe(true)
 
-  t.deepEqual(
-    checkerArgs,
-    [{ name: 'drag', axis: 'xy', edges: undefined }, interactable, element, true],
-    'calls cursorChecker with true for interacting arg',
-  )
-
-  t.end()
+  // calls cursorChecker with true for interacting arg
+  expect(checkerArgs).toEqual([{ name: 'drag', axis: 'xy', edges: undefined }, interactable, element, true])
 })

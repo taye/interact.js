@@ -3,6 +3,14 @@ extends:
   - 'plugin:import/errors'
   - 'plugin:import/warnings'
   - 'plugin:import/typescript'
+  - 'plugin:react/all'
+
+settings:
+  import/resolver:
+    typescript:
+      project: './tsconfig.json'
+  react:
+    version: '16'
 
 env:
   commonjs: true
@@ -22,7 +30,7 @@ globals:
   globalThis: false
 
 rules:
-  arrow-parens: [error, 'as-needed']
+  arrow-parens: [error, 'always']
   brace-style: off
   comma-dangle: [error, 'always-multiline']
   comma-style: [error, last]
@@ -50,6 +58,15 @@ rules:
   operator-linebreak: off
   prefer-arrow-callback: [error, { allowNamedFunctions: true }]
   prefer-const: error
+  react/jsx-filename-extension: off
+  react/jsx-indent-props: off
+  react/jsx-one-expression-per-line: off
+  react/jsx-sort-props: off
+  react/no-array-index-key: off
+  react/no-unknown-property: off
+  react/react-in-jsx-scope: off
+  react/jsx-indent: [error, 2]
+  react/jsx-max-props-per-line: [error, { maximum: 4 }]
   standard/array-bracket-even-spacing: off
   standard/computed-property-even-spacing: off
   standard/object-curly-even-spacing: off
@@ -66,23 +83,26 @@ rules:
 overrides:
   -
     files: '*.spec.ts'
+    extends:
+      - 'plugin:jest/recommended'
+      - 'plugin:jest/style'
     rules:
       array-bracket-spacing: off
       import/no-extraneous-dependencies: off
+      jest/consistent-test-it: [error, { fn: test }]
   -
     files: '*.ts{,x}'
     rules:
+      import/named: off
+      import/no-named-as-default: off
+      import/no-unresolved: off
       no-redeclare: off
       no-shadow: off
+      no-undef: off
       no-unused-vars: off
       no-use-before-define: off
-      no-undef: off
   -
     files: '**/examples/**/*.js'
     rules:
       import/no-absolute-path: off
-
-settings:
-  import/resolver:
-    typescript:
-      project: './tsconfig.json'
+      import/no-unresolved: off

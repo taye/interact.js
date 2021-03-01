@@ -1,4 +1,3 @@
-import test from '@interactjs/_dev/test/test'
 import drag from '@interactjs/actions/drag/plugin'
 import resize from '@interactjs/actions/resize/plugin'
 import * as helpers from '@interactjs/core/tests/_helpers'
@@ -12,9 +11,9 @@ const checkMap = checks.reduce((acc, check) => {
   return acc
 }, {} as { [name: string]: Check })
 
-test('devTools', t => {
+test('devTools', () => {
   const devToolsWithLogger = {
-    install: s =>
+    install: (s) =>
       s.usePlugin(devTools, {
         logger: {
           warn (...args: any[]) {
@@ -47,17 +46,14 @@ test('devTools', t => {
 
   down()
   start({ name: 'drag' })
-  t.deepEqual(
-    logs[0],
-    { args: [prefix + checkMap.touchAction.text, element, links.touchAction], type: 'warn' },
-    'warning about missing touchAction',
-  )
+  // warning about missing touchAction
+  expect(logs[0]).toEqual({
+    args: [prefix + checkMap.touchAction.text, element, links.touchAction],
+    type: 'warn',
+  })
 
-  t.deepEqual(
-    logs[1],
-    { args: [prefix + checkMap.noListeners.text, 'drag', interactable], type: 'warn' },
-    'warning about missing move listeners',
-  )
+  // warning about missing move listeners
+  expect(logs[1]).toEqual({ args: [prefix + checkMap.noListeners.text, 'drag', interactable], type: 'warn' })
 
   stop()
 
@@ -70,11 +66,11 @@ test('devTools', t => {
   move()
   stop()
 
-  t.deepEqual(
-    logs[2],
-    { args: [prefix + checkMap.boxSizing.text, element, links.boxSizing], type: 'warn' },
-    'warning about resizing without "box-sizing: none"',
-  )
+  // warning about resizing without "box-sizing: none"
+  expect(logs[2]).toEqual({
+    args: [prefix + checkMap.boxSizing.text, element, links.boxSizing],
+    type: 'warn',
+  })
 
   logs.splice(0)
 
@@ -88,7 +84,8 @@ test('devTools', t => {
   move()
   stop()
 
-  t.equal(logs.length, 1, 'warning removed with options.devTools.ignore')
+  // warning removed with options.devTools.ignore
+  expect(logs).toHaveLength(1)
 
   logs.splice(0)
 
@@ -104,7 +101,6 @@ test('devTools', t => {
   move()
   stop()
 
-  t.equal(logs.length, 0, 'no warnings when issues are resolved')
-
-  t.end()
+  // no warnings when issues are resolved
+  expect(logs).toHaveLength(0)
 })

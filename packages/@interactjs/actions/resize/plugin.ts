@@ -31,7 +31,7 @@ declare module '@interactjs/core/Interaction' {
   }
 }
 
-declare module '@interactjs/core/defaultOptions' {
+declare module '@interactjs/core/options' {
   interface ActionDefaults {
     resize: ResizableOptions
   }
@@ -438,11 +438,11 @@ const resize: Plugin = {
       interaction.resizeAxes = 'xy'
     },
 
-    'interactions:action-start': arg => {
+    'interactions:action-start': (arg) => {
       start(arg)
       updateEventAxes(arg)
     },
-    'interactions:action-move': arg => {
+    'interactions:action-move': (arg) => {
       move(arg)
       updateEventAxes(arg)
     },

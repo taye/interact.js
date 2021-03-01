@@ -1,7 +1,6 @@
 {
   "name": "@interactjs/auto-scroll",
   "version": "1.10.3",
-  "license": "MIT",
   "peerDependencies": {
     "@interactjs/utils": "1.10.3"
   },
@@ -14,5 +13,6 @@
   "sideEffects": [
     "**/index.js",
     "**/index.prod.js"
-  ]
+  ],
+  "license": "MIT"
 }

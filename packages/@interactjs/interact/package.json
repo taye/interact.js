@@ -1,7 +1,6 @@
 {
   "name": "@interactjs/interact",
   "version": "1.10.3",
-  "license": "MIT",
   "dependencies": {
     "@interactjs/core": "1.10.3",
     "@interactjs/types": "1.10.3",
@@ -10,5 +9,6 @@
   "publishConfig": {
     "access": "public"
   },
-  "sideEffects": false
+  "sideEffects": false,
+  "license": "MIT"
 }

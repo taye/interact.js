@@ -21,7 +21,7 @@ declare module '@interactjs/core/InteractEvent' {
   }
 }
 
-declare module '@interactjs/core/defaultOptions' {
+declare module '@interactjs/core/options' {
   interface PerActionDefaults {
     modifiers?: Modifier[]
   }
@@ -159,7 +159,7 @@ export function addEventModifiers ({
 const modifiersBase: Plugin = {
   id: 'modifiers/base',
   before: ['actions'],
-  install: scope => {
+  install: (scope) => {
     scope.defaults.perAction.modifiers = []
   },
   listeners: {
@@ -167,7 +167,7 @@ const modifiersBase: Plugin = {
       interaction.modification = new Modification(interaction)
     },
 
-    'interactions:before-action-start': arg => {
+    'interactions:before-action-start': (arg) => {
       const modification = arg.interaction.modification!
 
       modification.start(arg, arg.interaction.coords.start.page)
@@ -175,18 +175,18 @@ const modifiersBase: Plugin = {
       modification.applyToInteraction(arg)
     },
 
-    'interactions:before-action-move': arg => arg.interaction.modification.setAndApply(arg),
+    'interactions:before-action-move': (arg) => arg.interaction.modification.setAndApply(arg),
 
-    'interactions:before-action-end': arg => arg.interaction.modification.beforeEnd(arg),
+    'interactions:before-action-end': (arg) => arg.interaction.modification.beforeEnd(arg),
 
     'interactions:action-start': addEventModifiers,
     'interactions:action-move': addEventModifiers,
     'interactions:action-end': addEventModifiers,
 
-    'interactions:after-action-start': arg => arg.interaction.modification.restoreInteractionCoords(arg),
-    'interactions:after-action-move': arg => arg.interaction.modification.restoreInteractionCoords(arg),
+    'interactions:after-action-start': (arg) => arg.interaction.modification.restoreInteractionCoords(arg),
+    'interactions:after-action-move': (arg) => arg.interaction.modification.restoreInteractionCoords(arg),
 
-    'interactions:stop': arg => arg.interaction.modification.stop(arg),
+    'interactions:stop': (arg) => arg.interaction.modification.stop(arg),
   },
 }
 

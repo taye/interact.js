@@ -4,18 +4,20 @@ const path = require('path')
 const PROD_EXT = '.prod'
 
 function fixImportSource ({ node: { source } }, { filename }) {
-  if (shouldIgnoreImport(source)) {
-    return
-  }
+  if (shouldIgnoreImport(source)) return
 
   let resolvedShort = ''
 
   try {
-    const paths = [filename && path.dirname(filename), __dirname, process.cwd()].filter(p => !!p)
+    const paths = [filename && path.dirname(filename), __dirname, process.cwd()].filter((p) => !!p)
 
     const resolved = require.resolve(source.value, { paths })
+    const resolvedWithoutScopePath = resolved.replace(/.*[\\/]@interactjs[\\/]/, '')
 
-    resolvedShort = '@interactjs/' + resolved.replace(/.*\/@interactjs\//, '')
+    resolvedShort = path
+      .join('@interactjs', resolvedWithoutScopePath)
+      // windows path to posix
+      .replace(/\\/g, '/')
     source.value = resolvedShort.replace(/(\.js)?$/, PROD_EXT)
   } catch (e) {}
 }

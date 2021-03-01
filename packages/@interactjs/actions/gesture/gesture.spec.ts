@@ -1,4 +1,3 @@
-import test from '@interactjs/_dev/test/test'
 import type { Scope } from '@interactjs/core/scope'
 import * as helpers from '@interactjs/core/tests/_helpers'
 import extend from '@interactjs/utils/extend'
@@ -11,214 +10,184 @@ function getGestureProps (event: GestureEvent) {
   return helpers.getProps(event, ['type', 'angle', 'distance', 'scale', 'ds', 'da'])
 }
 
-test('gesture action init', t => {
-  const scope: Scope = helpers.mockScope()
+describe('actions/gesture', () => {
+  test('action init', () => {
+    const scope: Scope = helpers.mockScope()
 
-  scope.usePlugin(gesture)
+    scope.usePlugin(gesture)
 
-  t.ok(scope.actions.map.gesture, '"gesture" in actions.names')
-  t.equal(scope.actions.methodDict.gesture, 'gesturable')
-  t.equal(typeof scope.Interactable.prototype.gesturable, 'function')
-
-  t.end()
-})
-
-test('Interactable.gesturable method', t => {
-  const rect = Object.freeze({ top: 100, left: 200, bottom: 300, right: 400 })
-  const { scope, interaction, interactable, target: element, coords, down, start, move } = helpers.testEnv({
-    plugins: [gesture],
-    rect,
+    expect(scope.actions.map.gesture).toBeTruthy()
+    expect(scope.actions.methodDict.gesture).toBe('gesturable')
+    expect(scope.Interactable.prototype.gesturable).toBeInstanceOf(Function)
   })
-  const events: GestureEvent[] = []
-  const event2 = coordsToEvent(newCoords())
-  event2.coords.pointerId = 2
 
-  scope.usePlugin(gesture)
+  test('interactable.gesturable() method', () => {
+    const rect = Object.freeze({ top: 100, left: 200, bottom: 300, right: 400 })
+    const { scope, interaction, interactable, target: element, coords, down, start, move } = helpers.testEnv({
+      plugins: [gesture],
+      rect,
+    })
+    const events: GestureEvent[] = []
+    const event2 = coordsToEvent(newCoords())
+    event2.coords.pointerId = 2
 
-  interactable.rectChecker(() => ({ ...rect }))
-  interactable.gesturable(true)
-  interactable.on('gesturestart gesturemove gestureend', (event: GestureEvent) => {
-    events.push(event)
-  })
-  interaction.pointerType = 'touch'
+    scope.usePlugin(gesture)
 
-  // 0 --> 1
-  extend(coords.page, { x: 0, y: 0 })
-  extend(event2.coords.page, { x: 100, y: 0 })
+    interactable.rectChecker(() => ({ ...rect }))
+    interactable.gesturable(true)
+    interactable.on('gesturestart gesturemove gestureend', (event: GestureEvent) => {
+      events.push(event)
+    })
+    interaction.pointerType = 'touch'
 
-  const checkArg = {
-    action: null,
-    interactable,
-    interaction,
-    element,
-    rect,
-    buttons: 0,
-  }
+    // 0 ➡ 1
+    extend(coords.page, { x: 0, y: 0 })
+    extend(event2.coords.page, { x: 100, y: 0 })
 
-  down()
+    const checkArg = {
+      action: null,
+      interactable,
+      interaction,
+      element,
+      rect,
+      buttons: 0,
+    }
 
-  scope.fire('auto-start:check', checkArg)
-  t.notOk(checkArg.action, 'not allowed with 1 pointer')
+    down()
 
-  interaction.pointerDown(event2, event2, element)
-  scope.fire('auto-start:check', checkArg)
-  t.ok(checkArg.action, 'allowed with 2 pointers')
+    scope.fire('auto-start:check', checkArg)
+    // not allowed with 1 pointer
+    expect(checkArg.action).toBeFalsy()
 
-  start({ name: 'gesture' })
+    interaction.pointerDown(event2, event2, element)
+    scope.fire('auto-start:check', checkArg)
+    // allowed with 2 pointers
+    expect(checkArg.action).toBeTruthy()
 
-  t.deepEqual(
-    interaction.gesture,
-    {
+    start({ name: 'gesture' })
+
+    // start interaction properties are correct,
+    expect(interaction.gesture).toEqual({
       angle: 0,
       distance: 100,
       scale: 1,
       startAngle: 0,
       startDistance: 100,
-    },
-    'start interaction properties are correct',
-  )
+    })
 
-  t.deepEqual(
-    getGestureProps(events[0]),
-    {
+    // start event properties are correct,
+    expect(getGestureProps(events[0])).toEqual({
       type: 'gesturestart',
       angle: 0,
       distance: 100,
       scale: 1,
       ds: 0,
       da: 0,
-    },
-    'start event properties are correct',
-  )
+    })
 
-  // 0
-  // |
-  // v
-  // 1
-  extend(event2.coords.page, { x: 0, y: 50 })
-  interaction.pointerMove(event2, event2, element)
+    // 0
+    // ⬇
+    // 1
+    extend(event2.coords.page, { x: 0, y: 50 })
+    interaction.pointerMove(event2, event2, element)
 
-  t.deepEqual(
-    interaction.gesture,
-    {
+    // move interaction properties are correct,
+    expect(interaction.gesture).toEqual({
       angle: 90,
       distance: 50,
       scale: 0.5,
       startAngle: 0,
       startDistance: 100,
-    },
-    'move interaction properties are correct',
-  )
+    })
 
-  t.deepEqual(
-    getGestureProps(events[1]),
-    {
+    // move event properties are correct,
+    expect(getGestureProps(events[1])).toEqual({
       type: 'gesturemove',
       angle: 90,
       distance: 50,
       scale: 0.5,
       ds: -0.5,
       da: 90,
-    },
-    'move event properties are correct',
-  )
+    })
 
-  // 1 <-- 0
-  extend(coords.page, { x: 50, y: 50 })
-  move()
+    // 1 ⬅ 0
+    extend(coords.page, { x: 50, y: 50 })
+    move()
 
-  t.deepEqual(
-    interaction.gesture,
-    {
+    // move interaction properties are correct,
+    expect(interaction.gesture).toEqual({
       angle: 180,
       distance: 50,
       scale: 0.5,
       startAngle: 0,
       startDistance: 100,
-    },
-    'move interaction properties are correct',
-  )
+    })
 
-  t.deepEqual(
-    getGestureProps(events[2]),
-    {
+    // move event properties are correct,
+    expect(getGestureProps(events[2])).toEqual({
       type: 'gesturemove',
       angle: 180,
       distance: 50,
       scale: 0.5,
       ds: 0,
       da: 90,
-    },
-    'move event properties are correct',
-  )
+    })
 
-  interaction.pointerUp(event2, event2, element, element)
+    interaction.pointerUp(event2, event2, element, element)
 
-  t.deepEqual(
-    interaction.gesture,
-    {
+    // move interaction properties are correct,
+    expect(interaction.gesture).toEqual({
       angle: 180,
       distance: 50,
       scale: 0.5,
       startAngle: 0,
       startDistance: 100,
-    },
-    'move interaction properties are correct',
-  )
+    })
 
-  t.deepEqual(
-    getGestureProps(events[3]),
-    {
+    // end event properties are correct,
+    expect(getGestureProps(events[3])).toEqual({
       type: 'gestureend',
       angle: 180,
       distance: 50,
       scale: 0.5,
       ds: 0,
       da: 0,
-    },
-    'end event properties are correct',
-  )
+    })
 
-  // 0
-  // |
-  // v
-  // 1
-  interaction.pointerDown(event2, event2, element)
-  extend(coords.page, { x: 0, y: -150 })
-  checkArg.action = null
-  scope.fire('auto-start:check', checkArg)
-  interaction.pointerMove(event2, event2, element)
+    // 0
+    // ⬇
+    // 1
+    interaction.pointerDown(event2, event2, element)
+    extend(coords.page, { x: 0, y: -150 })
+    checkArg.action = null
+    scope.fire('auto-start:check', checkArg)
+    interaction.pointerMove(event2, event2, element)
 
-  t.ok(checkArg.action, 'not allowed with re-added second pointers')
+    // not allowed with re-added second pointers
+    expect(checkArg.action).toBeTruthy()
 
-  interaction.start({ name: 'gesture' }, interactable, element)
+    interaction.start({ name: 'gesture' }, interactable, element)
 
-  t.deepEqual(
-    interaction.gesture,
-    {
+    // move interaction properties are correct,
+    expect(interaction.gesture).toEqual({
       angle: 90,
       distance: 200,
       scale: 1,
       startAngle: 90,
       startDistance: 200,
-    },
-    'move interaction properties are correct',
-  )
+    })
 
-  t.deepEqual(
-    getGestureProps(events[4]),
-    {
+    // second start event properties are correct,
+    expect(getGestureProps(events[4])).toEqual({
       type: 'gesturestart',
       angle: 90,
       distance: 200,
       scale: 1,
       ds: 0,
       da: 0,
-    },
-    'second start event properties are correct',
-  )
+    })
 
-  t.equal(events.length, 5, 'correct number of events fired')
-
-  t.end()
+    // correct number of events fired
+    expect(events).toHaveLength(5)
+  })
 })

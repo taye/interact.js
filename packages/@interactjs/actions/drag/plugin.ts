@@ -10,7 +10,7 @@ declare module '@interactjs/core/Interactable' {
   }
 }
 
-declare module '@interactjs/core/defaultOptions' {
+declare module '@interactjs/core/options' {
   interface ActionDefaults {
     drag: DraggableOptions
   }
@@ -147,7 +147,7 @@ const drag: Plugin = {
 
     // dragmove
     'interactions:action-move': move,
-    'auto-start:check': arg => {
+    'auto-start:check': (arg) => {
       const { interaction, interactable, buttons } = arg
       const dragOptions = interactable.options.drag
 

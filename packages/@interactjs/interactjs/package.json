@@ -1,7 +1,6 @@
 {
   "name": "@interactjs/interactjs",
   "version": "1.10.3",
-  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/taye/interact.js.git"
@@ -29,5 +28,6 @@
   "publishConfig": {
     "access": "public"
   },
-  "sideEffects": false
+  "sideEffects": false,
+  "license": "MIT"
 }

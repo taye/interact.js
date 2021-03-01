@@ -21,7 +21,7 @@ function init (window: Window) {
   cancel = cancel && cancel.bind(window)
 
   if (!request) {
-    request = callback => {
+    request = (callback) => {
       const currTime = Date.now()
       const timeToCall = Math.max(0, 16 - (currTime - lastTime))
       const token = window.setTimeout(() => {
@@ -33,7 +33,7 @@ function init (window: Window) {
       return token
     }
 
-    cancel = token => clearTimeout(token)
+    cancel = (token) => clearTimeout(token)
   }
 }
 

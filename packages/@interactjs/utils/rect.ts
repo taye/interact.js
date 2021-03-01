@@ -1,4 +1,12 @@
-import type { HasGetRect, RectResolvable, Rect, Element, Point, FullRect, EdgeOptions } from '../types'
+import type {
+  HasGetRect,
+  RectResolvable,
+  Rect,
+  Element,
+  Point,
+  FullRect,
+  EdgeOptions,
+} from '@interactjs/types'
 
 import { closest, getElementRect, parentNode } from './domUtils'
 import extend from './extend'

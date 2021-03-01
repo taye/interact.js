@@ -28,7 +28,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function applyTransforms (event) {
     rootMatrix = root.getScreenCTM()
 
-    transformedPoints = originalPoints.map(point => {
+    transformedPoints = originalPoints.map((point) => {
       return point.matrixTransform(rootMatrix)
     })
 
@@ -69,7 +69,7 @@ document.addEventListener('DOMContentLoaded', () => {
     })
     .styleCursor(false)
 
-  document.addEventListener('dragstart', event => {
+  document.addEventListener('dragstart', (event) => {
     event.preventDefault()
   })
 })

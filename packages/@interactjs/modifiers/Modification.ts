@@ -342,7 +342,7 @@ export default class Modification {
     this.startOffset = other.startOffset
     this.startDelta = other.startDelta
     this.edges = other.edges
-    this.states = other.states.map(s => clone(s) as ModifierState)
+    this.states = other.states.map((s) => clone(s) as ModifierState)
     this.result = createResult(extend({}, other.result.coords), extend({}, other.result.rect))
   }
 
@@ -378,7 +378,7 @@ function getModifierList (interaction) {
   }
 
   return ['snap', 'snapSize', 'snapEdges', 'restrict', 'restrictEdges', 'restrictSize']
-    .map(type => {
+    .map((type) => {
       const options = actionOptions[type]
 
       return (
@@ -389,7 +389,7 @@ function getModifierList (interaction) {
         }
       )
     })
-    .filter(m => !!m)
+    .filter((m) => !!m)
 }
 
 export function getRectOffset (rect, coords) {

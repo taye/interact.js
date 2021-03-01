@@ -151,7 +151,7 @@ function startReflow<T extends ActionName> (
 
   const { Promise } = (scope.window as unknown) as { Promise: PromiseConstructor }
   const reflowPromise = Promise
-    ? new Promise<undefined>(resolve => {
+    ? new Promise<undefined>((resolve) => {
       interaction._reflowResolve = resolve
     })
     : undefined

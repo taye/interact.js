@@ -6,8 +6,7 @@ import type * as iEvent from '@interactjs/core/InteractEvent'
 import type * as iable from '@interactjs/core/Interactable'
 import type * as iSet from '@interactjs/core/InteractableSet'
 import type * as interaction from '@interactjs/core/Interaction'
-import type * as defaults from '@interactjs/core/defaultOptions'
-import type * as iStatic from '@interactjs/core/interactStatic'
+import type * as defaults from '@interactjs/core/options'
 import type * as scope from '@interactjs/core/scope'
 import type * as snap from '@interactjs/modifiers/snap/pointer'
 import type { PointerEvent as _PointerEvent } from '@interactjs/pointer-events/PointerEvent'
@@ -48,7 +47,6 @@ export type ActionProps<T extends scope.ActionName = ActionName> = interaction.A
 export type Interactable = iable.Interactable
 /** @internal */ export type InteractableSet = iSet.InteractableSet
 export type Scope = scope.Scope
-/** @interanal */ export type InteractStatic = iStatic.InteractStatic
 export type Interaction<T extends scope.ActionName = ActionName> = interaction.Interaction<T>
 export type InteractionProxy<T extends scope.ActionName = ActionName> = interaction.InteractionProxy<T>
 export type PointerArgProps<T extends {} = {}> = interaction.PointerArgProps<T>

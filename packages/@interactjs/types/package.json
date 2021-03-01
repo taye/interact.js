@@ -1,7 +1,6 @@
 {
   "name": "@interactjs/types",
   "version": "1.10.3",
-  "license": "MIT",
   "typings": "typings.d.ts",
   "devDependencies": {
     "@interactjs/actions": "1.10.3",
@@ -25,5 +24,6 @@
   "sideEffects": [
     "**/index.js",
     "**/index.prod.js"
-  ]
+  ],
+  "license": "MIT"
 }

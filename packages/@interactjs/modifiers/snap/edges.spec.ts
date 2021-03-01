@@ -1,10 +1,9 @@
-import test from '@interactjs/_dev/test/test'
 import * as helpers from '@interactjs/core/tests/_helpers'
 import type { EdgeOptions } from '@interactjs/types/index'
 
 import { snapEdges } from '../snap/edges'
 
-test('modifiers/snap/edges', t => {
+test('modifiers/snap/edges', () => {
   const rect = { top: 0, left: 0, bottom: 100, right: 100 }
   const { interaction, interactable } = helpers.testEnv({ rect })
   interaction.interactable = interactable
@@ -36,7 +35,8 @@ test('modifiers/snap/edges', t => {
   snapEdges.start(arg as any)
   snapEdges.set(arg as any)
 
-  t.deepEqual(arg.coords, { x: target0.left, y: target0.top }, 'modified coords are correct')
+  // modified coords are correct
+  expect(arg.coords).toEqual({ x: target0.left, y: target0.top })
 
   // resize from bottom right
   arg.edges = { bottom: true, right: true }
@@ -45,7 +45,6 @@ test('modifiers/snap/edges', t => {
   snapEdges.start(arg as any)
   snapEdges.set(arg as any)
 
-  t.deepEqual(arg.coords, { x: target0.right, y: target0.bottom }, 'modified coord are correct')
-
-  t.end()
+  // modified coord are correct
+  expect(arg.coords).toEqual({ x: target0.right, y: target0.bottom })
 })

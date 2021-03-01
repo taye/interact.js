@@ -1,9 +1,8 @@
-import test from '@interactjs/_dev/test/test'
 import type { ActionName } from '@interactjs/core/scope'
 
 import * as helpers from './tests/_helpers'
 
-test('scope', t => {
+test('core/scope', () => {
   const { scope, interactable, interaction, event } = helpers.testEnv()
 
   ;(interactable.options as any).test = { enabled: true }
@@ -17,24 +16,20 @@ test('scope', t => {
 
   const stopped = !interaction._interacting
 
-  t.ok(started && stopped, 'interaction is stopped on interactable.unset()')
+  // interaction is stopped on interactable.unset()
+  expect(started && stopped).toBe(true)
 
   const plugin1 = { id: '1', listeners: {} }
   const plugin2 = { id: '2', listeners: {} }
   const plugin3 = { id: '3', listeners: {}, before: ['2'] }
   const plugin4 = { id: '4', listeners: {}, before: ['2', '3'] }
 
-  const initialListeners = scope.listenerMaps.map(l => l.id)
+  const initialListeners = scope.listenerMaps.map((l) => l.id)
 
   scope.usePlugin(plugin1)
   scope.usePlugin(plugin2)
   scope.usePlugin(plugin3)
   scope.usePlugin(plugin4)
 
-  t.deepEqual(
-    scope.listenerMaps.map(l => l.id),
-    [...initialListeners, '1', '4', '3', '2'],
-  )
-
-  t.end()
+  expect(scope.listenerMaps.map((l) => l.id)).toEqual([...initialListeners, '1', '4', '3', '2'])
 })

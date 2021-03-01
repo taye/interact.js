@@ -1,8 +1,6 @@
-import test from '@interactjs/_dev/test/test'
-
 import { Eventable } from './Eventable'
 
-test('Eventable', t => {
+test('core/Eventable', () => {
   const eventable = new Eventable()
   const type = 'TEST'
 
@@ -18,19 +16,20 @@ test('Eventable', t => {
   eventable.on(type, listener)
   eventable.fire(testEvent)
 
-  t.equal(firedEvent, testEvent, "on'd listener is called")
+  // on'd listener is called
+  expect(firedEvent).toBe(testEvent)
 
   firedEvent = undefined
   eventable.off(type, listener)
   eventable.fire(testEvent)
 
-  t.equal(firedEvent, undefined, "off'd listener is not called")
+  // off'd listener is not called
+  expect(firedEvent).toBeUndefined()
 
   testEvent.immediatePropagationStopped = true
   eventable.on(type, listener)
   eventable.fire(testEvent)
 
-  t.equal(firedEvent, undefined, 'listener is not called with immediatePropagationStopped')
-
-  t.end()
+  // listener is not called with immediatePropagationStopped
+  expect(firedEvent).toBeUndefined()
 })

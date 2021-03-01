@@ -1,6 +1,6 @@
 import type { InteractEvent, EventPhase } from '@interactjs/core/InteractEvent'
 import type { Interaction, DoPhaseArg } from '@interactjs/core/Interaction'
-import type { Options } from '@interactjs/core/defaultOptions'
+import type { Options } from '@interactjs/core/options'
 import type { Scope, Plugin } from '@interactjs/core/scope'
 import type { ActionMethod, GesturableOptions, Rect, PointerType } from '@interactjs/types/index'
 import is from '@interactjs/utils/is'
@@ -26,7 +26,7 @@ declare module '@interactjs/core/Interactable' {
   }
 }
 
-declare module '@interactjs/core/defaultOptions' {
+declare module '@interactjs/core/options' {
   interface ActionDefaults {
     gesture: GesturableOptions
   }
@@ -109,7 +109,7 @@ function install (scope: Scope) {
 function updateGestureProps ({ interaction, iEvent, phase }: GestureSignalArg) {
   if (interaction.prepared.name !== 'gesture') return
 
-  const pointers = interaction.pointers.map(p => p.pointer)
+  const pointers = interaction.pointers.map((p) => p.pointer)
   const starting = phase === 'start'
   const ending = phase === 'end'
   const deltaSource = interaction.interactable.options.deltaSource
@@ -172,7 +172,7 @@ const gesture: Plugin = {
       }
     },
 
-    'auto-start:check': arg => {
+    'auto-start:check': (arg) => {
       if (arg.interaction.pointers.length < 2) {
         return undefined
       }

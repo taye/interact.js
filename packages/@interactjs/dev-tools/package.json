@@ -1,18 +1,20 @@
 {
   "name": "@interactjs/dev-tools",
   "version": "1.10.3",
-  "license": "MIT",
-  "dependencies": {
+  "peerDependencies": {
+    "@interactjs/modifiers": "1.10.3",
     "@interactjs/utils": "1.10.3"
   },
   "optionalDependencies": {
     "@interactjs/interact": "1.10.3"
   },
   "publishConfig": {
-    "access": "public"
+    "access": "public",
+    "registry": "https://registry.interactjs.io"
   },
   "sideEffects": [
     "**/index.js",
     "**/index.prod.js"
-  ]
+  ],
+  "license": "MIT"
 }

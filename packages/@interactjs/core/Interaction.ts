@@ -1,4 +1,4 @@
-import type { ActionDefaults } from '@interactjs/core/defaultOptions'
+import type { ActionDefaults } from '@interactjs/core/options'
 import type {
   Element,
   EdgeOptions,
@@ -483,7 +483,7 @@ export class Interaction<T extends ActionName | null = ActionName> {
     // mouse and pen interactions may have only one pointer
     return this.pointerType === 'mouse' || this.pointerType === 'pen'
       ? this.pointers.length - 1
-      : arr.findIndex(this.pointers, curPointer => curPointer.id === pointerId)
+      : arr.findIndex(this.pointers, (curPointer) => curPointer.id === pointerId)
   }
 
   getPointerInfo (pointer: any) {
@@ -508,7 +508,7 @@ export class Interaction<T extends ActionName | null = ActionName> {
 
     pointerUtils.setCoords(
       this.coords.cur,
-      this.pointers.map(p => p.pointer),
+      this.pointers.map((p) => p.pointer),
       this._now(),
     )
     pointerUtils.setCoordDeltas(this.coords.delta, this.coords.prev, this.coords.cur)

@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import type Interaction from '@interactjs/core/Interaction'
 import type { Scope, Plugin } from '@interactjs/core/scope'
 import type { Element, OptionMethod } from '@interactjs/types/index'
@@ -8,21 +7,13 @@ import extend from '@interactjs/utils/extend'
 import is from '@interactjs/utils/is'
 import * as win from '@interactjs/utils/window'
 
-import type visualizer from './visualizer/plugin'
-
 declare module '@interactjs/core/scope' {
   interface Scope {
     logger: Logger
   }
 }
 
-declare module '@interactjs/core/interactStatic' {
-  export interface InteractStatic {
-    visializer: typeof visualizer
-  }
-}
-
-declare module '@interactjs/core/defaultOptions' {
+declare module '@interactjs/core/options' {
   interface BaseDefaults {
     devTools?: DevToolsOptions
   }
@@ -66,7 +57,6 @@ const links = {
 // eslint-disable-next-line no-undef
 const isProduction = process.env.NODE_ENV === 'production'
 
-// eslint-disable-next-line no-restricted-syntax
 function install (scope: Scope, { logger }: { logger?: Logger } = {}) {
   const { Interactable, defaults } = scope
 
@@ -84,6 +74,8 @@ function install (scope: Scope, { logger }: { logger?: Logger } = {}) {
 
     return this.options.devTools
   }
+
+  // scope.usePlugin(visualizer)
 }
 
 const checks: Check[] = [

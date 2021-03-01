@@ -9,7 +9,7 @@ import { copyAction } from '@interactjs/utils/misc'
 
 import InteractableMethods from './InteractableMethods'
 
-declare module '@interactjs/core/interactStatic' {
+declare module '@interactjs/core/InteractStatic' {
   export interface InteractStatic {
     maxInteractions: (newValue: any) => any
   }
@@ -29,7 +29,7 @@ declare module '@interactjs/core/scope' {
   }
 }
 
-declare module '@interactjs/core/defaultOptions' {
+declare module '@interactjs/core/options' {
   interface BaseDefaults {
     actionChecker?: any
     cursorChecker?: any

@@ -1,6 +1,6 @@
 import type { Eventable } from '@interactjs/core/Eventable'
 import type { Interaction } from '@interactjs/core/Interaction'
-import type { PerActionDefaults } from '@interactjs/core/defaultOptions'
+import type { PerActionDefaults } from '@interactjs/core/options'
 import type { Scope, SignalArgs, Plugin } from '@interactjs/core/scope'
 import type { Point, PointerType, PointerEventType, Element } from '@interactjs/types'
 import * as domUtils from '@interactjs/utils/domUtils'
@@ -45,7 +45,7 @@ declare module '@interactjs/core/PointerInfo' {
   }
 }
 
-declare module '@interactjs/core/defaultOptions' {
+declare module '@interactjs/core/options' {
   interface ActionDefaults {
     pointerEvents: Options
   }
@@ -248,7 +248,7 @@ function collectEventTargets<T extends string> (
 
   if (type === 'hold') {
     signalArg.targets = signalArg.targets.filter(
-      target => target.eventable.options.holdDuration === interaction.pointers[pointerIndex]?.hold.duration,
+      (target) => target.eventable.options.holdDuration === interaction.pointers[pointerIndex]?.hold.duration,
     )
   }
 

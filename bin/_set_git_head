@@ -7,7 +7,7 @@ const shell = require('shelljs')
 
 const head = shell.exec('git rev-parse --short HEAD').trim()
 
-;['package.json', ...glob.sync('{@interactjs/*,interactjs}/package.json')].forEach(file => {
+;['package.json', ...glob.sync('{@interactjs/*,interactjs}/package.json')].forEach((file) => {
   const pkg = require(path.resolve(file))
 
   pkg.gitHead = head
