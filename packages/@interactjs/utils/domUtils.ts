@@ -140,19 +140,21 @@ export function indexOfDeepestElement (elements: Element[] | NodeListOf<globalTh
       deepestNodeParents[commonIndex],
     ]
 
-    let child = parents[0].lastChild
+    if (parents[0]) {
+      let child = parents[0].lastChild
 
-    while (child) {
-      if (child === parents[1]) {
-        deepestNodeIndex = i
-        deepestNodeParents = currentNodeParents
+      while (child) {
+        if (child === parents[1]) {
+          deepestNodeIndex = i
+          deepestNodeParents = currentNodeParents
 
-        break
-      } else if (child === parents[2]) {
-        break
+          break
+        } else if (child === parents[2]) {
+          break
+        }
+
+        child = child.previousSibling
       }
-
-      child = child.previousSibling
     }
   }
 
