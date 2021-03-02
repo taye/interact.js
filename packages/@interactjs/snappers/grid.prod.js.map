@@ -1,0 +1,35 @@
+{
+	"version": 3,
+	"sources": [
+		"grid.ts"
+	],
+	"names": [
+		"grid",
+		"coordFields",
+		"filter",
+		"xField",
+		"yField",
+		"gridFunc",
+		"x",
+		"y",
+		"range",
+		"limits",
+		"left",
+		"right",
+		"Infinity",
+		"top",
+		"bottom",
+		"offset",
+		"result",
+		"gridx",
+		"Math",
+		"round",
+		"gridy",
+		"max",
+		"min"
+	],
+	"mappings": "eASgBA,IACd,MAAMC,EAAe,CACnB,CAAC,IAAK,KACN,CAAC,OAAQ,OACT,CAAC,QAAS,UACV,CAAC,QAAS,WACAC,QAAO,EAAEC,EAAQC,KAAYD,KAAUH,GAAQI,KAAUJ,IAE/DK,EAGF,CAACC,EAAGC,KACN,MAAMC,MACJA,EADIC,OAEJA,EAAS,CACPC,MAAM,EAAA,EACNC,MAAOC,EAAAA,EACPC,KAAK,EAAA,EACLC,OAAQF,EAAAA,GANNG,OAQJA,EAAS,CAAET,EAAG,EAAGC,EAAG,IAClBP,EAEEgB,EAEF,CAAER,MAAAA,EAAOR,KAAAA,EAAMM,EAAG,KAAgBC,EAAG,MAEzC,IAAK,MAAOJ,EAAQC,KAAWH,EAAa,CAC1C,MAAMgB,EAAQC,KAAKC,OAAOb,EAAIS,EAAOT,GAAMN,EAAaG,IAClDiB,EAAQF,KAAKC,OAAOZ,EAAIQ,EAAOR,GAAMP,EAAaI,IAExDY,EAAOb,GAAUe,KAAKG,IAAIZ,EAAOC,KAAMQ,KAAKI,IAAIb,EAAOE,MAAOM,EAASjB,EAAaG,GAAUY,EAAOT,IACrGU,EAAOZ,GAAUc,KAAKG,IAAIZ,EAAOI,IAAKK,KAAKI,IAAIb,EAAOK,OAAQM,EAASpB,EAAaI,GAAUW,EAAOR,IAGvG,OAAOS,GAMT,OAHAX,EAASL,KAAOA,EAChBK,EAASJ,YAAcA,EAEhBI",
+	"sourcesContent": [
+		"import type { SnapFunction, SnapTarget } from '@interactjs/modifiers/snap/pointer'\nimport type { Rect, Point } from '@interactjs/types/index'\n\nexport type GridOptions = (Partial<Rect> | Point) & {\n  range?: number\n  limits?: Rect\n  offset?: Point\n}\n\nexport default (grid: GridOptions) => {\n  const coordFields = ([\n    ['x', 'y'],\n    ['left', 'top'],\n    ['right', 'bottom'],\n    ['width', 'height'],\n  ] as const).filter(([xField, yField]) => xField in grid || yField in grid)\n\n  const gridFunc: SnapFunction & {\n    grid: typeof grid\n    coordFields: typeof coordFields\n  } = (x, y) => {\n    const {\n      range,\n      limits = {\n        left: -Infinity,\n        right: Infinity,\n        top: -Infinity,\n        bottom: Infinity,\n      },\n      offset = { x: 0, y: 0 },\n    } = grid\n\n    const result: SnapTarget & {\n      grid: typeof grid\n    } = { range, grid, x: null as number, y: null as number }\n\n    for (const [xField, yField] of coordFields) {\n      const gridx = Math.round((x - offset.x) / (grid as any)[xField])\n      const gridy = Math.round((y - offset.y) / (grid as any)[yField])\n\n      result[xField] = Math.max(limits.left, Math.min(limits.right, gridx * (grid as any)[xField] + offset.x))\n      result[yField] = Math.max(limits.top, Math.min(limits.bottom, gridy * (grid as any)[yField] + offset.y))\n    }\n\n    return result\n  }\n\n  gridFunc.grid = grid\n  gridFunc.coordFields = coordFields\n\n  return gridFunc\n}\n"
+	]
+}

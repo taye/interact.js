@@ -1,0 +1,53 @@
+{
+	"version": 3,
+	"sources": [
+		"PointerEvent.ts"
+	],
+	"names": [
+		"BaseEvent",
+		"pointerUtils",
+		"PointerEvent",
+		"constructor",
+		"type",
+		"pointer",
+		"event",
+		"eventTarget",
+		"interaction",
+		"timeStamp",
+		"super",
+		"this",
+		"originalEvent",
+		"pointerId",
+		"pointerType",
+		"double",
+		"pageX",
+		"pageY",
+		"clientX",
+		"clientY",
+		"dt",
+		"eventable",
+		"pointerExtend",
+		"getPointerId",
+		"getPointerType",
+		"target",
+		"currentTarget",
+		"pointerIndex",
+		"getPointerIndex",
+		"pointers",
+		"downTime",
+		"interval",
+		"tapTime",
+		"prevTap",
+		"_subtractOrigin",
+		"x",
+		"originX",
+		"y",
+		"originY",
+		"_addOrigin",
+		"preventDefault"
+	],
+	"mappings": "oBAASA,MAAiB,sCAGdC,MAAkB,+CAEf,MAAMC,UAA6CF,EAehEG,YACEC,EACAC,EACAC,EACAC,EACAC,EACAC,GAiBA,GAfAC,MAAMF,GADNG,KArBFP,UAqBE,EAAAO,KApBFC,mBAoBE,EAAAD,KAnBFE,eAmBE,EAAAF,KAlBFG,iBAkBE,EAAAH,KAjBFI,YAiBE,EAAAJ,KAhBFK,WAgBE,EAAAL,KAfFM,WAeE,EAAAN,KAdFO,aAcE,EAAAP,KAbFQ,aAaE,EAAAR,KAZFS,QAYE,EAAAT,KAXFU,eAWE,EAEApB,EAAaqB,cAAcX,KAAML,GAE7BA,IAAUD,GACZJ,EAAaqB,cAAcX,KAAMN,GAGnCM,KAAKF,UAAYA,EACjBE,KAAKC,cAAgBN,EACrBK,KAAKP,KAAOA,EACZO,KAAKE,UAAYZ,EAAasB,aAAalB,GAC3CM,KAAKG,YAAcb,EAAauB,eAAenB,GAC/CM,KAAKc,OAASlB,EACdI,KAAKe,cAAgB,KAER,QAATtB,EAAgB,CAClB,MAAMuB,EAAenB,EAAYoB,gBAAgBvB,GACjDM,KAAKS,GAAKT,KAAKF,UAAYD,EAAYqB,SAASF,GAAcG,SAE9D,MAAMC,EAAWpB,KAAKF,UAAYD,EAAYwB,QAE9CrB,KAAKI,UACHP,EAAYyB,SACiB,cAA7BzB,EAAYyB,QAAQ7B,MACpBI,EAAYyB,QAAQR,SAAWd,KAAKc,QACpCM,EAAW,SAEK,cAAT3B,IACTO,KAAKS,GAAMf,EAAgCI,UAAYD,EAAYwB,SAIvEE,iBAAmBC,EAAGC,EAASC,EAAGC,IAMhC,OALA3B,KAAKK,OAASoB,EACdzB,KAAKM,OAASqB,EACd3B,KAAKO,SAAWkB,EAChBzB,KAAKQ,SAAWmB,EAET3B,KAGT4B,YAAcJ,EAAGC,EAASC,EAAGC,IAM3B,OALA3B,KAAKK,OAASoB,EACdzB,KAAKM,OAASqB,EACd3B,KAAKO,SAAWkB,EAChBzB,KAAKQ,SAAWmB,EAET3B,KAMT6B,iBACE7B,KAAKC,cAAc4B,yBAIdtC",
+	"sourcesContent": [
+		"import { BaseEvent } from '@interactjs/core/BaseEvent'\nimport type Interaction from '@interactjs/core/Interaction'\nimport type { PointerEventType, PointerType, Point } from '@interactjs/types/index'\nimport * as pointerUtils from '@interactjs/utils/pointerUtils'\n\nexport default class PointerEvent<T extends string = any> extends BaseEvent<never> {\n  type: T\n  originalEvent: PointerEventType\n  pointerId: number\n  pointerType: string\n  double: boolean\n  pageX: number\n  pageY: number\n  clientX: number\n  clientY: number\n  dt: number\n  eventable: any;\n  [key: string]: any\n\n  /** */\n  constructor (\n    type: T,\n    pointer: PointerType | PointerEvent<any>,\n    event: PointerEventType,\n    eventTarget: Node,\n    interaction: Interaction<never>,\n    timeStamp: number,\n  ) {\n    super(interaction)\n    pointerUtils.pointerExtend(this, event)\n\n    if (event !== pointer) {\n      pointerUtils.pointerExtend(this, pointer)\n    }\n\n    this.timeStamp = timeStamp\n    this.originalEvent = event\n    this.type = type\n    this.pointerId = pointerUtils.getPointerId(pointer)\n    this.pointerType = pointerUtils.getPointerType(pointer)\n    this.target = eventTarget\n    this.currentTarget = null\n\n    if (type === 'tap') {\n      const pointerIndex = interaction.getPointerIndex(pointer)\n      this.dt = this.timeStamp - interaction.pointers[pointerIndex].downTime\n\n      const interval = this.timeStamp - interaction.tapTime\n\n      this.double = !!(\n        interaction.prevTap &&\n        interaction.prevTap.type !== 'doubletap' &&\n        interaction.prevTap.target === this.target &&\n        interval < 500\n      )\n    } else if (type === 'doubletap') {\n      this.dt = (pointer as PointerEvent<'tap'>).timeStamp - interaction.tapTime\n    }\n  }\n\n  _subtractOrigin ({ x: originX, y: originY }: Point) {\n    this.pageX -= originX\n    this.pageY -= originY\n    this.clientX -= originX\n    this.clientY -= originY\n\n    return this\n  }\n\n  _addOrigin ({ x: originX, y: originY }: Point) {\n    this.pageX += originX\n    this.pageY += originY\n    this.clientX += originX\n    this.clientY += originY\n\n    return this\n  }\n\n  /**\n   * Prevent the default behaviour of the original Event\n   */\n  preventDefault () {\n    this.originalEvent.preventDefault()\n  }\n}\n\nexport { PointerEvent }\n"
+	]
+}

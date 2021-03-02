@@ -1,0 +1,13 @@
+{
+	"version": 3,
+	"sources": [
+		"rubberband.ts"
+	],
+	"names": [
+		"default"
+	],
+	"mappings": "OAASA,YAAe",
+	"sourcesContent": [
+		"export { default } from '../noop'\n"
+	]
+}

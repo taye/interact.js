@@ -1,0 +1,2 @@
+export default function t(t,e){if(t===e)return!0;if(!t||!e)return!1;const r=Object.keys(t);if(r.length!==Object.keys(e).length)return!1;for(const n of r)if(t[n]!==e[n])return!1;return!0}
+//# sourceMappingURL=shallowEqual.prod.js.map

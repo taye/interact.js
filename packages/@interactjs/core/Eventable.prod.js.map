@@ -1,0 +1,40 @@
+{
+	"version": 3,
+	"sources": [
+		"Eventable.ts"
+	],
+	"names": [
+		"arr",
+		"extend",
+		"normalize",
+		"fireUntilImmediateStopped",
+		"event",
+		"listeners",
+		"listener",
+		"immediatePropagationStopped",
+		"Eventable",
+		"constructor",
+		"options",
+		"this",
+		"types",
+		"propagationStopped",
+		"global",
+		"fire",
+		"type",
+		"on",
+		"merge",
+		"off",
+		"eventList",
+		"length",
+		"subListener",
+		"index",
+		"indexOf",
+		"splice",
+		"getRect",
+		"_element"
+	],
+	"mappings": "UACYA,MAAS,8BACdC,MAAY,iCAEZC,MAAe,sCAEtB,SAASC,EAA2BC,EAAYC,GAC9C,IAAK,MAAMC,KAAYD,EAAW,CAChC,GAAID,EAAMG,4BACR,MAGFD,EAASF,WAIN,MAAMI,UAOXC,YAAaC,GAAoCC,KANjDD,aAMiD,EAAAC,KALjDC,MAA6B,GAKoBD,KAJjDE,oBAAqB,EAI4BF,KAHjDJ,6BAA8B,EAGmBI,KAFjDG,YAEiD,EAC/CH,KAAKD,QAAUT,EAAO,GAAIS,GAAW,IAGvCK,KAAgEX,GAC9D,IAAIC,EACJ,MAAMS,EAASH,KAAKG,QAIfT,EAAYM,KAAKC,MAAMR,EAAMY,QAChCb,EAA0BC,EAAOC,IAI9BD,EAAMS,oBAAsBC,IAAWT,EAAYS,EAAOV,EAAMY,QACnEb,EAA0BC,EAAOC,GAIrCY,GAAID,EAAcV,GAChB,MAAMD,EAAYH,EAAUc,EAAMV,GAElC,IAAKU,KAAQX,EACXM,KAAKC,MAAMI,GAAQhB,EAAIkB,MAAMP,KAAKC,MAAMI,IAAS,GAAIX,EAAUW,IAInEG,IAAKH,EAAcV,GACjB,MAAMD,EAAYH,EAAUc,EAAMV,GAElC,IAAKU,KAAQX,EAAW,CACtB,MAAMe,EAAYT,KAAKC,MAAMI,GAE7B,GAAKI,GAAcA,EAAUC,OAI7B,IAAK,MAAMC,KAAejB,EAAUW,GAAO,CACzC,MAAMO,EAAQH,EAAUI,QAAQF,IAEjB,IAAXC,GACFH,EAAUK,OAAOF,EAAO,KAMhCG,QAASC,GACP,OAAO",
+	"sourcesContent": [
+		"import type { Listener, ListenersArg, Rect } from '@interactjs/types/index'\nimport * as arr from '@interactjs/utils/arr'\nimport extend from '@interactjs/utils/extend'\nimport type { NormalizedListeners } from '@interactjs/utils/normalizeListeners'\nimport normalize from '@interactjs/utils/normalizeListeners'\n\nfunction fireUntilImmediateStopped (event: any, listeners: Listener[]) {\n  for (const listener of listeners) {\n    if (event.immediatePropagationStopped) {\n      break\n    }\n\n    listener(event)\n  }\n}\n\nexport class Eventable {\n  options: any\n  types: NormalizedListeners = {}\n  propagationStopped = false\n  immediatePropagationStopped = false\n  global: any\n\n  constructor (options?: { [index: string]: any }) {\n    this.options = extend({}, options || {})\n  }\n\n  fire<T extends { type: string, propagationStopped?: boolean }> (event: T) {\n    let listeners: Listener[]\n    const global = this.global\n\n    // Interactable#on() listeners\n    // tslint:disable no-conditional-assignment\n    if ((listeners = this.types[event.type])) {\n      fireUntilImmediateStopped(event, listeners)\n    }\n\n    // interact.on() listeners\n    if (!event.propagationStopped && global && (listeners = global[event.type])) {\n      fireUntilImmediateStopped(event, listeners)\n    }\n  }\n\n  on (type: string, listener: ListenersArg) {\n    const listeners = normalize(type, listener)\n\n    for (type in listeners) {\n      this.types[type] = arr.merge(this.types[type] || [], listeners[type])\n    }\n  }\n\n  off (type: string, listener: ListenersArg) {\n    const listeners = normalize(type, listener)\n\n    for (type in listeners) {\n      const eventList = this.types[type]\n\n      if (!eventList || !eventList.length) {\n        continue\n      }\n\n      for (const subListener of listeners[type]) {\n        const index = eventList.indexOf(subListener)\n\n        if (index !== -1) {\n          eventList.splice(index, 1)\n        }\n      }\n    }\n  }\n\n  getRect (_element: Element): Rect {\n    return null\n  }\n}\n"
+	]
+}
