@@ -1,11 +1,11 @@
 {
   "name": "@interactjs/snappers",
-  "version": "1.10.3",
+  "version": "1.10.5",
   "peerDependencies": {
-    "@interactjs/utils": "1.10.3"
+    "@interactjs/utils": "1.10.5"
   },
   "optionalDependencies": {
-    "@interactjs/interact": "1.10.3"
+    "@interactjs/interact": "1.10.5"
   },
   "publishConfig": {
     "access": "public"
