@@ -110,7 +110,7 @@ function commitAndTag () {
   shell.exec(`git tag ${gitTag}`)
 }
 
-function pushAndPublish () {
+async function pushAndPublish () {
   const { NPM_TAG } = process.env
 
   try {
