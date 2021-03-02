@@ -24,8 +24,7 @@
   "homepage": "https://interactjs.io/pro",
   "description": "",
   "publishConfig": {
-    "access": "restricted",
-    "registry": "https://registry.interactjs.io"
+    "access": "restricted"
   },
   "dependencies": {
     "@babel/core": "latest",

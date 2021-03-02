@@ -6,8 +6,7 @@
     "@interactjs/symbol-tree": "1.10.3"
   },
   "publishConfig": {
-    "access": "public",
-    "registry": "https://registry.interactjs.io"
+    "access": "public"
   },
   "sideEffects": [
     "**/index.js",
