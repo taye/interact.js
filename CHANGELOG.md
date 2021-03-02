@@ -1,3 +1,7 @@
+## v1.10.5
+
+ - fix packaging error
+
 ## v1.10.4
 
  - fix NPE in indexOfDeepestElement if first element has no parent #887
