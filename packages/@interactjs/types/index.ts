@@ -14,7 +14,6 @@ import type { PointerEvent as _PointerEvent } from '@interactjs/pointer-events/P
 // import module augmentations
 import '@interactjs/actions/drag/plugin'
 import '@interactjs/actions/drop/plugin'
-import '@interactjs/arrange/plugin'
 import '@interactjs/auto-scroll/plugin'
 import '@interactjs/auto-start/InteractableMethods'
 import '@interactjs/auto-start/base'
