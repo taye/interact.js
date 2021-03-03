@@ -10,15 +10,13 @@ const cwd = process.cwd()
 
 process.env.PATH = `${cwd}/bin:${cwd}/node_modules/.bin:${process.env.PATH}`
 
-const { NO_CLEAN } = process.env
-
 shell.config.verbose = true
 shell.config.fatal = true
 
 ensureCleanIndex()
 
 const { gitTag } = checkVersion()
-const packages = await getPackages()
+let packages
 
 main().catch((error) => {
   console.error(error)
@@ -29,9 +27,9 @@ main().catch((error) => {
 async function main (ps) {
   gitDetatch()
 
-  if (NO_CLEAN !== 'true') {
-    clean()
-  }
+  clean()
+
+  packages = await getPackages()
 
   await runBuild()
 
@@ -72,12 +70,12 @@ function clean () {
 
 async function runBuild () {
   // copy README to interactjs package
-  await Promise.all((await packages)
+  await Promise.all((packages)
     .filter((p) => p.endsWith('interactjs'))
     .map((p) => fs.copyFile(`${cwd}/README.md`, `${p}/README.md`)))
 
   // copy license file and npmignore to all packages
-  await Promise.all((await packages).map(async (pkg) => {
+  await Promise.all((packages).map(async (pkg) => {
     await fs.copyFile('LICENSE.md', path.join(pkg, isPro() ? 'LICENSE.md' : 'LICENSE'))
     await fs.copyFile('.npmignore', path.join(pkg, '.npmignore'))
   }))
@@ -124,7 +122,7 @@ async function pushAndPublish () {
 
   const npmPublishCommand = 'npm publish' + (NPM_TAG ? ` --tag ${NPM_TAG}` : '')
 
-  for (const pkg of await packages) {
+  for (const pkg of packages) {
     shell.exec(npmPublishCommand, { cwd: path.resolve(pkg) })
   }
 
@@ -132,7 +130,7 @@ async function pushAndPublish () {
 }
 
 async function editPackageJsons (func) {
-  await (['.', ...await packages]).map(async (packageDir) => {
+  await (['.', ...packages]).map(async (packageDir) => {
     const file = path.resolve(packageDir, 'package.json')
     const pkg = JSON.parse((await fs.readFile(file)).toString())
 
