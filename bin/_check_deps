@@ -1,2 +1,2 @@
 #!/usr/bin/env node
-require('../scripts/bin/_ckeck_deps')
+require('../scripts/bin/_check_deps')
