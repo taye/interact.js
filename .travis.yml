@@ -32,6 +32,7 @@ before_deploy:
 deploy:
   - provider: script
     script: bash .travis/deploy.sh
+    skip_cleanup: true
     env:
       secure: JDw06YX4/egO+WjuWVHsEcPS/04syh6fEpY1RbQgEypFNDt8UVvHXPcSP6nNp2YDvfbAWF1TBKojBJk02EQDB1KlQgnO/csvq3tBOSlQU0Cku6zKcUX6LzywLuBPfc3gYKTeXsiNly31vmMxTh2hwHnx2iYxHdMN7CojQpf1JdI=
     on:

@@ -10,4 +10,4 @@ git fetch --tags
 git checkout -- $TRAVIS_BUILD_DIR/{jsdoc,scripts}
 
 # use npx to avoid yarn registry
-npx _release $@
+npx _release
