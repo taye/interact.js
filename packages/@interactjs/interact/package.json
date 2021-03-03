@@ -1,10 +1,10 @@
 {
   "name": "@interactjs/interact",
-  "version": "1.10.5",
+  "version": "1.10.6",
   "dependencies": {
-    "@interactjs/core": "1.10.5",
-    "@interactjs/types": "1.10.5",
-    "@interactjs/utils": "1.10.5"
+    "@interactjs/core": "1.10.6",
+    "@interactjs/types": "1.10.6",
+    "@interactjs/utils": "1.10.6"
   },
   "publishConfig": {
     "access": "public"

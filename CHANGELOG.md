@@ -1,3 +1,7 @@
+## v1.10.6
+
+ - fix packaging error
+
 ## v1.10.5
 
  - fix packaging error

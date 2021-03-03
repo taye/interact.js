@@ -1,12 +1,12 @@
 {
   "name": "@interactjs/pointer-events",
-  "version": "1.10.5",
+  "version": "1.10.6",
   "peerDependencies": {
-    "@interactjs/core": "1.10.5",
-    "@interactjs/utils": "1.10.5"
+    "@interactjs/core": "1.10.6",
+    "@interactjs/utils": "1.10.6"
   },
   "optionalDependencies": {
-    "@interactjs/interact": "1.10.5"
+    "@interactjs/interact": "1.10.6"
   },
   "publishConfig": {
     "access": "public"
