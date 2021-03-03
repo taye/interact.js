@@ -23,6 +23,7 @@ before_script:
 script:
   - npx _check_deps
   - npm run tsc_lint_test
+  - git checkout -f
 after_success:
   - ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT
 before_deploy:

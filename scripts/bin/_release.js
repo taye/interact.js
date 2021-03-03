@@ -83,14 +83,23 @@ async function runBuild () {
 
   if (isPro) await fs.rm(path.resolve('LICENSE'))
 
+  // clean up scope deps
+  shell.exec('_check_deps')
+
+  // bundle interactjs
+  shell.exec('npm run bundle')
+
+  // generate docs
+  shell.exec('npm run docs')
+
   // create @interactjs/**/use/* modules
   shell.exec('_add_plugin_indexes')
 
+  // generate types
+  shell.exec('_types')
+
   // generate esnext .js modules
   shell.exec('_esnext')
-
-  // bundle interactjs, generate docs, transpile modules, generate declaration files
-  shell.exec('npm run build')
 
   // set publishConfig
   await editPackageJsons((pkg) => {
