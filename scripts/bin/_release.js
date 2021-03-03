@@ -75,8 +75,9 @@ async function runBuild () {
     .map((p) => fs.copyFile(`${cwd}/README.md`, `${p}/README.md`)))
 
   // copy license file and npmignore to all packages
+  const licenseFilename = isPro ? 'LICENSE.md' : 'LICENSE'
   await Promise.all((packages).map(async (pkg) => {
-    await fs.copyFile('LICENSE.md', path.join(pkg, isPro ? 'LICENSE.md' : 'LICENSE'))
+    await fs.copyFile(licenseFilename, path.join(pkg, licenseFilename))
     await fs.copyFile('.npmignore', path.join(pkg, '.npmignore'))
   }))
 
