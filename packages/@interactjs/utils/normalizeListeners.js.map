@@ -1,0 +1,34 @@
+{
+	"version": 3,
+	"sources": [
+		"normalizeListeners.ts"
+	],
+	"names": [
+		"extend",
+		"is",
+		"normalize",
+		"type",
+		"listeners",
+		"result",
+		"string",
+		"search",
+		"split",
+		"array",
+		"reduce",
+		"acc",
+		"t",
+		"object",
+		"func",
+		"push",
+		"l",
+		"prefix",
+		"combinedTypes",
+		"map",
+		"p",
+		"trim"
+	],
+	"mappings": "AAEA,OAAOA,MAAP,MAAmB,aAAnB;AACA,OAAOC,EAAP,MAAe,SAAf;AAMA,eAAe,SAASC,SAAT,CACbC,IADa,EAEbC,SAFa,EAGbC,MAHa,EAIQ;AACrBA,EAAAA,MAAM,GAAGA,MAAM,IAAI,EAAnB;;AAEA,MAAIJ,EAAE,CAACK,MAAH,CAAUH,IAAV,KAAmBA,IAAI,CAACI,MAAL,CAAY,GAAZ,MAAqB,CAAC,CAA7C,EAAgD;AAC9CJ,IAAAA,IAAI,GAAGK,KAAK,CAACL,IAAD,CAAZ;AACD;;AAED,MAAIF,EAAE,CAACQ,KAAH,CAASN,IAAT,CAAJ,EAAoB;AAClB,WAAOA,IAAI,CAACO,MAAL,CAAiC,CAACC,GAAD,EAAMC,CAAN,KAAYZ,MAAM,CAACW,GAAD,EAAMT,SAAS,CAACU,CAAD,EAAIR,SAAJ,EAAeC,MAAf,CAAf,CAAnD,EAA2FA,MAA3F,CAAP;AACD,GAToB,CAWrB;;;AACA,MAAIJ,EAAE,CAACY,MAAH,CAAUV,IAAV,CAAJ,EAAqB;AACnBC,IAAAA,SAAS,GAAGD,IAAZ;AACAA,IAAAA,IAAI,GAAG,EAAP;AACD;;AAED,MAAIF,EAAE,CAACa,IAAH,CAAQV,SAAR,CAAJ,EAAwB;AACtBC,IAAAA,MAAM,CAACF,IAAD,CAAN,GAAeE,MAAM,CAACF,IAAD,CAAN,IAAgB,EAA/B;AACAE,IAAAA,MAAM,CAACF,IAAD,CAAN,CAAaY,IAAb,CAAkBX,SAAlB;AACD,GAHD,MAGO,IAAIH,EAAE,CAACQ,KAAH,CAASL,SAAT,CAAJ,EAAyB;AAC9B,SAAK,MAAMY,CAAX,IAAgBZ,SAAhB,EAA2B;AACzBF,MAAAA,SAAS,CAACC,IAAD,EAAOa,CAAP,EAAUX,MAAV,CAAT;AACD;AACF,GAJM,MAIA,IAAIJ,EAAE,CAACY,MAAH,CAAUT,SAAV,CAAJ,EAA0B;AAC/B,SAAK,MAAMa,MAAX,IAAqBb,SAArB,EAAgC;AAC9B,YAAMc,aAAa,GAAGV,KAAK,CAACS,MAAD,CAAL,CAAcE,GAAd,CAAmBC,CAAD,IAAQ,GAAEjB,IAAK,GAAEiB,CAAE,EAArC,CAAtB;AAEAlB,MAAAA,SAAS,CAACgB,aAAD,EAAgBd,SAAS,CAACa,MAAD,CAAzB,EAAmCZ,MAAnC,CAAT;AACD;AACF;;AAED,SAAOA,MAAP;AACD;;AAED,SAASG,KAAT,CAAgBL,IAAhB,EAA8B;AAC5B,SAAOA,IAAI,CAACkB,IAAL,GAAYb,KAAZ,CAAkB,IAAlB,CAAP;AACD",
+	"sourcesContent": [
+		"import type { EventTypes, Listener, ListenersArg } from '@interactjs/types/index'\n\nimport extend from './extend'\nimport is from './is'\n\nexport interface NormalizedListeners {\n  [type: string]: Listener[]\n}\n\nexport default function normalize (\n  type: EventTypes,\n  listeners?: ListenersArg | ListenersArg[],\n  result?: NormalizedListeners,\n): NormalizedListeners {\n  result = result || {}\n\n  if (is.string(type) && type.search(' ') !== -1) {\n    type = split(type)\n  }\n\n  if (is.array(type)) {\n    return type.reduce<NormalizedListeners>((acc, t) => extend(acc, normalize(t, listeners, result)), result)\n  }\n\n  // ({ type: fn }) -> ('', { type: fn })\n  if (is.object(type)) {\n    listeners = type\n    type = ''\n  }\n\n  if (is.func(listeners)) {\n    result[type] = result[type] || []\n    result[type].push(listeners)\n  } else if (is.array(listeners)) {\n    for (const l of listeners) {\n      normalize(type, l, result)\n    }\n  } else if (is.object(listeners)) {\n    for (const prefix in listeners) {\n      const combinedTypes = split(prefix).map((p) => `${type}${p}`)\n\n      normalize(combinedTypes, listeners[prefix], result)\n    }\n  }\n\n  return result as NormalizedListeners\n}\n\nfunction split (type: string) {\n  return type.trim().split(/ +/)\n}\n"
+	]
+}

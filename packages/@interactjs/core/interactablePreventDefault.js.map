@@ -1,0 +1,51 @@
+{
+	"version": 3,
+	"sources": [
+		"interactablePreventDefault.ts"
+	],
+	"names": [
+		"matchesSelector",
+		"nodeContains",
+		"is",
+		"getWindow",
+		"preventDefault",
+		"newValue",
+		"test",
+		"options",
+		"bool",
+		"checkAndPreventDefault",
+		"interactable",
+		"scope",
+		"event",
+		"setting",
+		"events",
+		"supportsPassive",
+		"type",
+		"doc",
+		"target",
+		"document",
+		"docOptions",
+		"getDocOptions",
+		"passive",
+		"element",
+		"onInteractionEvent",
+		"interaction",
+		"install",
+		"Interactable",
+		"prototype",
+		"interactions",
+		"docEvents",
+		"push",
+		"listener",
+		"list",
+		"id",
+		"listeners",
+		"reduce",
+		"acc",
+		"eventType"
+	],
+	"mappings": "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",
+	"sourcesContent": [
+		"import type { Interactable } from '@interactjs/core/Interactable'\nimport type Interaction from '@interactjs/core/Interaction'\nimport type { Scope } from '@interactjs/core/scope'\nimport type { PointerEventType } from '@interactjs/types/index'\nimport { matchesSelector, nodeContains } from '@interactjs/utils/domUtils'\nimport is from '@interactjs/utils/is'\nimport { getWindow } from '@interactjs/utils/window'\n\ndeclare module '@interactjs/core/Interactable' {\n  interface Interactable {\n    preventDefault: typeof preventDefault\n    checkAndPreventDefault: (event: Event) => void\n  }\n}\n\ntype PreventDefaultValue = 'always' | 'never' | 'auto'\nfunction preventDefault(this: Interactable): PreventDefaultValue\nfunction preventDefault(this: Interactable, newValue: PreventDefaultValue): typeof this\nfunction preventDefault (this: Interactable, newValue?: PreventDefaultValue) {\n  if (/^(always|never|auto)$/.test(newValue)) {\n    this.options.preventDefault = newValue\n    return this\n  }\n\n  if (is.bool(newValue)) {\n    this.options.preventDefault = newValue ? 'always' : 'never'\n    return this\n  }\n\n  return this.options.preventDefault\n}\n\nfunction checkAndPreventDefault (interactable: Interactable, scope: Scope, event: Event) {\n  const setting = interactable.options.preventDefault\n\n  if (setting === 'never') return\n\n  if (setting === 'always') {\n    event.preventDefault()\n    return\n  }\n\n  // setting === 'auto'\n\n  // if the browser supports passive event listeners and isn't running on iOS,\n  // don't preventDefault of touch{start,move} events. CSS touch-action and\n  // user-select should be used instead of calling event.preventDefault().\n  if (scope.events.supportsPassive && /^touch(start|move)$/.test(event.type)) {\n    const doc = getWindow(event.target).document\n    const docOptions = scope.getDocOptions(doc)\n\n    if (!(docOptions && docOptions.events) || docOptions.events.passive !== false) {\n      return\n    }\n  }\n\n  // don't preventDefault of pointerdown events\n  if (/^(mouse|pointer|touch)*(down|start)/i.test(event.type)) {\n    return\n  }\n\n  // don't preventDefault on editable elements\n  if (\n    is.element(event.target) &&\n    matchesSelector(event.target, 'input,select,textarea,[contenteditable=true],[contenteditable=true] *')\n  ) {\n    return\n  }\n\n  event.preventDefault()\n}\n\nfunction onInteractionEvent ({ interaction, event }: { interaction: Interaction, event: PointerEventType }) {\n  if (interaction.interactable) {\n    interaction.interactable.checkAndPreventDefault(event as Event)\n  }\n}\n\nexport function install (scope: Scope) {\n  /** @lends Interactable */\n  const { Interactable } = scope\n\n  /**\n   * Returns or sets whether to prevent the browser's default behaviour in\n   * response to pointer events. Can be set to:\n   *  - `'always'` to always prevent\n   *  - `'never'` to never prevent\n   *  - `'auto'` to let interact.js try to determine what would be best\n   *\n   * @param {string} [newValue] `'always'`, `'never'` or `'auto'`\n   * @return {string | Interactable} The current setting or this Interactable\n   */\n  Interactable.prototype.preventDefault = preventDefault\n\n  Interactable.prototype.checkAndPreventDefault = function (event) {\n    return checkAndPreventDefault(this, scope, event)\n  }\n\n  // prevent native HTML5 drag on interact.js target elements\n  scope.interactions.docEvents.push({\n    type: 'dragstart',\n    listener (event) {\n      for (const interaction of scope.interactions.list) {\n        if (\n          interaction.element &&\n          (interaction.element === event.target || nodeContains(interaction.element, event.target))\n        ) {\n          interaction.interactable.checkAndPreventDefault(event)\n          return\n        }\n      }\n    },\n  })\n}\n\nexport default {\n  id: 'core/interactablePreventDefault',\n  install,\n  listeners: ['down', 'move', 'up', 'cancel'].reduce((acc, eventType) => {\n    acc[`interactions:${eventType}`] = onInteractionEvent\n    return acc\n  }, {} as any),\n}\n"
+	]
+}

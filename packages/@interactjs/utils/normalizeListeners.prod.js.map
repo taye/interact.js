@@ -1,0 +1,33 @@
+{
+	"version": 3,
+	"sources": [
+		"normalizeListeners.ts"
+	],
+	"names": [
+		"extend",
+		"is",
+		"normalize",
+		"type",
+		"listeners",
+		"result",
+		"string",
+		"search",
+		"split",
+		"array",
+		"reduce",
+		"acc",
+		"t",
+		"object",
+		"func",
+		"push",
+		"l",
+		"prefix",
+		"map",
+		"p",
+		"trim"
+	],
+	"mappings": "OAEOA,MAAY,0BACZC,MAAQ,8BAMA,SAASC,EACtBC,EACAC,EACAC,GAQA,GANAA,EAASA,GAAU,GAEfJ,EAAGK,OAAOH,KAA+B,IAAtBA,EAAKI,OAAO,OACjCJ,EAAOK,EAAML,IAGXF,EAAGQ,MAAMN,GACX,OAAOA,EAAKO,QAA4B,CAACC,EAAKC,IAAMZ,EAAOW,EAAKT,EAAUU,EAAGR,EAAWC,KAAUA,GASpG,GALIJ,EAAGY,OAAOV,KACZC,EAAYD,EACZA,EAAO,IAGLF,EAAGa,KAAKV,GACVC,EAAOF,GAAQE,EAAOF,IAAS,GAC/BE,EAAOF,GAAMY,KAAKX,QACb,GAAIH,EAAGQ,MAAML,GAClB,IAAK,MAAMY,KAAKZ,EACdF,EAAUC,EAAMa,EAAGX,QAEhB,GAAIJ,EAAGY,OAAOT,GACnB,IAAK,MAAMa,KAAUb,EAGnBF,EAFsBM,EAAMS,GAAQC,KAAKC,GAAO,GAAEhB,IAAOgB,MAEhCf,EAAUa,GAASZ,GAIhD,OAAOA,EAGT,SAASG,EAAOL,GACd,OAAOA,EAAKiB,OAAOZ,MAAM",
+	"sourcesContent": [
+		"import type { EventTypes, Listener, ListenersArg } from '@interactjs/types/index'\n\nimport extend from './extend'\nimport is from './is'\n\nexport interface NormalizedListeners {\n  [type: string]: Listener[]\n}\n\nexport default function normalize (\n  type: EventTypes,\n  listeners?: ListenersArg | ListenersArg[],\n  result?: NormalizedListeners,\n): NormalizedListeners {\n  result = result || {}\n\n  if (is.string(type) && type.search(' ') !== -1) {\n    type = split(type)\n  }\n\n  if (is.array(type)) {\n    return type.reduce<NormalizedListeners>((acc, t) => extend(acc, normalize(t, listeners, result)), result)\n  }\n\n  // ({ type: fn }) -> ('', { type: fn })\n  if (is.object(type)) {\n    listeners = type\n    type = ''\n  }\n\n  if (is.func(listeners)) {\n    result[type] = result[type] || []\n    result[type].push(listeners)\n  } else if (is.array(listeners)) {\n    for (const l of listeners) {\n      normalize(type, l, result)\n    }\n  } else if (is.object(listeners)) {\n    for (const prefix in listeners) {\n      const combinedTypes = split(prefix).map((p) => `${type}${p}`)\n\n      normalize(combinedTypes, listeners[prefix], result)\n    }\n  }\n\n  return result as NormalizedListeners\n}\n\nfunction split (type: string) {\n  return type.trim().split(/ +/)\n}\n"
+	]
+}

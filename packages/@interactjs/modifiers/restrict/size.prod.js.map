@@ -1,0 +1,47 @@
+{
+	"version": 3,
+	"sources": [
+		"size.ts"
+	],
+	"names": [
+		"extend",
+		"rectUtils",
+		"makeModifier",
+		"restrictEdges",
+		"getRestrictionRect",
+		"noMin",
+		"width",
+		"height",
+		"noMax",
+		"restrictSize",
+		"start",
+		"arg",
+		"set",
+		"interaction",
+		"state",
+		"rect",
+		"edges",
+		"options",
+		"minSize",
+		"tlbrToXywh",
+		"min",
+		"coords",
+		"maxSize",
+		"max",
+		"endOnly",
+		"inner",
+		"noInner",
+		"outer",
+		"noOuter",
+		"top",
+		"bottom",
+		"left",
+		"right",
+		"defaults",
+		"enabled"
+	],
+	"mappings": "OACOA,MAAY,uCACPC,MAAe,kDAGlBC,MAAoB,0CAGpBC,MAAqB,+CAErBC,MAA0B,oBAEnC,MAAMC,EAAQ,CAAEC,OAAO,EAAA,EAAWC,QAAQ,EAAA,GACpCC,EAAQ,CAAEF,MAAO,EAAA,EAAWC,OAAQ,EAAA,GAoEpCE,EAAe,CACnBC,MA5DcC,GACPR,EAAcO,MAAMC,GA4D3BC,IAhDYD,GACZ,MAAME,YAAEA,EAAFC,MAAeA,EAAfC,KAAsBA,EAAtBC,MAA4BA,GAAUL,GACtCM,QAAEA,GAAYH,EAEpB,IAAKE,EACH,OAGF,MAAME,EACJjB,EAAUkB,WAAWf,EAAmBa,EAAQG,IAAYP,EAAaF,EAAIU,UAAYhB,EACrFiB,EACJrB,EAAUkB,WAAWf,EAAmBa,EAAQM,IAAYV,EAAaF,EAAIU,UAAYb,EAE3FM,EAAMG,QAAU,CACdO,QAASP,EAAQO,QACjBC,MAAOzB,EAAO,GAAIG,EAAcuB,SAChCC,MAAO3B,EAAO,GAAIG,EAAcyB,UAG9BZ,EAAMa,KACRf,EAAMG,QAAQQ,MAAMI,IAAMd,EAAKe,OAASZ,EAAQX,OAChDO,EAAMG,QAAQU,MAAME,IAAMd,EAAKe,OAASR,EAAQf,QACvCS,EAAMc,SACfhB,EAAMG,QAAQQ,MAAMK,OAASf,EAAKc,IAAMX,EAAQX,OAChDO,EAAMG,QAAQU,MAAMG,OAASf,EAAKc,IAAMP,EAAQf,QAE9CS,EAAMe,MACRjB,EAAMG,QAAQQ,MAAMM,KAAOhB,EAAKiB,MAAQd,EAAQZ,MAChDQ,EAAMG,QAAQU,MAAMI,KAAOhB,EAAKiB,MAAQV,EAAQhB,OACvCU,EAAMgB,QACflB,EAAMG,QAAQQ,MAAMO,MAAQjB,EAAKgB,KAAOb,EAAQZ,MAChDQ,EAAMG,QAAQU,MAAMK,MAAQjB,EAAKgB,KAAOT,EAAQhB,OAGlDH,EAAcS,IAAID,GAElBG,EAAMG,QAAUA,GAahBgB,SAVoC,CACpCb,IAAK,KACLG,IAAK,KACLC,SAAS,EACTU,SAAS,mBASIhC,EAAaO,EAAc,uBACjCA",
+	"sourcesContent": [
+		"import type { Point, Rect, Size } from '@interactjs/types/index'\nimport extend from '@interactjs/utils/extend'\nimport * as rectUtils from '@interactjs/utils/rect'\n\nimport type { ModifierArg, ModifierState } from '../base'\nimport { makeModifier } from '../base'\n\nimport type { RestrictEdgesState } from './edges'\nimport { restrictEdges } from './edges'\nimport type { RestrictOptions } from './pointer'\nimport { getRestrictionRect } from './pointer'\n\nconst noMin = { width: -Infinity, height: -Infinity }\nconst noMax = { width: +Infinity, height: +Infinity }\n\nexport interface RestrictSizeOptions {\n  min?: Size | Point | RestrictOptions['restriction']\n  max?: Size | Point | RestrictOptions['restriction']\n  endOnly: boolean\n  enabled?: boolean\n}\n\nfunction start (arg: ModifierArg<RestrictEdgesState>) {\n  return restrictEdges.start(arg)\n}\n\nexport type RestrictSizeState = RestrictEdgesState &\nModifierState<\nRestrictSizeOptions & { inner: Rect, outer: Rect },\n{\n  min: Rect\n  max: Rect\n}\n>\n\nfunction set (arg: ModifierArg<RestrictSizeState>) {\n  const { interaction, state, rect, edges } = arg\n  const { options } = state\n\n  if (!edges) {\n    return\n  }\n\n  const minSize =\n    rectUtils.tlbrToXywh(getRestrictionRect(options.min as any, interaction, arg.coords)) || noMin\n  const maxSize =\n    rectUtils.tlbrToXywh(getRestrictionRect(options.max as any, interaction, arg.coords)) || noMax\n\n  state.options = {\n    endOnly: options.endOnly,\n    inner: extend({}, restrictEdges.noInner),\n    outer: extend({}, restrictEdges.noOuter),\n  }\n\n  if (edges.top) {\n    state.options.inner.top = rect.bottom - minSize.height\n    state.options.outer.top = rect.bottom - maxSize.height\n  } else if (edges.bottom) {\n    state.options.inner.bottom = rect.top + minSize.height\n    state.options.outer.bottom = rect.top + maxSize.height\n  }\n  if (edges.left) {\n    state.options.inner.left = rect.right - minSize.width\n    state.options.outer.left = rect.right - maxSize.width\n  } else if (edges.right) {\n    state.options.inner.right = rect.left + minSize.width\n    state.options.outer.right = rect.left + maxSize.width\n  }\n\n  restrictEdges.set(arg)\n\n  state.options = options\n}\n\nconst defaults: RestrictSizeOptions = {\n  min: null,\n  max: null,\n  endOnly: false,\n  enabled: false,\n}\n\nconst restrictSize = {\n  start,\n  set,\n  defaults,\n}\n\nexport default makeModifier(restrictSize, 'restrictSize')\nexport { restrictSize }\n"
+	]
+}

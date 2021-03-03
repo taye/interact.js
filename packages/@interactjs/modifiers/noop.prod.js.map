@@ -1,0 +1,14 @@
+{
+	"version": 3,
+	"sources": [
+		"noop.ts"
+	],
+	"names": [
+		"noop",
+		"_defaults"
+	],
+	"mappings": "AAEA,MAAMA,EAAS,OAEfA,EAAKC,UAAY,kBAEFD",
+	"sourcesContent": [
+		"import type { ModifierFunction } from '@interactjs/modifiers/base'\n\nconst noop = ((() => {}) as unknown) as ModifierFunction<any, any, 'noop'>\n\nnoop._defaults = {}\n\nexport default noop\n"
+	]
+}

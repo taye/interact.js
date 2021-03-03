@@ -1,0 +1,33 @@
+{
+	"version": 3,
+	"sources": [
+		"BaseEvent.ts"
+	],
+	"names": [
+		"BaseEvent",
+		"constructor",
+		"interaction",
+		"this",
+		"type",
+		"target",
+		"currentTarget",
+		"interactable",
+		"_interaction",
+		"timeStamp",
+		"immediatePropagationStopped",
+		"propagationStopped",
+		"preventDefault",
+		"stopPropagation",
+		"stopImmediatePropagation",
+		"Object",
+		"defineProperty",
+		"prototype",
+		"get",
+		"_proxy",
+		"set"
+	],
+	"mappings": "OAIO,MAAMA,UAUXC,YAAaC,GAA6BC,KAT1CC,UAS0C,EAAAD,KAR1CE,YAQ0C,EAAAF,KAP1CG,mBAO0C,EAAAH,KAN1CI,kBAM0C,EAAAJ,KAL1CK,kBAK0C,EAAAL,KAJ1CM,eAI0C,EAAAN,KAH1CO,6BAA8B,EAGYP,KAF1CQ,oBAAqB,EAGnBR,KAAKK,aAAeN,EAGtBU,kBAKAC,kBACEV,KAAKQ,oBAAqB,EAM5BG,2BACEX,KAAKO,4BAA8BP,KAAKQ,oBAAqB,GAYjEI,OAAOC,eAAehB,UAAUiB,UAAW,cAAe,CACxDC,MACE,OAAOf,KAAKK,aAAaW,QAE3BC",
+	"sourcesContent": [
+		"import type { Interactable } from '@interactjs/core/Interactable'\nimport type { Interaction, InteractionProxy } from '@interactjs/core/Interaction'\nimport type { ActionName } from '@interactjs/core/scope'\n\nexport class BaseEvent<T extends ActionName | null = never> {\n  type: string\n  target: EventTarget\n  currentTarget: Node\n  interactable: Interactable\n  _interaction: Interaction<T>\n  timeStamp: any\n  immediatePropagationStopped = false\n  propagationStopped = false\n\n  constructor (interaction: Interaction<T>) {\n    this._interaction = interaction\n  }\n\n  preventDefault () {}\n\n  /**\n   * Don't call any other listeners (even on the current target)\n   */\n  stopPropagation () {\n    this.propagationStopped = true\n  }\n\n  /**\n   * Don't call listeners on the remaining targets\n   */\n  stopImmediatePropagation () {\n    this.immediatePropagationStopped = this.propagationStopped = true\n  }\n}\n\n// defined outside of class definition to avoid assignment of undefined during\n// construction\nexport interface BaseEvent<T extends ActionName> {\n  interaction: InteractionProxy<T>\n}\n\n// getters and setters defined here to support typescript 3.6 and below which\n// don't support getter and setters in .d.ts files\nObject.defineProperty(BaseEvent.prototype, 'interaction', {\n  get (this: BaseEvent) {\n    return this._interaction._proxy\n  },\n  set (this: BaseEvent) {},\n})\n"
+	]
+}

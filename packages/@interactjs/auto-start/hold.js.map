@@ -1,0 +1,37 @@
+{
+	"version": 3,
+	"sources": [
+		"hold.ts"
+	],
+	"names": [
+		"basePlugin",
+		"install",
+		"scope",
+		"defaults",
+		"usePlugin",
+		"perAction",
+		"hold",
+		"delay",
+		"getHoldDuration",
+		"interaction",
+		"actionName",
+		"prepared",
+		"name",
+		"options",
+		"interactable",
+		"id",
+		"listeners",
+		"autoStartHoldTimer",
+		"setTimeout",
+		"start",
+		"element",
+		"duplicate",
+		"pointerWasMoved",
+		"clearTimeout",
+		"holdDuration"
+	],
+	"mappings": "AAGA,OAAOA,UAAP,MAAuB,WAAvB;;AAeA,SAASC,OAAT,CAAkBC,KAAlB,EAAgC;AAC9B,QAAM;AAAEC,IAAAA;AAAF,MAAeD,KAArB;AAEAA,EAAAA,KAAK,CAACE,SAAN,CAAgBJ,UAAhB;AAEAG,EAAAA,QAAQ,CAACE,SAAT,CAAmBC,IAAnB,GAA0B,CAA1B;AACAH,EAAAA,QAAQ,CAACE,SAAT,CAAmBE,KAAnB,GAA2B,CAA3B;AACD;;AAED,SAASC,eAAT,CAA0BC,WAA1B,EAAoD;AAClD,QAAMC,UAAU,GAAGD,WAAW,CAACE,QAAZ,IAAwBF,WAAW,CAACE,QAAZ,CAAqBC,IAAhE;;AAEA,MAAI,CAACF,UAAL,EAAiB;AACf,WAAO,IAAP;AACD;;AAED,QAAMG,OAAO,GAAGJ,WAAW,CAACK,YAAZ,CAAyBD,OAAzC;AAEA,SAAOA,OAAO,CAACH,UAAD,CAAP,CAAoBJ,IAApB,IAA4BO,OAAO,CAACH,UAAD,CAAP,CAAoBH,KAAvD;AACD;;AAED,MAAMD,IAAY,GAAG;AACnBS,EAAAA,EAAE,EAAE,iBADe;AAEnBd,EAAAA,OAFmB;AAGnBe,EAAAA,SAAS,EAAE;AACT,wBAAoB,CAAC;AAAEP,MAAAA;AAAF,KAAD,KAAqB;AACvCA,MAAAA,WAAW,CAACQ,kBAAZ,GAAiC,IAAjC;AACD,KAHQ;AAKT,0BAAsB,CAAC;AAAER,MAAAA;AAAF,KAAD,KAAqB;AACzC,YAAMH,IAAI,GAAGE,eAAe,CAACC,WAAD,CAA5B;;AAEA,UAAIH,IAAI,GAAG,CAAX,EAAc;AACZG,QAAAA,WAAW,CAACQ,kBAAZ,GAAiCC,UAAU,CAAC,MAAM;AAChDT,UAAAA,WAAW,CAACU,KAAZ,CAAkBV,WAAW,CAACE,QAA9B,EAAwCF,WAAW,CAACK,YAApD,EAAkEL,WAAW,CAACW,OAA9E;AACD,SAF0C,EAExCd,IAFwC,CAA3C;AAGD;AACF,KAbQ;AAeT,yBAAqB,CAAC;AAAEG,MAAAA,WAAF;AAAeY,MAAAA;AAAf,KAAD,KAAgC;AACnD,UAAIZ,WAAW,CAACQ,kBAAZ,IAAkCR,WAAW,CAACa,eAA9C,IAAiE,CAACD,SAAtE,EAAiF;AAC/EE,QAAAA,YAAY,CAACd,WAAW,CAACQ,kBAAb,CAAZ;AACAR,QAAAA,WAAW,CAACQ,kBAAZ,GAAiC,IAAjC;AACD;AACF,KApBQ;AAsBT;AACA,8BAA0B,CAAC;AAAER,MAAAA;AAAF,KAAD,KAAqB;AAC7C,YAAMe,YAAY,GAAGhB,eAAe,CAACC,WAAD,CAApC;;AAEA,UAAIe,YAAY,GAAG,CAAnB,EAAsB;AACpBf,QAAAA,WAAW,CAACE,QAAZ,CAAqBC,IAArB,GAA4B,IAA5B;AACD;AACF;AA7BQ,GAHQ;AAkCnBJ,EAAAA;AAlCmB,CAArB;AAoCA,eAAeF,IAAf",
+	"sourcesContent": [
+		"import type Interaction from '@interactjs/core/Interaction'\nimport type { Scope, Plugin } from '@interactjs/core/scope'\n\nimport basePlugin from './base'\n\ndeclare module '@interactjs/core/options' {\n  interface PerActionDefaults {\n    hold?: number\n    delay?: number\n  }\n}\n\ndeclare module '@interactjs/core/Interaction' {\n  interface Interaction {\n    autoStartHoldTimer?: any\n  }\n}\n\nfunction install (scope: Scope) {\n  const { defaults } = scope\n\n  scope.usePlugin(basePlugin)\n\n  defaults.perAction.hold = 0\n  defaults.perAction.delay = 0\n}\n\nfunction getHoldDuration (interaction: Interaction) {\n  const actionName = interaction.prepared && interaction.prepared.name\n\n  if (!actionName) {\n    return null\n  }\n\n  const options = interaction.interactable.options\n\n  return options[actionName].hold || options[actionName].delay\n}\n\nconst hold: Plugin = {\n  id: 'auto-start/hold',\n  install,\n  listeners: {\n    'interactions:new': ({ interaction }) => {\n      interaction.autoStartHoldTimer = null\n    },\n\n    'autoStart:prepared': ({ interaction }) => {\n      const hold = getHoldDuration(interaction)\n\n      if (hold > 0) {\n        interaction.autoStartHoldTimer = setTimeout(() => {\n          interaction.start(interaction.prepared, interaction.interactable, interaction.element)\n        }, hold)\n      }\n    },\n\n    'interactions:move': ({ interaction, duplicate }) => {\n      if (interaction.autoStartHoldTimer && interaction.pointerWasMoved && !duplicate) {\n        clearTimeout(interaction.autoStartHoldTimer)\n        interaction.autoStartHoldTimer = null\n      }\n    },\n\n    // prevent regular down->move autoStart\n    'autoStart:before-start': ({ interaction }) => {\n      const holdDuration = getHoldDuration(interaction)\n\n      if (holdDuration > 0) {\n        interaction.prepared.name = null\n      }\n    },\n  },\n  getHoldDuration,\n}\nexport default hold\n"
+	]
+}

@@ -1,0 +1,47 @@
+{
+	"version": 3,
+	"sources": [
+		"holdRepeat.ts"
+	],
+	"names": [
+		"basePlugin",
+		"endHoldRepeat",
+		"interaction",
+		"holdIntervalHandle",
+		"clearInterval",
+		"holdRepeat",
+		"id",
+		"install",
+		"scope",
+		"usePlugin",
+		"pointerEvents",
+		"defaults",
+		"holdRepeatInterval",
+		"types",
+		"holdrepeat",
+		"actions",
+		"phaselessTypes",
+		"listeners",
+		"reduce",
+		"acc",
+		"enderTypes",
+		"[object Object]",
+		"pointerEvent",
+		"type",
+		"count",
+		"eventTarget",
+		"targets",
+		"length",
+		"interval",
+		"eventable",
+		"options",
+		"setTimeout",
+		"fire",
+		"pointer",
+		"event"
+	],
+	"mappings": "OAIOA,MAAgB,iBA+DvB,SAASC,GAAeC,YAAEA,IAGpBA,EAAYC,qBACdC,cAAcF,EAAYC,oBAC1BD,EAAYC,mBAAqB,MAIrC,MAAME,EAAqB,CACzBC,GAAI,4BACJC,QAtDgBC,GAChBA,EAAMC,UAAUT,GAEhB,MAAMU,cAAEA,GAAkBF,EAG1BE,EAAcC,SAASC,mBAAqB,EAC5CF,EAAcG,MAAMC,WAAaN,EAAMO,QAAQC,eAAeF,YAAa,GAgD3EG,UAAW,CAAC,OAAQ,KAAM,SAAU,UAAUC,QAC5C,CAACC,EAAKC,KACFD,EAAa,iBAAgBC,GAAgBnB,EACxCkB,IAET,CACEE,qBAnDUC,aAAEA,IACU,SAAtBA,EAAaC,OAEjBD,EAAaE,OAASF,EAAaE,OAAS,GAAK,IAiD7CH,uBA7CJnB,YAAEA,EAAFoB,aAAeA,EAAfG,YAA6BA,EAA7BC,QAA0CA,GAC1ClB,GAEA,GAA0B,SAAtBc,EAAaC,OAAoBG,EAAQC,OAAQ,OAGrD,MAAMC,EAAWF,EAAQ,GAAGG,UAAUC,QAAQlB,mBAG1CgB,GAAY,IAGhB1B,EAAYC,mBAAqB4B,YAAW,KAC1CvB,EAAME,cAAcsB,KAClB,CACE9B,YAAAA,EACAuB,YAAAA,EACAF,KAAM,OACNU,QAASX,EACTY,MAAOZ,GAETd,KAEDoB,uBA2BUvB",
+	"sourcesContent": [
+		"import type Interaction from '@interactjs/core/Interaction'\nimport type { ListenerMap, Scope, SignalArgs, Plugin } from '@interactjs/core/scope'\n\nimport type PointerEvent from './PointerEvent'\nimport basePlugin from './base'\n\ndeclare module '@interactjs/core/Interaction' {\n  interface Interaction {\n    holdIntervalHandle?: any\n  }\n}\n\ndeclare module '@interactjs/pointer-events/PointerEvent' {\n  interface PointerEvent<T extends string = any> {\n    count?: number\n  }\n}\n\ndeclare module '@interactjs/pointer-events/base' {\n  interface PointerEventOptions {\n    holdRepeatInterval?: number\n  }\n}\n\nfunction install (scope: Scope) {\n  scope.usePlugin(basePlugin)\n\n  const { pointerEvents } = scope\n\n  // don't repeat by default\n  pointerEvents.defaults.holdRepeatInterval = 0\n  pointerEvents.types.holdrepeat = scope.actions.phaselessTypes.holdrepeat = true\n}\n\nfunction onNew ({ pointerEvent }: { pointerEvent: PointerEvent<any> }) {\n  if (pointerEvent.type !== 'hold') return\n\n  pointerEvent.count = (pointerEvent.count || 0) + 1\n}\n\nfunction onFired (\n  { interaction, pointerEvent, eventTarget, targets }: SignalArgs['pointerEvents:fired'],\n  scope: Scope,\n) {\n  if (pointerEvent.type !== 'hold' || !targets.length) return\n\n  // get the repeat interval from the first eventable\n  const interval = targets[0].eventable.options.holdRepeatInterval\n\n  // don't repeat if the interval is 0 or less\n  if (interval <= 0) return\n\n  // set a timeout to fire the holdrepeat event\n  interaction.holdIntervalHandle = setTimeout(() => {\n    scope.pointerEvents.fire(\n      {\n        interaction,\n        eventTarget,\n        type: 'hold',\n        pointer: pointerEvent,\n        event: pointerEvent,\n      },\n      scope,\n    )\n  }, interval)\n}\n\nfunction endHoldRepeat ({ interaction }: { interaction: Interaction }) {\n  // set the interaction's holdStopTime property\n  // to stop further holdRepeat events\n  if (interaction.holdIntervalHandle) {\n    clearInterval(interaction.holdIntervalHandle)\n    interaction.holdIntervalHandle = null\n  }\n}\n\nconst holdRepeat: Plugin = {\n  id: 'pointer-events/holdRepeat',\n  install,\n  listeners: ['move', 'up', 'cancel', 'endall'].reduce(\n    (acc, enderTypes) => {\n      ;(acc as any)[`pointerEvents:${enderTypes}`] = endHoldRepeat\n      return acc\n    },\n    {\n      'pointerEvents:new': onNew,\n      'pointerEvents:fired': onFired,\n    } as ListenerMap,\n  ),\n}\n\nexport default holdRepeat\n"
+	]
+}

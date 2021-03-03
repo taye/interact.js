@@ -1,0 +1,31 @@
+{
+	"version": 3,
+	"sources": [
+		"edges.ts"
+	],
+	"names": [
+		"clone",
+		"extend",
+		"makeModifier",
+		"snapSize",
+		"snapEdges",
+		"start",
+		"arg",
+		"edges",
+		"state",
+		"targetFields",
+		"left",
+		"top",
+		"set",
+		"defaults",
+		"targets",
+		"range",
+		"offset",
+		"x",
+		"y"
+	],
+	"mappings": "OA6BOA,MAAW,mCACXC,MAAY,oDAGVC,MAAoB,qCAGpBC,MAAgB,iBAkBzB,MAAMC,EAA0F,CAC9FC,MAfcC,GACd,MAAMC,MAAEA,GAAUD,EAElB,OAAKC,GAILD,EAAIE,MAAMC,aAAeH,EAAIE,MAAMC,cAAgB,CACjD,CAACF,EAAMG,KAAO,OAAS,QAASH,EAAMI,IAAM,MAAQ,WAG/CR,EAASE,MAAMC,IAPb,MAYTM,IAAKT,EAASS,IACdC,SAAUZ,EAAOD,EAAMG,EAASU,UAAW,CACzCC,QAAS,KACTC,MAAO,KACPC,OAAQ,CAAEC,EAAG,EAAGC,EAAG,qBAIRhB,EAAaE,EAAW,oBAC9BA",
+	"sourcesContent": [
+		"/**\n * @module modifiers/snapEdges\n *\n * @description\n * WOW> This module allows snapping of the edges of targets during resize\n * interactions.\n *\n * ```js\n * interact(target).resizable({\n *   snapEdges: {\n *     targets: [interact.snappers.grid({ x: 100, y: 50 })],\n *   },\n * })\n *\n * interact(target).resizable({\n *   snapEdges: {\n *     targets: [\n *       interact.snappers.grid({\n *        top: 50,\n *        left: 50,\n *        bottom: 100,\n *        right: 100,\n *       }),\n *     ],\n *   },\n * })\n * ```\n */\n\nimport clone from '@interactjs/utils/clone'\nimport extend from '@interactjs/utils/extend'\n\nimport type { ModifierArg, ModifierModule } from '../base'\nimport { makeModifier } from '../base'\n\nimport type { SnapOptions, SnapState } from './pointer'\nimport { snapSize } from './size'\n\nexport type SnapEdgesOptions = Pick<SnapOptions, 'targets' | 'range' | 'offset' | 'endOnly' | 'enabled'>\n\nfunction start (arg: ModifierArg<SnapState>) {\n  const { edges } = arg\n\n  if (!edges) {\n    return null\n  }\n\n  arg.state.targetFields = arg.state.targetFields || [\n    [edges.left ? 'left' : 'right', edges.top ? 'top' : 'bottom'],\n  ]\n\n  return snapSize.start(arg)\n}\n\nconst snapEdges: ModifierModule<SnapEdgesOptions, SnapState, ReturnType<typeof snapSize.set>> = {\n  start,\n  set: snapSize.set,\n  defaults: extend(clone(snapSize.defaults), {\n    targets: null,\n    range: null,\n    offset: { x: 0, y: 0 },\n  } as const),\n}\n\nexport default makeModifier(snapEdges, 'snapEdges')\nexport { snapEdges }\n"
+	]
+}

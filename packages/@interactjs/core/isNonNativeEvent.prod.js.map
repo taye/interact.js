@@ -1,0 +1,22 @@
+{
+	"version": 3,
+	"sources": [
+		"isNonNativeEvent.ts"
+	],
+	"names": [
+		"isNonNativeEvent",
+		"type",
+		"actions",
+		"phaselessTypes",
+		"name",
+		"map",
+		"indexOf",
+		"substr",
+		"length",
+		"phases"
+	],
+	"mappings": "eAEe,SAASA,EAAkBC,EAAcC,GACtD,GAAIA,EAAQC,eAAeF,GACzB,OAAO,EAGT,IAAK,MAAMG,KAAQF,EAAQG,IACzB,GAA2B,IAAvBJ,EAAKK,QAAQF,IAAeH,EAAKM,OAAOH,EAAKI,UAAWN,EAAQO,OAClE,OAAO,EAIX,OAAO",
+	"sourcesContent": [
+		"import type { Actions } from '@interactjs/core/scope'\n\nexport default function isNonNativeEvent (type: string, actions: Actions) {\n  if (actions.phaselessTypes[type]) {\n    return true\n  }\n\n  for (const name in actions.map) {\n    if (type.indexOf(name) === 0 && type.substr(name.length) in actions.phases) {\n      return true\n    }\n  }\n\n  return false\n}\n"
+	]
+}
