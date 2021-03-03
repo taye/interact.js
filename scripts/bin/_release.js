@@ -76,7 +76,7 @@ async function runBuild () {
 
   // copy license file and npmignore to all packages
   await Promise.all((packages).map(async (pkg) => {
-    await fs.copyFile('LICENSE.md', path.join(pkg, isPro() ? 'LICENSE.md' : 'LICENSE'))
+    await fs.copyFile('LICENSE.md', path.join(pkg, isPro ? 'LICENSE.md' : 'LICENSE'))
     await fs.copyFile('.npmignore', path.join(pkg, '.npmignore'))
   }))
 
@@ -93,7 +93,7 @@ async function runBuild () {
 
   // set publishConfig
   await editPackageJsons((pkg) => {
-    pkg.publishConfig = isPro()
+    pkg.publishConfig = isPro
       ? { access: 'restricted', registry: 'https://registry.interactjs.io' }
       : { access: 'public' }
   })

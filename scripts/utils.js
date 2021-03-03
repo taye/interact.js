@@ -100,12 +100,10 @@ function shouldIgnoreImport (sourceValue, filename, moduleDirectory) {
   )
 }
 
-function isPro () {
-  return process.env.INTERACTJS_TIER === 'pro'
-}
+const isPro = process.env.INTERACTJS_TIER === 'pro'
 
 function extensionsWithStubs (extensions) {
-  return isPro() ? extensions : [...extensions.map((ext) => `.stub${ext}`), ...extensions]
+  return isPro ? extensions : [...extensions.map((ext) => `.stub${ext}`), ...extensions]
 }
 
 function transformImportsToRelative () {

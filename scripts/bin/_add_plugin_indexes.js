@@ -15,7 +15,7 @@ require('../addPluginIndexes')([
   'pointer-events/plugin',
   'reflow/plugin',
   'snappers/plugin',
-  ...isPro()
+  ...isPro
     ? [
       'react/plugin',
       // 'vue/plugin',
