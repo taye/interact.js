@@ -1,0 +1,32 @@
+{
+	"version": 3,
+	"sources": [
+		"BaseEvent.ts"
+	],
+	"names": [
+		"BaseEvent",
+		"constructor",
+		"interaction",
+		"type",
+		"target",
+		"currentTarget",
+		"interactable",
+		"_interaction",
+		"timeStamp",
+		"immediatePropagationStopped",
+		"propagationStopped",
+		"preventDefault",
+		"stopPropagation",
+		"stopImmediatePropagation",
+		"Object",
+		"defineProperty",
+		"prototype",
+		"get",
+		"_proxy",
+		"set"
+	],
+	"mappings": "AAIA,OAAO,MAAMA,SAAN,CAAqD;AAU1DC,EAAAA,WAAW,CAAEC,WAAF,EAA+B;AAAA,SAT1CC,IAS0C;AAAA,SAR1CC,MAQ0C;AAAA,SAP1CC,aAO0C;AAAA,SAN1CC,YAM0C;AAAA,SAL1CC,YAK0C;AAAA,SAJ1CC,SAI0C;AAAA,SAH1CC,2BAG0C,GAHZ,KAGY;AAAA,SAF1CC,kBAE0C,GAFrB,KAEqB;AACxC,SAAKH,YAAL,GAAoBL,WAApB;AACD;;AAEDS,EAAAA,cAAc,GAAI,CAAE;AAEpB;AACF;AACA;;;AACEC,EAAAA,eAAe,GAAI;AACjB,SAAKF,kBAAL,GAA0B,IAA1B;AACD;AAED;AACF;AACA;;;AACEG,EAAAA,wBAAwB,GAAI;AAC1B,SAAKJ,2BAAL,GAAmC,KAAKC,kBAAL,GAA0B,IAA7D;AACD;;AA5ByD,C,CA+B5D;AACA;;AAKA;AACA;AACAI,MAAM,CAACC,cAAP,CAAsBf,SAAS,CAACgB,SAAhC,EAA2C,aAA3C,EAA0D;AACxDC,EAAAA,GAAG,GAAmB;AACpB,WAAO,KAAKV,YAAL,CAAkBW,MAAzB;AACD,GAHuD;;AAIxDC,EAAAA,GAAG,GAAmB,CAAE;;AAJgC,CAA1D",
+	"sourcesContent": [
+		"import type { Interactable } from '@interactjs/core/Interactable'\nimport type { Interaction, InteractionProxy } from '@interactjs/core/Interaction'\nimport type { ActionName } from '@interactjs/core/scope'\n\nexport class BaseEvent<T extends ActionName | null = never> {\n  type: string\n  target: EventTarget\n  currentTarget: Node\n  interactable: Interactable\n  _interaction: Interaction<T>\n  timeStamp: any\n  immediatePropagationStopped = false\n  propagationStopped = false\n\n  constructor (interaction: Interaction<T>) {\n    this._interaction = interaction\n  }\n\n  preventDefault () {}\n\n  /**\n   * Don't call any other listeners (even on the current target)\n   */\n  stopPropagation () {\n    this.propagationStopped = true\n  }\n\n  /**\n   * Don't call listeners on the remaining targets\n   */\n  stopImmediatePropagation () {\n    this.immediatePropagationStopped = this.propagationStopped = true\n  }\n}\n\n// defined outside of class definition to avoid assignment of undefined during\n// construction\nexport interface BaseEvent<T extends ActionName> {\n  interaction: InteractionProxy<T>\n}\n\n// getters and setters defined here to support typescript 3.6 and below which\n// don't support getter and setters in .d.ts files\nObject.defineProperty(BaseEvent.prototype, 'interaction', {\n  get (this: BaseEvent) {\n    return this._interaction._proxy\n  },\n  set (this: BaseEvent) {},\n})\n"
+	]
+}

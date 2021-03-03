@@ -1,0 +1,19 @@
+{
+	"version": 3,
+	"sources": [
+		"vueModules.ts"
+	],
+	"names": [
+		"toRefs",
+		"computed",
+		"reactive",
+		"ref",
+		"onMounted",
+		"createVNode",
+		"createTextVNode"
+	],
+	"mappings": "OACSA,OAAQC,SAAUC,SAAUC,QAAW,2CACvCC,cAAiB,4CACjBC,YAAaC,oBAAuB",
+	"sourcesContent": [
+		"/* eslint-disable import/no-extraneous-dependencies */\nexport { toRefs, computed, reactive, ref } from '@vue/reactivity'\nexport { onMounted } from '@vue/runtime-dom'\nexport { createVNode, createTextVNode } from '@vue/runtime-core'\n"
+	]
+}

@@ -1,0 +1,29 @@
+{
+	"version": 3,
+	"sources": [
+		"misc.ts"
+	],
+	"names": [
+		"window",
+		"warnOnce",
+		"method",
+		"message",
+		"warned",
+		"console",
+		"warn",
+		"apply",
+		"arguments",
+		"copyAction",
+		"dest",
+		"src",
+		"name",
+		"axis",
+		"edges",
+		"sign",
+		"n"
+	],
+	"mappings": "AAGA,SAASA,MAAT,QAAuB,aAAvB;AAEA,OAAO,SAASC,QAAT,CAA+BC,MAA/B,EAAgEC,OAAhE,EAAiF;AACtF,MAAIC,MAAM,GAAG,KAAb;AAEA,SAAO,YAAmB;AACxB,QAAI,CAACA,MAAL,EAAa;AACX;AAAEJ,MAAAA,MAAD,CAAgBK,OAAhB,CAAwBC,IAAxB,CAA6BH,OAA7B;AACDC,MAAAA,MAAM,GAAG,IAAT;AACD;;AAED,WAAOF,MAAM,CAACK,KAAP,CAAa,IAAb,EAAmBC,SAAnB,CAAP;AACD,GAPD;AAQD;AAED,OAAO,SAASC,UAAT,CAA2CC,IAA3C,EAAmEC,GAAnE,EAAwF;AAC7FD,EAAAA,IAAI,CAACE,IAAL,GAAYD,GAAG,CAACC,IAAhB;AACAF,EAAAA,IAAI,CAACG,IAAL,GAAYF,GAAG,CAACE,IAAhB;AACAH,EAAAA,IAAI,CAACI,KAAL,GAAaH,GAAG,CAACG,KAAjB;AAEA,SAAOJ,IAAP;AACD;AAED,OAAO,MAAMK,IAAI,GAAIC,CAAD,IAAgBA,CAAC,IAAI,CAAL,GAAS,CAAT,GAAa,CAAC,CAA3C",
+	"sourcesContent": [
+		"import type { ActionProps } from '@interactjs/core/Interaction'\nimport type { ActionName } from '@interactjs/core/scope'\n\nimport { window } from './window'\n\nexport function warnOnce<T> (this: T, method: (...args: any[]) => any, message: string) {\n  let warned = false\n\n  return function (this: T) {\n    if (!warned) {\n      ;(window as any).console.warn(message)\n      warned = true\n    }\n\n    return method.apply(this, arguments)\n  }\n}\n\nexport function copyAction<T extends ActionName> (dest: ActionProps<any>, src: ActionProps<T>) {\n  dest.name = src.name\n  dest.axis = src.axis\n  dest.edges = src.edges\n\n  return dest\n}\n\nexport const sign = (n: number) => (n >= 0 ? 1 : -1)\n"
+	]
+}

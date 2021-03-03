@@ -1,0 +1,35 @@
+{
+	"version": 3,
+	"sources": [
+		"grid.ts"
+	],
+	"names": [
+		"grid",
+		"coordFields",
+		"filter",
+		"xField",
+		"yField",
+		"gridFunc",
+		"x",
+		"y",
+		"range",
+		"limits",
+		"left",
+		"Infinity",
+		"right",
+		"top",
+		"bottom",
+		"offset",
+		"result",
+		"gridx",
+		"Math",
+		"round",
+		"gridy",
+		"max",
+		"min"
+	],
+	"mappings": "AASA,gBAAgBA,IAAD,IAAuB;AACpC,QAAMC,WAAW,GAAI,CACnB,CAAC,GAAD,EAAM,GAAN,CADmB,EAEnB,CAAC,MAAD,EAAS,KAAT,CAFmB,EAGnB,CAAC,OAAD,EAAU,QAAV,CAHmB,EAInB,CAAC,OAAD,EAAU,QAAV,CAJmB,CAAD,CAKRC,MALQ,CAKD,CAAC,CAACC,MAAD,EAASC,MAAT,CAAD,KAAsBD,MAAM,IAAIH,IAAV,IAAkBI,MAAM,IAAIJ,IALjD,CAApB;;AAOA,QAAMK,QAGL,GAAG,CAACC,CAAD,EAAIC,CAAJ,KAAU;AACZ,UAAM;AACJC,MAAAA,KADI;AAEJC,MAAAA,MAAM,GAAG;AACPC,QAAAA,IAAI,EAAE,CAACC,QADA;AAEPC,QAAAA,KAAK,EAAED,QAFA;AAGPE,QAAAA,GAAG,EAAE,CAACF,QAHC;AAIPG,QAAAA,MAAM,EAAEH;AAJD,OAFL;AAQJI,MAAAA,MAAM,GAAG;AAAET,QAAAA,CAAC,EAAE,CAAL;AAAQC,QAAAA,CAAC,EAAE;AAAX;AARL,QASFP,IATJ;AAWA,UAAMgB,MAEL,GAAG;AAAER,MAAAA,KAAF;AAASR,MAAAA,IAAT;AAAeM,MAAAA,CAAC,EAAE,IAAlB;AAAkCC,MAAAA,CAAC,EAAE;AAArC,KAFJ;;AAIA,SAAK,MAAM,CAACJ,MAAD,EAASC,MAAT,CAAX,IAA+BH,WAA/B,EAA4C;AAC1C,YAAMgB,KAAK,GAAGC,IAAI,CAACC,KAAL,CAAW,CAACb,CAAC,GAAGS,MAAM,CAACT,CAAZ,IAAkBN,IAAD,CAAcG,MAAd,CAA5B,CAAd;AACA,YAAMiB,KAAK,GAAGF,IAAI,CAACC,KAAL,CAAW,CAACZ,CAAC,GAAGQ,MAAM,CAACR,CAAZ,IAAkBP,IAAD,CAAcI,MAAd,CAA5B,CAAd;AAEAY,MAAAA,MAAM,CAACb,MAAD,CAAN,GAAiBe,IAAI,CAACG,GAAL,CAASZ,MAAM,CAACC,IAAhB,EAAsBQ,IAAI,CAACI,GAAL,CAASb,MAAM,CAACG,KAAhB,EAAuBK,KAAK,GAAIjB,IAAD,CAAcG,MAAd,CAAR,GAAgCY,MAAM,CAACT,CAA9D,CAAtB,CAAjB;AACAU,MAAAA,MAAM,CAACZ,MAAD,CAAN,GAAiBc,IAAI,CAACG,GAAL,CAASZ,MAAM,CAACI,GAAhB,EAAqBK,IAAI,CAACI,GAAL,CAASb,MAAM,CAACK,MAAhB,EAAwBM,KAAK,GAAIpB,IAAD,CAAcI,MAAd,CAAR,GAAgCW,MAAM,CAACR,CAA/D,CAArB,CAAjB;AACD;;AAED,WAAOS,MAAP;AACD,GA5BD;;AA8BAX,EAAAA,QAAQ,CAACL,IAAT,GAAgBA,IAAhB;AACAK,EAAAA,QAAQ,CAACJ,WAAT,GAAuBA,WAAvB;AAEA,SAAOI,QAAP;AACD,CA1CD",
+	"sourcesContent": [
+		"import type { SnapFunction, SnapTarget } from '@interactjs/modifiers/snap/pointer'\nimport type { Rect, Point } from '@interactjs/types/index'\n\nexport type GridOptions = (Partial<Rect> | Point) & {\n  range?: number\n  limits?: Rect\n  offset?: Point\n}\n\nexport default (grid: GridOptions) => {\n  const coordFields = ([\n    ['x', 'y'],\n    ['left', 'top'],\n    ['right', 'bottom'],\n    ['width', 'height'],\n  ] as const).filter(([xField, yField]) => xField in grid || yField in grid)\n\n  const gridFunc: SnapFunction & {\n    grid: typeof grid\n    coordFields: typeof coordFields\n  } = (x, y) => {\n    const {\n      range,\n      limits = {\n        left: -Infinity,\n        right: Infinity,\n        top: -Infinity,\n        bottom: Infinity,\n      },\n      offset = { x: 0, y: 0 },\n    } = grid\n\n    const result: SnapTarget & {\n      grid: typeof grid\n    } = { range, grid, x: null as number, y: null as number }\n\n    for (const [xField, yField] of coordFields) {\n      const gridx = Math.round((x - offset.x) / (grid as any)[xField])\n      const gridy = Math.round((y - offset.y) / (grid as any)[yField])\n\n      result[xField] = Math.max(limits.left, Math.min(limits.right, gridx * (grid as any)[xField] + offset.x))\n      result[yField] = Math.max(limits.top, Math.min(limits.bottom, gridy * (grid as any)[yField] + offset.y))\n    }\n\n    return result\n  }\n\n  gridFunc.grid = grid\n  gridFunc.coordFields = coordFields\n\n  return gridFunc\n}\n"
+	]
+}

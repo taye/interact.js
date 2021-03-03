@@ -1,0 +1,17 @@
+{
+	"version": 3,
+	"sources": [
+		"index.ts"
+	],
+	"names": [
+		"interact",
+		"init",
+		"plugin",
+		"window",
+		"use"
+	],
+	"mappings": "OACOA,WAAYC,MAAY,mCACxBC,MAAY,mBAEG,iBAAXC,QAAyBA,QAClCF,EAAKE,QAGPH,EAASI,IAAIF",
+	"sourcesContent": [
+		"/* eslint-disable import/order, no-console, eol-last */\nimport interact, { init } from '@interactjs/interact'\nimport plugin from '@interactjs/auto-start/plugin'\n\nif (typeof window === 'object' && !!window) {\n  init(window)\n}\n\ninteract.use(plugin)"
+	]
+}

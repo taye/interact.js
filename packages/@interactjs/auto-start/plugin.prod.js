@@ -1,0 +1,2 @@
+import o from"./base.prod.js";import r from"./dragAxis.prod.js";import s from"./hold.prod.js";export default{id:"auto-start",install(i){i.usePlugin(o),i.usePlugin(s),i.usePlugin(r)}};
+//# sourceMappingURL=plugin.prod.js.map

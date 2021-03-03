@@ -1,0 +1,2 @@
+export default function e(e,n){if(n.phaselessTypes[e])return!0;for(const r in n.map)if(0===e.indexOf(r)&&e.substr(r.length)in n.phases)return!0;return!1}
+//# sourceMappingURL=isNonNativeEvent.prod.js.map

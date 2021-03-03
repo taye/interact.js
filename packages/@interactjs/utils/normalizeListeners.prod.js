@@ -1,0 +1,2 @@
+import r from"./extend.prod.js";import t from"./is.prod.js";export default function e(f,i,n){if(n=n||{},t.string(f)&&-1!==f.search(" ")&&(f=o(f)),t.array(f))return f.reduce(((t,o)=>r(t,e(o,i,n))),n);if(t.object(f)&&(i=f,f=""),t.func(i))n[f]=n[f]||[],n[f].push(i);else if(t.array(i))for(const r of i)e(f,r,n);else if(t.object(i))for(const r in i)e(o(r).map((r=>`${f}${r}`)),i[r],n);return n}function o(r){return r.trim().split(/ +/)}
+//# sourceMappingURL=normalizeListeners.prod.js.map

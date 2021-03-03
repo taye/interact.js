@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>packages/@interactjs/actions/gesture/plugin.ts - Documentation</title>
+
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+    <link type="text/css" rel="stylesheet" href="styles/prettify.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav>
+    <li class="nav-link nav-home-link"><a href="index.html">Home</a></li><li class="nav-heading">Classes</li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="DropEvent_DropEvent.html">DropEvent</a></span></li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="Interactable.html">Interactable</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#context">context</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#deltaSource">deltaSource</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#draggable">draggable</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#dropCheck">dropCheck</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#dropzone">dropzone</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#fire">fire</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#gesturable">gesturable</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#getRect">getRect</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#off">off</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#on">on</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#origin">origin</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#rectChecker">rectChecker</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#reflow">reflow</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#resizable">resizable</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#set">set</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#unset">unset</a></span></li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="InteractEvent_InteractEvent.html">InteractEvent</a></span></li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="Interaction_Interaction.html">Interaction</a></span></li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="module.exports_module.exports.html">exports</a></span></li><li class="nav-heading">Modules</li><li class="nav-heading"><span class="nav-item-type type-module">M</span><span class="nav-item-name"><a href="module-interact.html">interact</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="module-interact.html#.isSet">isSet</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="module-interact.html#.maxInteractions">maxInteractions</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="module-interact.html#.pointerMoveTolerance">pointerMoveTolerance</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="module-interact.html#.stop">stop</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="module-interact.html#.supportsPointerEvent">supportsPointerEvent</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="module-interact.html#.supportsTouch">supportsTouch</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="module-interact.html#.use">use</a></span></li><li class="nav-heading"><span class="nav-item-type type-module">M</span><span class="nav-item-name"><a href="module-modifiers_aspectRatio.html">modifiers/aspectRatio</a></span></li><li class="nav-heading"><span class="nav-item-type type-module">M</span><span class="nav-item-name"><a href="module-modifiers_snapEdges.html">modifiers/snapEdges</a></span></li><li class="nav-heading"><a href="global.html">Globals</a></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#interact">interact</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#preventDefault">preventDefault</a></span></li>
+</nav>
+
+<div class="code-col-bg"></div>
+
+<div id="main">
+    
+    <h1 class="page-title">packages/@interactjs/actions/gesture/plugin.ts</h1>
+    
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import type { InteractEvent, EventPhase } from '@interactjs/core/InteractEvent'
+import type { Interaction, DoPhaseArg } from '@interactjs/core/Interaction'
+import type { Options } from '@interactjs/core/options'
+import type { Scope, Plugin } from '@interactjs/core/scope'
+import type { ActionMethod, GesturableOptions, Rect, PointerType } from '@interactjs/types/index'
+import is from '@interactjs/utils/is'
+import * as pointerUtils from '@interactjs/utils/pointerUtils'
+
+export type GesturableMethod = ActionMethod&lt;GesturableOptions>
+
+declare module '@interactjs/core/Interaction' {
+  interface Interaction {
+    gesture?: {
+      angle: number // angle from first to second touch
+      distance: number
+      scale: number // gesture.distance / gesture.startDistance
+      startAngle: number // angle of line joining two touches
+      startDistance: number // distance between two touches of touchStart
+    }
+  }
+}
+
+declare module '@interactjs/core/Interactable' {
+  interface Interactable {
+    gesturable: GesturableMethod
+  }
+}
+
+declare module '@interactjs/core/options' {
+  interface ActionDefaults {
+    gesture: GesturableOptions
+  }
+}
+
+declare module '@interactjs/core/scope' {
+  interface ActionMap {
+    gesture?: typeof gesture
+  }
+}
+
+export interface GestureEvent extends InteractEvent&lt;'gesture'> {
+  distance: number
+  angle: number
+  da: number // angle change
+  scale: number // ratio of distance start to current event
+  ds: number // scale change
+  box: Rect // enclosing box of all points
+  touches: PointerType[]
+}
+
+export interface GestureSignalArg extends DoPhaseArg&lt;'gesture', EventPhase> {
+  iEvent: GestureEvent
+  interaction: Interaction&lt;'gesture'>
+}
+
+function install (scope: Scope) {
+  const { actions, Interactable, defaults } = scope
+
+  /**
+   * ```js
+   * interact(element).gesturable({
+   *     onstart: function (event) {},
+   *     onmove : function (event) {},
+   *     onend  : function (event) {},
+   *
+   *     // limit multiple gestures.
+   *     // See the explanation in {@link Interactable.draggable} example
+   *     max: Infinity,
+   *     maxPerElement: 1,
+   * })
+   *
+   * var isGestureable = interact(element).gesturable()
+   * ```
+   *
+   * Gets or sets whether multitouch gestures can be performed on the target
+   *
+   * @param {boolean | object} [options] true/false or An object with event
+   * listeners to be fired on gesture events (makes the Interactable gesturable)
+   * @return {boolean | Interactable} A boolean indicating if this can be the
+   * target of gesture events, or this Interactable
+   */
+  Interactable.prototype.gesturable = function (
+    this: InstanceType&lt;typeof Interactable>,
+    options: GesturableOptions | boolean,
+  ) {
+    if (is.object(options)) {
+      this.options.gesture.enabled = options.enabled !== false
+      this.setPerAction('gesture', options)
+      this.setOnEvents('gesture', options)
+
+      return this
+    }
+
+    if (is.bool(options)) {
+      this.options.gesture.enabled = options
+
+      return this
+    }
+
+    return this.options.gesture as Options
+  } as GesturableMethod
+
+  actions.map.gesture = gesture
+  actions.methodDict.gesture = 'gesturable'
+
+  defaults.actions.gesture = gesture.defaults
+}
+
+function updateGestureProps ({ interaction, iEvent, phase }: GestureSignalArg) {
+  if (interaction.prepared.name !== 'gesture') return
+
+  const pointers = interaction.pointers.map((p) => p.pointer)
+  const starting = phase === 'start'
+  const ending = phase === 'end'
+  const deltaSource = interaction.interactable.options.deltaSource
+
+  iEvent.touches = [pointers[0], pointers[1]]
+
+  if (starting) {
+    iEvent.distance = pointerUtils.touchDistance(pointers, deltaSource)
+    iEvent.box = pointerUtils.touchBBox(pointers)
+    iEvent.scale = 1
+    iEvent.ds = 0
+    iEvent.angle = pointerUtils.touchAngle(pointers, deltaSource)
+    iEvent.da = 0
+
+    interaction.gesture.startDistance = iEvent.distance
+    interaction.gesture.startAngle = iEvent.angle
+  } else if (ending) {
+    const prevEvent = interaction.prevEvent as GestureEvent
+
+    iEvent.distance = prevEvent.distance
+    iEvent.box = prevEvent.box
+    iEvent.scale = prevEvent.scale
+    iEvent.ds = 0
+    iEvent.angle = prevEvent.angle
+    iEvent.da = 0
+  } else {
+    iEvent.distance = pointerUtils.touchDistance(pointers, deltaSource)
+    iEvent.box = pointerUtils.touchBBox(pointers)
+    iEvent.scale = iEvent.distance / interaction.gesture.startDistance
+    iEvent.angle = pointerUtils.touchAngle(pointers, deltaSource)
+
+    iEvent.ds = iEvent.scale - interaction.gesture.scale
+    iEvent.da = iEvent.angle - interaction.gesture.angle
+  }
+
+  interaction.gesture.distance = iEvent.distance
+  interaction.gesture.angle = iEvent.angle
+
+  if (is.number(iEvent.scale) &amp;&amp; iEvent.scale !== Infinity &amp;&amp; !isNaN(iEvent.scale)) {
+    interaction.gesture.scale = iEvent.scale
+  }
+}
+
+const gesture: Plugin = {
+  id: 'actions/gesture',
+  before: ['actions/drag', 'actions/resize'],
+  install,
+  listeners: {
+    'interactions:action-start': updateGestureProps,
+    'interactions:action-move': updateGestureProps,
+    'interactions:action-end': updateGestureProps,
+
+    'interactions:new': ({ interaction }) => {
+      interaction.gesture = {
+        angle: 0,
+        distance: 0,
+        scale: 1,
+        startAngle: 0,
+        startDistance: 0,
+      }
+    },
+
+    'auto-start:check': (arg) => {
+      if (arg.interaction.pointers.length &lt; 2) {
+        return undefined
+      }
+
+      const gestureOptions = arg.interactable.options.gesture
+
+      if (!(gestureOptions &amp;&amp; gestureOptions.enabled)) {
+        return undefined
+      }
+
+      arg.action = { name: 'gesture' }
+
+      return false
+    },
+  },
+
+  defaults: {},
+
+  getCursor () {
+    return ''
+  },
+}
+
+export default gesture
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<script>prettyPrint();</script>
+<script src="scripts/linenumber.js"></script>
+</body>
+</html>

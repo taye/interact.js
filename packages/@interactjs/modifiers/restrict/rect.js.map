@@ -1,0 +1,25 @@
+{
+	"version": 3,
+	"sources": [
+		"rect.ts"
+	],
+	"names": [
+		"extend",
+		"makeModifier",
+		"restrict",
+		"defaults",
+		"elementRect",
+		"top",
+		"left",
+		"bottom",
+		"right",
+		"_",
+		"restrictRect",
+		"start",
+		"set"
+	],
+	"mappings": "AAAA,OAAOA,MAAP,MAAmB,uBAAnB;AAEA,SAASC,YAAT,QAA6B,YAA7B;AAEA,SAASC,QAAT,QAAyB,cAAzB;AAEA,MAAMC,QAAQ,GAAGH,MAAM,CACrB;AACE,MAAII,WAAJ,GAAmB;AACjB,WAAO;AAAEC,MAAAA,GAAG,EAAE,CAAP;AAAUC,MAAAA,IAAI,EAAE,CAAhB;AAAmBC,MAAAA,MAAM,EAAE,CAA3B;AAA8BC,MAAAA,KAAK,EAAE;AAArC,KAAP;AACD,GAHH;;AAIE,MAAIJ,WAAJ,CAAiBK,CAAjB,EAAoB,CAAE;;AAJxB,CADqB,EAOrBP,QAAQ,CAACC,QAPY,CAAvB;AAUA,MAAMO,YAAY,GAAG;AACnBC,EAAAA,KAAK,EAAET,QAAQ,CAACS,KADG;AAEnBC,EAAAA,GAAG,EAAEV,QAAQ,CAACU,GAFK;AAGnBT,EAAAA;AAHmB,CAArB;AAMA,eAAeF,YAAY,CAACS,YAAD,EAAe,cAAf,CAA3B;AACA,SAASA,YAAT",
+	"sourcesContent": [
+		"import extend from '@interactjs/utils/extend'\n\nimport { makeModifier } from '../base'\n\nimport { restrict } from './pointer'\n\nconst defaults = extend(\n  {\n    get elementRect () {\n      return { top: 0, left: 0, bottom: 1, right: 1 }\n    },\n    set elementRect (_) {},\n  },\n  restrict.defaults,\n)\n\nconst restrictRect = {\n  start: restrict.start,\n  set: restrict.set,\n  defaults,\n}\n\nexport default makeModifier(restrictRect, 'restrictRect')\nexport { restrictRect }\n"
+	]
+}
