@@ -94,6 +94,16 @@ async function getPackages (options) {
   return [...new Set(packageDirs)]
 }
 
+async function getPackageJsons (files) {
+  return Promise.all(
+    (await getPackages()).map(async (p) => {
+      const jsonPath = path.resolve(p, 'package.json')
+      const pkg = JSON.parse((await fs.readFile(jsonPath)).toString())
+      return [jsonPath, pkg]
+    }),
+  )
+}
+
 function shouldIgnoreImport (sourceValue, filename, moduleDirectory) {
   return (
     !/^(\.{1-2}|(@interactjs))[\\/]/.test(sourceValue) && !moduleDirectory.some((d) => filename.startsWith(d))
@@ -308,6 +318,7 @@ module.exports = {
   extendBabelOptions,
   getDevPackageDir,
   getPackages,
+  getPackageJsons,
   getModuleName,
   getModuleDirectories,
   getPackageDir,
