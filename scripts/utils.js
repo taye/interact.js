@@ -94,11 +94,13 @@ async function getPackages (options) {
   return [...new Set(packageDirs)]
 }
 
-async function getPackageJsons (files) {
+async function getPackageJsons () {
+  const packages = await getPackages()
+
   return Promise.all(
-    (await getPackages()).map(async (p) => {
+    packages.map(async (p) => {
       const jsonPath = path.resolve(p, 'package.json')
-      const pkg = JSON.parse((await fs.readFile(jsonPath)).toString())
+      const pkg = JSON.parse((await fs.promises.readFile(jsonPath)).toString())
       return [jsonPath, pkg]
     }),
   )
