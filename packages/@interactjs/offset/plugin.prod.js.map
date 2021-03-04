@@ -1,0 +1,49 @@
+{
+	"version": 3,
+	"sources": [
+		"plugin.ts"
+	],
+	"names": [
+		"_ProxyMethods",
+		"rectUtils",
+		"offsetBy",
+		"addTotal",
+		"interaction",
+		"pointerIsDown",
+		"addToCoords",
+		"coords",
+		"cur",
+		"offset",
+		"total",
+		"pending",
+		"x",
+		"y",
+		"beforeAction",
+		"applyPending",
+		"hasPending",
+		"delta",
+		"addEdges",
+		"edges",
+		"rect",
+		"this",
+		"page",
+		"client",
+		"id",
+		"before",
+		"install",
+		"scope",
+		"Interaction",
+		"prototype",
+		"listeners",
+		"[object Object]",
+		"interactions:update-pointer",
+		"interactions:before-action-start",
+		"interactions:before-action-move",
+		"move",
+		"end"
+	],
+	"mappings": "wBACSA,MAAqB,wCAGlBC,MAAe,wBAgBzBD,EAAsBE,SAAW,UAE5B,SAASC,SAAUC,GACnBA,EAAYC,gBAIjBC,EAAYF,EAAYG,OAAOC,IAAKJ,EAAYK,OAAOC,OAEvDN,EAAYK,OAAOE,QAAQC,EAAI,EAC/BR,EAAYK,OAAOE,QAAQE,EAAI,GAGjC,SAASC,GAAcV,YAAEA,IACvBW,aAAaX,UAqBR,SAASW,aAAcX,GAC5B,IA+BF,CAAqBA,MACTA,EAAYK,OAAOE,QAAQC,IAAKR,EAAYK,OAAOE,QAAQE,GAhChEG,CAAWZ,GACd,OAAO,EAGT,MAAMO,QAAEA,GAAYP,EAAYK,OAShC,OAPAH,EAAYF,EAAYG,OAAOC,IAAKG,GACpCL,EAAYF,EAAYG,OAAOU,MAAON,GACtCV,EAAUiB,SAASd,EAAYe,MAAOf,EAAYgB,KAAMT,GAExDA,EAAQC,EAAI,EACZD,EAAQE,EAAI,GAEL,EAGT,SAASX,GAA6BU,EAAEA,EAAFC,EAAKA,IACzCQ,KAAKZ,OAAOE,QAAQC,GAAKA,EACzBS,KAAKZ,OAAOE,QAAQE,GAAKA,EAEzBQ,KAAKZ,OAAOC,MAAME,GAAKA,EACvBS,KAAKZ,OAAOC,MAAMG,GAAKA,EAGzB,SAASP,GAAagB,KAAEA,EAAFC,OAAQA,IAAUX,EAAEA,EAAFC,EAAKA,IAC3CS,EAAKV,GAAKA,EACVU,EAAKT,GAAKA,EACVU,EAAOX,GAAKA,EACZW,EAAOV,GAAKA,EAOd,MAAMJ,EAAiB,CACrBe,GAAI,SACJC,OAAQ,CAAC,YAAa,iBAAkB,UAAW,WACnDC,QAASC,GACPA,EAAMC,YAAYC,UAAU3B,SAAWA,GAEzC4B,UAAW,CACTC,oBAAuB3B,YAAAA,IACrBA,EAAYK,OAAS,CACnBC,MAAO,CAAEE,EAAG,EAAGC,EAAG,GAClBF,QAAS,CAAEC,EAAG,EAAGC,EAAG,KAGxBmB,8BAA+B,EAAG5B,YAAAA,KAAkBD,SAASC,GAC7D6B,mCAAoCnB,EACpCoB,kCAAmCpB,EACnCiB,kCAtEgB3B,YAAEA,IAGpB,GAFmBW,aAAaX,GAOhC,OAHAA,EAAY+B,KAAK,CAAE1B,QAAQ,IAC3BL,EAAYgC,OAEL,GA+DLL,qBA5DU3B,YAAEA,IACdA,EAAYK,OAAOC,MAAME,EAAI,EAC7BR,EAAYK,OAAOC,MAAMG,EAAI,EAC7BT,EAAYK,OAAOE,QAAQC,EAAI,EAC/BR,EAAYK,OAAOE,QAAQE,EAAI,oBA4DlBJ",
+	"sourcesContent": [
+		"import type Interaction from '@interactjs/core/Interaction'\nimport { _ProxyMethods } from '@interactjs/core/Interaction'\nimport type { Plugin } from '@interactjs/core/scope'\nimport type { Point } from '@interactjs/types/index'\nimport * as rectUtils from '@interactjs/utils/rect'\n\ndeclare module '@interactjs/core/Interaction' {\n  interface Interaction {\n    offsetBy?: typeof offsetBy\n    offset: {\n      total: Point\n      pending: Point\n    }\n  }\n\n  enum _ProxyMethods {\n    offsetBy = '',\n  }\n}\n\n;(_ProxyMethods as any).offsetBy = ''\n\nexport function addTotal (interaction: Interaction) {\n  if (!interaction.pointerIsDown) {\n    return\n  }\n\n  addToCoords(interaction.coords.cur, interaction.offset.total)\n\n  interaction.offset.pending.x = 0\n  interaction.offset.pending.y = 0\n}\n\nfunction beforeAction ({ interaction }: { interaction: Interaction }) {\n  applyPending(interaction)\n}\n\nfunction beforeEnd ({ interaction }: { interaction: Interaction }): boolean | void {\n  const hadPending = applyPending(interaction)\n\n  if (!hadPending) return\n\n  interaction.move({ offset: true })\n  interaction.end()\n\n  return false\n}\n\nfunction end ({ interaction }: { interaction: Interaction }) {\n  interaction.offset.total.x = 0\n  interaction.offset.total.y = 0\n  interaction.offset.pending.x = 0\n  interaction.offset.pending.y = 0\n}\n\nexport function applyPending (interaction: Interaction) {\n  if (!hasPending(interaction)) {\n    return false\n  }\n\n  const { pending } = interaction.offset\n\n  addToCoords(interaction.coords.cur, pending)\n  addToCoords(interaction.coords.delta, pending)\n  rectUtils.addEdges(interaction.edges, interaction.rect, pending)\n\n  pending.x = 0\n  pending.y = 0\n\n  return true\n}\n\nfunction offsetBy (this: Interaction, { x, y }: Point) {\n  this.offset.pending.x += x\n  this.offset.pending.y += y\n\n  this.offset.total.x += x\n  this.offset.total.y += y\n}\n\nfunction addToCoords ({ page, client }, { x, y }: Point) {\n  page.x += x\n  page.y += y\n  client.x += x\n  client.y += y\n}\n\nfunction hasPending (interaction: Interaction) {\n  return !!(interaction.offset.pending.x || interaction.offset.pending.y)\n}\n\nconst offset: Plugin = {\n  id: 'offset',\n  before: ['modifiers', 'pointer-events', 'actions', 'inertia'],\n  install (scope) {\n    scope.Interaction.prototype.offsetBy = offsetBy\n  },\n  listeners: {\n    'interactions:new': ({ interaction }) => {\n      interaction.offset = {\n        total: { x: 0, y: 0 },\n        pending: { x: 0, y: 0 },\n      }\n    },\n    'interactions:update-pointer': ({ interaction }) => addTotal(interaction),\n    'interactions:before-action-start': beforeAction,\n    'interactions:before-action-move': beforeAction,\n    'interactions:before-action-end': beforeEnd,\n    'interactions:stop': end,\n  },\n}\n\nexport default offset\n"
+	]
+}

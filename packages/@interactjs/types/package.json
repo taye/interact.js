@@ -4,7 +4,6 @@
   "typings": "typings.d.ts",
   "devDependencies": {
     "@interactjs/actions": "1.10.7",
-    "@interactjs/arrange": "1.10.7",
     "@interactjs/auto-scroll": "1.10.7",
     "@interactjs/auto-start": "1.10.7",
     "@interactjs/core": "1.10.7",

@@ -1,0 +1,20 @@
+{
+	"version": 3,
+	"sources": [
+		"PointerInfo.ts"
+	],
+	"names": [
+		"PointerInfo",
+		"constructor",
+		"id",
+		"pointer",
+		"event",
+		"downTime",
+		"downTarget",
+		"this"
+	],
+	"mappings": "OAEO,MAAMA,YAOXC,YAAaC,EAAYC,EAAsBC,EAAyBC,EAAkBC,GAAkBC,KAN5GL,QAM4G,EAAAK,KAL5GJ,aAK4G,EAAAI,KAJ5GH,WAI4G,EAAAG,KAH5GF,cAG4G,EAAAE,KAF5GD,gBAE4G,EAC1GC,KAAKL,GAAKA,EACVK,KAAKJ,QAAUA,EACfI,KAAKH,MAAQA,EACbG,KAAKF,SAAWA,EAChBE,KAAKD,WAAaA",
+	"sourcesContent": [
+		"import type { PointerEventType, PointerType } from '@interactjs/types/index'\n\nexport class PointerInfo {\n  id: number\n  pointer: PointerType\n  event: PointerEventType\n  downTime: number\n  downTarget: Node\n\n  constructor (id: number, pointer: PointerType, event: PointerEventType, downTime: number, downTarget: Node) {\n    this.id = id\n    this.pointer = pointer\n    this.event = event\n    this.downTime = downTime\n    this.downTarget = downTarget\n  }\n}\n"
+	]
+}

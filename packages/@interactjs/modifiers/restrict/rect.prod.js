@@ -1,0 +1,2 @@
+import t from"../../utils/extend.prod.js";import{makeModifier as e}from"../base.prod.js";import{restrict as r}from"./pointer.prod.js";const o=t({get elementRect(){return{top:0,left:0,bottom:1,right:1}},set elementRect(t){}},r.defaults),s={start:r.start,set:r.set,defaults:o};export default e(s,"restrictRect");export{s as restrictRect};
+//# sourceMappingURL=rect.prod.js.map
