@@ -1,12 +1,12 @@
 {
   "name": "@interactjs/dev-tools",
-  "version": "1.10.7",
+  "version": "1.10.8",
   "peerDependencies": {
-    "@interactjs/modifiers": "1.10.7",
-    "@interactjs/utils": "1.10.7"
+    "@interactjs/modifiers": "1.10.8",
+    "@interactjs/utils": "1.10.8"
   },
   "optionalDependencies": {
-    "@interactjs/interact": "1.10.7"
+    "@interactjs/interact": "1.10.8"
   },
   "publishConfig": {
     "access": "public"
