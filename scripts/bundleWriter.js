@@ -24,7 +24,10 @@ module.exports = async function bundleWriter (
 
   if (!writeMin) return
 
-  const minifiedResult = await minify({ ...raw, env: { NODE_ENV: 'production' } })
+  const minifiedResult = await minify({
+    ...raw,
+    env: { NODE_ENV: 'production', npm_package_version: process.env.npm_package_version },
+  })
   const headerOpts = getHeaderOpts(
     headers.min,
     filenames.min,
