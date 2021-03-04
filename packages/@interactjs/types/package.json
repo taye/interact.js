@@ -1,22 +1,22 @@
 {
   "name": "@interactjs/types",
-  "version": "1.10.6",
+  "version": "1.10.7",
   "typings": "typings.d.ts",
   "devDependencies": {
-    "@interactjs/actions": "1.10.6",
-    "@interactjs/arrange": "1.10.6",
-    "@interactjs/auto-scroll": "1.10.6",
-    "@interactjs/auto-start": "1.10.6",
-    "@interactjs/core": "1.10.6",
-    "@interactjs/dev-tools": "1.10.6",
-    "@interactjs/inertia": "1.10.6",
-    "@interactjs/interact": "1.10.6",
-    "@interactjs/interactjs": "1.10.6",
-    "@interactjs/modifiers": "1.10.6",
-    "@interactjs/pointer-events": "1.10.6",
-    "@interactjs/reflow": "1.10.6",
-    "@interactjs/snappers": "1.10.6",
-    "@interactjs/utils": "1.10.6"
+    "@interactjs/actions": "1.10.7",
+    "@interactjs/arrange": "1.10.7",
+    "@interactjs/auto-scroll": "1.10.7",
+    "@interactjs/auto-start": "1.10.7",
+    "@interactjs/core": "1.10.7",
+    "@interactjs/dev-tools": "1.10.7",
+    "@interactjs/inertia": "1.10.7",
+    "@interactjs/interact": "1.10.7",
+    "@interactjs/interactjs": "1.10.7",
+    "@interactjs/modifiers": "1.10.7",
+    "@interactjs/pointer-events": "1.10.7",
+    "@interactjs/reflow": "1.10.7",
+    "@interactjs/snappers": "1.10.7",
+    "@interactjs/utils": "1.10.7"
   },
   "publishConfig": {
     "access": "public"

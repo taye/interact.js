@@ -1,3 +1,7 @@
+## v1.10.7
+
+ - correctly replace `process.env.npm_package_version` in min bundle #890
+
 ## v1.10.6
 
  - fix packaging error

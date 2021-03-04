@@ -1,6 +1,6 @@
 {
   "name": "interactjs",
-  "version": "1.10.6",
+  "version": "1.10.7",
   "main": "dist/interact.min.js",
   "typings": "index.d.ts",
   "description": "Drag and drop, resizing and multi-touch gestures with inertia and snapping for modern browsers (and also IE9+)",
@@ -38,7 +38,7 @@
     "test": "cd ../; npm test"
   },
   "dependencies": {
-    "@interactjs/types": "1.10.6"
+    "@interactjs/types": "1.10.7"
   },
   "sideEffects": [
     "**/index.js",
