@@ -1,0 +1,47 @@
+{
+	"version": 3,
+	"sources": [
+		"DropEvent.ts"
+	],
+	"names": [
+		"BaseEvent",
+		"arr",
+		"DropEvent",
+		"constructor",
+		"dropState",
+		"dragEvent",
+		"type",
+		"super",
+		"_interaction",
+		"this",
+		"target",
+		"dropzone",
+		"relatedTarget",
+		"draggable",
+		"timeStamp",
+		"propagationStopped",
+		"immediatePropagationStopped",
+		"element",
+		"prev",
+		"cur",
+		"currentTarget",
+		"interactable",
+		"reject",
+		"rejected",
+		"events",
+		"enter",
+		"stopImmediatePropagation",
+		"activeDrops",
+		"index",
+		"findIndex",
+		"splice",
+		"deactivateEvent",
+		"fire",
+		"preventDefault",
+		"stopPropagation"
+	],
+	"mappings": "oBAASA,MAAiB,yCAIdC,MAAS,iCAId,MAAMC,kBAAkBF,EAa7BG,YAAaC,EAAsBC,EAAkCC,GACnEC,MAAMF,EAAUG,cADiEC,KAZnFC,YAYmF,EAAAD,KAXnFE,cAWmF,EAAAF,KAVnFJ,eAUmF,EAAAI,KATnFG,mBASmF,EAAAH,KARnFI,eAQmF,EAAAJ,KAPnFK,eAOmF,EAAAL,KANnFM,oBAAqB,EAM8DN,KALnFO,6BAA8B,EAQ5B,MAAMC,QAAEA,EAAFN,SAAWA,GAAsB,cAATL,EAAuBF,EAAUc,KAAOd,EAAUe,IAEhFV,KAAKH,KAAOA,EACZG,KAAKC,OAASO,EACdR,KAAKW,cAAgBH,EACrBR,KAAKE,SAAWA,EAChBF,KAAKJ,UAAYA,EACjBI,KAAKG,cAAgBP,EAAUK,OAC/BD,KAAKI,UAAYR,EAAUgB,aAC3BZ,KAAKK,UAAYT,EAAUS,UAU7BQ,SACE,MAAMlB,UAAEA,GAAcK,KAAKD,aAE3B,GACgB,iBAAdC,KAAKH,MACHG,KAAKE,UAAYP,EAAUe,IAAIR,WAAaF,KAAKE,UAAYP,EAAUe,IAAIF,UAAYR,KAAKC,OAahG,GARAN,EAAUc,KAAKP,SAAWF,KAAKE,SAC/BP,EAAUc,KAAKD,QAAUR,KAAKC,OAE9BN,EAAUmB,UAAW,EACrBnB,EAAUoB,OAAOC,MAAQ,KAEzBhB,KAAKiB,2BAEa,iBAAdjB,KAAKH,KAAyB,CAChC,MAAMqB,EAAcvB,EAAUuB,YACxBC,EAAQ3B,EAAI4B,UAChBF,GACA,EAAGhB,SAAAA,EAAUM,QAAAA,KAAcN,IAAaF,KAAKE,UAAYM,IAAYR,KAAKC,SAG5EN,EAAUuB,YAAYG,OAAOF,EAAO,GAEpC,MAAMG,EAAkB,IAAI7B,UAAUE,EAAWK,KAAKJ,UAAW,kBAEjE0B,EAAgBpB,SAAWF,KAAKE,SAChCoB,EAAgBrB,OAASD,KAAKC,OAE9BD,KAAKE,SAASqB,KAAKD,QAEnBtB,KAAKE,SAASqB,KAAK,IAAI9B,UAAUE,EAAWK,KAAKJ,UAAW,cAIhE4B,kBAEAC,kBACEzB,KAAKM,oBAAqB,EAG5BW,2BACEjB,KAAKO,4BAA8BP,KAAKM,oBAAqB",
+	"sourcesContent": [
+		"import { BaseEvent } from '@interactjs/core/BaseEvent'\nimport type { InteractEvent } from '@interactjs/core/InteractEvent'\nimport type { Interactable } from '@interactjs/core/Interactable'\nimport type { Element } from '@interactjs/types/index'\nimport * as arr from '@interactjs/utils/arr'\n\nimport type { DropState } from './plugin'\n\nexport class DropEvent extends BaseEvent<'drag'> {\n  target: Element\n  dropzone: Interactable\n  dragEvent: InteractEvent<'drag'>\n  relatedTarget: Element\n  draggable: Interactable\n  timeStamp: number\n  propagationStopped = false\n  immediatePropagationStopped = false\n\n  /**\n   * Class of events fired on dropzones during drags with acceptable targets.\n   */\n  constructor (dropState: DropState, dragEvent: InteractEvent<'drag'>, type: string) {\n    super(dragEvent._interaction)\n\n    const { element, dropzone } = type === 'dragleave' ? dropState.prev : dropState.cur\n\n    this.type = type\n    this.target = element\n    this.currentTarget = element\n    this.dropzone = dropzone\n    this.dragEvent = dragEvent\n    this.relatedTarget = dragEvent.target\n    this.draggable = dragEvent.interactable\n    this.timeStamp = dragEvent.timeStamp\n  }\n\n  /**\n   * If this is a `dropactivate` event, the dropzone element will be\n   * deactivated.\n   *\n   * If this is a `dragmove` or `dragenter`, a `dragleave` will be fired on the\n   * dropzone element and more.\n   */\n  reject () {\n    const { dropState } = this._interaction\n\n    if (\n      this.type !== 'dropactivate' &&\n      (!this.dropzone || dropState.cur.dropzone !== this.dropzone || dropState.cur.element !== this.target)\n    ) {\n      return\n    }\n\n    dropState.prev.dropzone = this.dropzone\n    dropState.prev.element = this.target\n\n    dropState.rejected = true\n    dropState.events.enter = null\n\n    this.stopImmediatePropagation()\n\n    if (this.type === 'dropactivate') {\n      const activeDrops = dropState.activeDrops\n      const index = arr.findIndex(\n        activeDrops,\n        ({ dropzone, element }) => dropzone === this.dropzone && element === this.target,\n      )\n\n      dropState.activeDrops.splice(index, 1)\n\n      const deactivateEvent = new DropEvent(dropState, this.dragEvent, 'dropdeactivate')\n\n      deactivateEvent.dropzone = this.dropzone\n      deactivateEvent.target = this.target\n\n      this.dropzone.fire(deactivateEvent)\n    } else {\n      this.dropzone.fire(new DropEvent(dropState, this.dragEvent, 'dragleave'))\n    }\n  }\n\n  preventDefault () {}\n\n  stopPropagation () {\n    this.propagationStopped = true\n  }\n\n  stopImmediatePropagation () {\n    this.immediatePropagationStopped = this.propagationStopped = true\n  }\n}\n"
+	]
+}

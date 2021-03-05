@@ -1,0 +1,23 @@
+{
+	"version": 3,
+	"sources": [
+		"getOriginXY.ts"
+	],
+	"names": [
+		"rectToXY",
+		"resolveRectLike",
+		"target",
+		"element",
+		"actionName",
+		"actionOptions",
+		"options",
+		"origin",
+		"originRect",
+		"x",
+		"y"
+	],
+	"mappings": "mBAISA,qBAAUC,MAAuB,+BAE3B,CACbC,EACAC,EACAC,KAEA,MAAMC,EAAiBH,EAAOI,QAAgBF,GAExCG,EADeF,GAAiBA,EAAcE,QACrBL,EAAOI,QAAQC,OAExCC,EAAaP,EAAgBM,EAAQL,EAAQC,EAAS,CAACD,GAAUC,IAEvE,OAAOH,EAASQ,IAAe,CAAEC,EAAG,EAAGC,EAAG",
+	"sourcesContent": [
+		"import type { PerActionDefaults } from '@interactjs/core/options'\nimport type { ActionName } from '@interactjs/core/scope'\nimport type { HasGetRect } from '@interactjs/types/index'\n\nimport { rectToXY, resolveRectLike } from './rect'\n\nexport default function (\n  target: HasGetRect & { options: PerActionDefaults },\n  element: Node,\n  actionName?: ActionName,\n) {\n  const actionOptions = (target.options as any)[actionName]\n  const actionOrigin = actionOptions && actionOptions.origin\n  const origin = actionOrigin || target.options.origin\n\n  const originRect = resolveRectLike(origin, target, element, [target && element])\n\n  return rectToXY(originRect) || { x: 0, y: 0 }\n}\n"
+	]
+}

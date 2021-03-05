@@ -1,0 +1,42 @@
+{
+	"version": 3,
+	"sources": [
+		"rect.ts"
+	],
+	"names": [
+		"closest",
+		"getElementRect",
+		"parentNode",
+		"extend",
+		"is",
+		"getStringOptionResult",
+		"value",
+		"target",
+		"element",
+		"getRect",
+		"resolveRectLike",
+		"functionArgs",
+		"returnValue",
+		"string",
+		"func",
+		"rectToXY",
+		"rect",
+		"x",
+		"left",
+		"y",
+		"top",
+		"xywhToTlbr",
+		"right",
+		"width",
+		"bottom",
+		"height",
+		"tlbrToXywh",
+		"addEdges",
+		"edges",
+		"delta"
+	],
+	"mappings": "kBAUSA,oBAASC,gBAAgBC,MAAkB,4BAC7CC,MAAY,0BACZC,MAAQ,sBAER,SAASC,sBAAuBC,EAAYC,EAAoBC,GACrE,MAAc,WAAVF,EACKJ,EAAWM,GAGN,SAAVF,EACKC,EAAOE,QAAQD,GAGjBR,EAAQQ,EAASF,UAGnB,SAASI,gBACdJ,EACAC,EACAC,EACAG,GAEA,IAAIC,EAAmBN,EAWvB,OAVIF,EAAGS,OAAOD,GACZA,EAAcP,sBAAsBO,EAAaL,EAAQC,GAChDJ,EAAGU,KAAKF,KACjBA,EAAcA,KAAeD,IAG3BP,EAAGI,QAAQI,KACbA,EAAcX,EAAeW,IAGxBA,SAGF,SAASG,SAAUC,GACxB,OACEA,GAAQ,CACNC,EAAG,MAAOD,EAAOA,EAAKC,EAAID,EAAKE,KAC/BC,EAAG,MAAOH,EAAOA,EAAKG,EAAIH,EAAKI,YAK9B,SAASC,WAA6CL,GAU3D,OATIA,GAAU,SAAUA,GAAQ,QAASA,KACvCA,EAAOb,EAAO,GAAIa,IAEbE,KAAOF,EAAKC,GAAK,EACtBD,EAAKI,IAAMJ,EAAKG,GAAK,EACrBH,EAAKM,MAAQN,EAAKM,OAASN,EAAKE,KAAOF,EAAKO,MAC5CP,EAAKQ,OAASR,EAAKQ,QAAUR,EAAKI,IAAMJ,EAAKS,QAGxCT,SAGF,SAASU,WAAYV,GAU1B,OATIA,GAAU,MAAOA,GAAQ,MAAOA,KAClCA,EAAOb,EAAO,GAAIa,IAEbC,EAAID,EAAKE,MAAQ,EACtBF,EAAKG,EAAIH,EAAKI,KAAO,EACrBJ,EAAKO,MAAQP,EAAKO,QAAUP,EAAKM,OAAS,GAAKN,EAAKC,EACpDD,EAAKS,OAAST,EAAKS,SAAWT,EAAKQ,QAAU,GAAKR,EAAKG,GAGlDH,SAGF,SAASW,SAAUC,EAAoBZ,EAAYa,GACpDD,EAAMV,OACRF,EAAKE,MAAQW,EAAMZ,GAEjBW,EAAMN,QACRN,EAAKM,OAASO,EAAMZ,GAElBW,EAAMR,MACRJ,EAAKI,KAAOS,EAAMV,GAEhBS,EAAMJ,SACRR,EAAKQ,QAAUK,EAAMV,GAGvBH,EAAKO,MAAQP,EAAKM,MAAQN,EAAKE,KAC/BF,EAAKS,OAAST,EAAKQ,OAASR,EAAKI",
+	"sourcesContent": [
+		"import type {\n  HasGetRect,\n  RectResolvable,\n  Rect,\n  Element,\n  Point,\n  FullRect,\n  EdgeOptions,\n} from '@interactjs/types'\n\nimport { closest, getElementRect, parentNode } from './domUtils'\nimport extend from './extend'\nimport is from './is'\n\nexport function getStringOptionResult (value: any, target: HasGetRect, element: Node) {\n  if (value === 'parent') {\n    return parentNode(element)\n  }\n\n  if (value === 'self') {\n    return target.getRect(element as Element)\n  }\n\n  return closest(element, value)\n}\n\nexport function resolveRectLike<T extends any[]> (\n  value: RectResolvable<T>,\n  target?: HasGetRect,\n  element?: Node,\n  functionArgs?: T,\n) {\n  let returnValue: any = value\n  if (is.string(returnValue)) {\n    returnValue = getStringOptionResult(returnValue, target, element)\n  } else if (is.func(returnValue)) {\n    returnValue = returnValue(...functionArgs)\n  }\n\n  if (is.element(returnValue)) {\n    returnValue = getElementRect(returnValue)\n  }\n\n  return returnValue as Rect\n}\n\nexport function rectToXY (rect: Rect | Point) {\n  return (\n    rect && {\n      x: 'x' in rect ? rect.x : rect.left,\n      y: 'y' in rect ? rect.y : rect.top,\n    }\n  )\n}\n\nexport function xywhToTlbr<T extends Partial<Rect & Point>> (rect: T) {\n  if (rect && !('left' in rect && 'top' in rect)) {\n    rect = extend({}, rect)\n\n    rect.left = rect.x || 0\n    rect.top = rect.y || 0\n    rect.right = rect.right || rect.left + rect.width\n    rect.bottom = rect.bottom || rect.top + rect.height\n  }\n\n  return rect as Rect & T\n}\n\nexport function tlbrToXywh (rect: Rect & Partial<Point>) {\n  if (rect && !('x' in rect && 'y' in rect)) {\n    rect = extend({}, rect)\n\n    rect.x = rect.left || 0\n    rect.y = rect.top || 0\n    rect.width = rect.width || (rect.right || 0) - rect.x\n    rect.height = rect.height || (rect.bottom || 0) - rect.y\n  }\n\n  return rect as FullRect & Point\n}\n\nexport function addEdges (edges: EdgeOptions, rect: Rect, delta: Point) {\n  if (edges.left) {\n    rect.left += delta.x\n  }\n  if (edges.right) {\n    rect.right += delta.x\n  }\n  if (edges.top) {\n    rect.top += delta.y\n  }\n  if (edges.bottom) {\n    rect.bottom += delta.y\n  }\n\n  rect.width = rect.right - rect.left\n  rect.height = rect.bottom - rect.top\n}\n"
+	]
+}

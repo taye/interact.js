@@ -1,0 +1,50 @@
+{
+	"version": 3,
+	"sources": [
+		"dragAxis.ts"
+	],
+	"names": [
+		"parentNode",
+		"is",
+		"autoStart",
+		"id",
+		"listeners",
+		"[object Object]",
+		"interaction",
+		"eventTarget",
+		"dx",
+		"dy",
+		"scope",
+		"prepared",
+		"name",
+		"absX",
+		"Math",
+		"abs",
+		"absY",
+		"targetOptions",
+		"interactable",
+		"options",
+		"drag",
+		"startAxis",
+		"currentAxis",
+		"axis",
+		"lockAxis",
+		"element",
+		"getDraggable",
+		"manualStart",
+		"testIgnoreAllow",
+		"action",
+		"getAction",
+		"downPointer",
+		"downEvent",
+		"thisAxis",
+		"checkStartAxis",
+		"validateAction",
+		"interactables",
+		"forEachMatch"
+	],
+	"mappings": "qBAISA,MAAkB,mCACpBC,MAAQ,6BAERC,MAAe,+BA2EP,CACbC,GAAI,sBACJC,UAAW,CAAEC,0BA3EOC,YAAEA,EAAFC,YAAeA,EAAfC,GAA4BA,EAA5BC,GAAgCA,GAAuCC,GAC3F,GAAkC,SAA9BJ,EAAYK,SAASC,KAAiB,OAG1C,MAAMC,EAAOC,KAAKC,IAAIP,GAChBQ,EAAOF,KAAKC,IAAIN,GAChBQ,EAAgBX,EAAYY,aAAaC,QAAQC,KACjDC,EAAYJ,EAAcI,UAC1BC,EAAcT,EAAOG,EAAO,IAAMH,EAAOG,EAAO,IAAM,KAQ5D,GANAV,EAAYK,SAASY,KACQ,UAA3BN,EAAcO,SACTF,EAAY,GACbL,EAAcO,SAGA,OAAhBF,GAAsC,OAAdD,GAAsBA,IAAcC,EAAa,CAEzEhB,EAAwCK,SAASC,KAAO,KAG1D,IAAIa,EAAUlB,EAEd,MAAMmB,EAAyBR,IAC7B,GAAIA,IAAiBZ,EAAYY,aAAc,OAE/C,MAAMC,EAAUb,EAAYY,aAAaC,QAAQC,KAEjD,IAAKD,EAAQQ,aAAeT,EAAaU,gBAAgBT,EAASM,EAASlB,GAAc,CACvF,MAAMsB,EAASX,EAAaY,UAC1BxB,EAAYyB,YACZzB,EAAY0B,UACZ1B,EACAmB,GAGF,GACEI,GACgB,SAAhBA,EAAOjB,MAyBjB,EAAyBS,EAAmBH,KAC1C,IAAKA,EACH,OAAO,EAGT,MAAMe,EAAWf,EAAaC,QAAQC,KAAKC,UAE3C,MAAqB,OAAdA,GAAmC,OAAbY,GAAqBA,IAAaZ,GA/BvDa,CAAeZ,EAAaJ,IAC5BhB,EAAUiC,eAAeN,EAAQX,EAAcO,EAASlB,EAAaG,GAErE,OAAOQ,IAMb,KAAOjB,EAAGwB,QAAQA,IAAU,CAC1B,MAAMP,EAAeR,EAAM0B,cAAcC,aAAaZ,EAASC,GAE/D,GAAIR,EAAc,CACdZ,EAAwCK,SAASC,KAAO,OAC1DN,EAAYY,aAAeA,EAC3BZ,EAAYmB,QAAUA,EACtB,MAGFA,EAAUzB,EAAWyB",
+	"sourcesContent": [
+		"import type { Interactable } from '@interactjs/core/Interactable'\nimport type Interaction from '@interactjs/core/Interaction'\nimport type { SignalArgs, Scope, ActionName } from '@interactjs/core/scope'\nimport type { Element } from '@interactjs/types/index'\nimport { parentNode } from '@interactjs/utils/domUtils'\nimport is from '@interactjs/utils/is'\n\nimport autoStart from './base'\n\nfunction beforeStart ({ interaction, eventTarget, dx, dy }: SignalArgs['interactions:move'], scope: Scope) {\n  if (interaction.prepared.name !== 'drag') return\n\n  // check if a drag is in the correct axis\n  const absX = Math.abs(dx)\n  const absY = Math.abs(dy)\n  const targetOptions = interaction.interactable.options.drag\n  const startAxis = targetOptions.startAxis\n  const currentAxis = absX > absY ? 'x' : absX < absY ? 'y' : 'xy'\n\n  interaction.prepared.axis =\n    targetOptions.lockAxis === 'start'\n      ? (currentAxis[0] as 'x' | 'y') // always lock to one axis even if currentAxis === 'xy'\n      : targetOptions.lockAxis\n\n  // if the movement isn't in the startAxis of the interactable\n  if (currentAxis !== 'xy' && startAxis !== 'xy' && startAxis !== currentAxis) {\n    // cancel the prepared action\n    ;(interaction as Interaction<ActionName>).prepared.name = null\n\n    // then try to get a drag from another ineractable\n    let element = eventTarget as Element\n\n    const getDraggable = function (interactable: Interactable): Interactable | void {\n      if (interactable === interaction.interactable) return\n\n      const options = interaction.interactable.options.drag\n\n      if (!options.manualStart && interactable.testIgnoreAllow(options, element, eventTarget)) {\n        const action = interactable.getAction(\n          interaction.downPointer,\n          interaction.downEvent,\n          interaction,\n          element,\n        )\n\n        if (\n          action &&\n          action.name === 'drag' &&\n          checkStartAxis(currentAxis, interactable) &&\n          autoStart.validateAction(action, interactable, element, eventTarget, scope)\n        ) {\n          return interactable\n        }\n      }\n    }\n\n    // check all interactables\n    while (is.element(element)) {\n      const interactable = scope.interactables.forEachMatch(element, getDraggable)\n\n      if (interactable) {\n        ;(interaction as Interaction<ActionName>).prepared.name = 'drag'\n        interaction.interactable = interactable\n        interaction.element = element\n        break\n      }\n\n      element = parentNode(element) as Element\n    }\n  }\n}\n\nfunction checkStartAxis (startAxis: string, interactable: Interactable) {\n  if (!interactable) {\n    return false\n  }\n\n  const thisAxis = interactable.options.drag.startAxis\n\n  return startAxis === 'xy' || thisAxis === 'xy' || thisAxis === startAxis\n}\n\nexport default {\n  id: 'auto-start/dragAxis',\n  listeners: { 'autoStart:before-start': beforeStart },\n}\n"
+	]
+}

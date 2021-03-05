@@ -1,0 +1,2 @@
+import r from"./drag/plugin.prod.js";import i from"./drop/plugin.prod.js";import o from"./gesture/plugin.prod.js";import p from"./resize/plugin.prod.js";export default{id:"actions",install(u){u.usePlugin(o),u.usePlugin(p),u.usePlugin(r),u.usePlugin(i)}};
+//# sourceMappingURL=plugin.prod.js.map

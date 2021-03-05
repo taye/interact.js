@@ -1,0 +1,27 @@
+{
+	"version": 3,
+	"sources": [
+		"window.ts"
+	],
+	"names": [
+		"isWindow",
+		"realWindow",
+		"undefined",
+		"win",
+		"window",
+		"init",
+		"el",
+		"document",
+		"createTextNode",
+		"ownerDocument",
+		"wrap",
+		"getWindow",
+		"node",
+		"rootNode",
+		"defaultView"
+	],
+	"mappings": "AAAA,OAAOA,QAAP,MAAqB,eAArB;AAEA,OAAO,IAAIC,UAAU,GAAGC,SAAjB;AAEP,IAAIC,GAAG,GAAGD,SAAV;AACA,SAASC,GAAG,IAAIC,MAAhB;AAEA,OAAO,SAASC,IAAT,CAAeD,MAAf,EAAoE;AACzE;AAEAH,EAAAA,UAAU,GAAGG,MAAb,CAHyE,CAKzE;;AACA,QAAME,EAAE,GAAGF,MAAM,CAACG,QAAP,CAAgBC,cAAhB,CAA+B,EAA/B,CAAX,CANyE,CAQzE;;AACA,MAAIF,EAAE,CAACG,aAAH,KAAqBL,MAAM,CAACG,QAA5B,IAAwC,OAAOH,MAAM,CAACM,IAAd,KAAuB,UAA/D,IAA6EN,MAAM,CAACM,IAAP,CAAYJ,EAAZ,MAAoBA,EAArG,EAAyG;AACvG;AACAF,IAAAA,MAAM,GAAGA,MAAM,CAACM,IAAP,CAAYN,MAAZ,CAAT;AACD;;AAEDD,EAAAA,GAAG,GAAGC,MAAN;AACD;;AAED,IAAI,OAAOA,MAAP,KAAkB,WAAlB,IAAiC,CAAC,CAACA,MAAvC,EAA+C;AAC7CC,EAAAA,IAAI,CAACD,MAAD,CAAJ;AACD;;AAED,OAAO,SAASO,SAAT,CAAoBC,IAApB,EAA+B;AACpC,MAAIZ,QAAQ,CAACY,IAAD,CAAZ,EAAoB;AAClB,WAAOA,IAAP;AACD;;AAED,QAAMC,QAAQ,GAAGD,IAAI,CAACH,aAAL,IAAsBG,IAAvC;AAEA,SAAOC,QAAQ,CAACC,WAAT,IAAwBX,GAAG,CAACC,MAAnC;AACD",
+	"sourcesContent": [
+		"import isWindow from './isWindow'\n\nexport let realWindow = undefined as Window\n\nlet win = undefined as Window\nexport { win as window }\n\nexport function init (window: Window & { wrap?: (...args: any[]) => any }) {\n  // get wrapped window if using Shadow DOM polyfill\n\n  realWindow = window\n\n  // create a TextNode\n  const el = window.document.createTextNode('')\n\n  // check if it's wrapped by a polyfill\n  if (el.ownerDocument !== window.document && typeof window.wrap === 'function' && window.wrap(el) === el) {\n    // use wrapped window\n    window = window.wrap(window)\n  }\n\n  win = window\n}\n\nif (typeof window !== 'undefined' && !!window) {\n  init(window)\n}\n\nexport function getWindow (node: any) {\n  if (isWindow(node)) {\n    return node\n  }\n\n  const rootNode = node.ownerDocument || node\n\n  return rootNode.defaultView || win.window\n}\n"
+	]
+}
