@@ -1,5 +1,5 @@
 /* eslint-disable import/no-absolute-path */
-import interact from '/@interactjs/interactjs/index.js'
+import interact from '@interactjs/interactjs'
 
 const dirs = ['up', 'down', 'left', 'right']
 
@@ -39,7 +39,7 @@ function logEvent (event) {
     event.target.innerHTML += ' #' + event.pointerId
   }
 
-  const interactionIndex = interact.debug().interactions.indexOf(event.interaction)
+  const interactionIndex = interact.debug().interactions.list.indexOf(event.interaction)
 
   event.currentTarget.innerHTML +=
     ' ' +

@@ -1,11 +1,11 @@
 /* eslint-disable import/no-absolute-path */
-import '/@interactjs/actions/index.js'
-import '/@interactjs/modifiers/index.js'
-import '/@interactjs/inertia/index.js'
-import '/@interactjs/auto-start/index.js'
-import '/@interactjs/dev-tools/index.js'
+import '@interactjs/actions'
+import '@interactjs/modifiers'
+import '@interactjs/inertia'
+import '@interactjs/auto-start'
+import '@interactjs/dev-tools'
 
-import interact from '/@interactjs/interact/index.js'
+import interact from '@interactjs/interact'
 
 const svgCanvas = document.querySelector('svg')
 const svgNS = 'http://www.w3.org/2000/svg'

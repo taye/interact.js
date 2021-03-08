@@ -18,7 +18,7 @@ module.exports = (plugins) => {
         dest,
         `
       /* eslint-disable import/order, no-console, eol-last */
-      import interact, { init } from '@interactjs/interact'
+      import interact, { init } from '@interactjs/interact/index'
       import plugin from '${pluginPath.replace(/^packages./, '')}'
 
       if (typeof window === 'object' && !!window) {

@@ -1,12 +1,11 @@
-import Vue from 'vue/dist/vue.esm.browser.js'
-
-import interact from '@interactjs/interactjs/index.js'
+// import Vue from 'vue/dist/vue.esm.browser.js'
+import interact from '@interactjs/interactjs'
+import { createApp } from 'vue/dist/vue.esm-browser'
 
 import { getData, sortableOptions, swappableOptions } from './shared.js'
 
 // eslint-disable-next-line no-new
-new Vue({
-  el: '#vue-app',
+createApp({
   data () {
     return {
       ...getData(),
@@ -17,4 +16,4 @@ new Vue({
   components: {
     ...interact.vue.components,
   },
-})
+}).mount('#vue-app')

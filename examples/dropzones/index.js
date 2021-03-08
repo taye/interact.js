@@ -1,5 +1,5 @@
 /* eslint-disable import/no-absolute-path */
-import interact from '/@interactjs/interactjs/index.js'
+import interact from '@interactjs/interactjs'
 
 let transformProp
 const dragPositions = [1, 2, 3, 4].reduce((acc, n) => {

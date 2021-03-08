@@ -7,7 +7,7 @@
   },
   "scripts": {
     "bootstrap": "yarn install --pure-lockfile --prefer-offline --silent",
-    "start": "_bundle_shims && yarn esnext --serve",
+    "start": "_add_plugin_indexes && vite serve",
     "bundle": "_bundle_shims && NODE_ENV=${NODE_ENV:-production} _bundle",
     "build": "yarn docs && yarn bundle && _add_plugin_indexes && _types && _esnext",
     "docs": "node jsdoc/index.js",
@@ -112,6 +112,8 @@
     "ts-node": "latest",
     "tslint": "latest",
     "typescript": "latest",
+    "vite": "^2.0.4",
+    "vue": "^3.0.7",
     "vue-template-compiler": "^2.6.12",
     "yargs": "latest"
   },
@@ -120,7 +122,7 @@
   },
   "sideEffects": false,
   "lint-staged": {
-    "**/*.(t|j)s?(x)": [
+    "**/*.((ts|js)?(x))|(vue)": [
       "prettier --write",
       "eslint --fix"
     ]

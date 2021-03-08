@@ -1,3 +1,5 @@
+@import "bulma/css/bulma.css";
+
 body {
   margin: 1em;
   _font-size: 2em;

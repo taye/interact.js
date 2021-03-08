@@ -2,6 +2,7 @@
   "name": "interactjs",
   "version": "1.10.8",
   "main": "dist/interact.min.js",
+  "module": "index",
   "typings": "index.d.ts",
   "description": "Drag and drop, resizing and multi-touch gestures with inertia and snapping for modern browsers (and also IE9+)",
   "homepage": "https://interactjs.io",

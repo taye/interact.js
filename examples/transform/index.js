@@ -1,4 +1,4 @@
-import interact from '../../@interactjs/interactjs/index.js'
+import interact from '@interactjs/interactjs'
 // import Vue from '../../node_modules/vue/dist/vue.esm.browser.js'
 
 interact('.item')

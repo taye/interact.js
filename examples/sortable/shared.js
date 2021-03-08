@@ -1,4 +1,4 @@
-import interact from '@interactjs/interactjs/index.js'
+import interact from '@interactjs/interactjs'
 
 function sortListener (event) {
   console.log(event.type, event.position)

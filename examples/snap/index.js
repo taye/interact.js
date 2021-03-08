@@ -1,10 +1,5 @@
 /* eslint-disable import/no-absolute-path */
-import interact from '/@interactjs/interact/index.js'
-import '/@interactjs/actions/index.js'
-import '/@interactjs/modifiers/index.js'
-import '/@interactjs/inertia/index.js'
-import '/@interactjs/auto-start/index.js'
-import '/@interactjs/dev-tools/index.js'
+import interact from '@interactjs/interactjs'
 
 window.interact = interact
 let canvas
@@ -251,6 +246,7 @@ function modeChange (event) {
         endOnly: status.endOnly.checked,
         offset: status.relative.checked ? 'startCoords' : null,
       }),
+      interact.modifiers.spring(),
     ],
   })
 
