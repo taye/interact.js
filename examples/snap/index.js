@@ -2,6 +2,7 @@
 import interact from '@interactjs/interactjs'
 
 window.interact = interact
+
 let canvas
 let context
 let guidesCanvas

@@ -21,7 +21,7 @@ parser: '@typescript-eslint/parser'
 
 parserOptions:
   sourceType: module
-  ecmaVersion: 2018
+  ecmaVersion: 2020
 
 plugins:
   - '@typescript-eslint'
@@ -82,16 +82,7 @@ rules:
 
 overrides:
   -
-    files: '*.spec.ts'
-    extends:
-      - 'plugin:jest/recommended'
-      - 'plugin:jest/style'
-    rules:
-      array-bracket-spacing: off
-      import/no-extraneous-dependencies: off
-      jest/consistent-test-it: [error, { fn: test }]
-  -
-    files: '*.ts{,x}'
+    files: '*.{ts{,x},vue}'
     rules:
       import/named: off
       import/no-named-as-default: off
@@ -102,7 +93,17 @@ overrides:
       no-unused-vars: off
       no-use-before-define: off
   -
-    files: '**/examples/**/*.js'
+    files: '*.vue'
+    extends:
+      - 'plugin:vue/vue3-essential'
+    parserOptions:
+      parser: '@typescript-eslint/parser'
+  -
+    files: '*.spec.ts'
+    extends:
+      - 'plugin:jest/recommended'
+      - 'plugin:jest/style'
     rules:
-      import/no-absolute-path: off
-      import/no-unresolved: off
+      array-bracket-spacing: off
+      import/no-extraneous-dependencies: off
+      jest/consistent-test-it: [error, { fn: test }]

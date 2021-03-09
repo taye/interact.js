@@ -30,12 +30,10 @@ module.exports = {
             regenerator: false,
           },
         ],
-        require.resolve('@vue/babel-plugin-jsx'),
       ]
       : [
         require.resolve('@babel/plugin-transform-modules-commonjs'),
         require.resolve('@babel/plugin-proposal-class-properties'),
-        require.resolve('@vue/babel-plugin-jsx'),
       ],
 
   ignore: [

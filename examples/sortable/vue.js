@@ -6,14 +6,14 @@ import { getData, sortableOptions, swappableOptions } from './shared.js'
 
 // eslint-disable-next-line no-new
 createApp({
+  components: {
+    ...interact.vue.components,
+  },
   data () {
     return {
       ...getData(),
       sortableOptions,
       swappableOptions,
     }
-  },
-  components: {
-    ...interact.vue.components,
   },
 }).mount('#vue-app')

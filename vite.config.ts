@@ -1,6 +1,9 @@
 import path from 'path'
 
-export default {
+import vue from '@vitejs/plugin-vue'
+import { defineConfig } from 'vite'
+
+export default defineConfig({
   resolve: {
     alias: {
       '@interactjs/': path.resolve(__dirname, 'packages/@interactjs'),
@@ -10,10 +13,14 @@ export default {
   define: {
     ...getDefinedEnv(),
   },
+  plugins: [vue()],
   optimizeDeps: {
     include: ['react'],
   },
-}
+  server: {
+    port: 8081,
+  },
+})
 
 function getDefinedEnv () {
   const entries = Object.entries(process.env)
