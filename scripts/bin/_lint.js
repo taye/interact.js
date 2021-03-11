@@ -1,62 +1,74 @@
-#!/usr/bin/env node
-
-const { existsSync } = require('fs')
+const { existsSync, promises: fs } = require('fs')
 
 const { ESLint } = require('eslint')
+const prettier = require('prettier')
 const yargs = require('yargs')
 
 const { lintSourcesGlob, lintIgnoreGlobs } = require('../utils')
 
+const { fix, _: fileArgs } = yargs.boolean('fix').argv
 const jsExt = /\.js$/
-const dtsExt = /\.d\.ts$/
+const dtsExt = /\.d\.ts$/;
 
-function isNotGenerated (source) {
-  if (dtsExt.test(source) && existsSync(source.replace(dtsExt, '.ts'))) {
-    return false
+(async () => {
+  const sources = fileArgs.length ? fileArgs : await getSources()
+
+  console.log(
+    `Linting ${sources.length} 'file${sources.length === 1 ? '' : 's'}...`,
+  )
+
+  if (fix) {
+    try {
+      await Promise.all(sources.map(formatWithPrettier))
+    } catch (error) {
+      console.error(error)
+      process.exit(1)
+    }
   }
-  if (jsExt.test(source) && existsSync(source.replace(jsExt, '.ts'))) {
-    return false
-  }
 
-  return true
-}
-
-const argv = yargs.boolean('fix').argv
-
-function getSources () {
-  const glob = require('glob')
-
-  const sources = glob.sync(lintSourcesGlob, {
-    ignore: lintIgnoreGlobs,
-    silent: true,
+  const eslint = new ESLint({
+    fix: fix,
+    useEslintrc: true,
   })
-
-  return sources.filter((source) => isNotGenerated(source))
-}
-
-console.log('Linting...')
-
-const eslint = new ESLint({
-  fix: argv.fix,
-  useEslintrc: true,
-  // rules: { 'node/no-missing-import': 0, },
-})
-
-const sources = argv._.length ? argv._ : getSources()
-
-;(async () => {
   const results = await eslint.lintFiles(sources)
   const formatter = await eslint.loadFormatter('stylish')
 
-  if (argv.fix) {
-    ESLint.outputFixes(results)
+  if (fix) {
+    await ESLint.outputFixes(results)
   }
 
   console.log(formatter.format(results))
 
-  const hasUnfixedError = results.some((r) => r.errorCount > r.fixableErrorCount)
+  const hasUnfixedError = results.some((r) =>
+    r.errorCount > fix ? r.fixableErrorCount : 0,
+  )
 
   if (hasUnfixedError) {
     process.exit(1)
   }
 })()
+
+async function formatWithPrettier (filename) {
+  const input = (await fs.readFile(filename)).toString()
+  const output = prettier.format(input, { filepath: filename })
+
+  if (input !== output) await fs.writeFile(filename, output)
+}
+
+async function getSources () {
+  const glob = require('glob')
+
+  const sources = await glob.__promisify__(lintSourcesGlob, {
+    ignore: lintIgnoreGlobs,
+    silent: true,
+  })
+
+  return sources.filter((source) => !isGenerated(source))
+}
+
+function isGenerated (source) {
+  return (
+    (dtsExt.test(source) && existsSync(source.replace(dtsExt, '.ts'))) ||
+    (jsExt.test(source) && existsSync(source.replace(jsExt, '.ts')))
+  )
+}
