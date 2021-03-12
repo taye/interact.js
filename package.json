@@ -14,7 +14,7 @@
     "esnext": "_add_plugin_indexes && _esnext",
     "test": "jest",
     "test:debug": "node --inspect node_modules/.bin/jest --no-cache --runInBand ",
-    "tsc_lint_test": "_add_plugin_indexes && tsc -b -f && _lint && yarn test",
+    "tsc_lint_test": "_add_plugin_indexes && tsc -b -f && _lint && yarn test --coverage",
     "postinstall": "bin/_link; husky install"
   },
   "repository": {

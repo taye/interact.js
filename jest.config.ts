@@ -1,6 +1,7 @@
 import type { Config } from '@jest/types'
-// eslint-disable-next-line import/no-extraneous-dependencies
-import { defaults } from 'jest-config'
+import { defaults } from 'jest-config' // eslint-disable-line import/no-extraneous-dependencies
+
+import { sourcesGlob } from './scripts/utils'
 
 const config: Config.InitialOptions = {
   coverageThreshold: {
@@ -11,7 +12,17 @@ const config: Config.InitialOptions = {
       lines: 59,
     },
   },
-  coverageReporters: ['text', 'lcov'],
+  collectCoverageFrom: [sourcesGlob],
+  coveragePathIgnorePatterns: [
+    '[\\\\/]_',
+    '\\.d\\.ts$',
+    '@interactjs[\\\\/](rebound|symbol-tree)[\\\\/]',
+  ],
+  coverageReporters: [
+    'json',
+    'text',
+    ['lcov', { projectRoot: 'packages/@interactjs' }],
+  ],
   moduleFileExtensions: [...defaults.moduleFileExtensions, 'vue'],
   transform: {
     '^.+\\.(ts|js|vue)$': ['babel-jest', require('./babel.config')],
