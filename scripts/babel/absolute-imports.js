@@ -48,6 +48,7 @@ module.exports = function transformImportsToAbsolute () {
   }
 
   return {
+    name: '@interactjs/_dev:absolute-imports',
     visitor: {
       ImportDeclaration: fixImportSource,
       ExportNamedDeclaration: fixImportSource,

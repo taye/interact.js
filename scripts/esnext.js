@@ -10,7 +10,7 @@ const temp = require('temp').track()
 const minify = require('./minify')
 const {
   getSources,
-  getBabelOptions,
+  getEsnextBabelOptions,
   extendBabelOptions,
   getModuleName,
   getModuleDirectories,
@@ -50,7 +50,7 @@ const sourcePromises = new Map()
 async function generate ({
   sources,
   shim,
-  babelOptions = getBabelOptions(),
+  babelOptions = getEsnextBabelOptions(),
   moduleDirectory = getModuleDirectories(),
   serve = false,
   watch = false,
@@ -170,7 +170,9 @@ async function generate ({
 
       const sourceCode = (await fs.readFile(source)).toString()
       const ast = babel.parseSync(sourceCode, {
-        ...babelOptions,
+        ...extendBabelOptions(babelOptions, {
+          plugins: [require.resolve('./babel/vue-sfc')],
+        }),
         filename: source,
       })
 

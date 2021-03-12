@@ -1,13 +1,5 @@
-declare namespace React {
-  interface HTMLAttributes<T> {
-    class?: string
-  }
-  interface SVGProps<T> {
-    class?: string
-  }
-}
-
 declare module '*.vue' {
-  const x: any
-  export default x
+  import type { DefineComponent } from 'vue'
+  const component: ReturnType<DefineComponent<{}, {}, any>>
+  export default component
 }

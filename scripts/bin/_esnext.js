@@ -4,7 +4,7 @@ const path = require('path')
 const generate = require('../esnext')
 const minify = require('../minify')
 const bundleShim = require('../shimBundler')
-const { getBabelOptions, getSources, getShims } = require('../utils')
+const { getEsnextBabelOptions, getSources, getShims } = require('../utils')
 
 const [, , ...args] = process.argv
 
@@ -22,10 +22,8 @@ for (const arg of args) {
   }
 }
 
-const babelOptions = getBabelOptions()
+const babelOptions = getEsnextBabelOptions()
 const shims = getShims()
-
-babelOptions.plugins.push(require('@vue/babel-plugin-jsx'))
 
 const cwd = process.cwd()
 
@@ -42,9 +40,14 @@ sourcesPromise.then(async (sources) => {
       if (shimConfig) {
         const bundleCode = await bundleShim(shimConfig)
 
-        const { code, map, error } = await minify({ code: bundleCode, modern: true })
+        const { code, map, error } = await minify({
+          code: bundleCode,
+          modern: true,
+        })
 
-        if (error) { throw error }
+        if (error) {
+          throw error
+        }
 
         return { code, map }
       }

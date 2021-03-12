@@ -1,8 +1,16 @@
 const path = require('path')
 
-const { getModuleDirectories, getBabelrc, extendBabelOptions } = require('./utils')
+const {
+  getModuleDirectories,
+  getBabelConfig,
+  extendBabelOptions,
+} = require('./utils')
 
-process.env.NODE_PATH = `${process.env.NODE_PATH || ''}:${path.resolve(__dirname, '..', 'node_modules')}`
+process.env.NODE_PATH = `${process.env.NODE_PATH || ''}:${path.resolve(
+  __dirname,
+  '..',
+  'node_modules',
+)}`
 require('module').Module._initPaths()
 
 const dir = path.join(__dirname, '..')
@@ -12,24 +20,27 @@ require('module')._initPaths()
 
 module.exports = function (options) {
   const browserify = require('browserify')
-  const plugins = process.env.NODE_ENV === 'production' ? [require('browser-pack-flat/plugin')] : []
+  const plugins =
+    process.env.NODE_ENV === 'production'
+      ? [require('browser-pack-flat/plugin')]
+      : []
 
-  const babelrc = extendBabelOptions(
+  const babelConfig = extendBabelOptions(
     {
       babelrc: false,
       configFile: false,
       sourceType: 'module',
       global: true,
-      extensions: ['.ts', '.tsx', '.js', '.jsx'],
+      extensions: ['.ts', '.tsx', '.js', '.jsx', '.vue'],
     },
-    getBabelrc(),
+    getBabelConfig(),
   )
 
   const b = browserify({
     debug: true,
     bare: true,
     standalone: options.standalone,
-    transform: [[require('babelify'), babelrc]],
+    transform: [[require('babelify'), babelConfig]],
     plugin: plugins,
     extensions: ['.ts', '.tsx'],
     paths: getModuleDirectories(),

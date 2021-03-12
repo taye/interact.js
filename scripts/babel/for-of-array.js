@@ -20,7 +20,9 @@ module.exports = function ({ template, types: t }) {
 
     if (!t.isIdentifier(right) || !scope.hasBinding(right.name)) {
       const uid = scope.generateUidIdentifier('arr')
-      nodes.push(t.variableDeclaration('var', [t.variableDeclarator(uid, right)]))
+      nodes.push(
+        t.variableDeclaration('var', [t.variableDeclarator(uid, right)])
+      )
       right = uid
     }
 
@@ -42,7 +44,9 @@ module.exports = function ({ template, types: t }) {
       left.declarations[0].init = iterationValue
       loop.body.body.unshift(left)
     } else {
-      loop.body.body.unshift(t.expressionStatement(t.assignmentExpression('=', left, iterationValue)))
+      loop.body.body.unshift(
+        t.expressionStatement(t.assignmentExpression('=', left, iterationValue))
+      )
     }
 
     if (path.parentPath.isLabeledStatement()) {
@@ -110,17 +114,26 @@ module.exports = function ({ template, types: t }) {
     const { left } = node
     let declar, id, intermediate
 
-    if (t.isIdentifier(left) || t.isPattern(left) || t.isMemberExpression(left)) {
+    if (
+      t.isIdentifier(left) ||
+      t.isPattern(left) ||
+      t.isMemberExpression(left)
+    ) {
       // for (i of test), for ({ i } of test)
       id = left
       intermediate = null
     } else if (t.isVariableDeclaration(left)) {
       // for (let i of test)
       id = scope.generateUidIdentifier('ref')
-      declar = t.variableDeclaration(left.kind, [t.variableDeclarator(left.declarations[0].id, id)])
+      declar = t.variableDeclaration(left.kind, [
+        t.variableDeclarator(left.declarations[0].id, id),
+      ])
       intermediate = t.variableDeclaration('var', [t.variableDeclarator(id)])
     } else {
-      throw file.buildCodeFrameError(left, `Unknown node type ${left.type} in ForStatement`)
+      throw file.buildCodeFrameError(
+        left,
+        `Unknown node type ${left.type} in ForStatement`
+      )
     }
 
     const loop = buildForOfLoose({
@@ -139,6 +152,7 @@ module.exports = function ({ template, types: t }) {
     }
 
     return {
+      name: '@interactjs/_dev:for-of-array',
       replaceParent: isLabeledParent,
       declar: declar,
       node: labeled || loop,

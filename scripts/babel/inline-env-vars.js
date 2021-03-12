@@ -1,5 +1,6 @@
 module.exports = function transformInlineEnvironmentVariables ({ types: t }) {
   return {
+    name: '@interactjs/_dev:inline-env-vars',
     visitor: {
       // eslint-disable-next-line no-shadow
       MemberExpression (path, { opts: { include, exclude, env } = {} }) {

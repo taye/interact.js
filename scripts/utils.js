@@ -20,7 +20,7 @@ const builtFilesGlob =
   '{{**/dist/**,packages/{,@}interactjs/**/**/*.js{,.map}},packages/@interactjs/**/index.ts}'
 const builtFilesIgnoreGlobs = [
   '**/node_modules/**',
-  'packages/@interactjs/{dev-tools/babel-plugin-prod.js,{types,interact,interactjs}/index.ts}',
+  'packages/@interactjs/{dev-tools/babel-plugin-prod.js,{types,interact,interactjs,rebound}/index.ts}',
 ]
 
 const getSources = ({ cwd = process.cwd(), ...options } = {}) =>
@@ -41,36 +41,29 @@ const getBuiltJsFiles = ({ cwd = process.cwd() } = {}) =>
     nodir: true,
   })
 
-function getBabelrc () {
-  let babelrc
+function getBabelConfig () {
+  let babelConfig
 
   try {
-    babelrc = require(path.join(process.cwd(), 'babel.config.js'))
+    babelConfig = require(path.join(process.cwd(), 'babel.config.js'))
   } catch (e) {
-    babelrc = require('../babel.config.js')
+    babelConfig = require('../babel.config.js')
   }
 
-  return babelrc
+  return babelConfig
 }
 
-function getBabelOptions () {
-  const babelrc = getBabelrc()
-
+function getEsnextBabelOptions () {
   return {
-    ignore: babelrc.ignore,
     babelrc: false,
     configFile: false,
     sourceMaps: true,
     presets: [
-      [
-        require('@babel/preset-typescript'),
-        {
-          allExtensions: true,
-          isTSX: true,
-        },
-      ],
+      [require.resolve('@babel/preset-typescript'), { allExtensions: true }],
     ],
     plugins: [
+      require.resolve('./babel/vue-sfc'),
+      require.resolve('@babel/plugin-proposal-optional-catch-binding'),
       [
         require.resolve('@babel/plugin-proposal-class-properties'),
         { loose: true },
@@ -79,7 +72,6 @@ function getBabelOptions () {
         require.resolve('@babel/plugin-proposal-optional-chaining'),
         { loose: true },
       ],
-      require.resolve('@babel/plugin-proposal-optional-catch-binding'),
     ],
   }
 }
@@ -141,7 +133,7 @@ function extensionsWithStubs (extensions) {
 
 function extendBabelOptions (
   { ignore = [], plugins = [], presets = [], ...others },
-  base = getBabelOptions(),
+  base = getEsnextBabelOptions(),
 ) {
   return {
     ...base,
@@ -236,8 +228,8 @@ module.exports = {
   sourcesIgnoreGlobs,
   lintIgnoreGlobs,
   getBuiltJsFiles,
-  getBabelrc,
-  getBabelOptions,
+  getBabelConfig,
+  getEsnextBabelOptions,
   extendBabelOptions,
   getDevPackageDir,
   getPackages,

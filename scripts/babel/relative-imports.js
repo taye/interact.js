@@ -56,6 +56,7 @@ module.exports = function transformImportsToRelative () {
   }
 
   return {
+    name: '@interactjs/_dev:relative-imports',
     visitor: {
       ImportDeclaration: fixImportSource,
       ExportNamedDeclaration: fixImportSource,

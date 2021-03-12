@@ -12,7 +12,7 @@ const include = glob
 module.exports = {
   source: {
     include,
-    excludePattern: '[\\/]node_modules[\\/]',
+    excludePattern: '([\\/]node_modules[\\/])|(\\.vue)$',
     includePattern: '.*',
   },
 
@@ -27,8 +27,7 @@ module.exports = {
     extensions: ['js', 'ts'],
     babelrc: false,
     configFile: false,
-    presets: ['@babel/preset-typescript'],
-    plugins: [require('@vue/babel-plugin-jsx')],
+    presets: [require.resolve('@babel/preset-typescript')],
   },
 
   markdown: {
