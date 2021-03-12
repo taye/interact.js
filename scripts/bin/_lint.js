@@ -56,9 +56,9 @@ async function formatWithPrettier (filename) {
 }
 
 async function getSources () {
-  const glob = require('glob')
+  const glob = require('util').promisify(require('glob'))
 
-  const sources = await glob.__promisify__(lintSourcesGlob, {
+  const sources = await glob(lintSourcesGlob, {
     ignore: lintIgnoreGlobs,
     silent: true,
   })
