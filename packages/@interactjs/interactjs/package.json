@@ -1,0 +1,35 @@
+{
+  "name": "@interactjs/interactjs",
+  "version": "1.10.8",
+  "main": "index",
+  "module": "index",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/taye/interact.js.git"
+  },
+  "dependencies": {
+    "@interactjs/actions": "1.10.8",
+    "@interactjs/arrange": "1.10.8",
+    "@interactjs/auto-scroll": "1.10.8",
+    "@interactjs/auto-start": "1.10.8",
+    "@interactjs/clone": "1.10.8",
+    "@interactjs/core": "1.10.8",
+    "@interactjs/dev-tools": "1.10.8",
+    "@interactjs/feedback": "1.10.8",
+    "@interactjs/inertia": "1.10.8",
+    "@interactjs/interact": "1.10.8",
+    "@interactjs/modifiers": "1.10.8",
+    "@interactjs/multi-target": "1.10.8",
+    "@interactjs/offset": "1.10.8",
+    "@interactjs/pointer-events": "1.10.8",
+    "@interactjs/react": "1.10.8",
+    "@interactjs/reflow": "1.10.8",
+    "@interactjs/utils": "1.10.8",
+    "@interactjs/vue": "1.10.8"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "sideEffects": false,
+  "license": "MIT"
+}

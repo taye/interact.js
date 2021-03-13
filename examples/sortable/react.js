@@ -1,6 +1,7 @@
-import interact from '@interactjs/interactjs'
 import { createElement as h, useState } from 'react'
 import ReactDOM from 'react-dom'
+
+import interact from '@interactjs/interactjs'
 
 import { getData } from './shared.js'
 

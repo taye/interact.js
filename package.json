@@ -23,9 +23,6 @@
   },
   "homepage": "https://interactjs.io/pro",
   "description": "",
-  "publishConfig": {
-    "access": "restricted"
-  },
   "dependencies": {
     "@babel/core": "latest",
     "@babel/plugin-proposal-class-properties": "latest",

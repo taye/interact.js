@@ -1,0 +1,20 @@
+{
+  "name": "@interactjs/snappers",
+  "version": "1.10.8",
+  "main": "index",
+  "module": "index",
+  "peerDependencies": {
+    "@interactjs/utils": "1.10.8"
+  },
+  "optionalDependencies": {
+    "@interactjs/interact": "1.10.8"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "sideEffects": [
+    "**/index.js",
+    "**/index.prod.js"
+  ],
+  "license": "MIT"
+}
