@@ -53,10 +53,5 @@ function getStyleStatement (styles) {
   // TODO: minify CSS
   const html = `<style>${css}</style>`
 
-  return [
-    'document.head.insertAdjacentHTML(',
-    '"beforeEnd",',
-    JSON.stringify(html),
-    ')',
-  ].join('')
+  return ['document.head.insertAdjacentHTML(', '"beforeEnd",', JSON.stringify(html), ')'].join('')
 }

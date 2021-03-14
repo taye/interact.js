@@ -29,16 +29,9 @@ module.exports = function transformImportsToAbsolute () {
     })
 
     try {
-      const unrootedImport = getRelativeToRoot(
-        resolvedImport,
-        moduleDirectory,
-        prefix,
-      ).result
+      const unrootedImport = getRelativeToRoot(resolvedImport, moduleDirectory, prefix).result
 
-      source.value =
-        extension === null
-          ? unrootedImport
-          : unrootedImport.replace(/\.[jt]sx?$/, extension)
+      source.value = extension === null ? unrootedImport : unrootedImport.replace(/\.[jt]sx?$/, extension)
     } catch (error) {
       source.value = resolveSync(source.value, {
         basedir,

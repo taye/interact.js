@@ -7,9 +7,7 @@ import proposalExportDefaultFrom from '@babel/plugin-proposal-export-default-fro
 import babelPluginProd, { fixImportSource } from './babel-plugin-prod'
 
 describe('@dev-tools/prod/babel-plugin-prod', () => {
-  const filename = require.resolve(
-    '@interactjs/_dev/test/fixtures/babelPluginProject/index.js',
-  )
+  const filename = require.resolve('@interactjs/_dev/test/fixtures/babelPluginProject/index.js')
 
   const cases = [
     {
@@ -77,10 +75,7 @@ describe('@dev-tools/prod/babel-plugin-prod', () => {
         {
           babelrc: false,
           configFile: false,
-          plugins: [
-            babelPluginProd,
-            [proposalExportDefaultFrom, { loose: true }],
-          ],
+          plugins: [babelPluginProd, [proposalExportDefaultFrom, { loose: true }]],
           filename,
           sourceType: 'module',
         },

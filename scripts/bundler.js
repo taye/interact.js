@@ -1,16 +1,8 @@
 const path = require('path')
 
-const {
-  getModuleDirectories,
-  getBabelConfig,
-  extendBabelOptions,
-} = require('./utils')
+const { getModuleDirectories, getBabelConfig, extendBabelOptions } = require('./utils')
 
-process.env.NODE_PATH = `${process.env.NODE_PATH || ''}:${path.resolve(
-  __dirname,
-  '..',
-  'node_modules',
-)}`
+process.env.NODE_PATH = `${process.env.NODE_PATH || ''}:${path.resolve(__dirname, '..', 'node_modules')}`
 require('module').Module._initPaths()
 
 const dir = path.join(__dirname, '..')
@@ -20,10 +12,7 @@ require('module')._initPaths()
 
 module.exports = function (options) {
   const browserify = require('browserify')
-  const plugins =
-    process.env.NODE_ENV === 'production'
-      ? [require('browser-pack-flat/plugin')]
-      : []
+  const plugins = process.env.NODE_ENV === 'production' ? [require('browser-pack-flat/plugin')] : []
 
   const babelConfig = extendBabelOptions(
     {

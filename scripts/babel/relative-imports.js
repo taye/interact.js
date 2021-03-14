@@ -19,9 +19,7 @@ module.exports = function transformImportsToRelative () {
 
     const { extension = '.js' } = opts
 
-    const basedir = path.dirname(
-      getRelativeToRoot(filename, moduleDirectory).result,
-    )
+    const basedir = path.dirname(getRelativeToRoot(filename, moduleDirectory).result)
     let resolvedImport = ''
 
     for (const root of moduleDirectory) {
@@ -36,23 +34,14 @@ module.exports = function transformImportsToRelative () {
     }
 
     if (!resolvedImport) {
-      throw new Error(
-        `Couldn't find module "${source.value}" from "${filename}"`,
-      )
+      throw new Error(`Couldn't find module "${source.value}" from "${filename}"`)
     }
 
-    const relativeImport = path.relative(
-      basedir,
-      getRelativeToRoot(resolvedImport, moduleDirectory).result,
-    )
+    const relativeImport = path.relative(basedir, getRelativeToRoot(resolvedImport, moduleDirectory).result)
 
-    const importWithDir = /^[./\\]/.test(relativeImport)
-      ? relativeImport
-      : `${path.sep}${relativeImport}`
+    const importWithDir = /^[./\\]/.test(relativeImport) ? relativeImport : `${path.sep}${relativeImport}`
 
-    source.value = importWithDir
-      .replace(/^\//, `.${path.sep}`)
-      .replace(/\.tsx?$/, extension)
+    source.value = importWithDir.replace(/^\//, `.${path.sep}`).replace(/\.tsx?$/, extension)
   }
 
   return {

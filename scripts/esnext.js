@@ -59,9 +59,7 @@ async function generate ({
 } = {}) {
   sources = serve
     ? []
-    : (sources || (await getSources())).filter((s) =>
-      moduleDirectory.some((md) => s.startsWith(md)),
-    )
+    : (sources || (await getSources())).filter((s) => moduleDirectory.some((md) => s.startsWith(md)))
   moduleDirectory = [outDir, ...moduleDirectory]
 
   if (watch && !serve && !sources.length) {
@@ -71,9 +69,7 @@ async function generate ({
 
   if (!serve) {
     if (sources.length) {
-      console.log(
-        `generating javascript files for ${sources.length} modules...`,
-      )
+      console.log(`generating javascript files for ${sources.length} modules...`)
     }
 
     return Promise.all(sources.map((s) => queueFile(s, watch)))
@@ -98,11 +94,7 @@ async function generate ({
     reloadOnRestart: true,
     middleware: async ({ url }, _res, next) => {
       if (url.startsWith('/@interactjs/') && !url.endsWith('.map')) {
-        const source = resolveImport(
-          url.substring(1).replace(/\.js$/, ''),
-          null,
-          moduleDirectory,
-        )
+        const source = resolveImport(url.substring(1).replace(/\.js$/, ''), null, moduleDirectory)
         if (!sourcePromises.has(source)) {
           queueFile(source, true)
         }
@@ -145,10 +137,7 @@ async function generate ({
     const promise = queue.add(async () => {
       const shimResult = await shim?.(source)
       const moduleName = getModuleName(source)
-      const rootRelativeModuleName = getRelativeToRoot(
-        moduleName,
-        moduleDirectory,
-      ).result
+      const rootRelativeModuleName = getRelativeToRoot(moduleName, moduleDirectory).result
       const outModuleName = path.join(outDir, rootRelativeModuleName)
 
       if (shimResult) {
@@ -159,10 +148,7 @@ async function generate ({
             Promise.all([
               fs.writeFile(`${outModuleName}${extension}`, shimResult.code),
               shimResult.map &&
-                fs.writeFile(
-                  `${outModuleName}${extension}.map`,
-                  JSON.stringify(shimResult.map),
-                ),
+                fs.writeFile(`${outModuleName}${extension}.map`, JSON.stringify(shimResult.map)),
             ]),
           ),
         )
@@ -185,26 +171,17 @@ async function generate ({
               filename: source,
               plugins: [
                 [require.resolve('./babel/inline-env-vars'), { env }],
-                [
-                  require.resolve('./babel/relative-imports'),
-                  { extension, moduleDirectory },
-                ],
+                [require.resolve('./babel/relative-imports'), { extension, moduleDirectory }],
               ],
             },
             babelOptions,
           )
           const result = {
-            ...(await babel.transformFromAst(
-              ast,
-              sourceCode,
-              finalBabelOptions,
-            )),
+            ...(await babel.transformFromAst(ast, sourceCode, finalBabelOptions)),
             modern: true,
           }
 
-          const { code, map } = version.post
-            ? await version.post(result)
-            : result
+          const { code, map } = version.post ? await version.post(result) : result
           const jsFilename = `${outModuleName}${extension}`
           const mapFilename = `${jsFilename}.map`
 

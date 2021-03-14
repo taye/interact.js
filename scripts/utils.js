@@ -7,13 +7,7 @@ const resolveSync = require('resolve').sync
 
 const sourcesGlob = 'packages/{,@}interactjs/**/**/*{.ts,.tsx,.vue}'
 const lintSourcesGlob = `{${sourcesGlob},{scripts,examples,jsdoc}/**/*.js,bin/**/*}`
-const commonIgnoreGlobs = [
-  '**/node_modules/**',
-  '**/*_*',
-  '**/*.d.ts',
-  '**/dist/**',
-  'examples/js/**',
-]
+const commonIgnoreGlobs = ['**/node_modules/**', '**/*_*', '**/*.d.ts', '**/dist/**', 'examples/js/**']
 const lintIgnoreGlobs = [...commonIgnoreGlobs]
 const sourcesIgnoreGlobs = [...commonIgnoreGlobs, '**/*.spec.ts']
 const builtFilesGlob =
@@ -58,20 +52,12 @@ function getEsnextBabelOptions () {
     babelrc: false,
     configFile: false,
     sourceMaps: true,
-    presets: [
-      [require.resolve('@babel/preset-typescript'), { allExtensions: true }],
-    ],
+    presets: [[require.resolve('@babel/preset-typescript'), { allExtensions: true }]],
     plugins: [
       require.resolve('./babel/vue-sfc'),
       require.resolve('@babel/plugin-proposal-optional-catch-binding'),
-      [
-        require.resolve('@babel/plugin-proposal-class-properties'),
-        { loose: true },
-      ],
-      [
-        require.resolve('@babel/plugin-proposal-optional-chaining'),
-        { loose: true },
-      ],
+      [require.resolve('@babel/plugin-proposal-class-properties'), { loose: true }],
+      [require.resolve('@babel/plugin-proposal-optional-chaining'), { loose: true }],
     ],
   }
 }
@@ -85,20 +71,14 @@ function getModuleName (tsName) {
 }
 
 function getModuleDirectories () {
-  return [
-    path.join(__dirname, '..', 'packages'),
-    path.join(process.cwd(), 'node_modules'),
-  ]
+  return [path.join(__dirname, '..', 'packages'), path.join(process.cwd(), 'node_modules')]
 }
 
 async function getPackages (options) {
-  const packageJsonPaths = await glob(
-    'packages/{@interactjs/*,interactjs}/package.json',
-    {
-      ignore: commonIgnoreGlobs,
-      ...options,
-    },
-  )
+  const packageJsonPaths = await glob('packages/{@interactjs/*,interactjs}/package.json', {
+    ignore: commonIgnoreGlobs,
+    ...options,
+  })
   const packageDirs = packageJsonPaths.map((p) => path.join(p, '..'))
 
   return [...new Set(packageDirs)]
@@ -118,17 +98,14 @@ async function getPackageJsons () {
 
 function shouldIgnoreImport (sourceValue, filename, moduleDirectory) {
   return (
-    !/^(\.{1-2}|(@interactjs))[\\/]/.test(sourceValue) &&
-    !moduleDirectory.some((d) => filename.startsWith(d))
+    !/^(\.{1-2}|(@interactjs))[\\/]/.test(sourceValue) && !moduleDirectory.some((d) => filename.startsWith(d))
   )
 }
 
 const isPro = process.env.INTERACTJS_TIER === 'pro'
 
 function extensionsWithStubs (extensions) {
-  return isPro
-    ? extensions
-    : [...extensions.map((ext) => `.stub${ext}`), ...extensions]
+  return isPro ? extensions : [...extensions.map((ext) => `.stub${ext}`), ...extensions]
 }
 
 function extendBabelOptions (
@@ -170,9 +147,7 @@ function getRelativeToRoot (filename, moduleDirectory, prefix = '/') {
   }, moduleDirectory)
 
   if (!ret.result) {
-    throw new Error(
-      `Couldn't find module ${filename} in ${moduleDirectory.join(' or')}.`,
-    )
+    throw new Error(`Couldn't find module ${filename} in ${moduleDirectory.join(' or')}.`)
   }
 
   return ret
