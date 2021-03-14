@@ -1,4 +1,3 @@
-#!/usr/bin/env node
 const { isPro } = require('../utils')
 
 require('../addPluginIndexes')([
@@ -15,7 +14,7 @@ require('../addPluginIndexes')([
   'pointer-events/plugin',
   'reflow/plugin',
   'snappers/plugin',
-  ...isPro
+  ...(isPro
     ? [
       'react/plugin',
       // 'vue/plugin',
@@ -25,5 +24,5 @@ require('../addPluginIndexes')([
       'arrange/plugin',
       'iframes/plugin',
     ]
-    : [],
+    : []),
 ])

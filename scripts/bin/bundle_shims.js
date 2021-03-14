@@ -1,4 +1,3 @@
-#!/usr/bin/env node
 const fs = require('fs')
 const os = require('os')
 const path = require('path')
@@ -18,8 +17,7 @@ const shims = getShims()
 if (!shims.length) process.exit()
 
 for (const shimConfig of shims) {
-  queue.add(() => bundle(shimConfig)
-    .catch(errorExit))
+  queue.add(() => bundle(shimConfig).catch(errorExit))
 }
 
 async function bundle (shimConfig) {

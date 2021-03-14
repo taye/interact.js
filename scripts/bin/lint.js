@@ -8,14 +8,12 @@ const { lintSourcesGlob, lintIgnoreGlobs } = require('../utils')
 
 const { fix, _: fileArgs } = yargs.boolean('fix').argv
 const jsExt = /\.js$/
-const dtsExt = /\.d\.ts$/;
+const dtsExt = /\.d\.ts$/
 
-(async () => {
+;(async () => {
   const sources = fileArgs.length ? fileArgs : await getSources()
 
-  console.log(
-    `Linting ${sources.length} 'file${sources.length === 1 ? '' : 's'}...`,
-  )
+  console.log(`Linting ${sources.length} 'file${sources.length === 1 ? '' : 's'}...`)
 
   if (fix) {
     try {
@@ -39,20 +37,21 @@ const dtsExt = /\.d\.ts$/;
 
   console.log(formatter.format(results))
 
-  const hasUnfixedError = results.some((r) =>
-    r.errorCount > fix ? r.fixableErrorCount : 0,
-  )
+  const hasUnfixedError = results.some((r) => (r.errorCount > fix ? r.fixableErrorCount : 0))
 
   if (hasUnfixedError) {
     process.exit(1)
   }
 })()
 
-async function formatWithPrettier (filename) {
-  const input = (await fs.readFile(filename)).toString()
-  const output = prettier.format(input, { filepath: filename })
+async function formatWithPrettier (filepath) {
+  const [source, config] = await Promise.all([
+    fs.readFile(filepath).then((buffer) => buffer.toString()),
+    prettier.resolveConfig(filepath),
+  ])
+  const output = prettier.format(source, { ...config, filepath })
 
-  if (input !== output) await fs.writeFile(filename, output)
+  if (source !== output) await fs.writeFile(filepath, output)
 }
 
 async function getSources () {

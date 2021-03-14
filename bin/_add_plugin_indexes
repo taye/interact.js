@@ -1,2 +1,2 @@
 #!/usr/bin/env node
-require('../scripts/bin/_add_plugin_indexes')
+require('../scripts/bin/add_plugin_indexes')

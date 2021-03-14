@@ -1,2 +1,2 @@
 #!/usr/bin/env node
-require('../scripts/bin/_esnext')
+require('../scripts/bin/esnext')

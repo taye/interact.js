@@ -1,4 +1,3 @@
-#!/usr/bin/env node
 const fs = require('fs').promises
 const path = require('path')
 
@@ -70,16 +69,20 @@ function clean () {
 
 async function runBuild () {
   // copy README to interactjs package
-  await Promise.all((packages)
-    .filter((p) => p.endsWith('interactjs'))
-    .map((p) => fs.copyFile(`${cwd}/README.md`, `${p}/README.md`)))
+  await Promise.all(
+    packages
+      .filter((p) => p.endsWith('interactjs'))
+      .map((p) => fs.copyFile(`${cwd}/README.md`, `${p}/README.md`)),
+  )
 
   // copy license file and npmignore to all packages
   const licenseFilename = isPro ? 'LICENSE.md' : 'LICENSE'
-  await Promise.all((packages).map(async (pkg) => {
-    await fs.copyFile(licenseFilename, path.join(pkg, licenseFilename))
-    await fs.copyFile('.npmignore', path.join(pkg, '.npmignore'))
-  }))
+  await Promise.all(
+    packages.map(async (pkg) => {
+      await fs.copyFile(licenseFilename, path.join(pkg, licenseFilename))
+      await fs.copyFile('.npmignore', path.join(pkg, '.npmignore'))
+    }),
+  )
 
   if (isPro) await fs.rm(path.resolve('LICENSE'))
 
@@ -128,7 +131,9 @@ async function pushAndPublish () {
   }
 
   const gitHead = shell.exec('git rev-parse --short HEAD').trim()
-  editPackageJsons((pkg) => { pkg.gitHead = gitHead })
+  editPackageJsons((pkg) => {
+    pkg.gitHead = gitHead
+  })
 
   const npmPublishCommand = 'npm publish' + (NPM_TAG ? ` --tag ${NPM_TAG}` : '')
 
@@ -140,7 +145,7 @@ async function pushAndPublish () {
 }
 
 async function editPackageJsons (func) {
-  await (['.', ...packages]).map(async (packageDir) => {
+  await ['.', ...packages].map(async (packageDir) => {
     const file = path.resolve(packageDir, 'package.json')
     const pkg = JSON.parse((await fs.readFile(file)).toString())
 

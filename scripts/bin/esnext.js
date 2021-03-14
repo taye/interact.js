@@ -1,4 +1,3 @@
-#!/usr/bin/env node
 const path = require('path')
 
 const generate = require('../esnext')
@@ -27,9 +26,7 @@ const shims = getShims()
 
 const cwd = process.cwd()
 
-const sourcesPromise = fileArgs.length
-  ? Promise.resolve(fileArgs)
-  : getSources({ cwd })
+const sourcesPromise = fileArgs.length ? Promise.resolve(fileArgs) : getSources({ cwd })
 
 sourcesPromise.then(async (sources) => {
   await generate({

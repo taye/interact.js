@@ -1,4 +1,3 @@
-#!/usr/bin/env node
 const fs = require('fs')
 const path = require('path')
 
@@ -32,7 +31,10 @@ if (versionChange) {
 
   const versionTable = []
 
-  for (const file of ['package.json', ...glob.sync('packages/{@interactjs/*,interactjs}/package.json', { cwd })]) {
+  for (const file of [
+    'package.json',
+    ...glob.sync('packages/{@interactjs/*,interactjs}/package.json', { cwd }),
+  ]) {
     const pkg = require(path.resolve(file))
 
     versionTable.push({ package: pkg.name, old: pkg.version, new: currentVersion })
