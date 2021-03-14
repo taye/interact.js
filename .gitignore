@@ -4,7 +4,9 @@
 !shims.d.ts
 packages/@interactjs/**/index.ts
 packages/@interactjs/*/use/**/*.ts
-!packages/@interactjs/{types,interact,interactjs}/index.ts
+!packages/@interactjs/types/index.ts
+!packages/@interactjs/interact/index.ts
+!packages/@interactjs/interactjs/index.ts
 packages/**/*.js
 packages/**/*.js.map
 !packages/@interactjs/dev-tools/babel-plugin-prod.js
