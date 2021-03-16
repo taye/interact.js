@@ -116,5 +116,5 @@
   "lint-staged": {
     "**/*.((ts|js)?(x)|(vue))": "bin/_lint --fix"
   },
-  "license": "SEE LICENSE AT https://interactjs.io/license"
+  "license": "MIT"
 }
