@@ -22,7 +22,7 @@ module.exports = function transformVueSfc () {
   }
 }
 
-function compileSfc (source, { filename, isProd }) {
+function compileSfc (source, { filename, isProd = true }) {
   const id = hash([filename, source].join('\0'))
   const { descriptor: sfc, errors: parseErrors } = parse(source, {
     filename,
@@ -49,9 +49,13 @@ function compileSfc (source, { filename, isProd }) {
 }
 
 function getStyleStatement (styles) {
+  if (!styles.length) return ''
+
   const css = styles.map((style) => style.code).join('\n')
   // TODO: minify CSS
   const html = `<style>${css}</style>`
 
   return ['document.head.insertAdjacentHTML(', '"beforeEnd",', JSON.stringify(html), ')'].join('')
 }
+
+module.exports.compileSfc = compileSfc
