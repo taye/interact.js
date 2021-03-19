@@ -155,12 +155,7 @@ async function generate ({
       }
 
       const sourceCode = (await fs.readFile(source)).toString()
-      const ast = babel.parseSync(sourceCode, {
-        ...extendBabelOptions(babelOptions, {
-          plugins: [require.resolve('./babel/vue-sfc')],
-        }),
-        filename: source,
-      })
+      const ast = babel.parseSync(sourceCode, { ...babelOptions, filename: source })
 
       return Promise.all(
         OUTPUT_VERSIONS.map(async (version) => {
