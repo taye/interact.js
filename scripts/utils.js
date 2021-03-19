@@ -79,16 +79,14 @@ async function getPackages (options) {
     ignore: commonIgnoreGlobs,
     ...options,
   })
-  const packageDirs = packageJsonPaths.map((p) => path.join(p, '..'))
+  const packageDirs = packageJsonPaths.map(path.dirname)
 
   return [...new Set(packageDirs)]
 }
 
-async function getPackageJsons () {
-  const packages = await getPackages()
-
+async function getPackageJsons (packages = getPackages()) {
   return Promise.all(
-    packages.map(async (p) => {
+    (await packages).map(async (p) => {
       const jsonPath = path.resolve(p, 'package.json')
       const pkg = JSON.parse((await fs.promises.readFile(jsonPath)).toString())
       return [jsonPath, pkg]
