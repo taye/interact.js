@@ -32,8 +32,8 @@ async function main (ps) {
 
   await runBuild()
 
-  commitAndTag()
-  pushAndPublish()
+  await commitAndTag()
+  await pushAndPublish()
 }
 
 function ensureCleanIndex () {
