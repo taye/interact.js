@@ -32,7 +32,7 @@ async function main (ps) {
 
   await runBuild()
 
-  await commitAndTag()
+  await commit()
   await pushAndPublish()
 }
 
@@ -112,20 +112,19 @@ async function runBuild () {
   })
 }
 
-function commitAndTag () {
+function commit () {
   // commit and add new version tag
   shell.exec('git add --all .')
   shell.exec('git add --force packages')
   shell.exec('git reset **/node_modules')
   shell.exec(`git commit --no-verify -m ${gitTag}`)
-  shell.exec(`git tag ${gitTag}`)
 }
 
 async function pushAndPublish () {
   const { NPM_TAG } = process.env
 
   try {
-    shell.exec(`git push --no-verify origin ${gitTag}`)
+    shell.exec(`git push --no-verify origin HEAD:refs/tags/${gitTag}`)
   } catch {
     throw new Error(`failed to push git tag ${gitTag} to origin`)
   }
