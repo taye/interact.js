@@ -3,7 +3,7 @@ const path = require('path')
 
 const shell = require('shelljs')
 
-const { getPackages, isPro } = require('../utils')
+const { getPackages, isPro, registryUrl } = require('../utils')
 
 const cwd = process.cwd()
 
