@@ -89,11 +89,13 @@ async function runBuild () {
   // clean up scope deps
   shell.exec('npx _check_deps')
 
-  // bundle interactjs
-  shell.exec('npm run bundle')
+  if (!isPro) {
+    // bundle interactjs
+    shell.exec('npm run bundle')
 
-  // generate docs
-  shell.exec('npm run docs')
+    // generate docs
+    shell.exec('npm run docs')
+  }
 
   // create @interactjs/**/use/* modules
   shell.exec('npx _add_plugin_indexes')
@@ -106,9 +108,7 @@ async function runBuild () {
 
   // set publishConfig
   await editPackageJsons((pkg) => {
-    pkg.publishConfig = isPro
-      ? { access: 'restricted', registry: 'https://registry.interactjs.io' }
-      : { access: 'public' }
+    pkg.publishConfig = isPro ? { access: 'restricted', registry: registryUrl } : { access: 'public' }
   })
 }
 
@@ -136,8 +136,9 @@ async function pushAndPublish () {
   })
 
   const npmPublishCommand = 'npm publish' + (NPM_TAG ? ` --tag ${NPM_TAG}` : '')
+  const packagesToPublish = isPro ? packages.filter((p) => /@interactjs\//.test(p)) : packages
 
-  for (const pkg of packages) {
+  for (const pkg of packagesToPublish) {
     shell.exec(npmPublishCommand, { cwd: path.resolve(pkg) })
   }
 

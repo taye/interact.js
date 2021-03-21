@@ -101,6 +101,7 @@ function shouldIgnoreImport (sourceValue, filename, moduleDirectory) {
 }
 
 const isPro = process.env.INTERACTJS_TIER === 'pro'
+const registryUrl = isPro ? undefined : 'https://registry.interactjs.io'
 
 function extensionsWithStubs (extensions) {
   return isPro ? extensions : [...extensions.map((ext) => `.stub${ext}`), ...extensions]
@@ -215,6 +216,7 @@ module.exports = {
   resolveImport,
   extensionsWithStubs,
   isPro,
+  registryUrl,
   shouldIgnoreImport,
   getShims,
 }
