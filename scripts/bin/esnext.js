@@ -35,18 +35,9 @@ sourcesPromise.then(async (sources) => {
       const shimConfig = shims.find((s) => filename.endsWith(s.source))
 
       if (shimConfig) {
-        const bundleCode = await bundleShim(shimConfig)
+        const code = await bundleShim(shimConfig)
 
-        const { code, map, error } = await minify({
-          code: bundleCode,
-          modern: true,
-        })
-
-        if (error) {
-          throw error
-        }
-
-        return { code, map }
+        return { code }
       }
     },
     babelOptions,

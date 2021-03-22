@@ -130,7 +130,7 @@ async function pushAndPublish () {
   }
 
   const gitHead = shell.exec('git rev-parse --short HEAD').trim()
-  editPackageJsons((pkg) => {
+  await editPackageJsons((pkg) => {
     pkg.gitHead = gitHead
   })
 
