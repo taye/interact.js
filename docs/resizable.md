@@ -28,7 +28,7 @@ Resize events have `rect` and `deltaRect` properties. `rect` is updated on each
 Resizable options have an `edges` property which specifies the edges of the
 element which can be resized from (top, left, bottom or right).
 
-<LiveDemo :demoHtml="import('@/demos/resizable/basic.html')" :removeNext="2" />
+<LiveDemo :demoHtml="import('@/demos/resizable/basic.html?raw')" :removeNext="2" />
 
 ```html
 <div data-x=0 data-y=0 class="resizable">
@@ -93,7 +93,7 @@ to dimensions less than `0x0`. The possible values are:
  - `'reposition'` will keep the width/height positive by swapping the top and
  bottom edges and/or swapping the left and right edges
 
-<LiveDemo :demoHtml="require('@/demos/resizable/invert.html')" />
+<LiveDemo :demoHtml="import('@/demos/resizable/invert.html?raw')" />
 
 ### Aspect ratio
 

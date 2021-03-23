@@ -2,8 +2,7 @@
 title: Introduction
 ---
 
-What is interact.js?
---------------------
+## What is interact.js?
 
 interact.js is a JavaScript library for drag and drop, resizing and multi-touch
 gestures for modern browsers. Its free and open source version comes with
@@ -40,60 +39,60 @@ and more.
 </div>
 </div>
 
-Getting Started
----------------
+## Getting Started
 
 After [installing the library](/docs/installation), the basic steps to setting
 up your targets and interactions are:
 
- 1. Create an `Interactable` target.
- 2. Configure it to enable actions and add [modifiers](/docs/modifiers),
+1.  Create an `Interactable` target.
+2.  Configure it to enable actions and add [modifiers](/docs/modifiers),
     [inertia](/docs/inertia), etc.
- 3. Add event listeners to provide visual feedback and update your app's state.
+3.  Add event listeners to provide visual feedback and update your app's state.
 
 For example, here's some code for [a very simple slider
 input](https://codepen.io/taye/pen/GgpxNq):
 
-<LiveDemo :demoHtml="import('@/demos/slider.html')" :removeNext="1" hide-demo-only/>
+<LiveDemo :demoHtml="import('@/demos/slider.html?raw')" :removeNext="1" hide-demo-only/>
 
 ```js
 // Step 1
-const slider = interact('.slider')    // target elements with the "slider" class
+const slider = interact('.slider') // target elements with the "slider" class
 
 slider
   // Step 2
-  .draggable({                        // make the element fire drag events
-    origin: 'self',                   // (0, 0) will be the element's top-left
-    inertia: true,                    // start inertial movement if thrown
+  .draggable({
+    // make the element fire drag events
+    origin: 'self', // (0, 0) will be the element's top-left
+    inertia: true, // start inertial movement if thrown
     modifiers: [
       interact.modifiers.restrict({
-        restriction: 'self'           // keep the drag coords within the element
-      })
-    ]
+        restriction: 'self', // keep the drag coords within the element
+      }),
+    ],
   })
   // Step 3
-  .on('dragmove', function (event) {  // call this listener on every dragmove
+  .on('dragmove', function (event) {
+    // call this listener on every dragmove
     const sliderWidth = interact.getElementRect(event.target.parentNode).width
     const value = event.pageX / sliderWidth
 
-    event.target.style.paddingLeft = (value * 100) + '%'
+    event.target.style.paddingLeft = value * 100 + '%'
     event.target.setAttribute('data-value', value.toFixed(2))
   })
 ```
 
-Actions
--------
+## Actions
 
 interact.js supports 3 basic action types which are triggered by pointer down →
 move → up sequences:
 
-  - [Draggable](/docs/draggable) for moving elements or drawing on a canvas.
-    This can be combined with [dropzones](/docs/dropzone) to implement drag and
-    drop applications.
-  - [Resizable](/docs/resizable) for watching the size and position of an
-    element while the pointer is used to move one or two of the element's edges.
-  - [Gesturable](/docs/gesturable) for 2-finger gestures with angle, scale, etc.
-    data.
+- [Draggable](/docs/draggable) for moving elements or drawing on a canvas.
+  This can be combined with [dropzones](/docs/dropzone) to implement drag and
+  drop applications.
+- [Resizable](/docs/resizable) for watching the size and position of an
+  element while the pointer is used to move one or two of the element's edges.
+- [Gesturable](/docs/gesturable) for 2-finger gestures with angle, scale, etc.
+  data.
 
 Pro builds on the draggable action to provide [Sortable and
 Swappable](/docs/sortable) feature for drag and drop rearranging of lists of
