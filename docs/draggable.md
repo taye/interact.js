@@ -6,7 +6,7 @@ Dragging is the simplest action interact.js provides. To make an element
 draggable, create an interactable with your desired target then call the
 `draggable` method with the options that you need.
 
-<LiveDemo :demoHtml="require('@/demos/draggable/basic.html')" :removeNext="3" hide-demo-only />
+<LiveDemo :demoHtml="import('@/demos/draggable/basic.html')" :removeNext="3" hide-demo-only />
 
 ```html
 <div class="draggable"> Draggable Element </div>

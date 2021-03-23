@@ -54,7 +54,7 @@ up your targets and interactions are:
 For example, here's some code for [a very simple slider
 input](https://codepen.io/taye/pen/GgpxNq):
 
-<LiveDemo :demoHtml="require('@/demos/slider.html')" :removeNext="1" hide-demo-only/>
+<LiveDemo :demoHtml="import('@/demos/slider.html')" :removeNext="1" hide-demo-only/>
 
 ```js
 // Step 1

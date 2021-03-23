@@ -5,7 +5,7 @@ title: Events
 InteractEvents
 --------------
 
-<LiveDemo :demoHtml="require('@/demos/events/actions.html')" :removeNext="3"/>
+<LiveDemo :demoHtml="import('@/demos/events/actions.html')" :removeNext="3"/>
 
 ```html
 <div>Drag, resize, or perform a multi-touch gesture</div>
