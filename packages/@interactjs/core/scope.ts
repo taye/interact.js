@@ -3,6 +3,7 @@ import browser from '@interactjs/utils/browser'
 import clone from '@interactjs/utils/clone'
 import domObjects from '@interactjs/utils/domObjects'
 import extend from '@interactjs/utils/extend'
+import is from '@interactjs/utils/is'
 import raf from '@interactjs/utils/raf'
 import * as win from '@interactjs/utils/window'
 
@@ -149,7 +150,7 @@ export class Scope {
 
   onWindowUnload = (event: BeforeUnloadEvent) => this.removeDocument(event.target as Document)
 
-  init (window: Window) {
+  init (window: Window | typeof globalThis) {
     return this.isInitialized ? this : initScope(this, window)
   }
 
@@ -257,13 +258,18 @@ export class Scope {
   }
 }
 
-export function initScope (scope: Scope, window: Window) {
+export function initScope (scope: Scope, window: Window | typeof globalThis) {
   scope.isInitialized = true
-  win.init(window)
+
+  if (is.window(window)) {
+    win.init(window)
+  }
+
   domObjects.init(window)
   browser.init(window)
   raf.init(window)
 
+  // @ts-expect-error
   scope.window = window
   scope.document = window.document
 

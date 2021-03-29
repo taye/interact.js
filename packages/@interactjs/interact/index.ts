@@ -6,8 +6,5 @@ const interact = scope.interactStatic
 
 export default interact
 
-export const init = (win: Window) => scope.init(win)
-
-if (typeof window === 'object' && !!window) {
-  init(window)
-}
+const _global = typeof globalThis !== 'undefined' ? globalThis : typeof window !== 'undefined' ? window : this
+scope.init(_global)

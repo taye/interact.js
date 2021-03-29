@@ -49,7 +49,7 @@ function install (scope: Scope) {
   }
 
   // check if browser supports passive events and options arg
-  scope.document.createElement('div').addEventListener('test', null, {
+  scope.document?.createElement('div').addEventListener('test', null, {
     get capture () {
       return (eventsMethods.supportsOptions = true)
     },

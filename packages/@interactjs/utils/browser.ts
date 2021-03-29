@@ -1,6 +1,5 @@
 import domObjects from './domObjects'
 import is from './is'
-import * as win from './window'
 
 const browser = {
   init,
@@ -24,7 +23,7 @@ const browser = {
 
 function init (window: any) {
   const Element = domObjects.Element
-  const navigator = win.window.navigator
+  const navigator: Partial<Navigator> = window.navigator || {}
 
   // Does the browser support touch input?
   browser.supportsTouch =
@@ -77,7 +76,7 @@ function init (window: any) {
     : null
 
   // because Webkit and Opera still use 'mousewheel' event type
-  browser.wheelEvent = 'onmousewheel' in domObjects.document ? 'mousewheel' : 'wheel'
+  browser.wheelEvent = domObjects.document && 'onmousewheel' in domObjects.document ? 'mousewheel' : 'wheel'
 }
 
 export default browser
