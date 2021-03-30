@@ -1,10 +1,10 @@
 {
   "name": "@interactjs/core",
-  "version": "1.10.8",
+  "version": "1.10.9",
   "main": "index",
   "module": "index",
   "peerDependencies": {
-    "@interactjs/utils": "1.10.8"
+    "@interactjs/utils": "1.10.9"
   },
   "publishConfig": {
     "access": "public"

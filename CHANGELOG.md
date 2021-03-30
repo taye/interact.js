@@ -1,3 +1,7 @@
+## v1.10.9
+
+ - improved support for SSR environments
+
 ## v1.10.8
 
  - fixed imports of missing modules #891
