@@ -1,0 +1,22 @@
+{
+	"version": 3,
+	"sources": [
+		"clone.ts"
+	],
+	"names": [
+		"arr",
+		"is",
+		"clone",
+		"source",
+		"dest",
+		"prop",
+		"value",
+		"plainObject",
+		"array",
+		"from"
+	],
+	"mappings": "AAAA,OAAO,KAAKA,GAAZ,MAAqB,UAArB;AACA,OAAOC,EAAP,MAAe,SAAf,C,CAEA;;AACA,eAAe,SAASC,KAAT,CAAkCC,MAAlC,EAAyD;AACtE,QAAMC,IAAI,GAAG,EAAb;;AAEA,OAAK,MAAMC,IAAX,IAAmBF,MAAnB,EAA2B;AACzB,UAAMG,KAAK,GAAGH,MAAM,CAACE,IAAD,CAApB;;AAEA,QAAIJ,EAAE,CAACM,WAAH,CAAeD,KAAf,CAAJ,EAA2B;AACzBF,MAAAA,IAAI,CAACC,IAAD,CAAJ,GAAaH,KAAK,CAACI,KAAD,CAAlB;AACD,KAFD,MAEO,IAAIL,EAAE,CAACO,KAAH,CAASF,KAAT,CAAJ,EAAqB;AAC1BF,MAAAA,IAAI,CAACC,IAAD,CAAJ,GAAaL,GAAG,CAACS,IAAJ,CAASH,KAAT,CAAb;AACD,KAFM,MAEA;AACLF,MAAAA,IAAI,CAACC,IAAD,CAAJ,GAAaC,KAAb;AACD;AACF;;AAED,SAAOF,IAAP;AACD",
+	"sourcesContent": [
+		"import * as arr from './arr'\nimport is from './is'\n\n// tslint:disable-next-line ban-types\nexport default function clone<T extends Object> (source: T): Partial<T> {\n  const dest = {} as Partial<T>\n\n  for (const prop in source) {\n    const value = source[prop]\n\n    if (is.plainObject(value)) {\n      dest[prop] = clone(value) as any\n    } else if (is.array(value)) {\n      dest[prop] = arr.from(value) as typeof value\n    } else {\n      dest[prop] = value\n    }\n  }\n\n  return dest\n}\n"
+	]
+}

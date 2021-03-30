@@ -1,0 +1,13 @@
+{
+	"version": 3,
+	"sources": [
+		"index.ts"
+	],
+	"names": [
+		"default"
+	],
+	"mappings": "AAAA;AACA,SAASA,OAAT,QAAwB,yCAAxB",
+	"sourcesContent": [
+		"// eslint-disable-next-line import/no-extraneous-dependencies\nexport { default } from '@interactjs/interactjs/index'\n"
+	]
+}

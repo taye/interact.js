@@ -1,0 +1,46 @@
+{
+	"version": 3,
+	"sources": [
+		"browser.ts"
+	],
+	"names": [
+		"domObjects",
+		"is",
+		"browser",
+		"init",
+		"supportsTouch",
+		"supportsPointerEvent",
+		"isIOS7",
+		"isIOS",
+		"isIe9",
+		"isOperaMobile",
+		"prefixedMatchesSelector",
+		"pEventTypes",
+		"wheelEvent",
+		"window",
+		"Element",
+		"navigator",
+		"func",
+		"DocumentTouch",
+		"document",
+		"pointerEnabled",
+		"PointerEvent",
+		"test",
+		"platform",
+		"appVersion",
+		"userAgent",
+		"appName",
+		"prototype",
+		"MSPointerEvent",
+		"up",
+		"down",
+		"over",
+		"out",
+		"move",
+		"cancel"
+	],
+	"mappings": "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",
+	"sourcesContent": [
+		"import domObjects from './domObjects'\nimport is from './is'\n\nconst browser = {\n  init,\n  supportsTouch: null as boolean,\n  supportsPointerEvent: null as boolean,\n  isIOS7: null as boolean,\n  isIOS: null as boolean,\n  isIe9: null as boolean,\n  isOperaMobile: null as boolean,\n  prefixedMatchesSelector: null as 'matches',\n  pEventTypes: null as {\n    up: string\n    down: string\n    over: string\n    out: string\n    move: string\n    cancel: string\n  },\n  wheelEvent: null as string,\n}\n\nfunction init (window: any) {\n  const Element = domObjects.Element\n  const navigator: Partial<Navigator> = window.navigator || {}\n\n  // Does the browser support touch input?\n  browser.supportsTouch =\n    'ontouchstart' in window ||\n    (is.func(window.DocumentTouch) && domObjects.document instanceof window.DocumentTouch)\n\n  // Does the browser support PointerEvents\n  browser.supportsPointerEvent = navigator.pointerEnabled !== false && !!domObjects.PointerEvent\n\n  browser.isIOS = /iP(hone|od|ad)/.test(navigator.platform)\n\n  // scrolling doesn't change the result of getClientRects on iOS 7\n  browser.isIOS7 = /iP(hone|od|ad)/.test(navigator.platform) && /OS 7[^\\d]/.test(navigator.appVersion)\n\n  browser.isIe9 = /MSIE 9/.test(navigator.userAgent)\n\n  // Opera Mobile must be handled differently\n  browser.isOperaMobile =\n    navigator.appName === 'Opera' && browser.supportsTouch && /Presto/.test(navigator.userAgent)\n\n  // prefix matchesSelector\n  browser.prefixedMatchesSelector = ('matches' in Element.prototype\n    ? 'matches'\n    : 'webkitMatchesSelector' in Element.prototype\n      ? 'webkitMatchesSelector'\n      : 'mozMatchesSelector' in Element.prototype\n        ? 'mozMatchesSelector'\n        : 'oMatchesSelector' in Element.prototype\n          ? 'oMatchesSelector'\n          : 'msMatchesSelector') as 'matches'\n\n  browser.pEventTypes = browser.supportsPointerEvent\n    ? domObjects.PointerEvent === window.MSPointerEvent\n      ? {\n        up: 'MSPointerUp',\n        down: 'MSPointerDown',\n        over: 'mouseover',\n        out: 'mouseout',\n        move: 'MSPointerMove',\n        cancel: 'MSPointerCancel',\n      }\n      : {\n        up: 'pointerup',\n        down: 'pointerdown',\n        over: 'pointerover',\n        out: 'pointerout',\n        move: 'pointermove',\n        cancel: 'pointercancel',\n      }\n    : null\n\n  // because Webkit and Opera still use 'mousewheel' event type\n  browser.wheelEvent = domObjects.document && 'onmousewheel' in domObjects.document ? 'mousewheel' : 'wheel'\n}\n\nexport default browser\n"
+	]
+}

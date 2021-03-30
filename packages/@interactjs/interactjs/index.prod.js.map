@@ -1,0 +1,28 @@
+{
+	"version": 3,
+	"sources": [
+		"index.ts"
+	],
+	"names": [
+		"actions",
+		"autoScroll",
+		"autoStart",
+		"interactablePreventDefault",
+		"devTools",
+		"inertia",
+		"interact",
+		"modifiers",
+		"offset",
+		"pointerEvents",
+		"reflow",
+		"use",
+		"module",
+		"exports",
+		"_unused",
+		"default"
+	],
+	"mappings": "OAAOA,MAAa,mCACbC,MAAgB,uCAChBC,MAAe,sCACfC,MAAgC,oDAChCC,MAAc,qCACdC,MAAa,mCACbC,MAAc,mCACdC,MAAe,qCACfC,MAAY,kCACZC,MAAmB,0CACnBC,MAAY,2BAEnBJ,EAASK,IAAIR,GAEbG,EAASK,IAAIH,GAGbF,EAASK,IAAIF,GAGbH,EAASK,IAAIN,GAGbC,EAASK,IAAIJ,GAGbD,EAASK,IAAIT,GAGbI,EAASK,IAAIX,GAGbM,EAASK,IAAIV,GAGbK,EAASK,IAAID,kBAOEJ,EAEf,GAAsB,iBAAXM,QAAyBA,OAClC,IACEA,OAAOC,QAAUP,EACjB,MAAAQ,IAGFR,EAAiBS,QAAUT",
+	"sourcesContent": [
+		"import actions from '@interactjs/actions/plugin'\nimport autoScroll from '@interactjs/auto-scroll/plugin'\nimport autoStart from '@interactjs/auto-start/plugin'\nimport interactablePreventDefault from '@interactjs/core/interactablePreventDefault'\nimport devTools from '@interactjs/dev-tools/plugin'\nimport inertia from '@interactjs/inertia/plugin'\nimport interact from '@interactjs/interact'\nimport modifiers from '@interactjs/modifiers/plugin'\nimport offset from '@interactjs/offset/plugin'\nimport pointerEvents from '@interactjs/pointer-events/plugin'\nimport reflow from '@interactjs/reflow/plugin'\n\ninteract.use(interactablePreventDefault)\n\ninteract.use(offset)\n\n// pointerEvents\ninteract.use(pointerEvents)\n\n// inertia\ninteract.use(inertia)\n\n// snap, resize, etc.\ninteract.use(modifiers)\n\n// autoStart, hold\ninteract.use(autoStart)\n\n// drag and drop, resize, gesture\ninteract.use(actions)\n\n// autoScroll\ninteract.use(autoScroll)\n\n// reflow\ninteract.use(reflow)\n\n// eslint-disable-next-line no-undef\nif (process.env.NODE_ENV !== 'production') {\n  interact.use(devTools)\n}\n\nexport default interact\n\nif (typeof module === 'object' && !!module) {\n  try {\n    module.exports = interact\n  } catch {}\n}\n\n;(interact as any).default = interact\n"
+	]
+}
