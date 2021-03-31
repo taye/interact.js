@@ -2,12 +2,7 @@ const path = require('path')
 
 const resolveSync = require('resolve').sync
 
-const {
-  getModuleDirectories,
-  shouldIgnoreImport,
-  getRelativeToRoot,
-  extensionsWithStubs,
-} = require('../utils')
+const { getModuleDirectories, shouldIgnoreImport, getRelativeToRoot } = require('../utils')
 
 module.exports = function transformImportsToAbsolute () {
   const fixImportSource = ({ node: { source } }, { opts, filename }) => {
@@ -23,7 +18,7 @@ module.exports = function transformImportsToAbsolute () {
     let resolvedImport = ''
 
     resolvedImport = resolveSync(source.value, {
-      extensions: extensionsWithStubs(['.ts', '.tsx', '.js']),
+      extensions: ['.ts', '.tsx', '.js'],
       basedir,
       moduleDirectory,
     })

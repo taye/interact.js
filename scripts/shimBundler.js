@@ -7,14 +7,14 @@ const derequire = require('derequire')
 const resolveSync = require('resolve').sync
 
 const bundler = require('./bundler')
-const { getModuleDirectories, extensionsWithStubs } = require('./utils')
+const { getModuleDirectories } = require('./utils')
 
 const moduleDirectory = getModuleDirectories()
 
 module.exports = async ({ source, sourceType, exports = [] }) => {
   const sourcePath = resolveSync(source, {
     moduleDirectory,
-    extensions: extensionsWithStubs(['.ts', '.tsx', '.js', '.jsx']),
+    extensions: ['.ts', '.tsx', '.js', '.jsx'],
   })
   const fileStream = fs.createReadStream(sourcePath)
   const codeStream = new PassThrough()

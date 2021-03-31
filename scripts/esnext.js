@@ -57,9 +57,10 @@ async function generate ({
   serverOptions,
   outDir = serve ? temp.mkdirSync('ijs-serve') : packagesDir,
 } = {}) {
-  sources = serve
-    ? []
-    : (sources || (await getSources())).filter((s) => moduleDirectory.some((md) => s.startsWith(md)))
+  sources = serve ? [] : sources || (await getSources())
+  sources = sources
+    .filter((s) => moduleDirectory.some((dir) => s.startsWith(dir)))
+    .filter((s) => !s.endsWith('.stub.ts'))
   moduleDirectory = [outDir, ...moduleDirectory]
 
   if (watch && !serve && !sources.length) {
