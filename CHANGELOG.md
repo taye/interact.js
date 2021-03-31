@@ -1,6 +1,10 @@
+## v1.10.11
+
+ - fixed incorrect "module" field in package.json https://github.com/taye/interact.js/issues/894#issuecomment-811046898
+
 ## v1.10.10
 
- - fixed issue with unresolved stub files #
+ - fixed issue with unresolved stub files #894
  - fixed commonjs import of `interactjs` package
 
 ## v1.10.9
