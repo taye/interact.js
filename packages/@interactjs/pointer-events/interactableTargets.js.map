@@ -1,0 +1,46 @@
+{
+	"version": 3,
+	"sources": [
+		"interactableTargets.ts"
+	],
+	"names": [
+		"extend",
+		"install",
+		"scope",
+		"Interactable",
+		"prototype",
+		"pointerEvents",
+		"pointerEventsMethod",
+		"__backCompatOption",
+		"_backCompatOption",
+		"optionName",
+		"newValue",
+		"ret",
+		"call",
+		"events",
+		"options",
+		"plugin",
+		"id",
+		"listeners",
+		"targets",
+		"node",
+		"type",
+		"eventTarget",
+		"interactables",
+		"forEachMatch",
+		"interactable",
+		"eventable",
+		"types",
+		"length",
+		"testIgnoreAllow",
+		"push",
+		"props",
+		"getRect",
+		"element",
+		"defaults"
+	],
+	"mappings": "AAGA,OAAOA,MAAP,MAAmB,oBAAnB;;AASA,SAASC,OAAT,CAAkBC,KAAlB,EAAgC;AAC9B,QAAM;AAAEC,IAAAA;AAAF,MAAmBD,KAAzB;AAEAC,EAAAA,YAAY,CAACC,SAAb,CAAuBC,aAAvB,GAAuCC,mBAAvC;AAEA,QAAMC,kBAAkB,GAAGJ,YAAY,CAACC,SAAb,CAAuBI,iBAAlD;;AAEAL,EAAAA,YAAY,CAACC,SAAb,CAAuBI,iBAAvB,GAA2C,UAAUC,UAAV,EAAsBC,QAAtB,EAAgC;AACzE,UAAMC,GAAG,GAAGJ,kBAAkB,CAACK,IAAnB,CAAwB,IAAxB,EAA8BH,UAA9B,EAA0CC,QAA1C,CAAZ;;AAEA,QAAIC,GAAG,KAAK,IAAZ,EAAkB;AAChB,WAAKE,MAAL,CAAYC,OAAZ,CAAoBL,UAApB,IAAkCC,QAAlC;AACD;;AAED,WAAOC,GAAP;AACD,GARD;AASD;;AAED,SAASL,mBAAT,CAAkDQ,OAAlD,EAAgE;AAC9Dd,EAAAA,MAAM,CAAC,KAAKa,MAAL,CAAYC,OAAb,EAAsBA,OAAtB,CAAN;AAEA,SAAO,IAAP;AACD;;AAED,MAAMC,MAAc,GAAG;AACrBC,EAAAA,EAAE,EAAE,oCADiB;AAErBf,EAAAA,OAFqB;AAGrBgB,EAAAA,SAAS,EAAE;AACT,qCAAiC,CAAC;AAAEC,MAAAA,OAAF;AAAWC,MAAAA,IAAX;AAAiBC,MAAAA,IAAjB;AAAuBC,MAAAA;AAAvB,KAAD,EAAuCnB,KAAvC,KAAiD;AAChFA,MAAAA,KAAK,CAACoB,aAAN,CAAoBC,YAApB,CAAiCJ,IAAjC,EAAwCK,YAAD,IAAgC;AACrE,cAAMC,SAAS,GAAGD,YAAY,CAACX,MAA/B;AACA,cAAMC,OAAO,GAAGW,SAAS,CAACX,OAA1B;;AAEA,YACEW,SAAS,CAACC,KAAV,CAAgBN,IAAhB,KACAK,SAAS,CAACC,KAAV,CAAgBN,IAAhB,EAAsBO,MADtB,IAEAH,YAAY,CAACI,eAAb,CAA6Bd,OAA7B,EAAsCK,IAAtC,EAA4CE,WAA5C,CAHF,EAIE;AACAH,UAAAA,OAAO,CAACW,IAAR,CAAa;AACXV,YAAAA,IADW;AAEXM,YAAAA,SAFW;AAGXK,YAAAA,KAAK,EAAE;AAAEN,cAAAA;AAAF;AAHI,WAAb;AAKD;AACF,OAfD;AAgBD,KAlBQ;AAoBT,wBAAoB,CAAC;AAAEA,MAAAA;AAAF,KAAD,KAAsB;AACxCA,MAAAA,YAAY,CAACX,MAAb,CAAoBkB,OAApB,GAA8B,UAAUC,OAAV,EAA4B;AACxD,eAAOR,YAAY,CAACO,OAAb,CAAqBC,OAArB,CAAP;AACD,OAFD;AAGD,KAxBQ;AA0BT,wBAAoB,CAAC;AAAER,MAAAA,YAAF;AAAgBV,MAAAA;AAAhB,KAAD,EAA4BZ,KAA5B,KAAsC;AACxDF,MAAAA,MAAM,CAACwB,YAAY,CAACX,MAAb,CAAoBC,OAArB,EAA8BZ,KAAK,CAACG,aAAN,CAAoB4B,QAAlD,CAAN;AACAjC,MAAAA,MAAM,CAACwB,YAAY,CAACX,MAAb,CAAoBC,OAArB,EAA8BA,OAAO,CAACT,aAAR,IAAyB,EAAvD,CAAN;AACD;AA7BQ;AAHU,CAAvB;AAoCA,eAAeU,MAAf",
+	"sourcesContent": [
+		"import type { Interactable } from '@interactjs/core/Interactable'\nimport type { Scope, Plugin } from '@interactjs/core/scope'\nimport type { Element } from '@interactjs/types/index'\nimport extend from '@interactjs/utils/extend'\n\ndeclare module '@interactjs/core/Interactable' {\n  interface Interactable {\n    pointerEvents: typeof pointerEventsMethod\n    __backCompatOption: (optionName: string, newValue: any) => any\n  }\n}\n\nfunction install (scope: Scope) {\n  const { Interactable } = scope\n\n  Interactable.prototype.pointerEvents = pointerEventsMethod\n\n  const __backCompatOption = Interactable.prototype._backCompatOption\n\n  Interactable.prototype._backCompatOption = function (optionName, newValue) {\n    const ret = __backCompatOption.call(this, optionName, newValue)\n\n    if (ret === this) {\n      this.events.options[optionName] = newValue\n    }\n\n    return ret\n  }\n}\n\nfunction pointerEventsMethod (this: Interactable, options: any) {\n  extend(this.events.options, options)\n\n  return this\n}\n\nconst plugin: Plugin = {\n  id: 'pointer-events/interactableTargets',\n  install,\n  listeners: {\n    'pointerEvents:collect-targets': ({ targets, node, type, eventTarget }, scope) => {\n      scope.interactables.forEachMatch(node, (interactable: Interactable) => {\n        const eventable = interactable.events\n        const options = eventable.options\n\n        if (\n          eventable.types[type] &&\n          eventable.types[type].length &&\n          interactable.testIgnoreAllow(options, node, eventTarget)\n        ) {\n          targets.push({\n            node,\n            eventable,\n            props: { interactable },\n          })\n        }\n      })\n    },\n\n    'interactable:new': ({ interactable }) => {\n      interactable.events.getRect = function (element: Element) {\n        return interactable.getRect(element)\n      }\n    },\n\n    'interactable:set': ({ interactable, options }, scope) => {\n      extend(interactable.events.options, scope.pointerEvents.defaults)\n      extend(interactable.events.options, options.pointerEvents || {})\n    },\n  },\n}\n\nexport default plugin\n"
+	]
+}

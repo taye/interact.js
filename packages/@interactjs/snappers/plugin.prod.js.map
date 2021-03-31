@@ -1,0 +1,23 @@
+{
+	"version": 3,
+	"sources": [
+		"plugin.ts"
+	],
+	"names": [
+		"extend",
+		"allSnappers",
+		"snappersPlugin",
+		"id",
+		"install",
+		"scope",
+		"interactStatic",
+		"interact",
+		"snappers",
+		"createSnapGrid",
+		"grid"
+	],
+	"mappings": "OACOA,MAAY,oCAEPC,MAAiB,gBAS7B,MAAMC,EAAyB,CAC7BC,GAAI,WACJC,QAASC,GACP,MAAQC,eAAgBC,GAAaF,EAErCE,EAASC,SAAWR,EAAOO,EAASC,UAAY,GAAIP,GACpDM,EAASE,eAAiBF,EAASC,SAASE,sBAIjCR",
+	"sourcesContent": [
+		"import type { Plugin } from '@interactjs/core/scope'\nimport extend from '@interactjs/utils/extend'\n\nimport * as allSnappers from './all'\n\ndeclare module '@interactjs/core/InteractStatic' {\n  export interface InteractStatic {\n    snappers: typeof allSnappers\n    createSnapGrid: typeof allSnappers.grid\n  }\n}\n\nconst snappersPlugin: Plugin = {\n  id: 'snappers',\n  install (scope) {\n    const { interactStatic: interact } = scope\n\n    interact.snappers = extend(interact.snappers || {}, allSnappers)\n    interact.createSnapGrid = interact.snappers.grid\n  },\n}\n\nexport default snappersPlugin\n"
+	]
+}

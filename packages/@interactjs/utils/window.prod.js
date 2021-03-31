@@ -1,0 +1,2 @@
+import o from"./isWindow.prod.js";export let realWindow;let n;export{n as window};export function init(o){realWindow=o;const e=o.document.createTextNode("");e.ownerDocument!==o.document&&"function"==typeof o.wrap&&o.wrap(e)===e&&(o=o.wrap(o)),n=o}"undefined"!=typeof window&&window&&init(window);export function getWindow(e){return o(e)?e:(e.ownerDocument||e).defaultView||n.window}
+//# sourceMappingURL=window.prod.js.map

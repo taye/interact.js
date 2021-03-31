@@ -1,0 +1,3513 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Interactable - Documentation</title>
+
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+    <link type="text/css" rel="stylesheet" href="styles/prettify.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav>
+    <li class="nav-link nav-home-link"><a href="index.html">Home</a></li><li class="nav-heading">Classes</li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="DropEvent_DropEvent.html">DropEvent</a></span></li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="Interactable.html">Interactable</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#context">context</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#deltaSource">deltaSource</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#draggable">draggable</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#dropCheck">dropCheck</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#dropzone">dropzone</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#fire">fire</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#gesturable">gesturable</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#getRect">getRect</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#off">off</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#on">on</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#origin">origin</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#rectChecker">rectChecker</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#reflow">reflow</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#resizable">resizable</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#set">set</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#unset">unset</a></span></li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="InteractEvent_InteractEvent.html">InteractEvent</a></span></li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="Interaction_Interaction.html">Interaction</a></span></li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="module.exports_module.exports.html">exports</a></span></li><li class="nav-heading">Modules</li><li class="nav-heading"><span class="nav-item-type type-module">M</span><span class="nav-item-name"><a href="module-interact.html">interact</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="module-interact.html#.isSet">isSet</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="module-interact.html#.maxInteractions">maxInteractions</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="module-interact.html#.pointerMoveTolerance">pointerMoveTolerance</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="module-interact.html#.stop">stop</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="module-interact.html#.supportsPointerEvent">supportsPointerEvent</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="module-interact.html#.supportsTouch">supportsTouch</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="module-interact.html#.use">use</a></span></li><li class="nav-heading"><span class="nav-item-type type-module">M</span><span class="nav-item-name"><a href="module-modifiers_aspectRatio.html">modifiers/aspectRatio</a></span></li><li class="nav-heading"><span class="nav-item-type type-module">M</span><span class="nav-item-name"><a href="module-modifiers_snapEdges.html">modifiers/snapEdges</a></span></li><li class="nav-heading"><a href="global.html">Globals</a></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#interact">interact</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#preventDefault">preventDefault</a></span></li>
+</nav>
+
+<div class="code-col-bg"></div>
+
+<div id="main">
+    
+    <h1 class="page-title">Interactable</h1>
+    
+
+    
+
+
+
+
+<section>
+
+<header>
+    
+        <h2>
+        Interactable
+        </h2>
+        
+    
+</header>
+
+<article>
+    <div class="container-overview">
+    
+        
+<div class="section-method">
+
+    
+
+    <h4 class="name" id="Interactable"><span class="type-signature"></span>new Interactable<span class="signature">()</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="packages_@interactjs_core_Interactable.ts.html">packages/@interactjs/core/Interactable.ts</a>, <a href="packages_@interactjs_core_Interactable.ts.html#line27">line 27</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</div>
+
+    
+    </div>
+
+    
+
+    
+
+    
+        <h3 class="subsection-title">Classes</h3>
+
+        <dl>
+            <dt><a href="Interactable.html">Interactable</a></dt>
+            <dd></dd>
+        </dl>
+    
+
+     
+
+    
+
+    
+        <h3 class="subsection-title">Members</h3>
+
+        
+            
+<div class="section-members">
+<h4 class="name" id="_defaults"><span class="type-signature"></span>_defaults<span class="type-signature"></span></h4>
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="packages_@interactjs_core_Interactable.ts.html">packages/@interactjs/core/Interactable.ts</a>, <a href="packages_@interactjs_core_Interactable.ts.html#line16">line 16</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+</div>
+
+        
+            
+<div class="section-members">
+<h4 class="name" id="actionChecker"><span class="type-signature"></span>actionChecker<span class="type-signature"></span></h4>
+
+
+
+
+<div class="description">
+    <pre class="prettyprint source lang-js"><code>interact('.resize-drag')
+  .resizable(true)
+  .draggable(true)
+  .actionChecker(function (pointer, event, action, interactable, element, interaction) {
+
+    if (interact.matchesSelector(event.target, '.drag-handle')) {
+      // force drag with handle target
+      action.name = drag
+    }
+    else {
+      // resize from the top and right edges
+      action.name  = 'resize'
+      action.edges = { top: true, right: true }
+    }
+
+    return action
+})
+</code></pre>
+<p>Returns or sets the function used to check action to be performed on
+pointerDown</p>
+</div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="packages_@interactjs_auto-start_InteractableMethods.ts.html">packages/@interactjs/auto-start/InteractableMethods.ts</a>, <a href="packages_@interactjs_auto-start_InteractableMethods.ts.html#line108">line 108</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+</div>
+
+        
+            
+<div class="section-members">
+<h4 class="name" id="allowFrom"><span class="type-signature"></span>allowFrom<span class="type-signature"></span></h4>
+
+
+
+
+<div class="description">
+    <p>A drag/resize/gesture is started only If the target of the <code>mousedown</code>,
+<code>pointerdown</code> or <code>touchstart</code> event or any of it's parents match the given
+CSS selector or Element.</p>
+</div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <dt class="important tag-deprecated">Deprecated:</dt><dd><ul class="dummy"><li>Don't use this method. Instead set the `allowFrom` option for each action
+or for `pointerEvents`
+
+```js
+interact(targett)
+  .resizable({
+    allowFrom: '.resize-handle',
+  .pointerEvents({
+    allowFrom: '.handle',,
+  })
+```</li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="packages_@interactjs_auto-start_InteractableMethods.ts.html">packages/@interactjs/auto-start/InteractableMethods.ts</a>, <a href="packages_@interactjs_auto-start_InteractableMethods.ts.html#line80">line 80</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+</div>
+
+        
+            
+<div class="section-members">
+<h4 class="name" id="ignoreFrom"><span class="type-signature"></span>ignoreFrom<span class="type-signature"></span></h4>
+
+
+
+
+<div class="description">
+    <p>If the target of the <code>mousedown</code>, <code>pointerdown</code> or <code>touchstart</code> event or any
+of it's parents match the given CSS selector or Element, no
+drag/resize/gesture is started.</p>
+</div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <dt class="important tag-deprecated">Deprecated:</dt><dd><ul class="dummy"><li>Don't use this method. Instead set the `ignoreFrom` option for each action
+or for `pointerEvents`
+
+```js
+interact(targett)
+  .draggable({
+    ignoreFrom: 'input, textarea, a[href]'',
+  })
+  .pointerEvents({
+    ignoreFrom: '[no-pointer]',
+  })
+```</li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="packages_@interactjs_auto-start_InteractableMethods.ts.html">packages/@interactjs/auto-start/InteractableMethods.ts</a>, <a href="packages_@interactjs_auto-start_InteractableMethods.ts.html#line52">line 52</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+</div>
+
+        
+            
+<div class="section-members">
+<h4 class="name" id="preventDefault"><span class="type-signature"></span>preventDefault<span class="type-signature"></span></h4>
+
+
+
+
+<div class="description">
+    <p>Returns or sets whether to prevent the browser's default behaviour in
+response to pointer events. Can be set to:</p>
+<ul>
+<li><code>'always'</code> to always prevent</li>
+<li><code>'never'</code> to never prevent</li>
+<li><code>'auto'</code> to let interact.js try to determine what would be best</li>
+</ul>
+</div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="packages_@interactjs_core_interactablePreventDefault.ts.html">packages/@interactjs/core/interactablePreventDefault.ts</a>, <a href="packages_@interactjs_core_interactablePreventDefault.ts.html#line83">line 83</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+</div>
+
+        
+            
+<div class="section-members">
+<h4 class="name" id="styleCursor"><span class="type-signature"></span>styleCursor<span class="type-signature"></span></h4>
+
+
+
+
+<div class="description">
+    <p>Returns or sets whether the the cursor should be changed depending on the
+action that would be performed if the mouse were pressed and dragged.</p>
+</div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="packages_@interactjs_auto-start_InteractableMethods.ts.html">packages/@interactjs/auto-start/InteractableMethods.ts</a>, <a href="packages_@interactjs_auto-start_InteractableMethods.ts.html#line141">line 141</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+</div>
+
+        
+    
+
+    
+        <h3 class="subsection-title">Methods</h3>
+
+        
+            
+<div class="section-method">
+
+    
+
+    <h4 class="name" id="context"><span class="type-signature"></span>context<span class="signature">()</span><span class="type-signature"> &rarr; {Node}</span></h4>
+
+    
+
+
+
+<div class="description">
+    <p>Gets the selector context Node of the Interactable. The default is
+<code>window.document</code>.</p>
+</div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="packages_@interactjs_core_Interactable.ts.html">packages/@interactjs/core/Interactable.ts</a>, <a href="packages_@interactjs_core_Interactable.ts.html#line243">line 243</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="section-returns">
+<h5>Returns:</h5>
+
+        
+
+<dl class="param-type">
+    <dt>
+        Type:
+    </dt>
+    <dd>
+        
+<span class="param-type"><code>Node</code></span>
+
+
+    </dd>
+</dl>
+
+
+<div class="param-desc">
+    <p>The context Node of this Interactable</p>
+</div>
+
+    
+</div>
+
+
+
+</div>
+
+        
+            
+<div class="section-method">
+
+    
+
+    <h4 class="name" id="deltaSource"><span class="type-signature"></span>deltaSource<span class="signature">(newValue<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {string|object}</span></h4>
+
+    
+
+
+
+<div class="description">
+    <p>Returns or sets the mouse coordinate types used to calculate the
+movement of the pointer.</p>
+</div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="packages_@interactjs_core_Interactable.ts.html">packages/@interactjs/core/Interactable.ts</a>, <a href="packages_@interactjs_core_Interactable.ts.html#line223">line 223</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>newValue</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><code>string</code></span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="param-description last">
+                <p>Use 'client' if you will be scrolling while
+interacting; Use 'page' if you want autoScroll to work</p>
+                
+            </td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="section-returns">
+<h5>Returns:</h5>
+
+        
+
+<dl class="param-type">
+    <dt>
+        Type:
+    </dt>
+    <dd>
+        
+<span class="param-type"><code>string</code></span>
+|
+
+<span class="param-type"><code>object</code></span>
+
+
+    </dd>
+</dl>
+
+
+<div class="param-desc">
+    <p>The current deltaSource or this Interactable</p>
+</div>
+
+    
+</div>
+
+
+
+</div>
+
+        
+            
+<div class="section-method">
+
+    
+
+    <h4 class="name" id="draggable"><span class="type-signature"></span>draggable<span class="signature">(options<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {boolean|<a href="Interactable.html">Interactable</a>}</span></h4>
+
+    
+
+
+
+<div class="description">
+    <pre class="prettyprint source lang-js"><code>interact(element).draggable({
+    onstart: function (event) {},
+    onmove : function (event) {},
+    onend  : function (event) {},
+
+    // the axis in which the first movement must be
+    // for the drag sequence to start
+    // 'xy' by default - any direction
+    startAxis: 'x' || 'y' || 'xy',
+
+    // 'xy' by default - don't restrict to one axis (move in any direction)
+    // 'x' or 'y' to restrict movement to either axis
+    // 'start' to restrict movement to the axis the drag started in
+    lockAxis: 'x' || 'y' || 'xy' || 'start',
+
+    // max number of drags that can happen concurrently
+    // with elements of this Interactable. Infinity by default
+    max: Infinity,
+
+    // max number of drags that can target the same element+Interactable
+    // 1 by default
+    maxPerElement: 2
+})
+
+var isDraggable = interact('element').draggable(); // true
+</code></pre>
+<p>Get or set whether drag actions can be performed on the target</p>
+</div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="packages_@interactjs_actions_drag_plugin.ts.html">packages/@interactjs/actions/drag/plugin.ts</a>, <a href="packages_@interactjs_actions_drag_plugin.ts.html#line74">line 74</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>options</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><code>boolean</code></span>
+|
+
+<span class="param-type"><code>object</code></span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="param-description last">
+                <p>true/false or An object with event
+listeners to be fired on drag events (object makes the Interactable
+draggable)</p>
+                
+            </td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="section-returns">
+<h5>Returns:</h5>
+
+        
+
+<dl class="param-type">
+    <dt>
+        Type:
+    </dt>
+    <dd>
+        
+<span class="param-type"><code>boolean</code></span>
+|
+
+<span class="param-type"><code><a href="Interactable.html">Interactable</a></code></span>
+
+
+    </dd>
+</dl>
+
+
+<div class="param-desc">
+    <p>boolean indicating if this can be the
+target of drag events, or this Interctable</p>
+</div>
+
+    
+</div>
+
+
+
+</div>
+
+        
+            
+<div class="section-method">
+
+    
+
+    <h4 class="name" id="dropCheck"><span class="type-signature"></span>dropCheck<span class="signature">()</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+<div class="description">
+    <pre class="prettyprint source lang-js"><code>interact(target)
+.dropChecker(function(dragEvent,         // related dragmove or dragend event
+                      event,             // TouchEvent/PointerEvent/MouseEvent
+                      dropped,           // bool result of the default checker
+                      dropzone,          // dropzone Interactable
+                      dropElement,       // dropzone elemnt
+                      draggable,         // draggable Interactable
+                      draggableElement) {// draggable element
+
+  return dropped && event.target.hasAttribute('allow-drop')
+}
+</code></pre>
+</div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="packages_@interactjs_actions_drop_plugin.ts.html">packages/@interactjs/actions/drop/plugin.ts</a>, <a href="packages_@interactjs_actions_drop_plugin.ts.html#line167">line 167</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</div>
+
+        
+            
+<div class="section-method">
+
+    
+
+    <h4 class="name" id="dropzone"><span class="type-signature"></span>dropzone<span class="signature">(options<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {object|<a href="Interactable.html">Interactable</a>}</span></h4>
+
+    
+
+
+
+<div class="description">
+    <pre class="prettyprint source lang-js"><code>interact('.drop').dropzone({
+  accept: '.can-drop' || document.getElementById('single-drop'),
+  overlap: 'pointer' || 'center' || zeroToOne
+}
+</code></pre>
+<p>Returns or sets whether draggables can be dropped onto this target to
+trigger drop events</p>
+<p>Dropzones can receive the following events:</p>
+<ul>
+<li><code>dropactivate</code> and <code>dropdeactivate</code> when an acceptable drag starts and ends</li>
+<li><code>dragenter</code> and <code>dragleave</code> when a draggable enters and leaves the dropzone</li>
+<li><code>dragmove</code> when a draggable that has entered the dropzone is moved</li>
+<li><code>drop</code> when a draggable is dropped into this dropzone</li>
+</ul>
+<p>Use the <code>accept</code> option to allow only elements that match the given CSS
+selector or element. The value can be:</p>
+<ul>
+<li><strong>an Element</strong> - only that element can be dropped into this dropzone.</li>
+<li><strong>a string</strong>, - the element being dragged must match it as a CSS selector.</li>
+<li><strong><code>null</code></strong> - accept options is cleared - it accepts any element.</li>
+</ul>
+<p>Use the <code>overlap</code> option to set how drops are checked for. The allowed
+values are:</p>
+<ul>
+<li><code>'pointer'</code>, the pointer must be over the dropzone (default)</li>
+<li><code>'center'</code>, the draggable element's center must be over the dropzone</li>
+<li>a number from 0-1 which is the <code>(intersection area) / (draggable area)</code>.
+e.g. <code>0.5</code> for drop to happen when half of the area of the draggable is
+over the dropzone</li>
+</ul>
+<p>Use the <code>checker</code> option to specify a function to check if a dragged element
+is over this Interactable.</p>
+</div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="packages_@interactjs_actions_drop_plugin.ts.html">packages/@interactjs/actions/drop/plugin.ts</a>, <a href="packages_@interactjs_actions_drop_plugin.ts.html#line123">line 123</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>options</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><code>boolean</code></span>
+|
+
+<span class="param-type"><code>object</code></span>
+|
+
+<span class="param-type"><code>null</code></span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="param-description last">
+                <p>The new options to be set.</p>
+                
+            </td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="section-returns">
+<h5>Returns:</h5>
+
+        
+
+<dl class="param-type">
+    <dt>
+        Type:
+    </dt>
+    <dd>
+        
+<span class="param-type"><code>object</code></span>
+|
+
+<span class="param-type"><code><a href="Interactable.html">Interactable</a></code></span>
+
+
+    </dd>
+</dl>
+
+
+<div class="param-desc">
+    <p>The current setting or this Interactable</p>
+</div>
+
+    
+</div>
+
+
+
+</div>
+
+        
+            
+<div class="section-method">
+
+    
+
+    <h4 class="name" id="fire"><span class="type-signature"></span>fire<span class="signature">(iEvent)</span><span class="type-signature"> &rarr; {<a href="Interactable.html">Interactable</a>}</span></h4>
+
+    
+
+
+
+<div class="description">
+    <p>Calls listeners for the given InteractEvent type bound globally
+and directly to this Interactable</p>
+</div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="packages_@interactjs_core_Interactable.ts.html">packages/@interactjs/core/Interactable.ts</a>, <a href="packages_@interactjs_core_Interactable.ts.html#line301">line 301</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>iEvent</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><code><a href="InteractEvent.html">InteractEvent</a></code></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="param-description last">
+                <p>The InteractEvent object to be fired on this
+Interactable</p>
+                
+            </td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="section-returns">
+<h5>Returns:</h5>
+
+        
+
+<dl class="param-type">
+    <dt>
+        Type:
+    </dt>
+    <dd>
+        
+<span class="param-type"><code><a href="Interactable.html">Interactable</a></code></span>
+
+
+    </dd>
+</dl>
+
+
+<div class="param-desc">
+    <p>this Interactable</p>
+</div>
+
+    
+</div>
+
+
+
+</div>
+
+        
+            
+<div class="section-method">
+
+    
+
+    <h4 class="name" id="gesturable"><span class="type-signature"></span>gesturable<span class="signature">(options<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {boolean|<a href="Interactable.html">Interactable</a>}</span></h4>
+
+    
+
+
+
+<div class="description">
+    <pre class="prettyprint source lang-js"><code>interact(element).gesturable({
+    onstart: function (event) {},
+    onmove : function (event) {},
+    onend  : function (event) {},
+
+    // limit multiple gestures.
+    // See the explanation in <code>Interactable.draggable</code> example
+    max: Infinity,
+    maxPerElement: 1,
+})
+
+var isGestureable = interact(element).gesturable()
+</code></pre>
+<p>Gets or sets whether multitouch gestures can be performed on the target</p>
+</div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="packages_@interactjs_actions_gesture_plugin.ts.html">packages/@interactjs/actions/gesture/plugin.ts</a>, <a href="packages_@interactjs_actions_gesture_plugin.ts.html#line59">line 59</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>options</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><code>boolean</code></span>
+|
+
+<span class="param-type"><code>object</code></span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="param-description last">
+                <p>true/false or An object with event
+listeners to be fired on gesture events (makes the Interactable gesturable)</p>
+                
+            </td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="section-returns">
+<h5>Returns:</h5>
+
+        
+
+<dl class="param-type">
+    <dt>
+        Type:
+    </dt>
+    <dd>
+        
+<span class="param-type"><code>boolean</code></span>
+|
+
+<span class="param-type"><code><a href="Interactable.html">Interactable</a></code></span>
+
+
+    </dd>
+</dl>
+
+
+<div class="param-desc">
+    <p>A boolean indicating if this can be the
+target of gesture events, or this Interactable</p>
+</div>
+
+    
+</div>
+
+
+
+</div>
+
+        
+            
+<div class="section-method">
+
+    
+
+    <h4 class="name" id="getRect"><span class="type-signature"></span>getRect<span class="signature">(element<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {Rect}</span></h4>
+
+    
+
+
+
+<div class="description">
+    <p>The default function to get an Interactables bounding rect. Can be
+overridden using <code>Interactable.rectChecker</code>.</p>
+</div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="packages_@interactjs_core_Interactable.ts.html">packages/@interactjs/core/Interactable.ts</a>, <a href="packages_@interactjs_core_Interactable.ts.html#line140">line 140</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>element</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><code>Element</code></span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="param-description last">
+                <p>The element to measure.</p>
+                
+            </td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="section-returns">
+<h5>Returns:</h5>
+
+        
+
+<dl class="param-type">
+    <dt>
+        Type:
+    </dt>
+    <dd>
+        
+<span class="param-type"><code>Rect</code></span>
+
+
+    </dd>
+</dl>
+
+
+<div class="param-desc">
+    <p>The object's bounding rectangle.</p>
+</div>
+
+    
+</div>
+
+
+
+</div>
+
+        
+            
+<div class="section-method">
+
+    
+
+    <h4 class="name" id="off"><span class="type-signature"></span>off<span class="signature">(types, listener<span class="signature-attributes">opt</span>, options<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {<a href="Interactable.html">Interactable</a>}</span></h4>
+
+    
+
+
+
+<div class="description">
+    <p>Removes an InteractEvent, pointerEvent or DOM event listener.</p>
+</div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="packages_@interactjs_core_Interactable.ts.html">packages/@interactjs/core/Interactable.ts</a>, <a href="packages_@interactjs_core_Interactable.ts.html#line368">line 368</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>types</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><code>string</code></span>
+|
+
+<span class="param-type"><code>array</code></span>
+|
+
+<span class="param-type"><code>object</code></span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="param-description last">
+                <p>The types of events that were
+listened for</p>
+                
+            </td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>listener</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><code>function</code></span>
+|
+
+<span class="param-type"><code>array</code></span>
+|
+
+<span class="param-type"><code>object</code></span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="param-description last">
+                <p>The event listener function(s)</p>
+                
+            </td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>options</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><code>object</code></span>
+|
+
+<span class="param-type"><code>boolean</code></span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="param-description last">
+                <p>options object or useCapture flag for
+removeEventListener</p>
+                
+            </td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="section-returns">
+<h5>Returns:</h5>
+
+        
+
+<dl class="param-type">
+    <dt>
+        Type:
+    </dt>
+    <dd>
+        
+<span class="param-type"><code><a href="Interactable.html">Interactable</a></code></span>
+
+
+    </dd>
+</dl>
+
+
+<div class="param-desc">
+    <p>This Interactable</p>
+</div>
+
+    
+</div>
+
+
+
+</div>
+
+        
+            
+<div class="section-method">
+
+    
+
+    <h4 class="name" id="on"><span class="type-signature"></span>on<span class="signature">(types, listener<span class="signature-attributes">opt</span>, options<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {<a href="Interactable.html">Interactable</a>}</span></h4>
+
+    
+
+
+
+<div class="description">
+    <p>Binds a listener for an InteractEvent, pointerEvent or DOM event.</p>
+</div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="packages_@interactjs_core_Interactable.ts.html">packages/@interactjs/core/Interactable.ts</a>, <a href="packages_@interactjs_core_Interactable.ts.html#line354">line 354</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>types</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><code>string</code></span>
+|
+
+<span class="param-type"><code>array</code></span>
+|
+
+<span class="param-type"><code>object</code></span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="param-description last">
+                <p>The types of events to listen
+for</p>
+                
+            </td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>listener</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><code>function</code></span>
+|
+
+<span class="param-type"><code>array</code></span>
+|
+
+<span class="param-type"><code>object</code></span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="param-description last">
+                <p>The event listener function(s)</p>
+                
+            </td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>options</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><code>object</code></span>
+|
+
+<span class="param-type"><code>boolean</code></span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="param-description last">
+                <p>options object or useCapture flag for
+addEventListener</p>
+                
+            </td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="section-returns">
+<h5>Returns:</h5>
+
+        
+
+<dl class="param-type">
+    <dt>
+        Type:
+    </dt>
+    <dd>
+        
+<span class="param-type"><code><a href="Interactable.html">Interactable</a></code></span>
+
+
+    </dd>
+</dl>
+
+
+<div class="param-desc">
+    <p>This Interactable</p>
+</div>
+
+    
+</div>
+
+
+
+</div>
+
+        
+            
+<div class="section-method">
+
+    
+
+    <h4 class="name" id="origin"><span class="type-signature"></span>origin<span class="signature">(origin<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {object}</span></h4>
+
+    
+
+
+
+<div class="description">
+    <p>Gets or sets the origin of the Interactable's element.  The x and y
+of the origin will be subtracted from action event coordinates.</p>
+</div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="packages_@interactjs_core_Interactable.ts.html">packages/@interactjs/core/Interactable.ts</a>, <a href="packages_@interactjs_core_Interactable.ts.html#line209">line 209</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>origin</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><code>Element</code></span>
+|
+
+<span class="param-type"><code>object</code></span>
+|
+
+<span class="param-type"><code>string</code></span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="param-description last">
+                <p>An HTML or SVG Element whose
+rect will be used, an object eg. { x: 0, y: 0 } or string 'parent', 'self'
+or any CSS selector</p>
+                
+            </td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="section-returns">
+<h5>Returns:</h5>
+
+        
+
+<dl class="param-type">
+    <dt>
+        Type:
+    </dt>
+    <dd>
+        
+<span class="param-type"><code>object</code></span>
+
+
+    </dd>
+</dl>
+
+
+<div class="param-desc">
+    <p>The current origin or this Interactable</p>
+</div>
+
+    
+</div>
+
+
+
+</div>
+
+        
+            
+<div class="section-method">
+
+    
+
+    <h4 class="name" id="rectChecker"><span class="type-signature"></span>rectChecker<span class="signature">(checker<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {function|object}</span></h4>
+
+    
+
+
+
+<div class="description">
+    <p>Returns or sets the function used to calculate the interactable's
+element's rectangle</p>
+</div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="packages_@interactjs_core_Interactable.ts.html">packages/@interactjs/core/Interactable.ts</a>, <a href="packages_@interactjs_core_Interactable.ts.html#line157">line 157</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>checker</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><code>function</code></span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="param-description last">
+                <p>A function which returns this Interactable's
+bounding rectangle. See <code>Interactable.getRect</code></p>
+                
+            </td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="section-returns">
+<h5>Returns:</h5>
+
+        
+
+<dl class="param-type">
+    <dt>
+        Type:
+    </dt>
+    <dd>
+        
+<span class="param-type"><code>function</code></span>
+|
+
+<span class="param-type"><code>object</code></span>
+
+
+    </dd>
+</dl>
+
+
+<div class="param-desc">
+    <p>The checker function or this Interactable</p>
+</div>
+
+    
+</div>
+
+
+
+</div>
+
+        
+            
+<div class="section-method">
+
+    
+
+    <h4 class="name" id="reflow"><span class="type-signature"></span>reflow<span class="signature">(action)</span><span class="type-signature"> &rarr; {Promise}</span></h4>
+
+    
+
+
+
+<div class="description">
+    <pre class="prettyprint source lang-js"><code>const interactable = interact(target)
+const drag = { name: drag, axis: 'x' }
+const resize = { name: resize, edges: { left: true, bottom: true }
+
+interactable.reflow(drag)
+interactable.reflow(resize)
+</code></pre>
+<p>Start an action sequence to re-apply modifiers, check drops, etc.</p>
+</div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="packages_@interactjs_reflow_plugin.ts.html">packages/@interactjs/reflow/plugin.ts</a>, <a href="packages_@interactjs_reflow_plugin.ts.html#line46">line 46</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>action</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><code>Object</code></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="param-description last">
+                <p>The action to begin</p>
+                
+                    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>name</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><code>string</code></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="param-description last">
+                <p>The name of the action</p>
+                
+            </td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+                
+            </td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="section-returns">
+<h5>Returns:</h5>
+
+        
+
+<dl class="param-type">
+    <dt>
+        Type:
+    </dt>
+    <dd>
+        
+<span class="param-type"><code>Promise</code></span>
+
+
+    </dd>
+</dl>
+
+
+<div class="param-desc">
+    <p>A promise that resolves to the <code>Interactable</code> when actions on all targets have ended</p>
+</div>
+
+    
+</div>
+
+
+
+</div>
+
+        
+            
+<div class="section-method">
+
+    
+
+    <h4 class="name" id="resizable"><span class="type-signature"></span>resizable<span class="signature">(options<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {boolean|<a href="Interactable.html">Interactable</a>}</span></h4>
+
+    
+
+
+
+<div class="description">
+    <pre class="prettyprint source lang-js"><code>interact(element).resizable({
+  onstart: function (event) {},
+  onmove : function (event) {},
+  onend  : function (event) {},
+
+  edges: {
+    top   : true,       // Use pointer coords to check for resize.
+    left  : false,      // Disable resizing from left edge.
+    bottom: '.resize-s',// Resize if pointer target matches selector
+    right : handleEl    // Resize if pointer target is the given Element
+  },
+
+    // Width and height can be adjusted independently. When `true`, width and
+    // height are adjusted at a 1:1 ratio.
+    square: false,
+
+    // Width and height can be adjusted independently. When `true`, width and
+    // height maintain the aspect ratio they had when resizing started.
+    preserveAspectRatio: false,
+
+  // a value of 'none' will limit the resize rect to a minimum of 0x0
+  // 'negate' will allow the rect to have negative width/height
+  // 'reposition' will keep the width/height positive by swapping
+  // the top and bottom edges and/or swapping the left and right edges
+  invert: 'none' || 'negate' || 'reposition'
+
+  // limit multiple resizes.
+  // See the explanation in the <code>Interactable.draggable</code> example
+  max: Infinity,
+  maxPerElement: 1,
+})
+
+var isResizeable = interact(element).resizable()
+</code></pre>
+<p>Gets or sets whether resize actions can be performed on the target</p>
+</div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="packages_@interactjs_actions_resize_plugin.ts.html">packages/@interactjs/actions/resize/plugin.ts</a>, <a href="packages_@interactjs_actions_resize_plugin.ts.html#line65">line 65</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>options</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><code>boolean</code></span>
+|
+
+<span class="param-type"><code>object</code></span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="param-description last">
+                <p>true/false or An object with event
+listeners to be fired on resize events (object makes the Interactable
+resizable)</p>
+                
+            </td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="section-returns">
+<h5>Returns:</h5>
+
+        
+
+<dl class="param-type">
+    <dt>
+        Type:
+    </dt>
+    <dd>
+        
+<span class="param-type"><code>boolean</code></span>
+|
+
+<span class="param-type"><code><a href="Interactable.html">Interactable</a></code></span>
+
+
+    </dd>
+</dl>
+
+
+<div class="param-desc">
+    <p>A boolean indicating if this can be the
+target of resize elements, or this Interactable</p>
+</div>
+
+    
+</div>
+
+
+
+</div>
+
+        
+            
+<div class="section-method">
+
+    
+
+    <h4 class="name" id="set"><span class="type-signature"></span>set<span class="signature">(options)</span><span class="type-signature"> &rarr; {object}</span></h4>
+
+    
+
+
+
+<div class="description">
+    <p>Reset the options of this Interactable</p>
+</div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="packages_@interactjs_core_Interactable.ts.html">packages/@interactjs/core/Interactable.ts</a>, <a href="packages_@interactjs_core_Interactable.ts.html#line382">line 382</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>options</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><code>object</code></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="param-description last">
+                <p>The new settings to apply</p>
+                
+            </td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="section-returns">
+<h5>Returns:</h5>
+
+        
+
+<dl class="param-type">
+    <dt>
+        Type:
+    </dt>
+    <dd>
+        
+<span class="param-type"><code>object</code></span>
+
+
+    </dd>
+</dl>
+
+
+<div class="param-desc">
+    <p>This Interactable</p>
+</div>
+
+    
+</div>
+
+
+
+</div>
+
+        
+            
+<div class="section-method">
+
+    
+
+    <h4 class="name" id="unset"><span class="type-signature"></span>unset<span class="signature">()</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+<div class="description">
+    <p>Remove this interactable from the list of interactables and remove it's
+action capabilities and event listeners</p>
+</div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="packages_@interactjs_core_Interactable.ts.html">packages/@interactjs/core/Interactable.ts</a>, <a href="packages_@interactjs_core_Interactable.ts.html#line415">line 415</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</div>
+
+        
+    
+
+    
+
+    
+</article>
+
+</section>
+
+
+
+
+</div>
+
+<script>prettyPrint();</script>
+<script src="scripts/linenumber.js"></script>
+</body>
+</html>

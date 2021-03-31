@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>packages/@interactjs/core/interactablePreventDefault.ts - Documentation</title>
+
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+    <link type="text/css" rel="stylesheet" href="styles/prettify.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav>
+    <li class="nav-link nav-home-link"><a href="index.html">Home</a></li><li class="nav-heading">Classes</li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="DropEvent_DropEvent.html">DropEvent</a></span></li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="Interactable.html">Interactable</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#context">context</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#deltaSource">deltaSource</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#draggable">draggable</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#dropCheck">dropCheck</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#dropzone">dropzone</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#fire">fire</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#gesturable">gesturable</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#getRect">getRect</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#off">off</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#on">on</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#origin">origin</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#rectChecker">rectChecker</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#reflow">reflow</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#resizable">resizable</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#set">set</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#unset">unset</a></span></li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="InteractEvent_InteractEvent.html">InteractEvent</a></span></li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="Interaction_Interaction.html">Interaction</a></span></li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="module.exports_module.exports.html">exports</a></span></li><li class="nav-heading">Modules</li><li class="nav-heading"><span class="nav-item-type type-module">M</span><span class="nav-item-name"><a href="module-interact.html">interact</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="module-interact.html#.isSet">isSet</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="module-interact.html#.maxInteractions">maxInteractions</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="module-interact.html#.pointerMoveTolerance">pointerMoveTolerance</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="module-interact.html#.stop">stop</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="module-interact.html#.supportsPointerEvent">supportsPointerEvent</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="module-interact.html#.supportsTouch">supportsTouch</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="module-interact.html#.use">use</a></span></li><li class="nav-heading"><span class="nav-item-type type-module">M</span><span class="nav-item-name"><a href="module-modifiers_aspectRatio.html">modifiers/aspectRatio</a></span></li><li class="nav-heading"><span class="nav-item-type type-module">M</span><span class="nav-item-name"><a href="module-modifiers_snapEdges.html">modifiers/snapEdges</a></span></li><li class="nav-heading"><a href="global.html">Globals</a></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#interact">interact</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#preventDefault">preventDefault</a></span></li>
+</nav>
+
+<div class="code-col-bg"></div>
+
+<div id="main">
+    
+    <h1 class="page-title">packages/@interactjs/core/interactablePreventDefault.ts</h1>
+    
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import type { Interactable } from '@interactjs/core/Interactable'
+import type Interaction from '@interactjs/core/Interaction'
+import type { Scope } from '@interactjs/core/scope'
+import type { PointerEventType } from '@interactjs/types/index'
+import { matchesSelector, nodeContains } from '@interactjs/utils/domUtils'
+import is from '@interactjs/utils/is'
+import { getWindow } from '@interactjs/utils/window'
+
+declare module '@interactjs/core/Interactable' {
+  interface Interactable {
+    preventDefault: typeof preventDefault
+    checkAndPreventDefault: (event: Event) => void
+  }
+}
+
+type PreventDefaultValue = 'always' | 'never' | 'auto'
+function preventDefault(this: Interactable): PreventDefaultValue
+function preventDefault(this: Interactable, newValue: PreventDefaultValue): typeof this
+function preventDefault (this: Interactable, newValue?: PreventDefaultValue) {
+  if (/^(always|never|auto)$/.test(newValue)) {
+    this.options.preventDefault = newValue
+    return this
+  }
+
+  if (is.bool(newValue)) {
+    this.options.preventDefault = newValue ? 'always' : 'never'
+    return this
+  }
+
+  return this.options.preventDefault
+}
+
+function checkAndPreventDefault (interactable: Interactable, scope: Scope, event: Event) {
+  const setting = interactable.options.preventDefault
+
+  if (setting === 'never') return
+
+  if (setting === 'always') {
+    event.preventDefault()
+    return
+  }
+
+  // setting === 'auto'
+
+  // if the browser supports passive event listeners and isn't running on iOS,
+  // don't preventDefault of touch{start,move} events. CSS touch-action and
+  // user-select should be used instead of calling event.preventDefault().
+  if (scope.events.supportsPassive &amp;&amp; /^touch(start|move)$/.test(event.type)) {
+    const doc = getWindow(event.target).document
+    const docOptions = scope.getDocOptions(doc)
+
+    if (!(docOptions &amp;&amp; docOptions.events) || docOptions.events.passive !== false) {
+      return
+    }
+  }
+
+  // don't preventDefault of pointerdown events
+  if (/^(mouse|pointer|touch)*(down|start)/i.test(event.type)) {
+    return
+  }
+
+  // don't preventDefault on editable elements
+  if (
+    is.element(event.target) &amp;&amp;
+    matchesSelector(event.target, 'input,select,textarea,[contenteditable=true],[contenteditable=true] *')
+  ) {
+    return
+  }
+
+  event.preventDefault()
+}
+
+function onInteractionEvent ({ interaction, event }: { interaction: Interaction, event: PointerEventType }) {
+  if (interaction.interactable) {
+    interaction.interactable.checkAndPreventDefault(event as Event)
+  }
+}
+
+export function install (scope: Scope) {
+  /** @lends Interactable */
+  const { Interactable } = scope
+
+  /**
+   * Returns or sets whether to prevent the browser's default behaviour in
+   * response to pointer events. Can be set to:
+   *  - `'always'` to always prevent
+   *  - `'never'` to never prevent
+   *  - `'auto'` to let interact.js try to determine what would be best
+   *
+   * @param {string} [newValue] `'always'`, `'never'` or `'auto'`
+   * @return {string | Interactable} The current setting or this Interactable
+   */
+  Interactable.prototype.preventDefault = preventDefault
+
+  Interactable.prototype.checkAndPreventDefault = function (event) {
+    return checkAndPreventDefault(this, scope, event)
+  }
+
+  // prevent native HTML5 drag on interact.js target elements
+  scope.interactions.docEvents.push({
+    type: 'dragstart',
+    listener (event) {
+      for (const interaction of scope.interactions.list) {
+        if (
+          interaction.element &amp;&amp;
+          (interaction.element === event.target || nodeContains(interaction.element, event.target))
+        ) {
+          interaction.interactable.checkAndPreventDefault(event)
+          return
+        }
+      }
+    },
+  })
+}
+
+export default {
+  id: 'core/interactablePreventDefault',
+  install,
+  listeners: ['down', 'move', 'up', 'cancel'].reduce((acc, eventType) => {
+    acc[`interactions:${eventType}`] = onInteractionEvent
+    return acc
+  }, {} as any),
+}
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<script>prettyPrint();</script>
+<script src="scripts/linenumber.js"></script>
+</body>
+</html>
