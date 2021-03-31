@@ -1,9 +1,9 @@
 {
   "name": "@interactjs/utils",
-  "version": "1.10.9",
+  "version": "1.10.10",
   "peerDependencies": {
-    "@interactjs/feedback": "1.10.9",
-    "@interactjs/symbol-tree": "1.10.9"
+    "@interactjs/feedback": "1.10.10",
+    "@interactjs/symbol-tree": "1.10.10"
   },
   "publishConfig": {
     "access": "public"

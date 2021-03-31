@@ -1,6 +1,6 @@
 {
   "name": "interactjs",
-  "version": "1.10.9",
+  "version": "1.10.10",
   "main": "dist/interact.min.js",
   "module": "index",
   "typings": "index.d.ts",
@@ -39,7 +39,7 @@
     "test": "cd ../; npm test"
   },
   "dependencies": {
-    "@interactjs/types": "1.10.9"
+    "@interactjs/types": "1.10.10"
   },
   "sideEffects": [
     "**/index.js",

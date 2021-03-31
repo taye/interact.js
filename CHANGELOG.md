@@ -1,3 +1,8 @@
+## v1.10.10
+
+ - fixed issue with unresolved stub files #
+ - fixed commonjs import of `interactjs` package
+
 ## v1.10.9
 
  - improved support for SSR environments
