@@ -1,0 +1,37 @@
+{
+	"version": 3,
+	"sources": [
+		"hold.ts"
+	],
+	"names": [
+		"basePlugin",
+		"getHoldDuration",
+		"interaction",
+		"actionName",
+		"prepared",
+		"name",
+		"options",
+		"interactable",
+		"hold",
+		"delay",
+		"id",
+		"install",
+		"scope",
+		"defaults",
+		"usePlugin",
+		"perAction",
+		"listeners",
+		"[object Object]",
+		"autoStartHoldTimer",
+		"setTimeout",
+		"start",
+		"element",
+		"duplicate",
+		"pointerWasMoved",
+		"clearTimeout"
+	],
+	"mappings": "OAGOA,MAAgB,iBAwBvB,SAASC,EAAiBC,GACxB,MAAMC,EAAaD,EAAYE,UAAYF,EAAYE,SAASC,KAEhE,IAAKF,EACH,OAAO,KAGT,MAAMG,EAAUJ,EAAYK,aAAaD,QAEzC,OAAOA,EAAQH,GAAYK,MAAQF,EAAQH,GAAYM,MAGzD,MAAMD,EAAe,CACnBE,GAAI,kBACJC,QAvBgBC,GAChB,MAAMC,SAAEA,GAAaD,EAErBA,EAAME,UAAUd,GAEhBa,EAASE,UAAUP,KAAO,EAC1BK,EAASE,UAAUN,MAAQ,GAkB3BO,UAAW,CACTC,oBAAuBf,YAAAA,IACrBA,EAAYgB,mBAAqB,MAGnCD,sBAAyBf,YAAAA,IACvB,MAAMM,EAAOP,EAAgBC,GAEzBM,EAAO,IACTN,EAAYgB,mBAAqBC,YAAW,KAC1CjB,EAAYkB,MAAMlB,EAAYE,SAAUF,EAAYK,aAAcL,EAAYmB,WAC7Eb,KAIPS,qBAAwBf,YAAAA,EAAaoB,UAAAA,IAC/BpB,EAAYgB,oBAAsBhB,EAAYqB,kBAAoBD,IACpEE,aAAatB,EAAYgB,oBACzBhB,EAAYgB,mBAAqB,OAKrCD,0BAA6Bf,YAAAA,IACND,EAAgBC,GAElB,IACjBA,EAAYE,SAASC,KAAO,QAIlCJ,gBAAAA,kBAEaO",
+	"sourcesContent": [
+		"import type Interaction from '@interactjs/core/Interaction'\nimport type { Scope, Plugin } from '@interactjs/core/scope'\n\nimport basePlugin from './base'\n\ndeclare module '@interactjs/core/options' {\n  interface PerActionDefaults {\n    hold?: number\n    delay?: number\n  }\n}\n\ndeclare module '@interactjs/core/Interaction' {\n  interface Interaction {\n    autoStartHoldTimer?: any\n  }\n}\n\nfunction install (scope: Scope) {\n  const { defaults } = scope\n\n  scope.usePlugin(basePlugin)\n\n  defaults.perAction.hold = 0\n  defaults.perAction.delay = 0\n}\n\nfunction getHoldDuration (interaction: Interaction) {\n  const actionName = interaction.prepared && interaction.prepared.name\n\n  if (!actionName) {\n    return null\n  }\n\n  const options = interaction.interactable.options\n\n  return options[actionName].hold || options[actionName].delay\n}\n\nconst hold: Plugin = {\n  id: 'auto-start/hold',\n  install,\n  listeners: {\n    'interactions:new': ({ interaction }) => {\n      interaction.autoStartHoldTimer = null\n    },\n\n    'autoStart:prepared': ({ interaction }) => {\n      const hold = getHoldDuration(interaction)\n\n      if (hold > 0) {\n        interaction.autoStartHoldTimer = setTimeout(() => {\n          interaction.start(interaction.prepared, interaction.interactable, interaction.element)\n        }, hold)\n      }\n    },\n\n    'interactions:move': ({ interaction, duplicate }) => {\n      if (interaction.autoStartHoldTimer && interaction.pointerWasMoved && !duplicate) {\n        clearTimeout(interaction.autoStartHoldTimer)\n        interaction.autoStartHoldTimer = null\n      }\n    },\n\n    // prevent regular down->move autoStart\n    'autoStart:before-start': ({ interaction }) => {\n      const holdDuration = getHoldDuration(interaction)\n\n      if (holdDuration > 0) {\n        interaction.prepared.name = null\n      }\n    },\n  },\n  getHoldDuration,\n}\nexport default hold\n"
+	]
+}

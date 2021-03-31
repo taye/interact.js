@@ -1,0 +1,28 @@
+{
+	"version": 3,
+	"sources": [
+		"domObjects.ts"
+	],
+	"names": [
+		"domObjects",
+		"init",
+		"document",
+		"DocumentFragment",
+		"SVGElement",
+		"SVGSVGElement",
+		"SVGElementInstance",
+		"Element",
+		"HTMLElement",
+		"Event",
+		"Touch",
+		"PointerEvent",
+		"blank",
+		"window",
+		"win",
+		"MSPointerEvent"
+	],
+	"mappings": "AAAA,MAAMA,UAYL,GAAG;AACFC,EAAAA,IADE;AAEFC,EAAAA,QAAQ,EAAE,IAFR;AAGFC,EAAAA,gBAAgB,EAAE,IAHhB;AAIFC,EAAAA,UAAU,EAAE,IAJV;AAKFC,EAAAA,aAAa,EAAE,IALb;AAMFC,EAAAA,kBAAkB,EAAE,IANlB;AAOFC,EAAAA,OAAO,EAAE,IAPP;AAQFC,EAAAA,WAAW,EAAE,IARX;AASFC,EAAAA,KAAK,EAAE,IATL;AAUFC,EAAAA,KAAK,EAAE,IAVL;AAWFC,EAAAA,YAAY,EAAE;AAXZ,CAZJ;;AA0BA,SAASC,KAAT,GAAkB,CAAE;;AAEpB,eAAeZ,UAAf;;AAEA,SAASC,IAAT,CAAeY,MAAf,EAA+B;AAC7B,QAAMC,GAAG,GAAGD,MAAZ;AAEAb,EAAAA,UAAU,CAACE,QAAX,GAAsBY,GAAG,CAACZ,QAA1B;AACAF,EAAAA,UAAU,CAACG,gBAAX,GAA8BW,GAAG,CAACX,gBAAJ,IAAwBS,KAAtD;AACAZ,EAAAA,UAAU,CAACI,UAAX,GAAwBU,GAAG,CAACV,UAAJ,IAAkBQ,KAA1C;AACAZ,EAAAA,UAAU,CAACK,aAAX,GAA2BS,GAAG,CAACT,aAAJ,IAAqBO,KAAhD;AACAZ,EAAAA,UAAU,CAACM,kBAAX,GAAgCQ,GAAG,CAACR,kBAAJ,IAA0BM,KAA1D;AACAZ,EAAAA,UAAU,CAACO,OAAX,GAAqBO,GAAG,CAACP,OAAJ,IAAeK,KAApC;AACAZ,EAAAA,UAAU,CAACQ,WAAX,GAAyBM,GAAG,CAACN,WAAJ,IAAmBR,UAAU,CAACO,OAAvD;AAEAP,EAAAA,UAAU,CAACS,KAAX,GAAmBK,GAAG,CAACL,KAAvB;AACAT,EAAAA,UAAU,CAACU,KAAX,GAAmBI,GAAG,CAACJ,KAAJ,IAAaE,KAAhC;AACAZ,EAAAA,UAAU,CAACW,YAAX,GAA0BG,GAAG,CAACH,YAAJ,IAAoBG,GAAG,CAACC,cAAlD;AACD",
+	"sourcesContent": [
+		"const domObjects: {\n  init: any\n  document: Document\n  DocumentFragment: typeof DocumentFragment\n  SVGElement: typeof SVGElement\n  SVGSVGElement: typeof SVGSVGElement\n  SVGElementInstance: any\n  Element: typeof Element\n  HTMLElement: typeof HTMLElement\n  Event: typeof Event\n  Touch: typeof Touch\n  PointerEvent: typeof PointerEvent\n} = {\n  init,\n  document: null,\n  DocumentFragment: null,\n  SVGElement: null,\n  SVGSVGElement: null,\n  SVGElementInstance: null,\n  Element: null,\n  HTMLElement: null,\n  Event: null,\n  Touch: null,\n  PointerEvent: null,\n}\n\nfunction blank () {}\n\nexport default domObjects\n\nfunction init (window: Window) {\n  const win = window as any\n\n  domObjects.document = win.document\n  domObjects.DocumentFragment = win.DocumentFragment || blank\n  domObjects.SVGElement = win.SVGElement || blank\n  domObjects.SVGSVGElement = win.SVGSVGElement || blank\n  domObjects.SVGElementInstance = win.SVGElementInstance || blank\n  domObjects.Element = win.Element || blank\n  domObjects.HTMLElement = win.HTMLElement || domObjects.Element\n\n  domObjects.Event = win.Event\n  domObjects.Touch = win.Touch || blank\n  domObjects.PointerEvent = win.PointerEvent || win.MSPointerEvent\n}\n"
+	]
+}

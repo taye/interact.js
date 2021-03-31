@@ -1,0 +1,15 @@
+{
+	"version": 3,
+	"sources": [
+		"index.ts"
+	],
+	"names": [
+		"interact",
+		"plugin",
+		"use"
+	],
+	"mappings": "OACOA,MAAc,mCACdC,MAAY,mBACnBD,EAASE,IAAID",
+	"sourcesContent": [
+		"/* eslint-disable import/order, no-console, eol-last */\nimport interact from '@interactjs/interact/index'\nimport plugin from '@interactjs/reflow/plugin'\ninteract.use(plugin)"
+	]
+}

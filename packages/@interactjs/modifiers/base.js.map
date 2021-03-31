@@ -1,0 +1,53 @@
+{
+	"version": 3,
+	"sources": [
+		"base.ts"
+	],
+	"names": [
+		"Modification",
+		"makeModifier",
+		"module",
+		"name",
+		"defaults",
+		"methods",
+		"start",
+		"set",
+		"beforeEnd",
+		"stop",
+		"modifier",
+		"_options",
+		"options",
+		"enabled",
+		"prop",
+		"m",
+		"enable",
+		"disable",
+		"_defaults",
+		"_methods",
+		"addEventModifiers",
+		"iEvent",
+		"interaction",
+		"result",
+		"modification",
+		"modifiers",
+		"eventProps",
+		"modifiersBase",
+		"id",
+		"before",
+		"install",
+		"scope",
+		"perAction",
+		"listeners",
+		"arg",
+		"coords",
+		"page",
+		"edges",
+		"applyToInteraction",
+		"setAndApply",
+		"restoreInteractionCoords"
+	],
+	"mappings": "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",
+	"sourcesContent": [
+		"import type { EventPhase, InteractEvent } from '@interactjs/core/InteractEvent'\nimport type { Interactable } from '@interactjs/core/Interactable'\nimport type Interaction from '@interactjs/core/Interaction'\nimport type { Plugin } from '@interactjs/core/scope'\nimport type { EdgeOptions, FullRect, Point, Rect } from '@interactjs/types/index'\n\nimport Modification from './Modification'\n\ndeclare module '@interactjs/core/Interaction' {\n  interface Interaction {\n    modification?: Modification\n  }\n}\n\ndeclare module '@interactjs/core/InteractEvent' {\n  interface InteractEvent {\n    modifiers?: Array<{\n      name: string\n      [key: string]: any\n    }>\n  }\n}\n\ndeclare module '@interactjs/core/options' {\n  interface PerActionDefaults {\n    modifiers?: Modifier[]\n  }\n}\n\nexport interface Modifier<\n  Defaults = any,\n  State extends ModifierState = any,\n  Name extends string = any,\n  Result = any\n> {\n  options: Defaults\n  methods: {\n    start?: (arg: ModifierArg<State>) => void\n    set?: (arg: ModifierArg<State>) => Result\n    beforeEnd?: (arg: ModifierArg<State>) => Point | void\n    stop?: (arg: ModifierArg<State>) => void\n  }\n  name?: Name\n  enable: () => Modifier<Defaults, State, Name, Result>\n  disable: () => Modifier<Defaults, State, Name, Result>\n}\n\nexport type ModifierState<Defaults = unknown, StateProps = unknown, Name extends string = any> = {\n  options: Defaults\n  methods?: Modifier<Defaults>['methods']\n  index?: number\n  name?: Name\n} & StateProps\n\nexport interface ModifierArg<State extends ModifierState = ModifierState> {\n  interaction: Interaction\n  interactable: Interactable\n  phase: EventPhase\n  rect: FullRect\n  edges: EdgeOptions\n  state: State\n  element: Element\n  pageCoords: Point\n  prevCoords: Point\n  prevRect?: FullRect\n  coords: Point\n  startOffset: Rect\n  preEnd?: boolean\n}\n\nexport interface ModifierModule<\n  Defaults extends { enabled?: boolean },\n  State extends ModifierState,\n  Result = unknown\n> {\n  defaults?: Defaults\n  start?(arg: ModifierArg<State>): void\n  set?(arg: ModifierArg<State>): Result\n  beforeEnd?(arg: ModifierArg<State>): Point | void\n  stop?(arg: ModifierArg<State>): void\n}\n\nexport interface ModifierFunction<\n  Defaults extends { enabled?: boolean },\n  State extends ModifierState,\n  Name extends string\n> {\n  (_options?: Partial<Defaults>): Modifier<Defaults, State, Name>\n  _defaults: Defaults\n  _methods: ModifierModule<Defaults, State>\n}\n\nexport function makeModifier<\n  Defaults extends { enabled?: boolean },\n  State extends ModifierState,\n  Name extends string,\n  Result\n> (module: ModifierModule<Defaults, State, Result>, name?: Name) {\n  const { defaults } = module\n  const methods = {\n    start: module.start,\n    set: module.set,\n    beforeEnd: module.beforeEnd,\n    stop: module.stop,\n  }\n\n  const modifier = (_options?: Partial<Defaults>) => {\n    const options = (_options || {}) as Defaults\n\n    options.enabled = options.enabled !== false\n\n    // add missing defaults to options\n    for (const prop in defaults) {\n      if (!(prop in options)) {\n        ;(options as any)[prop] = defaults[prop]\n      }\n    }\n\n    const m: Modifier<Defaults, State, Name, Result> = {\n      options,\n      methods,\n      name,\n      enable: () => {\n        options.enabled = true\n        return m\n      },\n      disable: () => {\n        options.enabled = false\n        return m\n      },\n    }\n\n    return m\n  }\n\n  if (name && typeof name === 'string') {\n    // for backwrads compatibility\n    modifier._defaults = defaults\n    modifier._methods = methods\n  }\n\n  return modifier\n}\n\nexport function addEventModifiers ({\n  iEvent,\n  interaction,\n}: {\n  iEvent: InteractEvent<any>\n  interaction: Interaction<any>\n}) {\n  const result = interaction.modification!.result\n\n  if (result) {\n    iEvent.modifiers = result.eventProps\n  }\n}\n\nconst modifiersBase: Plugin = {\n  id: 'modifiers/base',\n  before: ['actions'],\n  install: (scope) => {\n    scope.defaults.perAction.modifiers = []\n  },\n  listeners: {\n    'interactions:new': ({ interaction }) => {\n      interaction.modification = new Modification(interaction)\n    },\n\n    'interactions:before-action-start': (arg) => {\n      const modification = arg.interaction.modification!\n\n      modification.start(arg, arg.interaction.coords.start.page)\n      arg.interaction.edges = modification.edges\n      modification.applyToInteraction(arg)\n    },\n\n    'interactions:before-action-move': (arg) => arg.interaction.modification.setAndApply(arg),\n\n    'interactions:before-action-end': (arg) => arg.interaction.modification.beforeEnd(arg),\n\n    'interactions:action-start': addEventModifiers,\n    'interactions:action-move': addEventModifiers,\n    'interactions:action-end': addEventModifiers,\n\n    'interactions:after-action-start': (arg) => arg.interaction.modification.restoreInteractionCoords(arg),\n    'interactions:after-action-move': (arg) => arg.interaction.modification.restoreInteractionCoords(arg),\n\n    'interactions:stop': (arg) => arg.interaction.modification.stop(arg),\n  },\n}\n\nexport default modifiersBase\n"
+	]
+}

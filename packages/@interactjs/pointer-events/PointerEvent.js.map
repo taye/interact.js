@@ -1,0 +1,51 @@
+{
+	"version": 3,
+	"sources": [
+		"PointerEvent.ts"
+	],
+	"names": [
+		"BaseEvent",
+		"pointerUtils",
+		"PointerEvent",
+		"constructor",
+		"type",
+		"pointer",
+		"event",
+		"eventTarget",
+		"interaction",
+		"timeStamp",
+		"originalEvent",
+		"pointerId",
+		"pointerType",
+		"double",
+		"pageX",
+		"pageY",
+		"clientX",
+		"clientY",
+		"dt",
+		"eventable",
+		"pointerExtend",
+		"getPointerId",
+		"getPointerType",
+		"target",
+		"currentTarget",
+		"pointerIndex",
+		"getPointerIndex",
+		"pointers",
+		"downTime",
+		"interval",
+		"tapTime",
+		"prevTap",
+		"_subtractOrigin",
+		"x",
+		"originX",
+		"y",
+		"originY",
+		"_addOrigin",
+		"preventDefault"
+	],
+	"mappings": "AAAA,SAASA,SAAT,QAA0B,sBAA1B;AAGA,OAAO,KAAKC,YAAZ,MAA8B,0BAA9B;AAEA,eAAe,MAAMC,YAAN,SAAmDF,SAAnD,CAAoE;AAcjF;AACAG,EAAAA,WAAW,CACTC,IADS,EAETC,OAFS,EAGTC,KAHS,EAITC,WAJS,EAKTC,WALS,EAMTC,SANS,EAOT;AACA,UAAMD,WAAN;AADA,SArBFJ,IAqBE;AAAA,SApBFM,aAoBE;AAAA,SAnBFC,SAmBE;AAAA,SAlBFC,WAkBE;AAAA,SAjBFC,MAiBE;AAAA,SAhBFC,KAgBE;AAAA,SAfFC,KAeE;AAAA,SAdFC,OAcE;AAAA,SAbFC,OAaE;AAAA,SAZFC,EAYE;AAAA,SAXFC,SAWE;AAEAlB,IAAAA,YAAY,CAACmB,aAAb,CAA2B,IAA3B,EAAiCd,KAAjC;;AAEA,QAAIA,KAAK,KAAKD,OAAd,EAAuB;AACrBJ,MAAAA,YAAY,CAACmB,aAAb,CAA2B,IAA3B,EAAiCf,OAAjC;AACD;;AAED,SAAKI,SAAL,GAAiBA,SAAjB;AACA,SAAKC,aAAL,GAAqBJ,KAArB;AACA,SAAKF,IAAL,GAAYA,IAAZ;AACA,SAAKO,SAAL,GAAiBV,YAAY,CAACoB,YAAb,CAA0BhB,OAA1B,CAAjB;AACA,SAAKO,WAAL,GAAmBX,YAAY,CAACqB,cAAb,CAA4BjB,OAA5B,CAAnB;AACA,SAAKkB,MAAL,GAAchB,WAAd;AACA,SAAKiB,aAAL,GAAqB,IAArB;;AAEA,QAAIpB,IAAI,KAAK,KAAb,EAAoB;AAClB,YAAMqB,YAAY,GAAGjB,WAAW,CAACkB,eAAZ,CAA4BrB,OAA5B,CAArB;AACA,WAAKa,EAAL,GAAU,KAAKT,SAAL,GAAiBD,WAAW,CAACmB,QAAZ,CAAqBF,YAArB,EAAmCG,QAA9D;AAEA,YAAMC,QAAQ,GAAG,KAAKpB,SAAL,GAAiBD,WAAW,CAACsB,OAA9C;AAEA,WAAKjB,MAAL,GAAc,CAAC,EACbL,WAAW,CAACuB,OAAZ,IACAvB,WAAW,CAACuB,OAAZ,CAAoB3B,IAApB,KAA6B,WAD7B,IAEAI,WAAW,CAACuB,OAAZ,CAAoBR,MAApB,KAA+B,KAAKA,MAFpC,IAGAM,QAAQ,GAAG,GAJE,CAAf;AAMD,KAZD,MAYO,IAAIzB,IAAI,KAAK,WAAb,EAA0B;AAC/B,WAAKc,EAAL,GAAWb,OAAD,CAAiCI,SAAjC,GAA6CD,WAAW,CAACsB,OAAnE;AACD;AACF;;AAEDE,EAAAA,eAAe,CAAE;AAAEC,IAAAA,CAAC,EAAEC,OAAL;AAAcC,IAAAA,CAAC,EAAEC;AAAjB,GAAF,EAAqC;AAClD,SAAKtB,KAAL,IAAcoB,OAAd;AACA,SAAKnB,KAAL,IAAcqB,OAAd;AACA,SAAKpB,OAAL,IAAgBkB,OAAhB;AACA,SAAKjB,OAAL,IAAgBmB,OAAhB;AAEA,WAAO,IAAP;AACD;;AAEDC,EAAAA,UAAU,CAAE;AAAEJ,IAAAA,CAAC,EAAEC,OAAL;AAAcC,IAAAA,CAAC,EAAEC;AAAjB,GAAF,EAAqC;AAC7C,SAAKtB,KAAL,IAAcoB,OAAd;AACA,SAAKnB,KAAL,IAAcqB,OAAd;AACA,SAAKpB,OAAL,IAAgBkB,OAAhB;AACA,SAAKjB,OAAL,IAAgBmB,OAAhB;AAEA,WAAO,IAAP;AACD;AAED;AACF;AACA;;;AACEE,EAAAA,cAAc,GAAI;AAChB,SAAK5B,aAAL,CAAmB4B,cAAnB;AACD;;AA9EgF;AAiFnF,SAASpC,YAAT",
+	"sourcesContent": [
+		"import { BaseEvent } from '@interactjs/core/BaseEvent'\nimport type Interaction from '@interactjs/core/Interaction'\nimport type { PointerEventType, PointerType, Point } from '@interactjs/types/index'\nimport * as pointerUtils from '@interactjs/utils/pointerUtils'\n\nexport default class PointerEvent<T extends string = any> extends BaseEvent<never> {\n  type: T\n  originalEvent: PointerEventType\n  pointerId: number\n  pointerType: string\n  double: boolean\n  pageX: number\n  pageY: number\n  clientX: number\n  clientY: number\n  dt: number\n  eventable: any;\n  [key: string]: any\n\n  /** */\n  constructor (\n    type: T,\n    pointer: PointerType | PointerEvent<any>,\n    event: PointerEventType,\n    eventTarget: Node,\n    interaction: Interaction<never>,\n    timeStamp: number,\n  ) {\n    super(interaction)\n    pointerUtils.pointerExtend(this, event)\n\n    if (event !== pointer) {\n      pointerUtils.pointerExtend(this, pointer)\n    }\n\n    this.timeStamp = timeStamp\n    this.originalEvent = event\n    this.type = type\n    this.pointerId = pointerUtils.getPointerId(pointer)\n    this.pointerType = pointerUtils.getPointerType(pointer)\n    this.target = eventTarget\n    this.currentTarget = null\n\n    if (type === 'tap') {\n      const pointerIndex = interaction.getPointerIndex(pointer)\n      this.dt = this.timeStamp - interaction.pointers[pointerIndex].downTime\n\n      const interval = this.timeStamp - interaction.tapTime\n\n      this.double = !!(\n        interaction.prevTap &&\n        interaction.prevTap.type !== 'doubletap' &&\n        interaction.prevTap.target === this.target &&\n        interval < 500\n      )\n    } else if (type === 'doubletap') {\n      this.dt = (pointer as PointerEvent<'tap'>).timeStamp - interaction.tapTime\n    }\n  }\n\n  _subtractOrigin ({ x: originX, y: originY }: Point) {\n    this.pageX -= originX\n    this.pageY -= originY\n    this.clientX -= originX\n    this.clientY -= originY\n\n    return this\n  }\n\n  _addOrigin ({ x: originX, y: originY }: Point) {\n    this.pageX += originX\n    this.pageY += originY\n    this.clientX += originX\n    this.clientY += originY\n\n    return this\n  }\n\n  /**\n   * Prevent the default behaviour of the original Event\n   */\n  preventDefault () {\n    this.originalEvent.preventDefault()\n  }\n}\n\nexport { PointerEvent }\n"
+	]
+}

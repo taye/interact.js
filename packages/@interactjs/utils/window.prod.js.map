@@ -1,0 +1,25 @@
+{
+	"version": 3,
+	"sources": [
+		"window.ts"
+	],
+	"names": [
+		"isWindow",
+		"realWindow",
+		"win",
+		"init",
+		"window",
+		"el",
+		"document",
+		"createTextNode",
+		"ownerDocument",
+		"wrap",
+		"getWindow",
+		"node",
+		"defaultView"
+	],
+	"mappings": "OAAOA,MAAc,4BAEd,IAAIC,WAEX,IAAIC,SACKA,oBAEF,SAASC,KAAMC,GAGpBH,WAAaG,EAGb,MAAMC,EAAKD,EAAOE,SAASC,eAAe,IAGtCF,EAAGG,gBAAkBJ,EAAOE,UAAmC,mBAAhBF,EAAOK,MAAuBL,EAAOK,KAAKJ,KAAQA,IAEnGD,EAASA,EAAOK,KAAKL,IAGvBF,EAAME,EAGc,oBAAXA,QAA4BA,QACrCD,KAAKC,eAGA,SAASM,UAAWC,GACzB,OAAIX,EAASW,GACJA,GAGQA,EAAKH,eAAiBG,GAEvBC,aAAeV,EAAIE",
+	"sourcesContent": [
+		"import isWindow from './isWindow'\n\nexport let realWindow = undefined as Window\n\nlet win = undefined as Window\nexport { win as window }\n\nexport function init (window: Window & { wrap?: (...args: any[]) => any }) {\n  // get wrapped window if using Shadow DOM polyfill\n\n  realWindow = window\n\n  // create a TextNode\n  const el = window.document.createTextNode('')\n\n  // check if it's wrapped by a polyfill\n  if (el.ownerDocument !== window.document && typeof window.wrap === 'function' && window.wrap(el) === el) {\n    // use wrapped window\n    window = window.wrap(window)\n  }\n\n  win = window\n}\n\nif (typeof window !== 'undefined' && !!window) {\n  init(window)\n}\n\nexport function getWindow (node: any) {\n  if (isWindow(node)) {\n    return node\n  }\n\n  const rootNode = node.ownerDocument || node\n\n  return rootNode.defaultView || win.window\n}\n"
+	]
+}

@@ -1,0 +1,21 @@
+{
+	"version": 3,
+	"sources": [
+		"index.ts"
+	],
+	"names": [
+		"Scope",
+		"scope",
+		"interact",
+		"interactStatic",
+		"_global",
+		"globalThis",
+		"window",
+		"this",
+		"init"
+	],
+	"mappings": "gBAASA,MAAa,wBAEtB,MAAMC,EAAQ,IAAID,EAEZE,EAAWD,EAAME,8BAERD,EAEf,MAAME,EAAgC,oBAAfC,WAA6BA,WAA+B,oBAAXC,OAAyBA,OAASC,KAC1GN,EAAMO,KAAKJ",
+	"sourcesContent": [
+		"import { Scope } from '@interactjs/core/scope'\n\nconst scope = new Scope()\n\nconst interact = scope.interactStatic\n\nexport default interact\n\nconst _global = typeof globalThis !== 'undefined' ? globalThis : typeof window !== 'undefined' ? window : this\nscope.init(_global)\n"
+	]
+}

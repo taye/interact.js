@@ -1,0 +1,32 @@
+{
+	"version": 3,
+	"sources": [
+		"raf.ts"
+	],
+	"names": [
+		"lastTime",
+		"request",
+		"cancel",
+		"init",
+		"global",
+		"requestAnimationFrame",
+		"cancelAnimationFrame",
+		"vendors",
+		"vendor",
+		"bind",
+		"callback",
+		"currTime",
+		"Date",
+		"now",
+		"timeToCall",
+		"Math",
+		"max",
+		"token",
+		"setTimeout",
+		"clearTimeout"
+	],
+	"mappings": "AAAA,IAAIA,QAAQ,GAAG,CAAf;AACA,IAAIC,OAAJ;AACA,IAAIC,MAAJ;;AAEA,SAASC,IAAT,CAAeC,MAAf,EAAmD;AACjDH,EAAAA,OAAO,GAAGG,MAAM,CAACC,qBAAjB;AACAH,EAAAA,MAAM,GAAGE,MAAM,CAACE,oBAAhB;;AAEA,MAAI,CAACL,OAAL,EAAc;AACZ,UAAMM,OAAO,GAAG,CAAC,IAAD,EAAO,KAAP,EAAc,QAAd,EAAwB,GAAxB,CAAhB;;AAEA,SAAK,MAAMC,MAAX,IAAqBD,OAArB,EAA8B;AAC5BN,MAAAA,OAAO,GAAGG,MAAM,CAAE,GAAEI,MAAO,uBAAX,CAAhB;AACAN,MAAAA,MAAM,GACJE,MAAM,CAAE,GAAEI,MAAO,sBAAX,CAAN,IACAJ,MAAM,CAAE,GAAEI,MAAO,6BAAX,CAFR;AAGD;AACF;;AAEDP,EAAAA,OAAO,GAAGA,OAAO,IAAIA,OAAO,CAACQ,IAAR,CAAaL,MAAb,CAArB;AACAF,EAAAA,MAAM,GAAGA,MAAM,IAAIA,MAAM,CAACO,IAAP,CAAYL,MAAZ,CAAnB;;AAEA,MAAI,CAACH,OAAL,EAAc;AACZA,IAAAA,OAAO,GAAIS,QAAD,IAAc;AACtB,YAAMC,QAAQ,GAAGC,IAAI,CAACC,GAAL,EAAjB;AACA,YAAMC,UAAU,GAAGC,IAAI,CAACC,GAAL,CAAS,CAAT,EAAY,MAAML,QAAQ,GAAGX,QAAjB,CAAZ,CAAnB;AACA,YAAMiB,KAAK,GAAGb,MAAM,CAACc,UAAP,CAAkB,MAAM;AACpC;AACAR,QAAAA,QAAQ,CAACC,QAAQ,GAAGG,UAAZ,CAAR;AACD,OAHa,EAGXA,UAHW,CAAd;AAKAd,MAAAA,QAAQ,GAAGW,QAAQ,GAAGG,UAAtB;AACA,aAAOG,KAAP;AACD,KAVD;;AAYAf,IAAAA,MAAM,GAAIe,KAAD,IAAWE,YAAY,CAACF,KAAD,CAAhC;AACD;AACF;;AAED,eAAe;AACbhB,EAAAA,OAAO,EAAGS,QAAD,IAAoCT,OAAO,CAACS,QAAD,CADvC;AAEbR,EAAAA,MAAM,EAAGe,KAAD,IAAmBf,MAAM,CAACe,KAAD,CAFpB;AAGbd,EAAAA;AAHa,CAAf",
+	"sourcesContent": [
+		"let lastTime = 0\nlet request: typeof requestAnimationFrame\nlet cancel: typeof cancelAnimationFrame\n\nfunction init (global: Window | typeof globalThis) {\n  request = global.requestAnimationFrame\n  cancel = global.cancelAnimationFrame\n\n  if (!request) {\n    const vendors = ['ms', 'moz', 'webkit', 'o']\n\n    for (const vendor of vendors) {\n      request = global[`${vendor}RequestAnimationFrame` as 'requestAnimationFrame']\n      cancel =\n        global[`${vendor}CancelAnimationFrame` as 'cancelAnimationFrame'] ||\n        global[`${vendor}CancelRequestAnimationFrame` as 'cancelAnimationFrame']\n    }\n  }\n\n  request = request && request.bind(global)\n  cancel = cancel && cancel.bind(global)\n\n  if (!request) {\n    request = (callback) => {\n      const currTime = Date.now()\n      const timeToCall = Math.max(0, 16 - (currTime - lastTime))\n      const token = global.setTimeout(() => {\n        // eslint-disable-next-line node/no-callback-literal\n        callback(currTime + timeToCall)\n      }, timeToCall)\n\n      lastTime = currTime + timeToCall\n      return token as any\n    }\n\n    cancel = (token) => clearTimeout(token)\n  }\n}\n\nexport default {\n  request: (callback: FrameRequestCallback) => request(callback),\n  cancel: (token: number) => cancel(token),\n  init,\n}\n"
+	]
+}

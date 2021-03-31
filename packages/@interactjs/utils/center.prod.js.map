@@ -1,0 +1,19 @@
+{
+	"version": 3,
+	"sources": [
+		"center.ts"
+	],
+	"names": [
+		"rect",
+		"x",
+		"left",
+		"right",
+		"y",
+		"top",
+		"bottom"
+	],
+	"mappings": "eAEgBA,IAAD,CACbC,EAAGD,EAAKE,MAAQF,EAAKG,MAAQH,EAAKE,MAAQ,EAC1CE,EAAGJ,EAAKK,KAAOL,EAAKM,OAASN,EAAKK,KAAO",
+	"sourcesContent": [
+		"import type { Rect } from '@interactjs/types'\n\nexport default (rect: Rect) => ({\n  x: rect.left + (rect.right - rect.left) / 2,\n  y: rect.top + (rect.bottom - rect.top) / 2,\n})\n"
+	]
+}

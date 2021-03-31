@@ -1,0 +1,27 @@
+{
+	"version": 3,
+	"sources": [
+		"index.ts"
+	],
+	"names": [
+		"actions",
+		"autoScroll",
+		"autoStart",
+		"interactablePreventDefault",
+		"devTools",
+		"inertia",
+		"interact",
+		"modifiers",
+		"offset",
+		"pointerEvents",
+		"reflow",
+		"use",
+		"module",
+		"exports",
+		"default"
+	],
+	"mappings": "AAAA,OAAOA,OAAP,MAAoB,sBAApB;AACA,OAAOC,UAAP,MAAuB,0BAAvB;AACA,OAAOC,SAAP,MAAsB,yBAAtB;AACA,OAAOC,0BAAP,MAAuC,uCAAvC;AACA,OAAOC,QAAP,MAAqB,wBAArB;AACA,OAAOC,OAAP,MAAoB,sBAApB;AACA,OAAOC,QAAP,MAAqB,sBAArB;AACA,OAAOC,SAAP,MAAsB,wBAAtB;AACA,OAAOC,MAAP,MAAmB,qBAAnB;AACA,OAAOC,aAAP,MAA0B,6BAA1B;AACA,OAAOC,MAAP,MAAmB,qBAAnB;AAEAJ,QAAQ,CAACK,GAAT,CAAaR,0BAAb;AAEAG,QAAQ,CAACK,GAAT,CAAaH,MAAb,E,CAEA;;AACAF,QAAQ,CAACK,GAAT,CAAaF,aAAb,E,CAEA;;AACAH,QAAQ,CAACK,GAAT,CAAaN,OAAb,E,CAEA;;AACAC,QAAQ,CAACK,GAAT,CAAaJ,SAAb,E,CAEA;;AACAD,QAAQ,CAACK,GAAT,CAAaT,SAAb,E,CAEA;;AACAI,QAAQ,CAACK,GAAT,CAAaX,OAAb,E,CAEA;;AACAM,QAAQ,CAACK,GAAT,CAAaV,UAAb,E,CAEA;;AACAK,QAAQ,CAACK,GAAT,CAAaD,MAAb,E,CAEA;;AACA,IAAI,kBAAyB,YAA7B,EAA2C;AACzCJ,EAAAA,QAAQ,CAACK,GAAT,CAAaP,QAAb;AACD;;AAED,eAAeE,QAAf;;AAEA,IAAI,OAAOM,MAAP,KAAkB,QAAlB,IAA8B,CAAC,CAACA,MAApC,EAA4C;AAC1C,MAAI;AACFA,IAAAA,MAAM,CAACC,OAAP,GAAiBP,QAAjB;AACD,GAFD,CAEE,gBAAM,CAAE;AACX;;AAED;AAAEA,QAAD,CAAkBQ,OAAlB,GAA4BR,QAA5B",
+	"sourcesContent": [
+		"import actions from '@interactjs/actions/plugin'\nimport autoScroll from '@interactjs/auto-scroll/plugin'\nimport autoStart from '@interactjs/auto-start/plugin'\nimport interactablePreventDefault from '@interactjs/core/interactablePreventDefault'\nimport devTools from '@interactjs/dev-tools/plugin'\nimport inertia from '@interactjs/inertia/plugin'\nimport interact from '@interactjs/interact'\nimport modifiers from '@interactjs/modifiers/plugin'\nimport offset from '@interactjs/offset/plugin'\nimport pointerEvents from '@interactjs/pointer-events/plugin'\nimport reflow from '@interactjs/reflow/plugin'\n\ninteract.use(interactablePreventDefault)\n\ninteract.use(offset)\n\n// pointerEvents\ninteract.use(pointerEvents)\n\n// inertia\ninteract.use(inertia)\n\n// snap, resize, etc.\ninteract.use(modifiers)\n\n// autoStart, hold\ninteract.use(autoStart)\n\n// drag and drop, resize, gesture\ninteract.use(actions)\n\n// autoScroll\ninteract.use(autoScroll)\n\n// reflow\ninteract.use(reflow)\n\n// eslint-disable-next-line no-undef\nif (process.env.NODE_ENV !== 'production') {\n  interact.use(devTools)\n}\n\nexport default interact\n\nif (typeof module === 'object' && !!module) {\n  try {\n    module.exports = interact\n  } catch {}\n}\n\n;(interact as any).default = interact\n"
+	]
+}
