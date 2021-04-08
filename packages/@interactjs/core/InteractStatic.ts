@@ -31,7 +31,7 @@ declare module '@interactjs/core/InteractStatic' {
         [key: string]: any
       },
     ): any
-    isSet(target: Element, options?: any): boolean
+    isSet(target: Target, options?: any): boolean
     on(type: string | EventTypes, listener: ListenersArg, options?: object): any
     off(type: EventTypes, listener: any, options?: object): any
     debug(): any
