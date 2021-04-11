@@ -21,20 +21,19 @@ interact(dropTarget)
   })
 ```
 
-Dropzone Events
----------------
+## Dropzone Events
 
 Dropzone events are plain objects with the following properties:
 
-| Property                | Description                                       |
-| ----------------------- | --------------------------------------------------|
-| `target`                | The dropzone element                              |
-| `dropzone`              | The dropzone Interactable                         |
-| `relatedTarget`         | The element that's being dragged                  |
-| `draggable`             | The Interactable that's being dragged             |
-| `dragEvent`             | The related drag event – `drag{start,move,end}`   |
-| `timeStamp`             | Time of the event                                 |
-| `type`                  | The event type                                    |
+| Property        | Description                                     |
+| --------------- | ----------------------------------------------- |
+| `target`        | The dropzone element                            |
+| `dropzone`      | The dropzone Interactable                       |
+| `relatedTarget` | The element that's being dragged                |
+| `draggable`     | The Interactable that's being dragged           |
+| `dragEvent`     | The related drag event – `drag{start,move,end}` |
+| `timeStamp`     | Time of the event                               |
+| `type`          | The event type                                  |
 
 ```javascript
 interact('.dropzone').dropzone({
@@ -42,8 +41,7 @@ interact('.dropzone').dropzone({
 });
 ```
 
-`accept`
---------
+## `accept`
 
 The dropzone `accept` option is a CSS selector or element which must match the
 dragged element in order for drop events to be fired.
@@ -56,14 +54,13 @@ interact(target).dropzone({
 
 The `overlap` option sets how drops are checked for. The allowed values are:
 
- - `'pointer'` – the pointer must be over the dropzone (default)
- - `'center'` – the draggable element's center must be over the dropzone
- - a number from 0-1 which is the (intersection area) / (draggable area).  e.g.
- `0.5` for drop to happen when half of the area of the draggable is over the
- dropzone
+- `'pointer'` – the pointer must be over the dropzone (default)
+- `'center'` – the draggable element's center must be over the dropzone
+- a number from 0-1 which is the (intersection area) / (draggable area). e.g.
+  `0.5` for drop to happen when half of the area of the draggable is over the
+  dropzone
 
-`checker`
----------
+## `checker`
 
 The `checker` option is a function that you set to additionally check if a
 dragged element can be dropped into a dropzone.
@@ -88,12 +85,12 @@ interact(target).dropzone({
 
 The checker function takes the following arguments:
 
-| Arg                     | Description                                       |
-| ----------------------- | --------------------------------------------------|
-| `dragEvent`             | related dragmove or dragend event                 |
-| `event`                 | The user move/up/end Event related to the dragEvent
-| `dropped`               | The value from the default drop checker           |
-| `dropzone`              | The dropzone interactable                         |
-| `dropElement`           | The dropzone element                              |
-| `draggable`             | The Interactable being dragged                    |
-| `draggableElement`      | The actual element that's being dragged           |
+| Arg                | Description                                         |
+| ------------------ | --------------------------------------------------- |
+| `dragEvent`        | related dragmove or dragend event                   |
+| `event`            | The user move/up/end Event related to the dragEvent |
+| `dropped`          | The value from the default drop checker             |
+| `dropzone`         | The dropzone interactable                           |
+| `dropElement`      | The dropzone element                                |
+| `draggable`        | The Interactable being dragged                      |
+| `draggableElement` | The actual element that's being dragged             |

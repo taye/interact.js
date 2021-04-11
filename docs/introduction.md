@@ -7,8 +7,7 @@ title: Introduction
 interact.js is a JavaScript library for drag and drop, resizing and multi-touch
 gestures for modern browsers. Its free and open source version comes with
 powerful options like inertia and modifiers for snapping and restricting.
-\
-\
+
 [interact.js Pro](/pro) extends the open source features with extra modifiers,
 more complex built-in interactions, framework integrations, and advanced dev
 tools to save you time and effort. {.notice}
@@ -17,13 +16,6 @@ The library's aim is to **present pointer input data consistently** across
 different browsers and devices and provide convenient ways to **pretend that the
 user's pointer moved in a way that it wasn't really moved** (snapping, inertia,
 etc.).
-
-The `interact` function takes an element or a CSS selector string and returns an
-`Interactable` object which has various methods to configure actions and event
-listeners. Pointer interactions of down → move → up sequences begin drag,
-resize, or gesture actions. By adding event listener functions for these action,
-you can respond to `InteractEvent`s which provide pointer coordinates, speed,
-element size, etc.
 
 Note that by default **interact.js doesn't move elements for you**. Styling an
 element so that it moves while a drag happens has to be done from your own event
@@ -80,6 +72,13 @@ slider
     event.target.setAttribute('data-value', value.toFixed(2))
   })
 ```
+
+The `interact` function takes an element or a CSS selector string and returns an
+`Interactable` object which has various methods to configure actions and event
+listeners. Pointer interactions of down → move → up sequences begin drag,
+resize, or gesture actions. By adding event listener functions for these action,
+you can respond to `InteractEvent`s which provide pointer coordinates, speed,
+element size, etc.
 
 ## Actions
 

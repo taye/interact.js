@@ -4,11 +4,11 @@ title: Installation
 
 interact.js offers two sets of free packages that you can add to your project:
 
- 1. To get started quickly, you can use the package named `interactjs` on npm.
-    This package contains all the features of the library as an *ES5 bundled*.
- 2. If you'd like to keep your JS payload small, there are npm packages under
+1.  To get started quickly, you can use the package named `interactjs` on npm.
+    This package contains all the features of the library as an _ES5 bundled_.
+2.  If you'd like to keep your JS payload small, there are npm packages under
     the `@interactjs/` scope which let you choose which features to include.
-    These packages are distributed as *ES6 modules* and may need to be
+    These packages are distributed as _ES6 modules_ and may need to be
     transpiled for older browsers.
 
 ### npm pre-bundled
@@ -84,34 +84,33 @@ interact('.item').draggable({
 For a more streamlined JS payload, you can install and import the package for
 each feature you need:
 
-| Package name                            | Description                                            |
-| --------------------------------------- | ------------------------------------------------------ |
-| `@interactjs/interact`                  |**(required)** provides the `interact()` method         |
-| [`@interactjs/actions`](action-options) | Drag, resize, gesture actions                          |
-| [`@interactjs/auto-start`](auto-start)  | Start actions with pointer down, move sequence         |
-| [`@interactjs/modifiers`](modifiers)    | Snap, restrict, etc. modifiers                         |
-| `@interactjs/snappers`                  | Provides `interact.snappers.grid()` utility            |
-| [`@interactjs/inertia`](inertia)        | Drag and resize inertia-like throwing                  |
-| [`@interactjs/reflow`](reflow)          | `interactable.reflow(action)` method to trigger modifiers and event listeners |
+| Package name                                           | Description                                                                                                                              |
+| ------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| `@interactjs/interact`                                 | **(required)** provides the `interact()` method                                                                                          |
+| [`@interactjs/actions`](action-options)                | Drag, resize, gesture actions                                                                                                            |
+| [`@interactjs/auto-start`](auto-start)                 | Start actions with pointer down, move sequence                                                                                           |
+| [`@interactjs/modifiers`](modifiers)                   | Snap, restrict, etc. modifiers                                                                                                           |
+| `@interactjs/snappers`                                 | Provides `interact.snappers.grid()` utility                                                                                              |
+| [`@interactjs/inertia`](inertia)                       | Drag and resize inertia-like throwing                                                                                                    |
+| [`@interactjs/reflow`](reflow)                         | `interactable.reflow(action)` method to trigger modifiers and event listeners                                                            |
 | [`@interactjs/dev-tools`](tooling#interactjsdev-tools) | Console warnings for common mistakes (optimized out when `NODE_ENV === 'production'`) and a babel plugin for optimized production builds |
 
 ### CDN streamlined
 
 ```html
 <script type="module">
-import 'https://cdn.interactjs.io/v1.9.20/auto-start/index.js'
-import 'https://cdn.interactjs.io/v1.9.20/actions/drag/index.js'
-import 'https://cdn.interactjs.io/v1.9.20/actions/resize/index.js'
-import 'https://cdn.interactjs.io/v1.9.20/modifiers/index.js'
-import 'https://cdn.interactjs.io/v1.9.20/dev-tools/index.js'
-import interact from 'https://cdn.interactjs.io/v1.9.20/interactjs/index.js'
+  import 'https://cdn.interactjs.io/v1.9.20/auto-start/index.js'
+  import 'https://cdn.interactjs.io/v1.9.20/actions/drag/index.js'
+  import 'https://cdn.interactjs.io/v1.9.20/actions/resize/index.js'
+  import 'https://cdn.interactjs.io/v1.9.20/modifiers/index.js'
+  import 'https://cdn.interactjs.io/v1.9.20/dev-tools/index.js'
+  import interact from 'https://cdn.interactjs.io/v1.9.20/interactjs/index.js'
 
-interact('.item').draggable({
-  onmove(event) {
-    console.log(event.pageX,
-                event.pageY)
-  }
-})
+  interact('.item').draggable({
+    onmove(event) {
+      console.log(event.pageX, event.pageY)
+    },
+  })
 </script>
 ```
 
@@ -122,8 +121,7 @@ modern browser which support ES6 `import`s.
 ### Ruby on Rails
 
 [Rails 5.1+](https://rubyonrails.org/) supports the [yarn](http://yarnpkg.com/)
-package manager, so you can add interact.js to you app by running `yarn add
-interactjs`. Then require the library with:
+package manager, so you can add interact.js to you app by running `yarn add interactjs`. Then require the library with:
 
 ```rb
 //= require interactjs/interact
