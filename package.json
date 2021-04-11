@@ -19,7 +19,7 @@
   },
   "homepage": "https://interactjs.io/pro",
   "description": "",
-  "dependencies": {
+  "devDependencies": {
     "@babel/core": "latest",
     "@babel/plugin-proposal-class-properties": "latest",
     "@babel/plugin-proposal-export-default-from": "latest",
