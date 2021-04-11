@@ -24,10 +24,10 @@ const position = { x: 0, y: 0 }
 
 interact('.draggable').draggable({
   listeners: {
-    start(event) {
+    start (event) {
       console.log(event.type, event.target)
     },
-    move(event) {
+    move (event) {
       position.x += event.dx
       position.y += event.dy
 

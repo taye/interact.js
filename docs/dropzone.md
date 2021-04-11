@@ -81,7 +81,7 @@ interact(target).dropzone({
     return dropped && !dropElement.hasChildNodes();
   }
 });
- ```
+```
 
 The checker function takes the following arguments:
 

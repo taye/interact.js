@@ -25,6 +25,7 @@ parserOptions:
 
 plugins:
   - '@typescript-eslint'
+  - 'markdown'
 
 globals:
   globalThis: false
@@ -93,7 +94,7 @@ overrides:
       no-unused-vars: off
       no-use-before-define: off
   -
-    files: '*.vue'
+    files: '{,.md/}*.vue'
     extends:
       - 'plugin:vue/vue3-essential'
     parserOptions:
@@ -107,3 +108,20 @@ overrides:
       array-bracket-spacing: off
       import/no-extraneous-dependencies: off
       jest/consistent-test-it: [error, { fn: test }]
+  -
+    files: "**/*.md"
+    processor: "markdown/markdown"
+  -
+    files: "**/*.md/*.{{ts,js}{,x},vue}"
+    rules:
+      arrow-parens: off
+      import/no-named-as-default: off
+      import/no-unresolved: off
+      no-console: off
+      no-redeclare: off
+      no-shadow: off
+      no-undef: off
+      no-unused-vars: off
+      no-use-before-define: off
+      no-var: off
+      prefer-arrow-callback: off

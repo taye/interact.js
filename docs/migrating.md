@@ -61,21 +61,21 @@ interact(target).resize({
   // sizes at fixed grid points
   snapSize: {
     targets: [
-      interact.snappers.grid({ x: 25, y: 25, range: Infinity })
-    ]
+      interact.snappers.grid({ x: 25, y: 25, range: Infinity }),
+    ],
   },
 
   // minimum size
   restrictSize: {
-    min: { width: 100, height: 50 }
+    min: { width: 100, height: 50 },
   },
 
   // keep the edges inside the parent
   restrictEdges: {
     outer: 'parent',
-    endOnly: true
-  }
-});
+    endOnly: true,
+  },
+})
 ```
 
 ### Resize `aspectRatio` modifier
@@ -93,9 +93,9 @@ interact(target).resizable({
       ratio: 'preserve',
       // To add other modifiers that respect the aspect ratio,
       // put them in the aspectRatio.modifiers array
-      modifiers: [interact.modifiers.restrictSize({ max: 'parent' })]
-    })
-  ]
+      modifiers: [interact.modifiers.restrictSize({ max: 'parent' })],
+    }),
+  ],
 })
 ```
 
@@ -104,9 +104,9 @@ interact(target).resizable({
   modifiers: [
     interact.modifiers.aspectRatio({
       // The equalDelta option replaces the old resize.square option
-      equalDelta: true
-    })
-  ]
+      equalDelta: true,
+    }),
+  ],
 })
 ```
 
@@ -136,7 +136,7 @@ starting coordinates and subtract them from the end event coordinates.
 interact(target).draggable({
   onend: function (event) {
     console.log(event.pageX - event.X0, event.pageY - event.Y0)
-  }
+  },
 })
 ```
 

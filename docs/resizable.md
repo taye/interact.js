@@ -44,7 +44,7 @@ element which can be resized from (top, left, bottom or right).
 interact('.resizable').resizable({
   edges: { top: true, left: true, bottom: true, right: true },
   listeners: {
-    move(event) {
+    move (event) {
       let { x, y } = event.target.dataset
 
       x = (parseFloat(x) || 0) + event.deltaRect.left
@@ -104,9 +104,9 @@ interact(target).resizable({
       ratio: 2,
       // also restrict the size by nesting another modifier
       modifiers: [
-        interact.modifiers.restrictSize({ max: 'parent' })
-      ]
-    })
+        interact.modifiers.restrictSize({ max: 'parent' }),
+      ],
+    }),
   ],
 })
 ```
