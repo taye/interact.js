@@ -4,6 +4,8 @@ const path = require('path')
 const del = require('del')
 const shell = require('shelljs')
 
+const { errorExit } = require('../utils')
+
 shell.config.verbose = true
 shell.config.fatal = true
 
@@ -27,7 +29,4 @@ export = Interact
 `.trimLeft()
 
   await fs.promises.writeFile(path.join(outDir, 'typings.d.ts'), namespaceDeclaration)
-})().catch((error) => {
-  console.error(error)
-  process.exit(1)
-})
+})().catch(errorExit)

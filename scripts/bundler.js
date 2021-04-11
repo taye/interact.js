@@ -1,6 +1,6 @@
 const path = require('path')
 
-const { getModuleDirectories, getBabelConfig, extendBabelOptions } = require('./utils')
+const { getModuleDirectories, getBabelConfig, extendBabelOptions, errorExit } = require('./utils')
 
 process.env.NODE_PATH = `${process.env.NODE_PATH || ''}:${path.resolve(__dirname, '..', 'node_modules')}`
 require('module').Module._initPaths()
@@ -38,10 +38,7 @@ module.exports = function (options) {
 
   b.add(options.entry)
 
-  b.on('error', (error) => {
-    console.error(error)
-    process.exit(1)
-  })
+  b.on('error', errorExit)
 
   function update (ids) {
     if (ids) {

@@ -6,7 +6,7 @@ const mkdirp = require('mkdirp')
 const { default: PQueue } = require('p-queue')
 
 const bundleShim = require('../shimBundler')
-const { getShims } = require('../utils')
+const { getShims, errorExit } = require('../utils')
 
 const destDir = path.join(__dirname, '..', 'dist', 'shims')
 
@@ -40,8 +40,3 @@ async function bundle (shimConfig) {
 queue.onIdle().then((bundled) => {
   console.log('Done.')
 })
-
-function errorExit (error) {
-  console.error(error)
-  process.exit(1)
-}

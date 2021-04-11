@@ -4,24 +4,21 @@ const { ESLint } = require('eslint')
 const prettier = require('prettier')
 const yargs = require('yargs')
 
-const { lintSourcesGlob, lintIgnoreGlobs } = require('../utils')
+const { lintSourcesGlob, lintIgnoreGlobs, errorExit } = require('../utils')
 
 const { fix, _: fileArgs } = yargs.boolean('fix').argv
 const jsExt = /\.js$/
 const dtsExt = /\.d\.ts$/
 
-;(async () => {
+main().catch(errorExit)
+
+async function main () {
   const sources = fileArgs.length ? fileArgs : await getSources()
 
   console.log(`Linting ${sources.length} 'file${sources.length === 1 ? '' : 's'}...`)
 
   if (fix) {
-    try {
-      await Promise.all(sources.map(formatWithPrettier))
-    } catch (error) {
-      console.error(error)
-      process.exit(1)
-    }
+    await Promise.all(sources.map(formatWithPrettier))
   }
 
   const eslint = new ESLint({
@@ -37,12 +34,12 @@ const dtsExt = /\.d\.ts$/
 
   console.log(formatter.format(results))
 
-  const hasUnfixedError = results.some((r) => (r.errorCount > fix ? r.fixableErrorCount : 0))
+  const hasUnfixedError = results.some((r) => r.errorCount > (fix ? r.fixableErrorCount : 0))
 
   if (hasUnfixedError) {
-    process.exit(1)
+    throw new Error('unfixed errors remain')
   }
-})()
+}
 
 async function formatWithPrettier (filepath) {
   const [source, config] = await Promise.all([

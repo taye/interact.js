@@ -1,6 +1,6 @@
 const fs = require('fs/promises')
 
-const { getPackageJsons } = require('../utils')
+const { getPackageJsons, errorExit } = require('../utils')
 
 async function checkDeps () {
   const packageJsons = await getPackageJsons()
@@ -24,7 +24,4 @@ async function checkDeps () {
   )
 }
 
-checkDeps().catch((error) => {
-  console.error(error)
-  process.exit(1)
-})
+checkDeps().catch(errorExit)
