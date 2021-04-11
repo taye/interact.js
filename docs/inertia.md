@@ -24,21 +24,20 @@ If an action ends without inertia but is snapped or restricted with the
 `endOnly` option, then the the coordinates are interpolated from the end coords
 to the snapped/restricted coords.
 
-Options
--------
+## Options
 
- - **`resistance`** is a number greater than zero which sets the rate at which
-   the action slows down. Higher values slow it down more quickly.
+- **`resistance`** is a number greater than zero which sets the rate at which
+  the action slows down. Higher values slow it down more quickly.
 
- - **`endSpeed`** is the speed (pixels per second) at which the action is
-   considered to have stopped.
+- **`endSpeed`** is the speed (pixels per second) at which the action is
+  considered to have stopped.
 
- - **`allowResume`** is a `boolean` value which indicates whether the user
-   should be allowed to resume an action while it is in the inertia phase.
+- **`allowResume`** is a `boolean` value which indicates whether the user
+  should be allowed to resume an action while it is in the inertia phase.
 
- - **`smoothEndDuration`** is the duration (milliseconds) of the interpolated
-   movement from the actual end coords to the modified coords with `endOnly`.
-   Set the value to `0` to disable end transitions with `endOnly` snap/restrict.
+- **`smoothEndDuration`** is the duration (milliseconds) of the interpolated
+  movement from the actual end coords to the modified coords with `endOnly`.
+  Set the value to `0` to disable end transitions with `endOnly` snap/restrict.
 
 When inertia is resumed, the difference between the start and resume coordinates
 relative to the target's top left corner, isn't reflected in the next

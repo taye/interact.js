@@ -1,5 +1,5 @@
 ---
-title: "AutoStart (manualStart: false)"
+title: 'AutoStart (manualStart: false)'
 ---
 
 The [pre-bundled](/docs/installation) package includes the `auto-start` plugin

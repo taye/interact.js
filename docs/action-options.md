@@ -9,20 +9,19 @@ common options as well as some action-specific options and event properties.
 Drag, resizem and gesture interactions fire `InteractEvent`s which have the
 following properties common to all action types:
 
-| InteractEvent property  | Description                                       |
-| ----------------------- | --------------------------------------------------|
-| `target`                | The element that is being interacted with         |
-| `interactable`          | The Interactable that is being interacted with    |
-| `interaction`           | The Interaction that the event belongs to         |
-| `x0`, `y0`              | Page x and y coordinates of the starting event    |
-| `clientX0`, `clientY0`  | Client x and y coordinates of the starting event  |
-| `dx`, `dy`              | Change in coordinates of the mouse/touch          |
-| `velocityX`, `velocityY`| The Velocity of the pointer                       |
-| `speed`                 | The speed of the pointer                          |
-| `timeStamp`             | The time of creation of the event object          |
+| InteractEvent property   | Description                                      |
+| ------------------------ | ------------------------------------------------ |
+| `target`                 | The element that is being interacted with        |
+| `interactable`           | The Interactable that is being interacted with   |
+| `interaction`            | The Interaction that the event belongs to        |
+| `x0`, `y0`               | Page x and y coordinates of the starting event   |
+| `clientX0`, `clientY0`   | Client x and y coordinates of the starting event |
+| `dx`, `dy`               | Change in coordinates of the mouse/touch         |
+| `velocityX`, `velocityY` | The Velocity of the pointer                      |
+| `speed`                  | The speed of the pointer                         |
+| `timeStamp`              | The time of creation of the event object         |
 
-Common Action Options
----------------------
+## Common Action Options
 
 The Interactable methods `draggable`, `resizable` and `gesturable` take either
 `true` or `false` to simply allow/disallow the action or an object with
@@ -173,7 +172,7 @@ interact(movable)
 ```
 
 The compliment to `allowFrom`, `ignoreFrom` lets you specify elements within
-your target with which to avoid starting actions.  This is useful when certain
+your target with which to avoid starting actions. This is useful when certain
 elements need to maintain default behavior when interacted with. For example,
 dragging around a text/contentEditable, by wrapping this object with a
 draggable element and ignoring the editable content you maintain the ability to

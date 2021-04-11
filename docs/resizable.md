@@ -19,11 +19,11 @@ Resize events have `rect` and `deltaRect` properties. `rect` is updated on each
 `resizestart`, `rect` will be identical to the rect returned by
 `interactable.getRect(element)` and `deltaRect` will have all-zero properties.
 
-| Resize Event property   | Description                                       |
-| ----------------------- | --------------------------------------------------|
-| `edges`                 | The edges of the element that are being changed   |
-| `rect`                  | An object with the new dimensions of the target   |
-| `deltaRect`             | The change in dimensions since the previous event |
+| Resize Event property | Description                                       |
+| --------------------- | ------------------------------------------------- |
+| `edges`               | The edges of the element that are being changed   |
+| `rect`                | An object with the new dimensions of the target   |
+| `deltaRect`           | The change in dimensions since the previous event |
 
 Resizable options have an `edges` property which specifies the edges of the
 element which can be resized from (top, left, bottom or right).
@@ -31,7 +31,7 @@ element which can be resized from (top, left, bottom or right).
 <LiveDemo :demoHtml="import('@/demos/resizable/basic.html?raw')" :removeNext="2" />
 
 ```html
-<div data-x=0 data-y=0 class="resizable">
+<div data-x="0" data-y="0" class="resizable">
   <!-- top-left resize handle -->
   <div class="resize-top resize-left"></div>
 
@@ -41,26 +41,25 @@ element which can be resized from (top, left, bottom or right).
 ```
 
 ```js
-interact('.resizable')
-  .resizable({
-    edges: { top: true, left: true, bottom: true, right: true },
-    listeners: {
-      move (event) {
-        let { x, y } = event.target.dataset
+interact('.resizable').resizable({
+  edges: { top: true, left: true, bottom: true, right: true },
+  listeners: {
+    move(event) {
+      let { x, y } = event.target.dataset
 
-        x = (parseFloat(x) || 0) + event.deltaRect.left
-        y = (parseFloat(y) || 0) + event.deltaRect.top
+      x = (parseFloat(x) || 0) + event.deltaRect.left
+      y = (parseFloat(y) || 0) + event.deltaRect.top
 
-        Object.assign(event.target.style, {
-          width: `${event.rect.width}px`,
-          height: `${event.rect.height}px`,
-          transform: `translate(${x}px, ${y}px)`
-        })
+      Object.assign(event.target.style, {
+        width: `${event.rect.width}px`,
+        height: `${event.rect.height}px`,
+        transform: `translate(${x}px, ${y}px)`,
+      })
 
-        Object.assign(event.target.dataset, { x, y })
-      }
-    }
-  })
+      Object.assign(event.target.dataset, { x, y })
+    },
+  },
+})
 ```
 
 Remember to use CSS `touch-action: none` to prevent the browser from panning
@@ -88,10 +87,10 @@ By default, resize actions can't make the `event.rect` smaller than `0x0`. Use
 the `invert` option to specify what should happen if the target would be resized
 to dimensions less than `0x0`. The possible values are:
 
- - `'none'` (default) will limit the resize rect to a minimum of `0x0`
- - `'negate'` will allow the rect to have negative width/height
- - `'reposition'` will keep the width/height positive by swapping the top and
- bottom edges and/or swapping the left and right edges
+- `'none'` (default) will limit the resize rect to a minimum of `0x0`
+- `'negate'` will allow the rect to have negative width/height
+- `'reposition'` will keep the width/height positive by swapping the top and
+  bottom edges and/or swapping the left and right edges
 
 <LiveDemo :demoHtml="import('@/demos/resizable/invert.html?raw')" />
 
@@ -116,7 +115,7 @@ interact.js comes with an `aspectRatio` modifier which can be used to force the
 resized rect to maintain a certain aspect ratio. The modifier has 3 options:
 
 | Prop         | Type                 | Description                                                                             |
-|--------------|----------------------|-----------------------------------------------------------------------------------------|
+| ------------ | -------------------- | --------------------------------------------------------------------------------------- |
 | `ratio`      | number or 'preserve' | The aspect ratio to maintain or the value 'preserve' to maintain the starting ratio     |
 | `equalDelta` | boolean              | Increase edges by the same amount instead of maintaining the same ratio                 |
 | `modifiers`  | array of modifiers   | Modifiers to apply to the resize which will be made to respect the aspect ratio options |

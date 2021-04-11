@@ -5,38 +5,36 @@ title: Restrict
 interact.js has 3 restriction modifiers available through the
 `interact.modifiers` object:
 
-  - pointer coordinate-based `restrict`
-  - element rect-based restriction `restrictRect`
-  - element size-based `restrictSize` (resize only)
-  - and element edge-based `restrictEdges` (resize only)
+- pointer coordinate-based `restrict`
+- element rect-based restriction `restrictRect`
+- element size-based `restrictSize` (resize only)
+- and element edge-based `restrictEdges` (resize only)
 
-`restrict()`
-------------
+## `restrict()`
 
 ```javascript
-interact(target)
-  .draggable({
-    modifiers: [
-      interact.modifiers.restrict({
-        restriction: 'parent',
-        endOnly: true
-      })
-    ]
-  })
+interact(target).draggable({
+  modifiers: [
+    interact.modifiers.restrict({
+      restriction: 'parent',
+      endOnly: true
+    })
+  ]
+})
 ```
 
 The `restriction` value specifies the area that the action will be confined to.
 The value can be:
 
- - a rect object with `top`, `left`, `bottom` and `right` or `x`, `y`,
- `width` and `height`,
- - an element whose dimensions will be used as the restriction area,
- - a function which takes `(x, y, element)` and returns a rect or an element
- - one of these strings:
-  - `'self'` – restrict to the target element's rect
-  - `'parent'` – restrict to the rect of the element's parentNode or
- - a CSS selector string – if one of the parents of the target element matches
- this selector, it's rect will be used as the restriction area.
+- a rect object with `top`, `left`, `bottom` and `right` or `x`, `y`,
+  `width` and `height`,
+- an element whose dimensions will be used as the restriction area,
+- a function which takes `(x, y, element)` and returns a rect or an element
+- one of these strings:
+- `'self'` – restrict to the target element's rect
+- `'parent'` – restrict to the rect of the element's parentNode or
+- a CSS selector string – if one of the parents of the target element matches
+  this selector, it's rect will be used as the restriction area.
 
 ### `restrictRect()`
 
@@ -47,12 +45,12 @@ that the element's edges are considered while dragging.
 
 ```javascript
 interact(target).draggable({
-    modifiers: [
-      interact.modifiers.restrictRect({
-        restriction: 'parent'
-      })
-    ]
-  })
+  modifiers: [
+    interact.modifiers.restrictRect({
+      restriction: 'parent'
+    })
+  ]
+})
 ```
 
 If the target element is larger than the restriction, then the element will be
@@ -72,41 +70,39 @@ the element and 1 means the bottom.
 `{ top: 0.25, left: 0.25, bottom: 0.75, right: 0.75 }` would result in a quarter
 of the element being allowed to hang over the restriction edges.
 
-`restrictSize()`
-----------------
+## `restrictSize()`
 
 ```javascript
 interact(target).resizable({
-    modifiers: [
-      interact.modifiers.restrictSize({
-        min: { width: 100, height: 100 },
-        max: { width: 500, height: 500 },
-      })
-    ]
-  })
+  modifiers: [
+    interact.modifiers.restrictSize({
+      min: { width: 100, height: 100 },
+      max: { width: 500, height: 500 }
+    })
+  ]
+})
 ```
 
 `restrictSize` lets you specify the minimum and maximum dimensions that the
 target element must have when resizing.
 
-`restrictEdges()`
------------------
+## `restrictEdges()`
 
 ```javascript
 interact(target).resizable({
-    modifiers: [
-      interact.modifiers.restrictEdges({
-        inner: {
-          left: 100, // the left edge must be <= 100
-          right: 200, // the right edge must be >= 200
-        },
-        outer: {
-          left: 0, // the left edge must be >= 0
-          right: 300, // the right edge must be <= 300
-        },
-      })
-    ]
-  })
+  modifiers: [
+    interact.modifiers.restrictEdges({
+      inner: {
+        left: 100,  // the left edge must be <= 100
+        right: 200  // the right edge must be >= 200
+      }
+      outer: {
+        left: 0,    // the left edge must be >= 0
+        right: 300  // the right edge must be <= 300
+      }
+    })
+  ]
+})
 ```
 
 `restrictEdges` lets you specify `inner` and `outer` dimensions that the target
