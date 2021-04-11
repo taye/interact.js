@@ -10,19 +10,19 @@ enabled target elements. You can disable this for an action by setting the
 ```js
 interact(target)
   .draggable({
-    manualStart: true
+    manualStart: true,
   })
   .on('doubletap', function (event) {
-    var interaction = event.interaction;
+    var interaction = event.interaction
 
     if (!interaction.interacting()) {
       interaction.start(
         { name: 'drag' },
         event.interactable,
-        event.currentTarget
-      );
+        event.currentTarget,
+      )
     }
-  });
+  })
 ```
 
 With `manualStart: true`, you will need to start the action from a pointer event

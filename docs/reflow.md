@@ -16,7 +16,7 @@ which is resolved when all interactions are complete. So you can `await` or
 ```js
 const interactable = interact(target).draggable({}).resizable({})
 
-async function onWindowResize() {
+async function onWindowResize () {
   // start a resize action and wait for inertia to finish
   await interactable.reflow({ name: drag, axis: 'x' })
 

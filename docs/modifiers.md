@@ -14,7 +14,7 @@ const restrictToParent = interact.modifiers.restrict({
 const snap100x100 = interact.modifiers.snap({
   targets: [interact.snappers.grid({ x: 100, y: 100 })],
   relativePoints: [{ x: 0.5, y: 0.5 }],
-}),
+})
 
 interact(target)
   .draggable({

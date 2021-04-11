@@ -24,8 +24,8 @@ they are within range.
 const mySnap = interact.modifiers.snap({
   targets: [
     { x: 200, y: 200 },
-    { x: 250, y: 350 }
-  ]
+    { x: 250, y: 350 },
+  ],
 })
 ```
 
@@ -106,10 +106,10 @@ interact(target).resizable({
     interact.modifiers.snapSize({
       targets: [
         { width: 100 },
-        interact.snappers.grid({ width: 100, height: 100 })
-      ]
-    })
-  ]
+        interact.snappers.grid({ width: 100, height: 100 }),
+      ],
+    }),
+  ],
 })
 ```
 
@@ -127,10 +127,10 @@ interact(target).resizable({
   modifiers: [
     interact.modifiers.snapEdges({
       targets: [
-        interact.snappers.grid({ top: 100, left: 100 })
-      ]
-    })
-  ]
+        interact.snappers.grid({ top: 100, left: 100 }),
+      ],
+    }),
+  ],
 })
 ```
 
@@ -254,8 +254,8 @@ interact(target).draggable({
   listeners: {
     move (event) {
       console.log(event.modifiers[0].target.source)
-    }
-  }
+    },
+  },
 })
 ```
 

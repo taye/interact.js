@@ -25,8 +25,8 @@ interact('.item').draggable({
   listeners: {
     move (event) {
       console.log(event.pageX, event.pageY)
-    }
-  }
+    },
+  },
 })
 ```
 
@@ -51,7 +51,6 @@ this below.
 ## Optimizing for production
 
 ### Babel plugin
-
 
 ```json
 // babel config

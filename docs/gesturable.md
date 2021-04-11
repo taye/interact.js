@@ -19,22 +19,22 @@ title: Gesturable
 ```
 
 ```js
-var angle = 0;
+var angle = 0
 
 interact('#rotate-area').gesturable({
   onmove: function (event) {
-    var arrow = document.getElementById('arrow');
+    var arrow = document.getElementById('arrow')
 
-    angle += event.da;
+    angle += event.da
 
     arrow.style.webkitTransform =
     arrow.style.transform =
-      'rotate(' + angle + 'deg)';
+      'rotate(' + angle + 'deg)'
 
     document.getElementById('angle-info').textContent =
-      angle.toFixed(2) + '\u00b0';
-  }
-});
+      angle.toFixed(2) + '\u00b0'
+  },
+})
 ```
 
 Gesture events are triggered when two pointers go down and are moved. In

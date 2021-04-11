@@ -74,15 +74,15 @@ interact(target)
     cursorChecker (action, interactable, element, interacting) {
       // the library uses biderectional arrows <-> by default,
       // but we want specific arrows (<- or ->) for each diriection
-      if (action.edges.left) { return 'w-resize'}
-      if (action.edges.right) { return 'e-resize'}
-    }
+      if (action.edges.left) { return 'w-resize' }
+      if (action.edges.right) { return 'e-resize' }
+    },
   })
   .draggable({
     cursorChecker () {
       // don't set a cursor for drag actions
       return null
-    }
+    },
   })
 ```
 

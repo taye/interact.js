@@ -21,6 +21,9 @@ $ npm install --save interactjs
 ```js
 // es6 import
 import interact from 'interactjs'
+```
+
+```js
 // or if using commonjs or AMD
 const interact = require('interactjs')
 ```
@@ -76,8 +79,8 @@ interact('.item').draggable({
   listeners: {
     move (event) {
       console.log(event.pageX, event.pageY)
-    }
-  }
+    },
+  },
 })
 ```
 
