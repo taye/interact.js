@@ -190,6 +190,11 @@ function getShims () {
   }
 }
 
+function errorExit (error) {
+  console.error(error)
+  process.exit(1)
+}
+
 module.exports = {
   getSources,
   sourcesGlob,
@@ -214,4 +219,5 @@ module.exports = {
   registryUrl,
   shouldIgnoreImport,
   getShims,
+  errorExit,
 }

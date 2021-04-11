@@ -3,6 +3,7 @@ const path = require('path')
 const writer = require('../bundleWriter')
 const bundler = require('../bundler')
 const headers = require('../headers')
+const { errorExit } = require('../utils')
 
 const [, , entry = 'packages/interactjs', standalone = 'interact', name = standalone] = process.argv
 const entryPkgDir = path.join(process.cwd(), entry)
@@ -25,7 +26,4 @@ bundler(options)
     await writer(code, options)
     console.log(' done.')
   })
-  .catch((error) => {
-    console.error(error)
-    process.exit(1)
-  })
+  .catch(errorExit)

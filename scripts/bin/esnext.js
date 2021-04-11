@@ -1,7 +1,6 @@
 const path = require('path')
 
 const generate = require('../esnext')
-const minify = require('../minify')
 const bundleShim = require('../shimBundler')
 const { getEsnextBabelOptions, getSources, getShims } = require('../utils')
 

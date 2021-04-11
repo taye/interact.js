@@ -3,7 +3,7 @@ const path = require('path')
 
 const shell = require('shelljs')
 
-const { getPackages, isPro, registryUrl } = require('../utils')
+const { getPackages, isPro, registryUrl, errorExit } = require('../utils')
 
 const cwd = process.cwd()
 
@@ -17,11 +17,7 @@ ensureCleanIndex()
 const { gitTag } = checkVersion()
 let packages
 
-main().catch((error) => {
-  console.error(error)
-
-  process.exit(1)
-})
+main().catch(errorExit)
 
 async function main (ps) {
   gitDetatch()

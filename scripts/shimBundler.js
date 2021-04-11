@@ -7,7 +7,7 @@ const derequire = require('derequire')
 const resolveSync = require('resolve').sync
 
 const bundler = require('./bundler')
-const { getModuleDirectories } = require('./utils')
+const { getModuleDirectories, errorExit } = require('./utils')
 
 const moduleDirectory = getModuleDirectories()
 
@@ -41,7 +41,6 @@ module.exports = async ({ source, sourceType, exports = [] }) => {
       ...exports.map((e) => `export const ${e} = __exports__["${e}"] || __exports__.default["${e}"]`),
     ].join(';')
   } catch (error) {
-    console.error(error)
-    process.exit(1)
+    errorExit(error)
   }
 }
