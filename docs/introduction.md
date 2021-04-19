@@ -8,10 +8,6 @@ interact.js is a JavaScript library for drag and drop, resizing and multi-touch
 gestures for modern browsers. Its free and open source version comes with
 powerful options like inertia and modifiers for snapping and restricting.
 
-[interact.js Pro](/pro) extends the open source features with extra modifiers,
-more complex built-in interactions, framework integrations, and advanced dev
-tools to save you time and effort. {.notice}
-
 The library's aim is to **present pointer input data consistently** across
 different browsers and devices and provide convenient ways to **pretend that the
 user's pointer moved in a way that it wasn't really moved** (snapping, inertia,
@@ -44,7 +40,7 @@ up your targets and interactions are:
 For example, here's some code for [a very simple slider
 input](https://codepen.io/taye/pen/GgpxNq):
 
-<LiveDemo :demoHtml="import('@/demos/slider.html?raw')" :removeNext="1" hide-demo-only/>
+<LiveDemo :demoHtml="import('@/demos/slider.html?raw')" :removeNext="1"/>
 
 ```js
 // Step 1
