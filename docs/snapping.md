@@ -134,7 +134,7 @@ interact(target).resizable({
 })
 ```
 
-The `snapSize` modifier snaps the _edges_ of targets when resizing. Its targets
+The `snapEdges` modifier snaps the _edges_ of targets when resizing. Its targets
 have either `x` and `y` number props to snap the left/right and top/bottom edges
 respectively, `top`, `left`, `width` and `height` number props to snap each edge
 and an optional `range`.
