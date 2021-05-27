@@ -586,7 +586,7 @@ export class Interaction<T extends ActionName | null = ActionName> {
   }
 
   _fireEvent<P extends EventPhase> (iEvent: InteractEvent<T, P>) {
-    this.interactable.fire(iEvent)
+    this.interactable?.fire(iEvent)
 
     if (!this.prevEvent || iEvent.timeStamp >= this.prevEvent.timeStamp) {
       this.prevEvent = iEvent
