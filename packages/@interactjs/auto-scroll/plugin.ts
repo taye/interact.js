@@ -27,7 +27,7 @@ declare module '@interactjs/core/options' {
 }
 
 export interface AutoScrollOptions {
-  container?: Window | HTMLElement
+  container?: Window | HTMLElement | string;
   margin?: number
   distance?: number
   interval?: number
