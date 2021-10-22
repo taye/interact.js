@@ -3,6 +3,11 @@
   "version": "1.10.11",
   "main": "index",
   "module": "index",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/taye/interact.js.git",
+    "directory": "packages/@interactjs/interact"
+  },
   "dependencies": {
     "@interactjs/core": "1.10.11",
     "@interactjs/types": "1.10.11",
