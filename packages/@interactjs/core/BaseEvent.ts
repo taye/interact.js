@@ -3,12 +3,12 @@ import type { Interaction, InteractionProxy } from '@interactjs/core/Interaction
 import type { ActionName } from '@interactjs/core/scope'
 
 export class BaseEvent<T extends ActionName | null = never> {
-  type: string
-  target: EventTarget
-  currentTarget: Node
-  interactable: Interactable
-  _interaction: Interaction<T>
-  timeStamp: any
+  declare type: string
+  declare target: EventTarget
+  declare currentTarget: Node
+  declare interactable: Interactable
+  declare _interaction: Interaction<T>
+  declare timeStamp: number
   immediatePropagationStopped = false
   propagationStopped = false
 

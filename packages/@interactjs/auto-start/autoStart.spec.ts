@@ -4,45 +4,65 @@ import * as helpers from '@interactjs/core/tests/_helpers'
 import autoStart from './base'
 
 test('autoStart', () => {
-  const rect = { top: 100, left: 200, bottom: 300, right: 400 }
-  const { interaction, interactable, event, coords, target: element } = helpers.testEnv({
+  window.PointerEvent = null
+
+  document.body.innerHTML = `
+    <style>
+    #target { position: absolute; top: 100px; left: 200px; bottom: 300px; right: 400px }
+    </style>
+    <div id=target></div>
+  `
+
+  Object.assign(document.body.style)
+
+  const {
+    interaction,
+    interactable,
+    event,
+    coords,
+    target: element,
+    down,
+  } = helpers.testEnv({
     plugins: [autoStart, drag],
-    rect,
+    target: document.getElementById('target'),
   })
 
   interactable.draggable(true)
   interaction.pointerType = coords.pointerType = 'mouse'
   coords.buttons = 1
 
-  interaction.pointerDown(event, event, element)
+  down()
 
   // prepares action
   expect(interaction.prepared).toEqual({ name: 'drag', axis: 'xy', edges: undefined })
 
   // set interaction.rect
-  expect(interaction.rect).toEqual({ ...rect, width: rect.right - rect.left, height: rect.bottom - rect.top })
+  expect(interaction.rect).toEqual(
+    helpers.getProps(element.getBoundingClientRect(), ['top', 'left', 'bottom', 'right', 'width', 'height']),
+  )
 
   // sets drag cursor
   expect(element.style.cursor).toBe('move')
 
-  let checkerArgs: any[]
+  const cursorChecker = jest.fn(() => 'pointer')
 
   interactable.draggable({
-    cursorChecker (...args) {
-      checkerArgs = args
-
-      return 'custom-cursor'
-    },
+    cursorChecker,
   })
 
   interaction.pointerDown(event, event, element)
 
   // calls cursorChecker with expected args
-  expect(checkerArgs).toEqual([{ name: 'drag', axis: 'xy', edges: undefined }, interactable, element, false])
+  expect(cursorChecker).toHaveBeenCalledWith(
+    { name: 'drag', axis: 'xy', edges: undefined },
+    interactable,
+    element,
+    false,
+  )
 
   interaction.pointerDown(event, event, element)
   // uses cursorChecker value
-  expect(element.style.cursor).toBe('custom-cursor')
+  expect(element.style.cursor).toBe('pointer')
 
   coords.page.x += 10
   coords.client.x += 10
@@ -51,5 +71,10 @@ test('autoStart', () => {
   expect(interaction._interacting).toBe(true)
 
   // calls cursorChecker with true for interacting arg
-  expect(checkerArgs).toEqual([{ name: 'drag', axis: 'xy', edges: undefined }, interactable, element, true])
+  expect(cursorChecker).toHaveBeenCalledWith(
+    { name: 'drag', axis: 'xy', edges: undefined },
+    interactable,
+    element,
+    true,
+  )
 })

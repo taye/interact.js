@@ -1,18 +1,13 @@
-// eslint-disable-next-line import/no-extraneous-dependencies
-import { JSDOM } from 'jsdom'
-
-import type { ActionProps } from '@interactjs/core/Interaction'
 import type { PointerType, Rect, Target } from '@interactjs/types/index'
 import extend from '@interactjs/utils/extend'
 import is from '@interactjs/utils/is'
 import * as pointerUtils from '@interactjs/utils/pointerUtils'
 
+import type { ActionProps } from '../Interaction'
 import type { Plugin, ActionName } from '../scope'
 import { Scope } from '../scope'
 
 let counter = 0
-
-const doc = globalThis.document || new JSDOM('').window.document
 
 export function unique () {
   return counter++
@@ -72,7 +67,7 @@ export function newPointer (n = 50) {
   } as PointerType
 }
 
-export function mockScope ({ document = doc } = {} as any) {
+export function mockScope ({ document = window.document } = {} as any) {
   const window = document.defaultView
 
   const scope = new Scope().init(window)
@@ -95,20 +90,22 @@ export function getProps<T extends { [key: string]: any }, K extends keyof T> (s
 export function testEnv<T extends Target = HTMLElement> ({
   plugins = [],
   target,
-  rect = { top: 0, left: 0, bottom: 0, right: 0 },
+  rect,
+  document = window.document,
 }: {
   plugins?: Plugin[]
   target?: T
   rect?: Rect
+  document?: Document
 } = {}) {
-  const scope = mockScope()
+  const scope = mockScope({ document })
 
   for (const plugin of plugins) {
     scope.usePlugin(plugin)
   }
 
   if (!target) {
-    ;((target as unknown) as HTMLElement) = scope.document.body
+    ;(target as unknown as HTMLElement) = scope.document.body
   }
 
   const interaction = scope.interactions.new({})
@@ -118,7 +115,9 @@ export function testEnv<T extends Target = HTMLElement> ({
   coords.target = target
   const event = pointerUtils.coordsToEvent(coords)
 
-  interactable.rectChecker(() => ({ ...rect }))
+  if (rect) {
+    interactable.rectChecker(() => ({ ...rect }))
+  }
 
   return {
     scope,
@@ -139,7 +138,7 @@ export function testEnv<T extends Target = HTMLElement> ({
 }
 
 export function timeout (n: number) {
-  return new Promise(resolve => setTimeout(resolve, n))
+  return new Promise((resolve) => setTimeout(resolve, n))
 }
 
 export function ltrbwh (

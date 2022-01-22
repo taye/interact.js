@@ -1,13 +1,14 @@
-import PromisePolyfill from 'promise-polyfill'
-
 import type { InteractEvent } from '@interactjs/core/InteractEvent'
 import type { ActionName } from '@interactjs/core/scope'
 import * as helpers from '@interactjs/core/tests/_helpers'
-import type { Point } from '@interactjs/types/index'
+import type { Interactable, Point } from '@interactjs/types/index'
+import PromisePolyfill from 'promise-polyfill'
 
 import reflow from './plugin'
 
 const testAction = { name: 'TEST' as ActionName }
+
+const Promise_ = Promise
 
 describe('reflow', () => {
   test('sync', () => {
@@ -81,7 +82,7 @@ describe('reflow', () => {
     Object.assign(scope.actions, { TEST: {}, names: ['TEST'] })
 
     let reflowEvent: any
-    let promise
+    let promise: Promise<Interactable>
 
     const interactable = scope.interactables.new(scope.window)
     const rect = Object.freeze({ top: 100, left: 200, bottom: 300, right: 400 })
@@ -134,9 +135,12 @@ describe('reflow', () => {
     // interaction continues if end is blocked without Promise
     expect(reflowEvent.interaction.interacting() && !stoppedFromTimeout).toBe(true)
 
-    setTimeout(() => {
-      // interaction is stopped after timeout without Promised
-      expect(reflowEvent.interaction.interacting() || !stoppedFromTimeout).toBe(false)
-    }, 0)
+    await new Promise_<void>((resolve) =>
+      setTimeout(() => {
+        // interaction is stopped after timeout without Promised
+        expect(reflowEvent.interaction.interacting() || !stoppedFromTimeout).toBe(false)
+        resolve()
+      }, 0),
+    )
   })
 })

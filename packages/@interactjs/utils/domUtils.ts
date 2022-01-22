@@ -198,7 +198,7 @@ export function matchesUpTo (element: Element, selector: string, limit: Node) {
 }
 
 export function getActualElement (element: Element) {
-  return (element as SVGElement).correspondingUseElement || element
+  return (element as any).correspondingUseElement || element
 }
 
 export function getScrollXY (relevantWindow?: Window) {

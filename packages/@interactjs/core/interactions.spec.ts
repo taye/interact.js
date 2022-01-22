@@ -54,21 +54,16 @@ describe('core/interactions', () => {
   test('interactions removes pointers on targeting removed elements', () => {
     const { interaction, scope } = helpers.testEnv()
 
-    const {
-      TouchEvent,
-      Touch = function (_t: any) {
-        return _t
-      },
-    } = scope.window as any
+    const { PointerEvent } = scope.window as any
     const div1 = scope.document.body.appendChild(scope.document.createElement('div'))
     const div2 = scope.document.body.appendChild(scope.document.createElement('div'))
 
-    const touch1Init = { bubbles: true, changedTouches: [new Touch({ identifier: 1, target: div1 })] }
-    const touch2Init = { bubbles: true, changedTouches: [new Touch({ identifier: 2, target: div2 })] }
+    const touch1Init = { bubbles: true, pointerType: 'touch', pointerId: 1, target: div1 }
+    const touch2Init = { bubbles: true, pointerType: 'touch', pointerId: 2, target: div2 }
 
     interaction.pointerType = 'touch'
-    div1.dispatchEvent(new TouchEvent('touchstart', touch1Init))
-    div1.dispatchEvent(new TouchEvent('touchmove', touch1Init))
+    div1.dispatchEvent(new PointerEvent('pointerdown', touch1Init))
+    div1.dispatchEvent(new PointerEvent('pointermove', touch1Init))
 
     expect(scope.interactions.list).toHaveLength(1)
 

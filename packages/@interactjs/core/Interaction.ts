@@ -1,4 +1,3 @@
-import type { ActionDefaults } from '@interactjs/core/options'
 import type {
   Element,
   EdgeOptions,
@@ -13,6 +12,8 @@ import hypot from '@interactjs/utils/hypot'
 import { warnOnce, copyAction } from '@interactjs/utils/misc'
 import * as pointerUtils from '@interactjs/utils/pointerUtils'
 import * as rectUtils from '@interactjs/utils/rect'
+
+import type { ActionDefaults } from '@interactjs/core/options'
 
 import type { EventPhase } from './InteractEvent'
 import { InteractEvent } from './InteractEvent'
@@ -110,18 +111,18 @@ let idCounter = 0
 
 export class Interaction<T extends ActionName | null = ActionName> {
   // current interactable being interacted with
-  interactable: Interactable = null
+  interactable: Interactable | null = null
 
   // the target element of the interactable
-  element: Element = null
-  rect: FullRect
+  element: Element | null = null
+  rect: FullRect | null = null
   _rects?: {
     start: FullRect
     corrected: FullRect
     previous: FullRect
     delta: FullRect
   }
-  edges: EdgeOptions
+  edges: EdgeOptions | null = null
 
   _scopeFire: Scope['fire']
 
@@ -138,7 +139,7 @@ export class Interaction<T extends ActionName | null = ActionName> {
   pointers: PointerInfo[] = []
 
   // pointerdown/mousedown/touchstart event
-  downEvent: PointerEventType = null
+  downEvent: PointerEventType | null = null
 
   downPointer: PointerType = {} as PointerType
 
@@ -160,7 +161,7 @@ export class Interaction<T extends ActionName | null = ActionName> {
   _interacting = false
   _ending = false
   _stopped = true
-  _proxy: InteractionProxy<T> = null
+  _proxy: InteractionProxy<T> | null = null
 
   simulation = null
 
@@ -227,7 +228,7 @@ export class Interaction<T extends ActionName | null = ActionName> {
       pointerIndex,
       pointerInfo,
       type: 'down',
-      interaction: (this as unknown) as Interaction<never>,
+      interaction: this as unknown as Interaction<never>,
     })
   }
 
@@ -324,7 +325,7 @@ export class Interaction<T extends ActionName | null = ActionName> {
       dx,
       dy,
       duplicate: duplicateMove,
-      interaction: (this as unknown) as Interaction<never>,
+      interaction: this as unknown as Interaction<never>,
     }
 
     if (!duplicateMove) {
@@ -403,7 +404,7 @@ export class Interaction<T extends ActionName | null = ActionName> {
       eventTarget,
       type: type as any,
       curEventTarget,
-      interaction: (this as unknown) as Interaction<never>,
+      interaction: this as unknown as Interaction<never>,
     })
 
     if (!this.simulation) {
@@ -418,7 +419,7 @@ export class Interaction<T extends ActionName | null = ActionName> {
     this._scopeFire('interactions:blur', {
       event,
       type: 'blur',
-      interaction: (this as unknown) as Interaction<never>,
+      interaction: this as unknown as Interaction<never>,
     })
   }
 
@@ -538,7 +539,7 @@ export class Interaction<T extends ActionName | null = ActionName> {
       down,
       pointerInfo,
       pointerIndex,
-      interaction: (this as unknown) as Interaction<never>,
+      interaction: this as unknown as Interaction<never>,
     })
 
     return pointerIndex
@@ -557,7 +558,7 @@ export class Interaction<T extends ActionName | null = ActionName> {
       eventTarget: null,
       pointerIndex,
       pointerInfo,
-      interaction: (this as unknown) as Interaction<never>,
+      interaction: this as unknown as Interaction<never>,
     })
 
     this.pointers.splice(pointerIndex, 1)

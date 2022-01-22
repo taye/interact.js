@@ -1,12 +1,14 @@
-import { JSDOM } from 'jsdom'
-
 import { Scope } from '@interactjs/core/scope'
 
+const makeIframeDoc = () => {
+  const iframe = document.body.appendChild(document.createElement('iframe'))
+  return iframe.contentWindow.document
+}
 test('interact export', () => {
   const scope = new Scope()
   const interact = scope.interactStatic
 
-  scope.init(new JSDOM('').window)
+  scope.init(window)
 
   const interactable1 = interact('selector')
   // interact function returns Interactable instance
@@ -22,14 +24,16 @@ test('interact export', () => {
   // unset interactions are removed
   expect(scope.interactions.list).toHaveLength(0)
 
-  const doc1 = new JSDOM('').window.document
-  const doc2 = new JSDOM('').window.document
-  const results = [
-    ['repeat', doc1],
-    ['repeat', doc2],
-    [doc1, doc1],
-    [doc2.body, doc2],
-  ].reduce((acc, [target, context]) => {
+  const doc1 = document
+  const doc2 = makeIframeDoc()
+  const results = (
+    [
+      ['repeat', doc1],
+      ['repeat', doc2],
+      [doc1, doc1],
+      [doc2.body, doc2],
+    ] as const
+  ).reduce((acc, [target, context]) => {
     const interactable = interact(target, { context })
 
     // unique contexts make unique interactables with identical targets
@@ -44,7 +48,7 @@ test('interact export', () => {
     expect(scope.interactables.get(target, { context })).toBe(interactable)
   }
 
-  const doc3 = new JSDOM('').window.document
+  const doc3 = makeIframeDoc()
 
   const prevDocCount = scope.documents.length
 

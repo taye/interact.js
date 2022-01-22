@@ -4,17 +4,17 @@ import type { PointerEventType, PointerType, Point } from '@interactjs/types/ind
 import * as pointerUtils from '@interactjs/utils/pointerUtils'
 
 export default class PointerEvent<T extends string = any> extends BaseEvent<never> {
-  type: T
-  originalEvent: PointerEventType
-  pointerId: number
-  pointerType: string
-  double: boolean
-  pageX: number
-  pageY: number
-  clientX: number
-  clientY: number
-  dt: number
-  eventable: any;
+  declare type: T
+  declare originalEvent: PointerEventType
+  declare pointerId: number
+  declare pointerType: string
+  declare double: boolean
+  declare pageX: number
+  declare pageY: number
+  declare clientX: number
+  declare clientY: number
+  declare dt: number
+  declare eventable: any;
   [key: string]: any
 
   /** */
