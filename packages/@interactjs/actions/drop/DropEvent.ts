@@ -7,12 +7,11 @@ import * as arr from '@interactjs/utils/arr'
 import type { DropState } from './plugin'
 
 export class DropEvent extends BaseEvent<'drag'> {
-  target: Element
+  declare target: Element
   dropzone: Interactable
   dragEvent: InteractEvent<'drag'>
   relatedTarget: Element
   draggable: Interactable
-  timeStamp: number
   propagationStopped = false
   immediatePropagationStopped = false
 

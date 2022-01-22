@@ -1,5 +1,3 @@
-import { JSDOM } from 'jsdom'
-
 import domObjects from './domObjects'
 import { indexOfDeepestElement } from './domUtils'
 
@@ -12,13 +10,13 @@ interface MockNode {
 }
 
 test('utils/domUtils/indexOfDeepestElement', () => {
-  const doc1: Document = new JSDOM(`<div id="topDiv">
+  document.body.innerHTML = `<div id="topDiv">
     <div id="sib0"></div>
     <div id="sib1"></div>
     <div id="sib2"></div>
-  </div>`).window.document
+  </div>`
 
-  domObjects.init(doc1.defaultView)
+  domObjects.init(document)
 
   const ownerDocument: MockNode = {
     name: 'Owner Document',
@@ -61,15 +59,15 @@ test('utils/domUtils/indexOfDeepestElement', () => {
   d1.lastChild = d1
   wrapper.lastChild = a
 
-  const deepestShadow = ([null, d2Shadow, c1, b1, a] as unknown) as HTMLElement[]
+  const deepestShadow = [null, d2Shadow, c1, b1, a] as unknown as HTMLElement[]
   expect(indexOfDeepestElement(deepestShadow)).toBe(deepestShadow.indexOf(d2Shadow as any))
 
-  const noShadow = ([null, d1, c1, b1] as unknown) as HTMLElement[]
+  const noShadow = [null, d1, c1, b1] as unknown as HTMLElement[]
 
   // only chooses elements that are passed in
   expect(indexOfDeepestElement(noShadow)).toBe(noShadow.indexOf(d1 as any))
 
-  const siblings: NodeListOf<HTMLElement> = doc1.querySelectorAll('#topDiv > *')
+  const siblings: NodeListOf<HTMLElement> = document.querySelectorAll('#topDiv > *')
 
   // last sibling is deepest with equal zIndex
   expect(indexOfDeepestElement(siblings)).toBe(2)
@@ -83,6 +81,6 @@ test('utils/domUtils/indexOfDeepestElement', () => {
   expect(indexOfDeepestElement(siblings)).toBe(1)
 
   const nodeWithoutParent: MockNode = { name: 'd1', ownerDocument, parentNode: undefined, lastChild: null }
-  const brokenElementCollection = ([nodeWithoutParent, d1, c2] as unknown) as HTMLElement[]
+  const brokenElementCollection = [nodeWithoutParent, d1, c2] as unknown as HTMLElement[]
   expect(indexOfDeepestElement(brokenElementCollection)).toBe(0)
 })

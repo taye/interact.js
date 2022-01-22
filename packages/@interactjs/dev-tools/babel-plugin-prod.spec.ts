@@ -1,6 +1,4 @@
-/**
- * @jest-environment node
- * */
+/** @jest-environment node */
 import * as babel from '@babel/core'
 import proposalExportDefaultFrom from '@babel/plugin-proposal-export-default-from'
 

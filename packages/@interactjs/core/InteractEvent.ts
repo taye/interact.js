@@ -1,4 +1,3 @@
-import type { ActionName } from '@interactjs/core/scope'
 import type { Point, FullRect, PointerEventType, Element } from '@interactjs/types/index'
 import extend from '@interactjs/utils/extend'
 import getOriginXY from '@interactjs/utils/getOriginXY'
@@ -7,6 +6,7 @@ import hypot from '@interactjs/utils/hypot'
 import { BaseEvent } from './BaseEvent'
 import type { Interaction } from './Interaction'
 import { defaults } from './options'
+import type { ActionName } from './scope'
 
 export type EventPhase = keyof PhaseMap
 
@@ -34,10 +34,10 @@ export interface InteractEvent {
 
 export class InteractEvent<
   T extends ActionName = never,
-  P extends EventPhase = EventPhase
+  P extends EventPhase = EventPhase,
 > extends BaseEvent<T> {
-  target: Element
-  currentTarget: Element
+  declare target: Element
+  declare currentTarget: Element
   relatedTarget: Element | null = null
   screenX?: number
   screenY?: number
@@ -61,7 +61,6 @@ export class InteractEvent<
   velocity: Point
   speed: number
   swipe: ReturnType<InteractEvent<T>['getSwipe']>
-  timeStamp: any
   // resize
   axes?: 'x' | 'y' | 'xy'
   preEnd?: boolean
