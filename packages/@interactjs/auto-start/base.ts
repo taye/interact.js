@@ -121,8 +121,8 @@ function prepareOnMove (
   { interaction, pointer, event, eventTarget }: SignalArgs['interactions:move'],
   scope: Scope,
 ) {
-  if (interaction.pointerType !== 'mouse' || interaction.pointerIsDown || interaction.interacting() || event.ctrlKey) return
-  
+  if (interaction.pointerType !== 'mouse' || interaction.pointerIsDown || interaction.interacting()) return
+
   const actionInfo = getActionInfo(interaction, pointer, event, eventTarget as Element, scope)
   prepare(interaction, actionInfo, scope)
 }
