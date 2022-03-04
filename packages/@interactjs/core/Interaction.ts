@@ -280,7 +280,7 @@ export class Interaction<T extends ActionName | null = ActionName> {
     this.edges = this.prepared.edges
       ? extend({}, this.prepared.edges)
       : { left: true, right: true, top: true, bottom: true }
-    this._stopped = false
+    this._stopped = false || this.downEvent.ctrlKey
     this._interacting =
       this._doPhase({
         interaction: this,
