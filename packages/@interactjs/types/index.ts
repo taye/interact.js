@@ -33,47 +33,38 @@ import '@interactjs/snappers/plugin'
 import type _NativePointerEventType from './NativePointerEventType'
 
 export type OrBoolean<T> = {
-  [P in keyof T]: T[P] | boolean;
-};
+  [P in keyof T]: T[P] | boolean
+}
 
-export type Element = HTMLElement | SVGElement;
-export type Context = Document | Element;
-export type EventTarget = Window | Document | Element;
-export type Target = EventTarget | string;
-export type Plugin = scope.Plugin;
-export type Actions = scope.Actions;
-export type ActionProps<
-  T extends scope.ActionName = ActionName
-> = interaction.ActionProps<T>;
-export type Interactable = iable.Interactable;
-/** @internal */ export type InteractableSet = iSet.InteractableSet;
-export type Scope = scope.Scope;
-export type Interaction<
-  T extends scope.ActionName = ActionName
-> = interaction.Interaction<T>;
-export type InteractionProxy<
-  T extends scope.ActionName = ActionName
-> = interaction.InteractionProxy<T>;
-export type PointerArgProps<T extends {} = {}> = interaction.PointerArgProps<T>;
+export type Element = HTMLElement | SVGElement
+export type Context = Document | Element
+export type EventTarget = Window | Document | Element
+export type Target = EventTarget | string
+export type Plugin = scope.Plugin
+export type Actions = scope.Actions
+export type ActionProps<T extends scope.ActionName = ActionName> = interaction.ActionProps<T>
+export type Interactable = iable.Interactable
+/** @internal */ export type InteractableSet = iSet.InteractableSet
+export type Scope = scope.Scope
+export type Interaction<T extends scope.ActionName = ActionName> = interaction.Interaction<T>
+export type InteractionProxy<T extends scope.ActionName = ActionName> = interaction.InteractionProxy<T>
+export type PointerArgProps<T extends {} = {}> = interaction.PointerArgProps<T>
 export type InteractEvent<
   T extends keyof scope.ActionMap = never,
-  P extends iEvent.EventPhase = iEvent.EventPhase
-> = iEvent.InteractEvent<T, P>;
-export type EventPhase = iEvent.EventPhase;
-export type Options = defaults.Options;
-export type ActionName = scope.ActionName;
-export type SignalArgs = scope.SignalArgs;
-export type DoPhaseArg<
-  T extends ActionName,
-  P extends EventPhase
-> = interaction.DoPhaseArg<T, P>;
-export type DoAnyPhaseArg = interaction.DoAnyPhaseArg;
+  P extends iEvent.EventPhase = iEvent.EventPhase,
+> = iEvent.InteractEvent<T, P>
+export type EventPhase = iEvent.EventPhase
+export type Options = defaults.Options
+export type ActionName = scope.ActionName
+export type SignalArgs = scope.SignalArgs
+export type DoPhaseArg<T extends ActionName, P extends EventPhase> = interaction.DoPhaseArg<T, P>
+export type DoAnyPhaseArg = interaction.DoAnyPhaseArg
 
-export type DragEvent = InteractEvent<'drag'>;
-export type DropEvent = dropEvent.DropEvent;
-export type ResizeEvent = resize.ResizeEvent;
-export type GestureEvent = gesture.GestureEvent;
-export type PointerEvent<T extends string = any> = _PointerEvent<T>;
+export type DragEvent = InteractEvent<'drag'>
+export type DropEvent = dropEvent.DropEvent
+export type ResizeEvent = resize.ResizeEvent
+export type GestureEvent = gesture.GestureEvent
+export type PointerEvent<T extends string = any> = _PointerEvent<T>
 
 export interface Point {
   x: number
@@ -94,17 +85,13 @@ export interface Rect {
   height?: number
 }
 
-export type FullRect = Required<Rect>;
+export type FullRect = Required<Rect>
 
-export type RectFunction<T extends any[]> = (...args: T) => Rect | Element;
+export type RectFunction<T extends any[]> = (...args: T) => Rect | Element
 
-export type RectResolvable<T extends any[]> =
-  | Rect
-  | string
-  | Element
-  | RectFunction<T>;
+export type RectResolvable<T extends any[]> = Rect | string | Element | RectFunction<T>
 
-export type Dimensions = Point & Size;
+export type Dimensions = Point & Size
 
 export interface CoordsSetMember {
   page: Point
@@ -131,7 +118,7 @@ export interface InertiaOption {
   allowResume?: boolean
   smoothEndDuration?: number
 }
-export type InertiaOptions = InertiaOption | boolean;
+export type InertiaOptions = InertiaOption | boolean
 
 export interface EdgeOptions {
   top?: boolean | string | Element
@@ -144,8 +131,8 @@ export type CursorChecker = (
   action: ActionProps<ActionName>,
   interactable: Interactable,
   element: Element,
-  interacting: boolean
-) => string;
+  interacting: boolean,
+) => string
 
 export interface ActionMethod<T> {
   (this: Interactable): T
@@ -159,8 +146,8 @@ export interface OptionMethod<T> {
   (this: Interactable, options: T): typeof this
 }
 
-export type PerActionDefaults = defaults.PerActionDefaults;
-export type OptionsArg = defaults.OptionsArg;
+export type PerActionDefaults = defaults.PerActionDefaults
+export type OptionsArg = defaults.OptionsArg
 
 export interface DraggableOptions extends PerActionDefaults {
   startAxis?: 'x' | 'y' | 'xy'
@@ -175,13 +162,7 @@ export interface DropzoneOptions extends PerActionDefaults {
   accept?:
   | string
   | Element
-  | (({
-    dropzone,
-    draggableElement,
-  }: {
-    dropzone: Interactable
-    draggableElement: Element
-  }) => boolean)
+  | (({ dropzone, draggableElement }: { dropzone: Interactable, draggableElement: Element }) => boolean)
   // How the overlap is checked on the drop zone
   overlap?: 'pointer' | 'center' | number
   checker?: DropFunctionChecker
@@ -201,8 +182,8 @@ export type DropFunctionChecker = (
   dropzone: Interactable, // dropzone interactable
   dropElement: Element, // drop zone element
   draggable: Interactable, // draggable's Interactable
-  draggableElement: Element // dragged element
-) => boolean;
+  draggableElement: Element, // dragged element
+) => boolean
 
 export interface ResizableOptions extends PerActionDefaults {
   square?: boolean
@@ -229,12 +210,12 @@ export type ActionChecker = (
   defaultAction: string,
   interactable: Interactable,
   element: Element,
-  interaction: Interaction
-) => ActionProps;
+  interaction: Interaction,
+) => ActionProps
 
-export type OriginFunction = (target: Element) => Rect;
-export type SnapFunction = snap.SnapFunction;
-export type SnapTarget = snap.SnapTarget;
+export type OriginFunction = (target: Element) => Rect
+export type SnapFunction = snap.SnapFunction
+export type SnapTarget = snap.SnapTarget
 
 export interface PointerEventsOptions {
   holdDuration?: number
@@ -243,32 +224,19 @@ export interface PointerEventsOptions {
   origin?: Rect | Point | string | Element | OriginFunction
 }
 
-export type RectChecker = (element: Element) => Rect;
+export type RectChecker = (element: Element) => Rect
 
-export type NativePointerEventType = typeof _NativePointerEventType;
-export type PointerEventType =
-  | MouseEvent
-  | TouchEvent
-  | NativePointerEventType
-  | PointerEvent
-  | InteractEvent;
-export type PointerType =
-  | MouseEvent
-  | Touch
-  | NativePointerEventType
-  | PointerEvent
-  | InteractEvent;
+export type NativePointerEventType = typeof _NativePointerEventType
+export type PointerEventType = MouseEvent | TouchEvent | NativePointerEventType | PointerEvent | InteractEvent
+export type PointerType = MouseEvent | Touch | NativePointerEventType | PointerEvent | InteractEvent
 
-export type EventTypes = string | ListenerMap | Array<string | ListenerMap>;
+export type EventTypes = string | ListenerMap | Array<string | ListenerMap>
 
-export type Listener = (...args: any[]) => any;
-export type Listeners = ListenerMap | ListenerMap[];
-export type ListenersArg =
-  | Listener
-  | ListenerMap
-  | Array<Listener | ListenerMap>;
+export type Listener = (...args: any[]) => any
+export type Listeners = ListenerMap | ListenerMap[]
+export type ListenersArg = Listener | ListenerMap | Array<Listener | ListenerMap>
 export interface ListenerMap {
   [index: string]: ListenersArg | ListenersArg[]
 }
 
-export type ArrayElementType<T> = T extends Array<infer P> ? P : never;
+export type ArrayElementType<T> = T extends Array<infer P> ? P : never

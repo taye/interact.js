@@ -232,7 +232,7 @@ export default class Modification {
       arg.state = state
       const { options, methods } = state
 
-      const endPosition = methods.beforeEnd && methods.beforeEnd((arg as unknown) as ModifierArg)
+      const endPosition = methods.beforeEnd && methods.beforeEnd(arg as unknown as ModifierArg)
 
       if (endPosition) {
         this.endResult = endPosition

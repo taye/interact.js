@@ -19,6 +19,7 @@ module.exports = (plugins) => {
         [
           '/* eslint-disable import/order, no-console, eol-last */',
           "import interact from '@interactjs/interact/index'",
+          '// eslint-disable-next-line import/no-extraneous-dependencies',
           `import plugin from '${pluginPath.replace(/^packages./, '')}'`,
           'interact.use(plugin)',
         ].join('\n'),

@@ -8,12 +8,14 @@ export type GridOptions = (Partial<Rect> | Point) & {
 }
 
 export default (grid: GridOptions) => {
-  const coordFields = ([
-    ['x', 'y'],
-    ['left', 'top'],
-    ['right', 'bottom'],
-    ['width', 'height'],
-  ] as const).filter(([xField, yField]) => xField in grid || yField in grid)
+  const coordFields = (
+    [
+      ['x', 'y'],
+      ['left', 'top'],
+      ['right', 'bottom'],
+      ['width', 'height'],
+    ] as const
+  ).filter(([xField, yField]) => xField in grid || yField in grid)
 
   const gridFunc: SnapFunction & {
     grid: typeof grid

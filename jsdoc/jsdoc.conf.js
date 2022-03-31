@@ -28,7 +28,7 @@ module.exports = {
     extensions: ['js', 'ts'],
     babelrc: false,
     configFile: false,
-    presets: [require.resolve('@babel/preset-typescript')],
+    presets: [[require.resolve('@babel/preset-typescript'), { allowDeclareFields: true }]],
   },
 
   markdown: {

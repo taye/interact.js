@@ -18,7 +18,7 @@ describe('actions/drag', () => {
   })
 
   describe('interactable.draggable method', () => {
-    const interactable = ({
+    const interactable = {
       options: {
         drag: {},
       },
@@ -29,7 +29,7 @@ describe('actions/drag', () => {
       setOnEvents: () => {
         calledSetOnEvents = true
       },
-    } as unknown) as Interactable
+    } as unknown as Interactable
     let calledSetPerAction = false
     let calledSetOnEvents = false
 

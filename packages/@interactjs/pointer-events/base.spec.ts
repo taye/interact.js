@@ -166,7 +166,7 @@ test('pointerEvents Interaction remove-pointer signal', () => {
     interaction.removePointer({ pointerId: removal.id } as any, null)
 
     // `${removal.message} - remaining interaction.pointers[i].hold are correct`
-    expect(interaction.pointers.map((p) => (p.hold as unknown) as number)).toEqual(removal.remain)
+    expect(interaction.pointers.map((p) => p.hold as unknown as number)).toEqual(removal.remain)
   }
 })
 

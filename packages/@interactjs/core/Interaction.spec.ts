@@ -352,7 +352,15 @@ describe('core/Interaction', () => {
   })
 
   test('Interaction.start', () => {
-    const { interaction, interactable, scope, event, target: element, down, stop } = helpers.testEnv({
+    const {
+      interaction,
+      interactable,
+      scope,
+      event,
+      target: element,
+      down,
+      stop,
+    } = helpers.testEnv({
       plugins: [drag],
     })
     const action = { name: 'drag' } as const

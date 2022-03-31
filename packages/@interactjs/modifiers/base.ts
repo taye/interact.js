@@ -31,7 +31,7 @@ export interface Modifier<
   Defaults = any,
   State extends ModifierState = any,
   Name extends string = any,
-  Result = any
+  Result = any,
 > {
   options: Defaults
   methods: {
@@ -71,7 +71,7 @@ export interface ModifierArg<State extends ModifierState = ModifierState> {
 export interface ModifierModule<
   Defaults extends { enabled?: boolean },
   State extends ModifierState,
-  Result = unknown
+  Result = unknown,
 > {
   defaults?: Defaults
   start?(arg: ModifierArg<State>): void
@@ -83,7 +83,7 @@ export interface ModifierModule<
 export interface ModifierFunction<
   Defaults extends { enabled?: boolean },
   State extends ModifierState,
-  Name extends string
+  Name extends string,
 > {
   (_options?: Partial<Defaults>): Modifier<Defaults, State, Name>
   _defaults: Defaults
@@ -94,7 +94,7 @@ export function makeModifier<
   Defaults extends { enabled?: boolean },
   State extends ModifierState,
   Name extends string,
-  Result
+  Result,
 > (module: ModifierModule<Defaults, State, Result>, name?: Name) {
   const { defaults } = module
   const methods = {
