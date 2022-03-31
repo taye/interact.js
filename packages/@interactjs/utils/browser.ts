@@ -45,15 +45,17 @@ function init (window: any) {
     navigator.appName === 'Opera' && browser.supportsTouch && /Presto/.test(navigator.userAgent)
 
   // prefix matchesSelector
-  browser.prefixedMatchesSelector = ('matches' in Element.prototype
-    ? 'matches'
-    : 'webkitMatchesSelector' in Element.prototype
-      ? 'webkitMatchesSelector'
-      : 'mozMatchesSelector' in Element.prototype
-        ? 'mozMatchesSelector'
-        : 'oMatchesSelector' in Element.prototype
-          ? 'oMatchesSelector'
-          : 'msMatchesSelector') as 'matches'
+  browser.prefixedMatchesSelector = (
+    'matches' in Element.prototype
+      ? 'matches'
+      : 'webkitMatchesSelector' in Element.prototype
+        ? 'webkitMatchesSelector'
+        : 'mozMatchesSelector' in Element.prototype
+          ? 'mozMatchesSelector'
+          : 'oMatchesSelector' in Element.prototype
+            ? 'oMatchesSelector'
+            : 'msMatchesSelector'
+  ) as 'matches'
 
   browser.pEventTypes = browser.supportsPointerEvent
     ? domObjects.PointerEvent === window.MSPointerEvent

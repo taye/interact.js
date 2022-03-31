@@ -13,12 +13,11 @@ import { warnOnce, copyAction } from '@interactjs/utils/misc'
 import * as pointerUtils from '@interactjs/utils/pointerUtils'
 import * as rectUtils from '@interactjs/utils/rect'
 
-import type { ActionDefaults } from '@interactjs/core/options'
-
 import type { EventPhase } from './InteractEvent'
 import { InteractEvent } from './InteractEvent'
 import type { Interactable } from './Interactable'
 import { PointerInfo } from './PointerInfo'
+import type { ActionDefaults } from './options'
 import type { ActionName, Scope } from './scope'
 
 export interface ActionProps<T extends ActionName | null = never> {
@@ -148,10 +147,10 @@ export class Interaction<T extends ActionName | null = ActionName> {
     event: PointerEventType
     eventTarget: Node
   } = {
-    pointer: null,
-    event: null,
-    eventTarget: null,
-  }
+      pointer: null,
+      event: null,
+      eventTarget: null,
+    }
 
   // previous action event
   prevEvent: InteractEvent<T, EventPhase> = null

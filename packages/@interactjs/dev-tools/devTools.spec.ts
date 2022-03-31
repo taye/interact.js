@@ -29,7 +29,16 @@ test('devTools', () => {
       }),
   }
 
-  const { scope, interaction, interactable, target: element, down, start, move, stop } = helpers.testEnv({
+  const {
+    scope,
+    interaction,
+    interactable,
+    target: element,
+    down,
+    start,
+    move,
+    stop,
+  } = helpers.testEnv({
     plugins: [devToolsWithLogger, drag, resize],
   })
 

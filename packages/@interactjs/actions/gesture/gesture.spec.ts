@@ -23,7 +23,16 @@ describe('actions/gesture', () => {
 
   test('interactable.gesturable() method', () => {
     const rect = Object.freeze({ top: 100, left: 200, bottom: 300, right: 400 })
-    const { scope, interaction, interactable, target: element, coords, down, start, move } = helpers.testEnv({
+    const {
+      scope,
+      interaction,
+      interactable,
+      target: element,
+      coords,
+      down,
+      start,
+      move,
+    } = helpers.testEnv({
       plugins: [gesture],
       rect,
     })

@@ -102,9 +102,9 @@ export class Scope {
     list: Plugin[]
     map: { [id: string]: Plugin }
   } = {
-    list: [],
-    map: {},
-  }
+      list: [],
+      map: {},
+    }
 
   constructor () {
     const scope = this

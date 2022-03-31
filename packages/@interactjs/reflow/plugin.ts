@@ -69,9 +69,11 @@ function doReflow<T extends ActionName> (
   action: ActionProps<T>,
   scope: Scope,
 ): Promise<Interactable> {
-  const elements = (is.string(interactable.target)
-    ? arr.from(interactable._context.querySelectorAll(interactable.target))
-    : [interactable.target]) as Element[]
+  const elements = (
+    is.string(interactable.target)
+      ? arr.from(interactable._context.querySelectorAll(interactable.target))
+      : [interactable.target]
+  ) as Element[]
 
   // tslint:disable-next-line variable-name
   const Promise = (scope.window as any).Promise
@@ -149,7 +151,7 @@ function startReflow<T extends ActionName> (
   copyAction(interaction.prepared, action)
   interaction._doPhase(signalArg)
 
-  const { Promise } = (scope.window as unknown) as { Promise: PromiseConstructor }
+  const { Promise } = scope.window as unknown as { Promise: PromiseConstructor }
   const reflowPromise = Promise
     ? new Promise<undefined>((resolve) => {
       interaction._reflowResolve = resolve

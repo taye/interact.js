@@ -1,6 +1,6 @@
 import type { Config } from '@jest/types'
 
-// import { sourcesGlob } from './scripts/utils'
+import { sourcesGlob } from './scripts/utils'
 
 const config: Config.InitialOptions = {
   preset: 'vijest',
@@ -13,7 +13,7 @@ const config: Config.InitialOptions = {
     },
   },
   // collectCoverage: true,
-  // collectCoverageFrom: [sourcesGlob],
+  collectCoverageFrom: [sourcesGlob],
   coveragePathIgnorePatterns: ['[\\\\/]_', '\\.d\\.ts$', '@interactjs[\\\\/](rebound|symbol-tree)[\\\\/]'],
   coverageReporters: ['json', 'text', ['lcov', { projectRoot: 'packages/@interactjs' }]],
 }

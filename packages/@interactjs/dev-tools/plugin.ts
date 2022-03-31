@@ -1,5 +1,6 @@
 import type Interaction from '@interactjs/core/Interaction'
 import type { Scope, Plugin } from '@interactjs/core/scope'
+// eslint-disable-next-line import/no-extraneous-dependencies
 import visualizer from '@interactjs/dev-tools/visualizer/plugin'
 import type { Element, OptionMethod } from '@interactjs/types/index'
 import domObjects from '@interactjs/utils/domObjects'

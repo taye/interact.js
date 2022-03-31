@@ -21,8 +21,7 @@ import { getWindow } from '@interactjs/utils/window'
 
 import { Eventable } from './Eventable'
 import isNonNativeEvent from './isNonNativeEvent'
-import type { ActionDefaults, Defaults, OptionsArg, PerActionDefaults } from './options'
-import { Options } from './options'
+import type { ActionDefaults, Defaults, OptionsArg, PerActionDefaults, Options } from './options'
 
 type IgnoreValue = string | Element | boolean
 type DeltaSource = 'page' | 'client'

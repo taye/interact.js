@@ -248,11 +248,13 @@ function collectDrops ({ interactables }: Scope, draggableElement: Element) {
     }
 
     // query for new elements if necessary
-    const dropElements = (is.string(dropzone.target)
-      ? dropzone._context.querySelectorAll(dropzone.target)
-      : is.array(dropzone.target)
-        ? dropzone.target
-        : [dropzone.target]) as Element[]
+    const dropElements = (
+      is.string(dropzone.target)
+        ? dropzone._context.querySelectorAll(dropzone.target)
+        : is.array(dropzone.target)
+          ? dropzone.target
+          : [dropzone.target]
+    ) as Element[]
 
     for (const dropzoneElement of dropElements) {
       if (dropzoneElement !== draggableElement) {

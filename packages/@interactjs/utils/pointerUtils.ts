@@ -214,7 +214,7 @@ export function getPointerType (pointer: { pointerType?: string, identifier?: nu
 export function getEventTargets (event: Event) {
   const path = is.func(event.composedPath)
     ? (event.composedPath() as Element[])
-    : ((event as unknown) as { path: Element[] }).path
+    : (event as unknown as { path: Element[] }).path
 
   return [
     domUtils.getActualElement(path ? path[0] : (event.target as Element)),

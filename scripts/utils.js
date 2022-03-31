@@ -52,11 +52,12 @@ function getEsnextBabelOptions () {
     babelrc: false,
     configFile: false,
     sourceMaps: true,
-    presets: [[require.resolve('@babel/preset-typescript'), { allExtensions: true }]],
+    presets: [
+      [require.resolve('@babel/preset-typescript'), { allExtensions: true, allowDeclareFields: true }],
+    ],
     plugins: [
       require.resolve('./babel/vue-sfc'),
       require.resolve('@babel/plugin-proposal-optional-catch-binding'),
-      [require.resolve('@babel/plugin-proposal-class-properties'), { loose: true }],
       [require.resolve('@babel/plugin-proposal-optional-chaining'), { loose: true }],
     ],
   }
