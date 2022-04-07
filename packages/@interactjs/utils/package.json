@@ -1,6 +1,11 @@
 {
   "name": "@interactjs/utils",
   "version": "1.10.11",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/taye/interact.js.git",
+    "directory": "packages/@interactjs/utils"
+  },
   "peerDependencies": {
     "@interactjs/feedback": "1.10.11",
     "@interactjs/symbol-tree": "1.10.11"
