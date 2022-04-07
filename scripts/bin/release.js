@@ -20,6 +20,7 @@ let packages
 main().catch(errorExit)
 
 async function main (ps) {
+  configGitUser()
   gitDetatch()
 
   clean()
@@ -30,6 +31,11 @@ async function main (ps) {
 
   await commit()
   await pushAndPublish()
+}
+
+function configGitUser () {
+  shell.exec('git config user.name "CI"')
+  shell.exec('git config user.email "<>"')
 }
 
 function ensureCleanIndex () {
