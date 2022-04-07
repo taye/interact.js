@@ -1,0 +1,41 @@
+name: Workflow
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  test:
+    name: '🧪 Test'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ianwalter/playwright-container@43940dfa7d309fe3569b9df407ae9e84dcbf2e7f
+      - name: ⚙ bootstrap
+        run: 'npm run bootstrap && npx _check_deps && npx _add_plugin_indexes'
+      - name: 📐 types
+        run: npx tsc -b -f
+      - name: 🔍 lint
+        run: npx _lint
+      - name: 🧪 tests
+        run: npm test
+
+  publish-npm:
+    name: '📦 Build and Publish 🚀'
+    if: ${{ github.repository == 'taye/interact.js' && (github.ref_name == 'latest' || github.ref_name == 'next') }}
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          registry-url: https://registry.npmjs.org/
+          cache: yarn
+      - name: ⚙ bootstrap
+        run: 'npm run bootstrap && git fetch --tags'
+      - name: 📦 build and publish 🚀
+        run: npx _release
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.npm_token}}
