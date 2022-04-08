@@ -65,7 +65,7 @@ function start ({ rect, startOffset, state, interaction, pageCoords }: ModifierA
   state.offset = offset
 }
 
-function set ({ coords, interaction, state }: ModifierArg<RestrictState>) {
+function set ({ coords, interaction, state, edges }: ModifierArg<RestrictState>) {
   const { options, offset } = state
 
   const restriction = getRestrictionRect(options.restriction, interaction, coords)
@@ -74,8 +74,43 @@ function set ({ coords, interaction, state }: ModifierArg<RestrictState>) {
 
   const rect = rectUtils.xywhToTlbr(restriction)
 
-  coords.x = Math.max(Math.min(rect.right - offset.right, coords.x), rect.left + offset.left)
-  coords.y = Math.max(Math.min(rect.bottom - offset.bottom, coords.y), rect.top + offset.top)
+  // Configure coords X
+  switch (true) {
+    // Drag
+    case edges.left && edges.right:
+      coords.x = Math.max(Math.min(rect.right - offset.right, coords.x), rect.left + offset.left)
+      break
+    // Resize
+    case edges.left:
+      coords.x = Math.max(rect.left + offset.left, coords.x)
+      break
+    case edges.right:
+      coords.x = Math.min(rect.right - offset.right, coords.x)
+      break
+    // Other
+    default:
+      coords.x = Math.max(Math.min(rect.right - offset.right, coords.x), rect.left + offset.left)
+      break
+  }
+
+  // Configure coords Y
+  switch (true) {
+    // Drag
+    case edges.top && edges.bottom:
+      coords.y = Math.max(Math.min(rect.bottom - offset.bottom, coords.y), rect.top + offset.top)
+      break
+    // Resize
+    case edges.top:
+      coords.y = Math.max(rect.top + offset.top, coords.y)
+      break
+    case edges.bottom:
+      coords.y = Math.min(rect.bottom - offset.bottom, coords.y)
+      break
+    // Other
+    default:
+      coords.y = Math.max(Math.min(rect.bottom - offset.bottom, coords.y), rect.top + offset.top)
+      break
+  }
 }
 
 export function getRestrictionRect (
