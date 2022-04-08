@@ -40,7 +40,10 @@ AspectRatioOptions,
   ratio: number
   equalDelta: boolean
   xIsPrimaryAxis: boolean
-  edgeSign: 1 | -1
+  edgeSign: {
+    x: number
+    y: number
+  }
   subModification: Modification
 }
 >
@@ -70,10 +73,16 @@ const aspectRatio: ModifierModule<AspectRatioOptions, AspectRatioState> = {
     state.xIsPrimaryAxis = !!(originalEdges.left || originalEdges.right)
 
     if (state.equalDelta) {
-      state.edgeSign = ((linkedEdges.left ? 1 : -1) * (linkedEdges.top ? 1 : -1)) as 1 | -1
+      const sign = (linkedEdges.left ? 1 : -1) * (linkedEdges.top ? 1 : -1)
+      state.edgeSign = {
+        x: sign,
+        y: sign,
+      }
     } else {
-      const negativeSecondaryEdge = state.xIsPrimaryAxis ? linkedEdges.top : linkedEdges.left
-      state.edgeSign = negativeSecondaryEdge ? -1 : 1
+      state.edgeSign = {
+        x: linkedEdges.left ? -1 : 1,
+        y: linkedEdges.top ? -1 : 1,
+      }
     }
 
     extend(arg.edges, linkedEdges)
@@ -139,9 +148,9 @@ const aspectRatio: ModifierModule<AspectRatioOptions, AspectRatioState> = {
 
 function setEqualDelta ({ startCoords, edgeSign }: AspectRatioState, xIsPrimaryAxis: boolean, coords: Point) {
   if (xIsPrimaryAxis) {
-    coords.y = startCoords.y + (coords.x - startCoords.x) * edgeSign
+    coords.y = startCoords.y + (coords.x - startCoords.x) * edgeSign.y
   } else {
-    coords.x = startCoords.x + (coords.y - startCoords.y) * edgeSign
+    coords.x = startCoords.x + (coords.y - startCoords.y) * edgeSign.x
   }
 }
 
@@ -154,11 +163,11 @@ function setRatio (
   if (xIsPrimaryAxis) {
     const newHeight = rect.width / ratio
 
-    coords.y = startCoords.y + (newHeight - startRect.height) * edgeSign
+    coords.y = startCoords.y + (newHeight - startRect.height) * edgeSign.y
   } else {
     const newWidth = rect.height * ratio
 
-    coords.x = startCoords.x + (newWidth - startRect.width) * edgeSign
+    coords.x = startCoords.x + (newWidth - startRect.width) * edgeSign.x
   }
 }
 
