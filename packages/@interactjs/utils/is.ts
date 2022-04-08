@@ -1,5 +1,3 @@
-import type { Element } from '@interactjs/core/types'
-
 import isWindow from './isWindow'
 import * as win from './window'
 
@@ -17,16 +15,15 @@ const bool = (thing: any): thing is boolean => typeof thing === 'boolean'
 
 const string = (thing: any): thing is string => typeof thing === 'string'
 
-const element = (thing: any): thing is Element => {
+const element = (thing: any): thing is HTMLElement | SVGElement => {
   if (!thing || typeof thing !== 'object') {
     return false
   }
 
-  // eslint-disable-next-line import/no-named-as-default-member
   const _window = win.getWindow(thing) || win.window
 
-  return /object|function/.test(typeof _window.Element)
-    ? thing instanceof _window.Element // DOM2
+  return /object|function/.test(typeof Element)
+    ? thing instanceof Element || thing instanceof _window.Element
     : thing.nodeType === 1 && typeof thing.nodeName === 'string'
 }
 
