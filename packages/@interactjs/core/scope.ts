@@ -127,8 +127,12 @@ export class Scope {
 
       unset (this: InteractableBase) {
         super.unset()
-        scope.interactables.list.splice(scope.interactables.list.indexOf(this), 1)
 
+        const index = scope.interactables.list.indexOf(this)
+        if (index < 0) return
+
+        super.unset()
+        scope.interactables.list.splice(index, 1)
         scope.fire('interactable:unset', { interactable: this })
       }
     }
