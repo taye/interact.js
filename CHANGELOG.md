@@ -1,189 +1,194 @@
+## v1.10.12
+
+- fixed incorrect behaviour when `interactable.unset()` is called multiple
+  times
+
 ## v1.10.11
 
- - fixed incorrect "module" field in package.json https://github.com/taye/interact.js/issues/894#issuecomment-811046898
+- fixed incorrect "module" field in package.json https://github.com/taye/interact.js/issues/894#issuecomment-811046898
 
 ## v1.10.10
 
- - fixed issue with unresolved stub files #894
- - fixed commonjs import of `interactjs` package
+- fixed issue with unresolved stub files #894
+- fixed commonjs import of `interactjs` package
 
 ## v1.10.9
 
- - improved support for SSR environments
+- improved support for SSR environments
 
 ## v1.10.8
 
- - fixed imports of missing modules #891
+- fixed imports of missing modules #891
 
 ## v1.10.7
 
- - correctly replace `process.env.npm_package_version` in min bundle #890
+- correctly replace `process.env.npm_package_version` in min bundle #890
 
 ## v1.10.6
 
- - fix packaging error
+- fix packaging error
 
 ## v1.10.5
 
- - fix packaging error
+- fix packaging error
 
 ## v1.10.4
 
- - fix NPE in indexOfDeepestElement if first element has no parent #887
- - improve babel-plugin-prod on windows #885
+- fix NPE in indexOfDeepestElement if first element has no parent #887
+- improve babel-plugin-prod on windows #885
 
 ## v1.10.3
 
- - fixed issue with TS strict null checks #882
- - fixed issue with type imports being emitted in JS modules #881
+- fixed issue with TS strict null checks #882
+- fixed issue with type imports being emitted in JS modules #881
 
 ## v1.10.2
 
- - marked interact.{on,off} methods as deprecated
+- marked interact.{on,off} methods as deprecated
 
 ## v1.10.1
 
- - fixed mouseButtons option typings #865
- - removed plugin index module warnings
+- fixed mouseButtons option typings #865
+- removed plugin index module warnings
 
 ## v1.10.0
 
- - changed production files extension from '.min.js' to '.prod.js' #857
- - added experimental `@interactjs/dev-tools/babel-plugin-prod` babel plugin to
-   change `@interactjs/*` imports to production versions
- - added `sideEffects` fields to package.json files
+- changed production files extension from '.min.js' to '.prod.js' #857
+- added experimental `@interactjs/dev-tools/babel-plugin-prod` babel plugin to
+  change `@interactjs/*` imports to production versions
+- added `sideEffects` fields to package.json files
 
 ## v1.9.22
 
- - fixed inertia issue with arbitrary plugin order #834
- - fixed inertia regression #853
+- fixed inertia issue with arbitrary plugin order #834
+- fixed inertia regression #853
 
 ## v1.9.21
 
- - used findIndex polyfill to support 1E11 #852
- - fixed issue where resize reflow increased element size #817
- - fixed drop event order: fire `dropmove` after `dragenter` #841 and final
-   drop events before `dragend` #842
- - updated docs #844 #829
+- used findIndex polyfill to support 1E11 #852
+- fixed issue where resize reflow increased element size #817
+- fixed drop event order: fire `dropmove` after `dragenter` #841 and final
+  drop events before `dragend` #842
+- updated docs #844 #829
 
 ## v1.9.20
 
- - fixed ordering of plugins
+- fixed ordering of plugins
 
 ## v1.9.19
 
- - exposed `DropEvent` type
+- exposed `DropEvent` type
 
 ## v1.9.18
 
- - fixed further issues with types
+- fixed further issues with types
 
 ## v1.9.17
 
- - fixed missing types for interactjs package
+- fixed missing types for interactjs package
 
 ## v1.9.16
 
- - fixed missing types for interactjs package
+- fixed missing types for interactjs package
 
 ## v1.9.15
 
- - fixed missing types for interactjs package
+- fixed missing types for interactjs package
 
 ## v1.9.15
 
- - fixed further regression breaking typescript builds #816
+- fixed further regression breaking typescript builds #816
 
 ## v1.9.14
 
- - fixed regression breaking typescript builds #816
+- fixed regression breaking typescript builds #816
 
 ## v1.9.13
 
- - fixed regression breaking es5 compatibility of .min.js bundle #814
+- fixed regression breaking es5 compatibility of .min.js bundle #814
 
 ## v1.9.12
 
- - fixed regression breaking commonjs imports withotu .default
+- fixed regression breaking commonjs imports withotu .default
 
 ## v1.9.11
 
- - fixed issue with missing width/height on rectChecker result
- - fixed resize checker with negative sizes
- - moved generated plugin use modules to @interactjs/*/{use/,}*/index.ts #800
- - changed snap function args to provide interaction proxy
- - restored dev-tools helpers in development bundle
+- fixed issue with missing width/height on rectChecker result
+- fixed resize checker with negative sizes
+- moved generated plugin use modules to @interactjs/_/{use/,}_/index.ts #800
+- changed snap function args to provide interaction proxy
+- restored dev-tools helpers in development bundle
 
 ## v1.9.10
 
- - fixed issue with uninitialized scope in non browser env #803
+- fixed issue with uninitialized scope in non browser env #803
 
 ## v1.9.9
 
- - fixed typescript issue #807
+- fixed typescript issue #807
 
 ## v1.9.8
 
- - fixed minified bundle #802
- - fixed issue with removing delegated events #801
+- fixed minified bundle #802
+- fixed issue with removing delegated events #801
 
 ## v1.9.7
 
- - fixed typing issues
+- fixed typing issues
 
 ## v1.9.6
 
- - improved package dependencies
+- improved package dependencies
 
 ## v1.9.5
 
- - made `core` and `utils` packages dependencies of `interact`
+- made `core` and `utils` packages dependencies of `interact`
 
 ## v1.9.4
 
- - restored `@interactjs/*/use/*.js*` builds
+- restored `@interactjs/*/use/*.js*` builds
 
 ## v1.9.2
 
-  - fixed imports within generated modules
+- fixed imports within generated modules
 
 ## v1.9.1
 
- - added `@interactjs/*/use/*.min.js` builds
- - fixed issue with webpack minifier #800
- - fixed typescript issues
+- added `@interactjs/*/use/*.min.js` builds
+- fixed issue with webpack minifier #800
+- fixed typescript issues
 
 ## v1.9.0
 
- - added various `@interactjs/*/use` packages for simpler selective imports
-   #800
- - fixed endOnly modifiers without inertia
+- added various `@interactjs/*/use` packages for simpler selective imports
+  #800
+- fixed endOnly modifiers without inertia
 
 ## v1.8.5
 
- - fixed a but causing incorrect modifications after resuming inertia #790
+- fixed a but causing incorrect modifications after resuming inertia #790
 
 ## v1.8.4
 
- - fixed bug when calling interaction.move() from start event #791
+- fixed bug when calling interaction.move() from start event #791
 
 ## v1.8.3
 
- - fixed bug when calling interaction.move() from start event #791
- - fixed invalid non-array argument spread types #789
- - fixed missing typescript definition of some interactable methods #788
- - disabled `.d.ts.map` files output since the `.ts` source files are not
-   published
- - fixed typings for modifiers
+- fixed bug when calling interaction.move() from start event #791
+- fixed invalid non-array argument spread types #789
+- fixed missing typescript definition of some interactable methods #788
+- disabled `.d.ts.map` files output since the `.ts` source files are not
+  published
+- fixed typings for modifiers
 
 ## v1.8.2
 
- - enabled `.d.ts.map` files output
- - added license field to @interactjs/interact package.json
+- enabled `.d.ts.map` files output
+- added license field to @interactjs/interact package.json
 
 ## v1.8.1
 
- - fixed an issue causing flickering a cursor on Firefox for Windows #781
+- fixed an issue causing flickering a cursor on Firefox for Windows #781
 
 ## v1.8.0
 
@@ -193,264 +198,267 @@ issues and pull requests.
 
 ## v1.8.0-rc.3
 
- - fixed incorrect publish
+- fixed incorrect publish
 
 ## v1.8.0-rc.2
 
- - refactoring
+- refactoring
 
 ## v1.8.0-rc.1
 
- - fixed `interact.snappers.grid` arg typings
-   (https://twitter.com/ksumarine/status/1204457347856424960)
- - removed "?" from definitions for interact.{modifiers,snappers,createSnapGrid}
+- fixed `interact.snappers.grid` arg typings
+  (https://twitter.com/ksumarine/status/1204457347856424960)
+- removed "?" from definitions for interact.{modifiers,snappers,createSnapGrid}
 
 ## v1.8.0-rc.0
 
- - fixed `modifiers.restrictSize` #779
- - fixed option types in typescript and fixed devTools options #776
+- fixed `modifiers.restrictSize` #779
+- fixed option types in typescript and fixed devTools options #776
 
 ## v1.8.0-alpha.7
 
- - reverted to typescript@3.6 to avoid backwards compatibility issues #775
+- reverted to typescript@3.6 to avoid backwards compatibility issues #775
 
 ## v1.8.0-alpha.6
 
- - fixed dev scripts
+- fixed dev scripts
 
 ## v1.8.0-alpha.5
 
- - moved `interact.dynamicDrop` definition in order to avoid compilation errors
+- moved `interact.dynamicDrop` definition in order to avoid compilation errors
 
 ## v1.8.0-alpha.4
 
- - added `main` field to interactjs package.json #774
- - removed baseUrl from project tsconfig to avoid relative imports in generated
-   declarations
+- added `main` field to interactjs package.json #774
+- removed baseUrl from project tsconfig to avoid relative imports in generated
+  declarations
 
 ## v1.8.0-alpha.3
 
- - added missing typescript declaration files
+- added missing typescript declaration files
 
 ## v1.8.0-alpha.2
 
- - used non relative imports in .ts files with correct config for
-   babel-plugin-bare-import-rewrite
+- used non relative imports in .ts files with correct config for
+  babel-plugin-bare-import-rewrite
 
 ## v1.8.0-alpha.1
 
- - added `event.modifiers` array #772
+- added `event.modifiers` array #772
 
 ## v1.8.0-alpha.0
 
- - added `aspectRatio` modifier #638
+- added `aspectRatio` modifier #638
 
 ## v1.7.4
 
- - fixed `interact.snappers.grid` arg typings
-   (https://twitter.com/ksumarine/status/1204457347856424960)
- - removed "?" from definitions for interact.{modifiers,snappers,createSnapGrid}
+- fixed `interact.snappers.grid` arg typings
+  (https://twitter.com/ksumarine/status/1204457347856424960)
+- removed "?" from definitions for interact.{modifiers,snappers,createSnapGrid}
 
 ## v1.7.3
 
- - fixed interactjs package main and browser fields #774
- - reverted to typescript@3.6 to avoid backwards compatibility issues #775
+- fixed interactjs package main and browser fields #774
+- reverted to typescript@3.6 to avoid backwards compatibility issues #775
 
 ## v1.7.2
 
- - fixed typescript definition files #771
+- fixed typescript definition files #771
 
 ## v1.7.1
 
- - reorganized modules for esnext resolution
+- reorganized modules for esnext resolution
 
 ## v1.7.0
 
- - fixed hold repeat `event.count`
- - added esnext js builds #769
+- fixed hold repeat `event.count`
+- added esnext js builds #769
 
 ## v1.6.3
 
- - fixed issue with inertia resume with `endOnly: false` #765
+- fixed issue with inertia resume with `endOnly: false` #765
 
 ## v1.6.2
 
- - @mlucool added license field to package.json of sub modules #755
- - added `rect`, `deltaRect` and `edges` to resizestart and resizeend events #754
+- @mlucool added license field to package.json of sub modules #755
+- added `rect`, `deltaRect` and `edges` to resizestart and resizeend events #754
 
 ## v1.6.1
 
- - fixed resize without invert
+- fixed resize without invert
 
 ## v1.6.0
 
- - avoided accessing deprecated event.mozPressure #751
- - changed typings to use `HTMLElement | SVGElement` for `event.target` #747
- - added `interacting` arg to cursorChecker #739
- - added zIndex compare for sibling dropzones
+- avoided accessing deprecated event.mozPressure #751
+- changed typings to use `HTMLElement | SVGElement` for `event.target` #747
+- added `interacting` arg to cursorChecker #739
+- added zIndex compare for sibling dropzones
 
 ## v1.5.4
 
- - fixed broken modifiers #746
+- fixed broken modifiers #746
 
 ## v1.5.3
 
- - fixed issues with old modifiers API
+- fixed issues with old modifiers API
 
 ## v1.5.2
 
- - fixed null restriction issue #737
- - improved typings for modifiers
+- fixed null restriction issue #737
+- improved typings for modifiers
 
 ## v1.5.1
 
- - fixed typing issues #738
+- fixed typing issues #738
 
 ## v1.5.0
 
- - added `cursorChecker` option for drag and resize #736
- - allowed restrictions larger than the target element #735
- - added `interact.modifiers.restrictRect` with pre-set elementRect #735
+- added `cursorChecker` option for drag and resize #736
+- allowed restrictions larger than the target element #735
+- added `interact.modifiers.restrictRect` with pre-set elementRect #735
 
 ## v1.4.14
 
- - fixed issue with string restriction values that don't resolve to a rect
-   #731
- - changed plugin order so that `pointer-events` is installed before `inertia`
+- fixed issue with string restriction values that don't resolve to a rect
+  #731
+- changed plugin order so that `pointer-events` is installed before `inertia`
 
 ## v1.4.13
 
- - fixed restrictSize min and max function restrictions
+- fixed restrictSize min and max function restrictions
 
 ## v1.4.12
 
- - fixed errors from calling `interaction.stop()` in start event #725
+- fixed errors from calling `interaction.stop()` in start event #725
 
 ## v1.4.11
 
- - fixed hold events #730
+- fixed hold events #730
 
 ## v1.4.10
 
- - fixed regression of preventing native drag behaviour #729
+- fixed regression of preventing native drag behaviour #729
 
 ## v1.4.9
 
- - fixed modifiers with inertia action-resume #728
- - fixed docs for snap grid limits #717
+- fixed modifiers with inertia action-resume #728
+- fixed docs for snap grid limits #717
 
 ## v1.4.8
 
- - fixed exports in generated typings #727
+- fixed exports in generated typings #727
 
 ## v1.4.7
 
- - fixed exports in generated typings #726
+- fixed exports in generated typings #726
 
 ## v1.4.6
 
- - fixed pointerEvents currentTarget
+- fixed pointerEvents currentTarget
 
 ## v1.4.5
 
- - @0xflotus fixed typos in docs #724
- - fixed error on iOS #682
+- @0xflotus fixed typos in docs #724
+- fixed error on iOS #682
 
 ## v1.4.4
 
- - fixed an issue with interactions lingering on removed elements #723
+- fixed an issue with interactions lingering on removed elements #723
 
 ## v1.4.3
 
- - destroy only relevant interactions on interactable.unset()
+- destroy only relevant interactions on interactable.unset()
 
 ## v1.4.2
 
- - @jf-m fixed memory leaks and a bug on interactions stop [PR #715](https://github.com/taye/interact.js/pull/715)
- - fixed dropzones in shadow DOM [PR #722](https://github.com/taye/interact.js/pull/722)
+- @jf-m fixed memory leaks and a bug on interactions stop [PR #715](https://github.com/taye/interact.js/pull/715)
+- fixed dropzones in shadow DOM [PR #722](https://github.com/taye/interact.js/pull/722)
 
 ## v1.4.1
 
- - fixed scripts to run bundle optimizations and fix issues with browserify
+- fixed scripts to run bundle optimizations and fix issues with browserify
 
 # v1.4.0
 
 Most notablly:
 
- - `interactable.reflow(action)` to re-run modifiers, drop, etc [PR #610](https://github.com/taye/interact.js/pull/610)
- - `dropEvent.reject()` [PR #613](https://github.com/taye/interact.js/pull/613)
- - snapEdges modifier [PR #620](https://github.com/taye/interact.js/pull/620)
- - per-action modifiers array [PR #625](https://github.com/taye/interact.js/pull/625)
- - autoStart set cursor on both target and &lt;html&gt; [PR #639](https://github.com/taye/interact.js/pull/639)
- - inertia: rename resume event to `${action}resume`
- - `interactable.reflow(action)` to re-run modifiers, drop, etc [PR #610](https://github.com/taye/interact.js/pull/610)
- - added `options.listeners` array/object for actions
- - `snapEdges` modifier [PR #620](https://github.com/taye/interact.js/pull/620)
- - fixed iOS preventDefault passive event issue ([issue #631](https://github.com/taye/interact.js/issues/631))
- - added `console.warn` messages for common, easily detected issues
- - improved docs
- - various fixes
+- `interactable.reflow(action)` to re-run modifiers, drop, etc [PR #610](https://github.com/taye/interact.js/pull/610)
+- `dropEvent.reject()` [PR #613](https://github.com/taye/interact.js/pull/613)
+- snapEdges modifier [PR #620](https://github.com/taye/interact.js/pull/620)
+- per-action modifiers array [PR #625](https://github.com/taye/interact.js/pull/625)
+- autoStart set cursor on both target and &lt;html&gt; [PR #639](https://github.com/taye/interact.js/pull/639)
+- inertia: rename resume event to `${action}resume`
+- `interactable.reflow(action)` to re-run modifiers, drop, etc [PR #610](https://github.com/taye/interact.js/pull/610)
+- added `options.listeners` array/object for actions
+- `snapEdges` modifier [PR #620](https://github.com/taye/interact.js/pull/620)
+- fixed iOS preventDefault passive event issue ([issue #631](https://github.com/taye/interact.js/issues/631))
+- added `console.warn` messages for common, easily detected issues
+- improved docs
+- various fixes
 
 Full list of [changes on Github](https://github.com/taye/interact.js/compare/1.3.4...v1.4.0).
 
 ## v1.3.3
- - fixed issues with action options ([PR #567](https://github.com/taye/interact.js/pull/567), [issue #570](https://github.com/taye/interact.js/issues/570))
+
+- fixed issues with action options ([PR #567](https://github.com/taye/interact.js/pull/567), [issue #570](https://github.com/taye/interact.js/issues/570))
 
 ## v1.3.2
- - fixed iOS preventDefault passive event issue ([issue #561](https://github.com/taye/interact.js/issues/561))
+
+- fixed iOS preventDefault passive event issue ([issue #561](https://github.com/taye/interact.js/issues/561))
 
 ## v1.3.1
- - allowed calling `draggable.unset()` during `dragend` and `drop` event
-   listeners ([issue #560](https://github.com/taye/interact.js/issues/560))
- - allowed snap to be enabled with falsey targets value [issue #562](https://github.com/taye/interact.js/issues/562)
+
+- allowed calling `draggable.unset()` during `dragend` and `drop` event
+  listeners ([issue #560](https://github.com/taye/interact.js/issues/560))
+- allowed snap to be enabled with falsey targets value [issue #562](https://github.com/taye/interact.js/issues/562)
 
 ## v1.3.0
 
 Most notably:
 
- - changed the npm and bower package names to "interactjs" ([issue
-   #399](https://github.com/taye/interact.js/issues/399)
- - major refactor with [PR #231](https://github.com/taye/interact.js/pull/231).
- - removed deprecated methods:
-   - `Interactable`: `squareResize`, `snap`, `restrict`, `inertia`,
-     `autoScroll`, `accept`
-   - `interact`: `enabbleDragging`, `enableResizing`, `enableGesturing`,
-     `margin`
- - new `hold` option for starting actions
- - new `interaction.end()` method
-   ([df963b0](https://github.com/taye/interact.js/commit/df963b0))
- - `snap.offset` `self` option ([issue
-   #204](https://github.com/taye/interact.js/issues/204/#issuecomment-154879052))
- - `interaction.doMove()`
-   ([3489ee1](https://github.com/taye/interact.js/commit/3489ee1))
-   ([c5c658a](https://github.com/taye/interact.js/commit/c5c658a))
- - snap grid limits
-   ([d549672](https://github.com/taye/interact.js/commit/d549672))
- - improved iframe support ([PR
-   #313](https://github.com/taye/interact.js/pull/313))
- - `actionend` event dx/dy are now `0`, not the difference between start and
-   end coords ([cbfaf00](https://github.com/taye/interact.js/commit/cbfaf00))
- - replaced drag `axis` option with `startAxis` and `lockAxis`
- - added pointerEvents options:
-   - `holdDuration`
-     ([1c58f92](https://github.com/taye/interact.js/commit/1c58f927)),
-   - `ignoreFrom` and `allowFrom`
-     ([6cbaad6](https://github.com/taye/interact.js/commit/6cbaad6d))
-   - `origin` ([7823bb9](https://github.com/taye/interact.js/commit/7823bb95))
- - action events set with action method options (eg.
-   `target.draggable({onmove})` are removed when that action is disabled with a
-   method call ([cca4e26](https://github.com/taye/interact.js/commit/cca4e260))
- - `context` option now works for Element targets
-   ([8f64a7a](https://github.com/taye/interact.js/commit/8f64a7a4))
- - added an action `mouseButtons` option and allowed actions only with the left
-   mouse button by default
-   ([54ebdc3](https://github.com/taye/interact.js/commit/54ebdc3e))
- - added repeating `hold` events
-   ([fe11a8e](https://github.com/taye/interact.js/commit/fe11a8e5))
- - fixed `Interactable.off` ([PR
-   #477](https://github.com/taye/interact.js/pull/477))
- - added `restrictEdges`, `restrictSize` and `snapSize` resize modifiers ([PR
-   #455](https://github.com/taye/interact.js/pull/455))
+- changed the npm and bower package names to "interactjs" ([issue
+  #399](https://github.com/taye/interact.js/issues/399)
+- major refactor with [PR #231](https://github.com/taye/interact.js/pull/231).
+- removed deprecated methods:
+  - `Interactable`: `squareResize`, `snap`, `restrict`, `inertia`,
+    `autoScroll`, `accept`
+  - `interact`: `enabbleDragging`, `enableResizing`, `enableGesturing`,
+    `margin`
+- new `hold` option for starting actions
+- new `interaction.end()` method
+  ([df963b0](https://github.com/taye/interact.js/commit/df963b0))
+- `snap.offset` `self` option ([issue
+  #204](https://github.com/taye/interact.js/issues/204/#issuecomment-154879052))
+- `interaction.doMove()`
+  ([3489ee1](https://github.com/taye/interact.js/commit/3489ee1))
+  ([c5c658a](https://github.com/taye/interact.js/commit/c5c658a))
+- snap grid limits
+  ([d549672](https://github.com/taye/interact.js/commit/d549672))
+- improved iframe support ([PR
+  #313](https://github.com/taye/interact.js/pull/313))
+- `actionend` event dx/dy are now `0`, not the difference between start and
+  end coords ([cbfaf00](https://github.com/taye/interact.js/commit/cbfaf00))
+- replaced drag `axis` option with `startAxis` and `lockAxis`
+- added pointerEvents options:
+  - `holdDuration`
+    ([1c58f92](https://github.com/taye/interact.js/commit/1c58f927)),
+  - `ignoreFrom` and `allowFrom`
+    ([6cbaad6](https://github.com/taye/interact.js/commit/6cbaad6d))
+  - `origin` ([7823bb9](https://github.com/taye/interact.js/commit/7823bb95))
+- action events set with action method options (eg.
+  `target.draggable({onmove})` are removed when that action is disabled with a
+  method call ([cca4e26](https://github.com/taye/interact.js/commit/cca4e260))
+- `context` option now works for Element targets
+  ([8f64a7a](https://github.com/taye/interact.js/commit/8f64a7a4))
+- added an action `mouseButtons` option and allowed actions only with the left
+  mouse button by default
+  ([54ebdc3](https://github.com/taye/interact.js/commit/54ebdc3e))
+- added repeating `hold` events
+  ([fe11a8e](https://github.com/taye/interact.js/commit/fe11a8e5))
+- fixed `Interactable.off` ([PR
+  #477](https://github.com/taye/interact.js/pull/477))
+- added `restrictEdges`, `restrictSize` and `snapSize` resize modifiers ([PR
+  #455](https://github.com/taye/interact.js/pull/455))
 
 Full list of [changes on Github](https://github.com/taye/interact.js/compare/v1.2.6...v1.3.0).
 
@@ -465,15 +473,16 @@ interact(target).resizable({ preserveAspectRatio: true });
 See [PR #260](https://github.com/taye/interact.js/pull/260).
 
 ### Deprecated
- - `interact.margin(number)` - Use `interact(target).resizable({ margin: number });` instead
+
+- `interact.margin(number)` - Use `interact(target).resizable({ margin: number });` instead
 
 ### Fixed
 
- - incorrect coordinates of the first movement of every action ([5e5a040](https://github.com/taye/interact.js/commit/5e5a040))
- - warning about deprecated "webkitForce" event property ([0943290](https://github.com/taye/interact.js/commit/0943290))
- - bugs with multiple concurrent interactions ([ed53aee](http://github.com/taye/interact.js/commit/ed53aee))
- - iPad 1, iOS 5.1.1 error "undefined is not a function" when autoScroll is set
-   to true ([PR #194](https://github.com/taye/interact.js/pull/194))
+- incorrect coordinates of the first movement of every action ([5e5a040](https://github.com/taye/interact.js/commit/5e5a040))
+- warning about deprecated "webkitForce" event property ([0943290](https://github.com/taye/interact.js/commit/0943290))
+- bugs with multiple concurrent interactions ([ed53aee](http://github.com/taye/interact.js/commit/ed53aee))
+- iPad 1, iOS 5.1.1 error "undefined is not a function" when autoScroll is set
+  to true ([PR #194](https://github.com/taye/interact.js/pull/194))
 
 Full list of [changes on Github](https://github.com/taye/interact.js/compare/v1.2.5...v1.2.6)
 
@@ -481,9 +490,9 @@ Full list of [changes on Github](https://github.com/taye/interact.js/compare/v1.
 
 ### Changed parameters to actionChecker and drop.checker
 
- - Added `event` as the first argument to actionCheckers. See commit [88dc583](https://github.com/taye/interact.js/commit/88dc583)
- - Added `dragEvent` as the first parameter to drop.checker functions. See
-   commits [16d74d4](https://github.com/taye/interact.js/commit/16d74d4) and [d0c4b69](https://github.com/taye/interact.js/commit/d0c4b69)
+- Added `event` as the first argument to actionCheckers. See commit [88dc583](https://github.com/taye/interact.js/commit/88dc583)
+- Added `dragEvent` as the first parameter to drop.checker functions. See
+  commits [16d74d4](https://github.com/taye/interact.js/commit/16d74d4) and [d0c4b69](https://github.com/taye/interact.js/commit/d0c4b69)
 
 ### Deprecated methods
 
@@ -505,30 +514,30 @@ See https://github.com/taye/interact.js/issues/166#issuecomment-91234390
 
 ### Fixes
 
- - touch coords on Presto Opera Mobile - see commits [886e54c](https://github.com/taye/interact.js/commit/886e54c) and [5a3a850](https://github.com/taye/interact.js/commit/5a3a850)
- - bug with multiple pointers - see commit [64882d3](https://github.com/taye/interact.js/commit/64882d3)
- - accessing certain recently deprecated event properties in Blink - see
-   commits [e91fbc6](https://github.com/taye/interact.js/commit/e91fbc6) and [195cfe9](https://github.com/taye/interact.js/commit/195cfe9)
- - dropzones with `accept: 'pointer'` in scrolled pages on iOS6 and lower - see
-   commit [0b94aac](https://github.com/taye/interact.js/commit/0b94aac)
- - setting styleCursor through Interactable options object - see [PR
-   #270](https://github.com/taye/interact.js/pull/270)
- - one missed interaction element on stop triggered - see [PR
-   #258](https://github.com/taye/interact.js/pull/258)
- - pointer dt on touchscreen devices - see [PR
-   #215](https://github.com/taye/interact.js/pull/215)
- - autoScroll with containers with fixed position - see commit [3635840](https://github.com/taye/interact.js/commit/3635840)
- - autoScroll for mobile - see #180
- - preventDefault - see commits [1984c80](https://github.com/taye/interact.js/commit/1984c80) and [6913959](https://github.com/taye/interact.js/commit/6913959)
- - occasional error - see [issue
-   #183](https://github.com/taye/interact.js/issue/183)
- - Interactable#unset - see [PR
-   #178](https://github.com/taye/interact.js/pull/178)
- - coords of start event after manual start - see commit [fec73b2](https://github.com/taye/interact.js/commit/fec73b2)
- - bug with touch and selector interactables - see commit [d8df3de](https://github.com/taye/interact.js/commit/d8df3de)
- - touch doubletap bug - see [273f461](https://github.com/taye/interact.js/commit/273f461)
- - event x0/y0 with origin - see [PR
-   #167](https://github.com/taye/interact.js/pull/167)
+- touch coords on Presto Opera Mobile - see commits [886e54c](https://github.com/taye/interact.js/commit/886e54c) and [5a3a850](https://github.com/taye/interact.js/commit/5a3a850)
+- bug with multiple pointers - see commit [64882d3](https://github.com/taye/interact.js/commit/64882d3)
+- accessing certain recently deprecated event properties in Blink - see
+  commits [e91fbc6](https://github.com/taye/interact.js/commit/e91fbc6) and [195cfe9](https://github.com/taye/interact.js/commit/195cfe9)
+- dropzones with `accept: 'pointer'` in scrolled pages on iOS6 and lower - see
+  commit [0b94aac](https://github.com/taye/interact.js/commit/0b94aac)
+- setting styleCursor through Interactable options object - see [PR
+  #270](https://github.com/taye/interact.js/pull/270)
+- one missed interaction element on stop triggered - see [PR
+  #258](https://github.com/taye/interact.js/pull/258)
+- pointer dt on touchscreen devices - see [PR
+  #215](https://github.com/taye/interact.js/pull/215)
+- autoScroll with containers with fixed position - see commit [3635840](https://github.com/taye/interact.js/commit/3635840)
+- autoScroll for mobile - see #180
+- preventDefault - see commits [1984c80](https://github.com/taye/interact.js/commit/1984c80) and [6913959](https://github.com/taye/interact.js/commit/6913959)
+- occasional error - see [issue
+  #183](https://github.com/taye/interact.js/issue/183)
+- Interactable#unset - see [PR
+  #178](https://github.com/taye/interact.js/pull/178)
+- coords of start event after manual start - see commit [fec73b2](https://github.com/taye/interact.js/commit/fec73b2)
+- bug with touch and selector interactables - see commit [d8df3de](https://github.com/taye/interact.js/commit/d8df3de)
+- touch doubletap bug - see [273f461](https://github.com/taye/interact.js/commit/273f461)
+- event x0/y0 with origin - see [PR
+  #167](https://github.com/taye/interact.js/pull/167)
 
 ## 1.2.4
 
@@ -590,8 +599,7 @@ v1.2.0](https://github.com/taye/interact.js/issues/146). They're fixed now.
 
 ### Restriction
 
-Fixed restriction to an element when the element doesn't have a rect (`display:
-none`, not in DOM, etc.). [Issue
+Fixed restriction to an element when the element doesn't have a rect (`display: none`, not in DOM, etc.). [Issue
 144](https://github.com/taye/interact.js/issues/144).
 
 ## 1.2.0
@@ -618,6 +626,7 @@ If you don't want multiple interactions, call `interact.maxInteractions(1)`.
 ### Snapping
 
 #### Unified snap modes
+
 Snap modes have been
 [unified](https://github.com/taye/interact.js/pull/127). A `targets` array
 now holds all the snap objects and functions for snapping.
@@ -633,7 +642,7 @@ interact(target).draggable({
     relativePoints: [
       { x: 0, y: 0 },  // snap relative to the top left of the element
       { x: 1, y: 1 },  // and also to the bottom right
-    ],  
+    ],
 
     // offset the snap target coordinates
     // can be an object with x/y or 'startCoords'
@@ -649,13 +658,13 @@ The current `Interaction` is now passed as the third parameter to snap functions
 ```js
 interact(target).draggable({
   snap: {
-    targets: [ function (x, y, interaction) {
+    targets: [function (x, y, interaction) {
       if (!interaction.dropTarget) {
-        return { x: 0, y: 0 };
+        return { x: 0, y: 0 }
       }
-    } ]
-  }
-});
+    }],
+  },
+})
 ```
 
 #### snap.relativePoints and offset
