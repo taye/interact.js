@@ -1,3 +1,7 @@
+## v1.10.13
+
+- Added `.d.ts` files to all `@interactjs/*` packages
+
 ## v1.10.12
 
 - fixed incorrect behaviour when `interactable.unset()` is called multiple
