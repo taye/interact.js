@@ -1,4 +1,4 @@
-import type { Point, FullRect, PointerEventType, Element } from '@interactjs/types/index'
+import type { Point, FullRect, PointerEventType, Element } from '@interactjs/core/types'
 import extend from '@interactjs/utils/extend'
 import getOriginXY from '@interactjs/utils/getOriginXY'
 import hypot from '@interactjs/utils/hypot'
@@ -6,7 +6,7 @@ import hypot from '@interactjs/utils/hypot'
 import { BaseEvent } from './BaseEvent'
 import type { Interaction } from './Interaction'
 import { defaults } from './options'
-import type { ActionName } from './scope'
+import type { ActionName } from './types'
 
 export type EventPhase = keyof PhaseMap
 

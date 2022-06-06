@@ -1,6 +1,6 @@
 import type { Interactable } from '@interactjs/core/Interactable'
 import type { Scope, Plugin } from '@interactjs/core/scope'
-import type { Element } from '@interactjs/types/index'
+import type { Element } from '@interactjs/core/types'
 import extend from '@interactjs/utils/extend'
 
 declare module '@interactjs/core/Interactable' {

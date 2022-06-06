@@ -1,6 +1,6 @@
 import type Interaction from '@interactjs/core/Interaction'
 import type { Scope } from '@interactjs/core/scope'
-import type { PointerType } from '@interactjs/types/index'
+import type { PointerType } from '@interactjs/core/types'
 import * as dom from '@interactjs/utils/domUtils'
 
 export interface SearchDetails {

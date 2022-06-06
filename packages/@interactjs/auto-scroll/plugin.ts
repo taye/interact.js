@@ -1,7 +1,7 @@
 import type { Interactable } from '@interactjs/core/Interactable'
 import type Interaction from '@interactjs/core/Interaction'
-import type { ActionName, Scope, Plugin } from '@interactjs/core/scope'
-import type { PointerType } from '@interactjs/types/index'
+import type { Scope, Plugin } from '@interactjs/core/scope'
+import type { ActionName, PointerType } from '@interactjs/core/types'
 import * as domUtils from '@interactjs/utils/domUtils'
 import is from '@interactjs/utils/is'
 import raf from '@interactjs/utils/raf'
@@ -59,7 +59,7 @@ const autoScroll = {
 
   now: Date.now,
 
-  interaction: null as Interaction,
+  interaction: null as Interaction<ActionName> | null,
   i: 0, // the handle returned by window.setInterval
 
   // Direction each pulse is to scroll in

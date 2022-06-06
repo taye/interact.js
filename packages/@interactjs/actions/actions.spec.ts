@@ -1,5 +1,6 @@
-import type { Scope, ActionName } from '@interactjs/core/scope'
+import type { Scope } from '@interactjs/core/scope'
 import * as helpers from '@interactjs/core/tests/_helpers'
+import type { ActionName } from '@interactjs/core/types'
 import * as pointerUtils from '@interactjs/utils/pointerUtils'
 
 import actions from './plugin'

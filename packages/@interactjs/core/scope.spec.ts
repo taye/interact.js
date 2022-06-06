@@ -1,4 +1,4 @@
-import type { ActionName } from '@interactjs/core/scope'
+import type { ActionName } from '@interactjs/core/types'
 
 import * as helpers from './tests/_helpers'
 

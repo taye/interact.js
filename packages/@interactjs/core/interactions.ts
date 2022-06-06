@@ -1,5 +1,5 @@
-import type { Scope, ActionName, SignalArgs, Plugin } from '@interactjs/core/scope'
-import type { Listener } from '@interactjs/types/index'
+import type { Scope, SignalArgs, Plugin } from '@interactjs/core/scope'
+import type { ActionName, Listener } from '@interactjs/core/types'
 import browser from '@interactjs/utils/browser'
 import domObjects from '@interactjs/utils/domObjects'
 import { nodeContains } from '@interactjs/utils/domUtils'
@@ -22,9 +22,7 @@ declare module '@interactjs/core/scope' {
     }
     prevTouchTime: number
   }
-}
 
-declare module '@interactjs/core/scope' {
   interface SignalArgs {
     'interactions:find': {
       interaction: InteractionBase

@@ -1,5 +1,5 @@
 import type { InteractEvent } from '@interactjs/core/InteractEvent'
-import type { CoordsSetMember, PointerType, Point, PointerEventType, Element } from '@interactjs/types/index'
+import type { CoordsSetMember, PointerType, Point, PointerEventType, Element } from '@interactjs/core/types'
 
 import browser from './browser'
 import dom from './domObjects'
@@ -54,8 +54,8 @@ export function getXY (type: string, pointer: PointerType | InteractEvent, xy: P
   xy = xy || ({} as Point)
   type = type || 'page'
 
-  xy.x = pointer[(type + 'X') as keyof PointerType]
-  xy.y = pointer[(type + 'Y') as keyof PointerType]
+  xy.x = pointer[(type + 'X') as 'pageX']
+  xy.y = pointer[(type + 'Y') as 'pageY']
 
   return xy
 }

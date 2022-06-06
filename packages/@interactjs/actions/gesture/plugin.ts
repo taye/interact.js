@@ -1,8 +1,8 @@
 import type { InteractEvent, EventPhase } from '@interactjs/core/InteractEvent'
 import type { Interaction, DoPhaseArg } from '@interactjs/core/Interaction'
-import type { Options } from '@interactjs/core/options'
+import type { PerActionDefaults } from '@interactjs/core/options'
 import type { Scope, Plugin } from '@interactjs/core/scope'
-import type { ActionMethod, GesturableOptions, Rect, PointerType } from '@interactjs/types/index'
+import type { ActionMethod, Rect, PointerType, ListenersArg } from '@interactjs/core/types'
 import is from '@interactjs/utils/is'
 import * as pointerUtils from '@interactjs/utils/pointerUtils'
 
@@ -32,10 +32,16 @@ declare module '@interactjs/core/options' {
   }
 }
 
-declare module '@interactjs/core/scope' {
+declare module '@interactjs/core/types' {
   interface ActionMap {
     gesture?: typeof gesture
   }
+}
+
+export interface GesturableOptions extends PerActionDefaults {
+  onstart?: ListenersArg
+  onmove?: ListenersArg
+  onend?: ListenersArg
 }
 
 export interface GestureEvent extends InteractEvent<'gesture'> {
@@ -97,7 +103,7 @@ function install (scope: Scope) {
       return this
     }
 
-    return this.options.gesture as Options
+    return this.options.gesture as GesturableOptions
   } as GesturableMethod
 
   actions.map.gesture = gesture

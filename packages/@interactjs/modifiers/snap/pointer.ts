@@ -1,6 +1,5 @@
 import type { Interaction, InteractionProxy } from '@interactjs/core/Interaction'
-import type { ActionName } from '@interactjs/core/scope'
-import type { Point, RectResolvable, Element } from '@interactjs/types/index'
+import type { ActionName, Point, RectResolvable, Element } from '@interactjs/core/types'
 import extend from '@interactjs/utils/extend'
 import getOriginXY from '@interactjs/utils/getOriginXY'
 import hypot from '@interactjs/utils/hypot'

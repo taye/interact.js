@@ -9,7 +9,7 @@
 //   },
 // })
 
-import type { Point, Rect } from '@interactjs/types/index'
+import type { Point, Rect } from '@interactjs/core/types'
 import extend from '@interactjs/utils/extend'
 import * as rectUtils from '@interactjs/utils/rect'
 

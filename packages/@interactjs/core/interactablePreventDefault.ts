@@ -1,7 +1,7 @@
 import type { Interactable } from '@interactjs/core/Interactable'
 import type Interaction from '@interactjs/core/Interaction'
 import type { Scope } from '@interactjs/core/scope'
-import type { PointerEventType } from '@interactjs/types/index'
+import type { PointerEventType } from '@interactjs/core/types'
 import { matchesSelector, nodeContains } from '@interactjs/utils/domUtils'
 import is from '@interactjs/utils/is'
 import { getWindow } from '@interactjs/utils/window'

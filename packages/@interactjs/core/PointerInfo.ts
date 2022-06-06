@@ -1,4 +1,4 @@
-import type { PointerEventType, PointerType } from '@interactjs/types/index'
+import type { PointerEventType, PointerType } from '@interactjs/core/types'
 
 export class PointerInfo {
   id: number

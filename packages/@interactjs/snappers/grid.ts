@@ -1,5 +1,5 @@
+import type { Rect, Point } from '@interactjs/core/types'
 import type { SnapFunction, SnapTarget } from '@interactjs/modifiers/snap/pointer'
-import type { Rect, Point } from '@interactjs/types/index'
 
 export type GridOptions = (Partial<Rect> | Point) & {
   range?: number

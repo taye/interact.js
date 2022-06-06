@@ -19,7 +19,8 @@ const [, , modulesDir = 'packages'] = process.argv
 
   await del(path.join(typesDir, outBasename))
 
-  shell.exec(`npx tsc -p types.tsconfig.json --outFile ${outFile}`)
+  shell.exec(`npx tsc -p types.tsconfig.json --outDir ${modulesDir}/@interactjs`)
+  shell.exec(`npx tsc -p types.tsconfig.json --rootDir packages --outFile ${outFile}`)
 
   const namespaceDeclaration = `
 import * as Interact from '@interactjs/types/index'
@@ -28,5 +29,5 @@ export as namespace Interact
 export = Interact
 `.trimLeft()
 
-  await fs.promises.writeFile(path.join(outDir, 'typings.d.ts'), namespaceDeclaration)
+  await Promise.all([fs.promises.writeFile(path.join(outDir, 'typings.d.ts'), namespaceDeclaration)])
 })().catch(errorExit)

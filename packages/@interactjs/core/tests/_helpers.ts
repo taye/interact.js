@@ -1,11 +1,11 @@
-import type { PointerType, Rect, Target } from '@interactjs/types/index'
+import type { PointerType, Rect, Target } from '@interactjs/core/types'
 import extend from '@interactjs/utils/extend'
 import is from '@interactjs/utils/is'
 import * as pointerUtils from '@interactjs/utils/pointerUtils'
 
-import type { ActionProps } from '../Interaction'
-import type { Plugin, ActionName } from '../scope'
+import type { Plugin } from '../scope'
 import { Scope } from '../scope'
+import type { ActionName, ActionProps } from '../types'
 
 let counter = 0
 

@@ -1,6 +1,6 @@
 import type { EventPhase } from '@interactjs/core/InteractEvent'
 import type { Interaction, DoAnyPhaseArg } from '@interactjs/core/Interaction'
-import type { EdgeOptions, FullRect, Point, Rect } from '@interactjs/types/index'
+import type { EdgeOptions, FullRect, Point, Rect } from '@interactjs/core/types'
 import clone from '@interactjs/utils/clone'
 import extend from '@interactjs/utils/extend'
 import * as rectUtils from '@interactjs/utils/rect'

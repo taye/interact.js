@@ -1,15 +1,19 @@
 import type { EventPhase, InteractEvent } from '@interactjs/core/InteractEvent'
 import type { Interactable } from '@interactjs/core/Interactable'
-import type { ActionProps, Interaction } from '@interactjs/core/Interaction'
+import type { Interaction } from '@interactjs/core/Interaction'
+import type { PerActionDefaults } from '@interactjs/core/options'
 import type { Scope, Plugin } from '@interactjs/core/scope'
 import type {
+  ActionName,
+  ActionProps,
   ActionMethod,
-  ResizableOptions,
+  EdgeOptions,
   FullRect,
+  ListenersArg,
   OrBoolean,
   Point,
   Rect,
-} from '@interactjs/types/index'
+} from '@interactjs/core/types'
 import * as dom from '@interactjs/utils/domUtils'
 import extend from '@interactjs/utils/extend'
 import is from '@interactjs/utils/is'
@@ -25,7 +29,7 @@ declare module '@interactjs/core/Interactable' {
 }
 
 declare module '@interactjs/core/Interaction' {
-  interface Interaction {
+  interface Interaction<T extends ActionName | null = ActionName> {
     resizeAxes: 'x' | 'y' | 'xy'
     resizeStartAspectRatio: number
   }
@@ -37,10 +41,24 @@ declare module '@interactjs/core/options' {
   }
 }
 
-declare module '@interactjs/core/scope' {
+declare module '@interactjs/core/types' {
   interface ActionMap {
     resize?: typeof resize
   }
+}
+
+export interface ResizableOptions extends PerActionDefaults {
+  square?: boolean
+  preserveAspectRatio?: boolean
+  edges?: EdgeOptions | null
+  axis?: 'x' | 'y' | 'xy' // deprecated
+  invert?: 'none' | 'negate' | 'reposition'
+  margin?: number
+  squareResize?: boolean
+  oninertiastart?: ListenersArg
+  onstart?: ListenersArg
+  onmove?: ListenersArg
+  onend?: ListenersArg
 }
 
 export interface ResizeEvent<P extends EventPhase = EventPhase> extends InteractEvent<'resize', P> {

@@ -1,7 +1,7 @@
 import { BaseEvent } from '@interactjs/core/BaseEvent'
 import type { InteractEvent } from '@interactjs/core/InteractEvent'
 import type { Interactable } from '@interactjs/core/Interactable'
-import type { Element } from '@interactjs/types/index'
+import type { Element } from '@interactjs/core/types'
 import * as arr from '@interactjs/utils/arr'
 
 import type { DropState } from './plugin'

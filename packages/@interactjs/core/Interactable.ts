@@ -1,15 +1,18 @@
 /* eslint-disable no-dupe-class-members */
-import type { ActionMap, ActionName, Actions, Scope } from '@interactjs/core/scope'
+import type { Scope } from '@interactjs/core/scope'
 import type {
+  ActionMap,
+  ActionMethod,
+  ActionName,
+  Actions,
   Context,
   Element,
-  Target,
-  Listeners,
-  OrBoolean,
   EventTypes,
+  Listeners,
   ListenersArg,
-  ActionMethod,
-} from '@interactjs/types/index'
+  OrBoolean,
+  Target,
+} from '@interactjs/core/types'
 import * as arr from '@interactjs/utils/arr'
 import browser from '@interactjs/utils/browser'
 import clone from '@interactjs/utils/clone'

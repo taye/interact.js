@@ -1,4 +1,4 @@
-import type { Listener, ListenersArg, Rect } from '@interactjs/types/index'
+import type { Listener, ListenersArg, Rect } from '@interactjs/core/types'
 import * as arr from '@interactjs/utils/arr'
 import extend from '@interactjs/utils/extend'
 import type { NormalizedListeners } from '@interactjs/utils/normalizeListeners'

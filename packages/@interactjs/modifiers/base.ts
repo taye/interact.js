@@ -2,7 +2,7 @@ import type { EventPhase, InteractEvent } from '@interactjs/core/InteractEvent'
 import type { Interactable } from '@interactjs/core/Interactable'
 import type Interaction from '@interactjs/core/Interaction'
 import type { Plugin } from '@interactjs/core/scope'
-import type { EdgeOptions, FullRect, Point, Rect } from '@interactjs/types/index'
+import type { EdgeOptions, FullRect, Point, Rect } from '@interactjs/core/types'
 
 import Modification from './Modification'
 

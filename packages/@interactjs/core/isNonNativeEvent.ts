@@ -1,4 +1,4 @@
-import type { Actions } from '@interactjs/core/scope'
+import type { Actions } from '@interactjs/core/types'
 
 export default function isNonNativeEvent (type: string, actions: Actions) {
   if (actions.phaselessTypes[type]) {

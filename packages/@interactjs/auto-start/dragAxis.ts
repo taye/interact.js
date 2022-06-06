@@ -1,7 +1,7 @@
 import type { Interactable } from '@interactjs/core/Interactable'
 import type Interaction from '@interactjs/core/Interaction'
-import type { SignalArgs, Scope, ActionName } from '@interactjs/core/scope'
-import type { Element } from '@interactjs/types/index'
+import type { SignalArgs, Scope } from '@interactjs/core/scope'
+import type { ActionName, Element } from '@interactjs/core/types'
 import { parentNode } from '@interactjs/utils/domUtils'
 import is from '@interactjs/utils/is'
 

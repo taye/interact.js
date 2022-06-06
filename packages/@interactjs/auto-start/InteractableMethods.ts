@@ -1,7 +1,7 @@
 import type { Interactable } from '@interactjs/core/Interactable'
-import type { Interaction, ActionProps } from '@interactjs/core/Interaction'
+import type { Interaction } from '@interactjs/core/Interaction'
 import type { Scope } from '@interactjs/core/scope'
-import type { PointerType, PointerEventType, Element } from '@interactjs/types/index'
+import type { ActionProps, PointerType, PointerEventType, Element } from '@interactjs/core/types'
 import is from '@interactjs/utils/is'
 import { warnOnce } from '@interactjs/utils/misc'
 

@@ -1,8 +1,8 @@
 import type Interaction from '@interactjs/core/Interaction'
 import type { Scope, Plugin } from '@interactjs/core/scope'
+import type { Element, OptionMethod } from '@interactjs/core/types'
 // eslint-disable-next-line import/no-extraneous-dependencies
 import visualizer from '@interactjs/dev-tools/visualizer/plugin'
-import type { Element, OptionMethod } from '@interactjs/types/index'
 import domObjects from '@interactjs/utils/domObjects'
 import { parentNode } from '@interactjs/utils/domUtils'
 import extend from '@interactjs/utils/extend'

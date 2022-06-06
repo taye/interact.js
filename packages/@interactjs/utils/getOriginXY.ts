@@ -1,6 +1,5 @@
 import type { PerActionDefaults } from '@interactjs/core/options'
-import type { ActionName } from '@interactjs/core/scope'
-import type { HasGetRect } from '@interactjs/types/index'
+import type { ActionName, HasGetRect } from '@interactjs/core/types'
 
 import { rectToXY, resolveRectLike } from './rect'
 

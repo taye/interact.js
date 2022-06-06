@@ -7,7 +7,7 @@ const shell = require('shelljs')
 const { getBuiltJsFiles } = require('../utils')
 
 console.log('removing typescript generated files.')
-shell.exec('tsc -b --clean')
+shell.exec('tsc -b types.tsconfig.json --clean')
 
 getBuiltJsFiles().then(async (filenames) => {
   console.log(`removing ${filenames.length} generated files and directories.`)

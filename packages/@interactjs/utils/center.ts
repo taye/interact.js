@@ -1,4 +1,4 @@
-import type { Rect } from '@interactjs/types'
+import type { Rect } from '@interactjs/core/types'
 
 export default (rect: Rect) => ({
   x: rect.left + (rect.right - rect.left) / 2,

@@ -1,5 +1,5 @@
 import type Interaction from '@interactjs/core/Interaction'
-import type { RectResolvable, Rect, Point } from '@interactjs/types/index'
+import type { RectResolvable, Rect, Point } from '@interactjs/core/types'
 import extend from '@interactjs/utils/extend'
 import is from '@interactjs/utils/is'
 import * as rectUtils from '@interactjs/utils/rect'

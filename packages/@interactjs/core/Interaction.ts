@@ -5,7 +5,7 @@ import type {
   PointerType,
   FullRect,
   CoordsSet,
-} from '@interactjs/types/index'
+} from '@interactjs/core/types'
 import * as arr from '@interactjs/utils/arr'
 import extend from '@interactjs/utils/extend'
 import hypot from '@interactjs/utils/hypot'
@@ -18,13 +18,8 @@ import { InteractEvent } from './InteractEvent'
 import type { Interactable } from './Interactable'
 import { PointerInfo } from './PointerInfo'
 import type { ActionDefaults } from './options'
-import type { ActionName, Scope } from './scope'
-
-export interface ActionProps<T extends ActionName | null = never> {
-  name: T
-  axis?: 'x' | 'y' | 'xy' | null
-  edges?: EdgeOptions | null
-}
+import type { Scope } from './scope'
+import type { ActionName, ActionProps } from './types'
 
 export enum _ProxyValues {
   interactable = '',
@@ -477,7 +472,7 @@ export class Interaction<T extends ActionName | null = ActionName> {
     this.prepared.name = this.prevEvent = null
   }
 
-  getPointerIndex (pointer: PointerType) {
+  getPointerIndex (pointer: any) {
     const pointerId = pointerUtils.getPointerId(pointer)
 
     // mouse and pen interactions may have only one pointer

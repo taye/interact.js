@@ -8,16 +8,15 @@ import raf from '@interactjs/utils/raf'
 import * as win from '@interactjs/utils/window'
 
 import { Eventable } from './Eventable'
-import type { PhaseMap } from './InteractEvent'
 import { InteractEvent } from './InteractEvent'
 import { createInteractStatic } from './InteractStatic'
-import type { Interactable } from './Interactable'
 import { Interactable as InteractableBase } from './Interactable'
 import { InteractableSet } from './InteractableSet'
 import events from './events'
 import interactions from './interactions'
 import type { OptionsArg } from './options'
 import { defaults } from './options'
+import type { Actions } from './types'
 
 export interface SignalArgs {
   'scope:add-document': DocSignalArg
@@ -38,17 +37,6 @@ interface DocSignalArg {
   window: Window
   scope: Scope
   options: Record<string, any>
-}
-
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
-export interface ActionMap {}
-export type ActionName = keyof ActionMap
-
-export interface Actions {
-  map: ActionMap
-  phases: PhaseMap
-  methodDict: { [P in ActionName]?: keyof Interactable }
-  phaselessTypes: { [type: string]: true }
 }
 
 export interface Plugin {
@@ -77,7 +65,7 @@ export class Scope {
       move: true,
       end: true,
     },
-    methodDict: {},
+    methodDict: {} as any,
     phaselessTypes: {},
   }
 

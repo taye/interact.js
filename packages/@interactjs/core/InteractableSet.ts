@@ -1,7 +1,7 @@
 import type { Interactable } from '@interactjs/core/Interactable'
 import type { OptionsArg, Options } from '@interactjs/core/options'
 import type { Scope } from '@interactjs/core/scope'
-import type { Target, Context } from '@interactjs/types/index'
+import type { Target, Context } from '@interactjs/core/types'
 import * as arr from '@interactjs/utils/arr'
 import * as domUtils from '@interactjs/utils/domUtils'
 import extend from '@interactjs/utils/extend'

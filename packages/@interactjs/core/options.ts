@@ -1,4 +1,4 @@
-import type { Point, Listeners, OrBoolean, Element } from '@interactjs/types/index'
+import type { Point, Listeners, OrBoolean, Element } from '@interactjs/core/types'
 
 export interface Defaults {
   base: BaseDefaults
@@ -24,12 +24,9 @@ export interface PerActionDefaults {
 }
 
 export type Options = Partial<BaseDefaults> &
-Partial<PerActionDefaults> &
-{
+Partial<PerActionDefaults> & {
   [P in keyof ActionDefaults]?: Partial<ActionDefaults[P]>
 }
-
-// export interface Options extends BaseDefaults, PerActionDefaults {}
 
 export interface OptionsArg extends BaseDefaults, OrBoolean<Partial<ActionDefaults>> {}
 

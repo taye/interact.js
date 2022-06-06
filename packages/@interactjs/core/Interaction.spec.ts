@@ -1,7 +1,7 @@
 import drag from '@interactjs/actions/drag/plugin'
 import drop from '@interactjs/actions/drop/plugin'
 import autoStart from '@interactjs/auto-start/base'
-import type { PointerType } from '@interactjs/types/index'
+import type { PointerType } from '@interactjs/core/types'
 import extend from '@interactjs/utils/extend'
 import * as pointerUtils from '@interactjs/utils/pointerUtils'
 

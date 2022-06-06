@@ -1,6 +1,6 @@
 /** @module interact */
 import type { Scope, Plugin } from '@interactjs/core/scope'
-import type { Context, EventTypes, Listener, ListenersArg, Target } from '@interactjs/types/index'
+import type { Context, EventTypes, Listener, ListenersArg, Target } from '@interactjs/core/types'
 import browser from '@interactjs/utils/browser'
 import * as domUtils from '@interactjs/utils/domUtils'
 import is from '@interactjs/utils/is'

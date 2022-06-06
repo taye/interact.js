@@ -1,8 +1,9 @@
 import type { EventPhase, InteractEvent } from '@interactjs/core/InteractEvent'
 import type { Interactable } from '@interactjs/core/Interactable'
 import type { Interaction, DoPhaseArg } from '@interactjs/core/Interaction'
+import type { PerActionDefaults } from '@interactjs/core/options'
 import type { Scope, Plugin } from '@interactjs/core/scope'
-import type { DropzoneOptions, Element, PointerEventType, Rect } from '@interactjs/types/index'
+import type { Element, PointerEventType, Rect, ListenersArg } from '@interactjs/core/types'
 import * as domUtils from '@interactjs/utils/domUtils'
 import extend from '@interactjs/utils/extend'
 import getOriginXY from '@interactjs/utils/getOriginXY'
@@ -14,6 +15,33 @@ import type { DragEvent } from '../drag/plugin'
 import drag from '../drag/plugin'
 
 import { DropEvent } from './DropEvent'
+
+export type DropFunctionChecker = (
+  dragEvent: any, // related drag operation
+  event: any, // touch or mouse EventEmitter
+  dropped: boolean, // default checker result
+  dropzone: Interactable, // dropzone interactable
+  dropElement: Element, // drop zone element
+  draggable: Interactable, // draggable's Interactable
+  draggableElement: Element, // dragged element
+) => boolean
+
+export interface DropzoneOptions extends PerActionDefaults {
+  accept?:
+  | string
+  | Element
+  | (({ dropzone, draggableElement }: { dropzone: Interactable, draggableElement: Element }) => boolean)
+  // How the overlap is checked on the drop zone
+  overlap?: 'pointer' | 'center' | number
+  checker?: DropFunctionChecker
+
+  ondropactivate?: ListenersArg
+  ondropdeactivate?: ListenersArg
+  ondragenter?: ListenersArg
+  ondragleave?: ListenersArg
+  ondropmove?: ListenersArg
+  ondrop?: ListenersArg
+}
 
 export interface DropzoneMethod {
   (this: Interactable, options: DropzoneOptions | boolean): Interactable
@@ -56,10 +84,6 @@ declare module '@interactjs/core/options' {
 }
 
 declare module '@interactjs/core/scope' {
-  interface ActionMap {
-    drop?: typeof drop
-  }
-
   interface Scope {
     dynamicDrop?: boolean
   }
@@ -68,6 +92,12 @@ declare module '@interactjs/core/scope' {
     'actions/drop:start': DropSignalArg
     'actions/drop:move': DropSignalArg
     'actions/drop:end': DropSignalArg
+  }
+}
+
+declare module '@interactjs/core/types' {
+  interface ActionMap {
+    drop?: typeof drop
   }
 }
 
@@ -160,7 +190,7 @@ function install (scope: Scope) {
    * @param {boolean | object | null} [options] The new options to be set.
    * @return {object | Interactable} The current setting or this Interactable
    */
-  Interactable.prototype.dropzone = function (this: Interactable, options?: DropzoneOptions | boolean) {
+  Interactable.prototype.dropzone = function (this: Interactable, options) {
     return dropzoneMethod(this, options)
   } as Interactable['dropzone']
 

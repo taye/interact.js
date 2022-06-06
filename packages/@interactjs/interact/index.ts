@@ -1,4 +1,5 @@
 import { Scope } from '@interactjs/core/scope'
+export * from '@interactjs/core/types'
 
 const scope = new Scope()
 

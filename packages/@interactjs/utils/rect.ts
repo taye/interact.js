@@ -6,7 +6,7 @@ import type {
   Point,
   FullRect,
   EdgeOptions,
-} from '@interactjs/types'
+} from '@interactjs/core/types'
 
 import { closest, getElementRect, parentNode } from './domUtils'
 import extend from './extend'

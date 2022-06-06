@@ -1,5 +1,5 @@
 import type { Scope } from '@interactjs/core/scope'
-import type { Element } from '@interactjs/types/index'
+import type { Element } from '@interactjs/core/types'
 import * as arr from '@interactjs/utils/arr'
 import * as domUtils from '@interactjs/utils/domUtils'
 import extend from '@interactjs/utils/extend'

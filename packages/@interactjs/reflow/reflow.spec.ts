@@ -1,7 +1,7 @@
 import type { InteractEvent } from '@interactjs/core/InteractEvent'
-import type { ActionName } from '@interactjs/core/scope'
+import type { Interactable } from '@interactjs/core/Interactable'
 import * as helpers from '@interactjs/core/tests/_helpers'
-import type { Interactable, Point } from '@interactjs/types/index'
+import type { ActionName, Point } from '@interactjs/core/types'
 import PromisePolyfill from 'promise-polyfill'
 
 import reflow from './plugin'

@@ -1,7 +1,8 @@
 import type { InteractEvent } from '@interactjs/core/InteractEvent'
 import type { Interactable } from '@interactjs/core/Interactable'
+import type { PerActionDefaults } from '@interactjs/core/options'
 import type { Scope, Plugin } from '@interactjs/core/scope'
-import type { ActionMethod, DraggableOptions, DropzoneOptions } from '@interactjs/types/index'
+import type { ActionMethod, ListenersArg } from '@interactjs/core/types'
 import is from '@interactjs/utils/is'
 
 declare module '@interactjs/core/Interactable' {
@@ -16,7 +17,7 @@ declare module '@interactjs/core/options' {
   }
 }
 
-declare module '@interactjs/core/scope' {
+declare module '@interactjs/core/types' {
   interface ActionMap {
     drag?: typeof drag
   }
@@ -25,6 +26,15 @@ declare module '@interactjs/core/scope' {
 export type DragEvent = InteractEvent<'drag'>
 
 export type DraggableMethod = ActionMethod<DraggableOptions>
+
+export interface DraggableOptions extends PerActionDefaults {
+  startAxis?: 'x' | 'y' | 'xy'
+  lockAxis?: 'x' | 'y' | 'xy' | 'start'
+  oninertiastart?: ListenersArg
+  onstart?: ListenersArg
+  onmove?: ListenersArg
+  onend?: ListenersArg
+}
 
 function install (scope: Scope) {
   const { actions, Interactable, defaults } = scope
@@ -135,7 +145,7 @@ const draggable: DraggableMethod = function draggable (
     return this
   }
 
-  return this.options.drag
+  return this.options.drag as DraggableOptions
 }
 
 const drag: Plugin = {
@@ -175,7 +185,7 @@ const drag: Plugin = {
   defaults: {
     startAxis: 'xy',
     lockAxis: 'xy',
-  } as DropzoneOptions,
+  } as DraggableOptions,
 
   getCursor () {
     return 'move'

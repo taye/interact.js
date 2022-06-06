@@ -16,7 +16,7 @@
  * ```
  */
 
-import type { Point, Rect, EdgeOptions } from '@interactjs/types/index'
+import type { Point, Rect, EdgeOptions } from '@interactjs/core/types'
 import extend from '@interactjs/utils/extend'
 import { addEdges } from '@interactjs/utils/rect'
 
