@@ -1,0 +1,2 @@
+export const contains=(e,n)=>-1!==e.indexOf(n);export const remove=(e,n)=>e.splice(e.indexOf(n),1);export const merge=(e,n)=>{for(const o of n)e.push(o);return e};export const from=e=>merge([],e);export const findIndex=(e,n)=>{for(let o=0;o<e.length;o++)if(n(e[o],o,e))return o;return-1};export const find=(e,n)=>e[findIndex(e,n)];
+//# sourceMappingURL=arr.prod.js.map

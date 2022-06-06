@@ -1,0 +1,20 @@
+{
+	"version": 3,
+	"sources": [
+		"shallowEqual.ts"
+	],
+	"names": [
+		"shallowEqual",
+		"left",
+		"right",
+		"leftKeys",
+		"Object",
+		"keys",
+		"length",
+		"key"
+	],
+	"mappings": "AAAA,eAAe,SAASA,YAAT,CAAuBC,IAAvB,EAAkCC,KAAlC,EAA8C;AAC3D,MAAID,IAAI,KAAKC,KAAb,EAAoB;AAClB,WAAO,IAAP;AACD;;AAED,MAAI,CAACD,IAAD,IAAS,CAACC,KAAd,EAAqB;AACnB,WAAO,KAAP;AACD;;AAED,QAAMC,QAAQ,GAAGC,MAAM,CAACC,IAAP,CAAYJ,IAAZ,CAAjB;;AAEA,MAAIE,QAAQ,CAACG,MAAT,KAAoBF,MAAM,CAACC,IAAP,CAAYH,KAAZ,EAAmBI,MAA3C,EAAmD;AACjD,WAAO,KAAP;AACD;;AAED,OAAK,MAAMC,GAAX,IAAkBJ,QAAlB,EAA4B;AAC1B,QAAIF,IAAI,CAACM,GAAD,CAAJ,KAAcL,KAAK,CAACK,GAAD,CAAvB,EAA8B;AAC5B,aAAO,KAAP;AACD;AACF;;AAED,SAAO,IAAP;AACD",
+	"sourcesContent": [
+		"export default function shallowEqual (left: any, right: any) {\n  if (left === right) {\n    return true\n  }\n\n  if (!left || !right) {\n    return false\n  }\n\n  const leftKeys = Object.keys(left)\n\n  if (leftKeys.length !== Object.keys(right).length) {\n    return false\n  }\n\n  for (const key of leftKeys) {\n    if (left[key] !== right[key]) {\n      return false\n    }\n  }\n\n  return true\n}\n"
+	]
+}

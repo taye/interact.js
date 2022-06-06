@@ -1,0 +1,32 @@
+{
+	"version": 3,
+	"sources": [
+		"raf.ts"
+	],
+	"names": [
+		"request",
+		"cancel",
+		"lastTime",
+		"callback",
+		"token",
+		"init",
+		"global",
+		"requestAnimationFrame",
+		"cancelAnimationFrame",
+		"vendors",
+		"vendor",
+		"bind",
+		"currTime",
+		"Date",
+		"now",
+		"timeToCall",
+		"Math",
+		"max",
+		"setTimeout",
+		"clearTimeout"
+	],
+	"mappings": "AAAA,IACIA,EACAC,EAFAC,EAAW,gBAuCA,CACbF,QAAUG,GAAmCH,EAAQG,GACrDF,OAASG,GAAkBH,EAAOG,GAClCC,KAtCaC,GAIb,GAHAN,EAAUM,EAAOC,sBACjBN,EAASK,EAAOE,sBAEXR,EAAS,CACZ,MAAMS,EAAU,CAAC,KAAM,MAAO,SAAU,KAExC,IAAK,MAAMC,KAAUD,EACnBT,EAAUM,EAAUI,EAAF,yBAClBT,EACEK,EAAUI,EAAF,yBACRJ,EAAUI,EAAF,+BAIdV,EAAUA,GAAWA,EAAQW,KAAKL,GAClCL,EAASA,GAAUA,EAAOU,KAAKL,GAE1BN,IACHA,EAAWG,IACT,MAAMS,EAAWC,KAAKC,MAChBC,EAAaC,KAAKC,IAAI,EAAG,IAAML,EAAWV,IAC1CE,EAAQE,EAAOY,YAAW,KAE9Bf,EAASS,EAAWG,KACnBA,GAGH,OADAb,EAAWU,EAAWG,EACfX,GAGTH,EAAUG,GAAUe,aAAaf",
+	"sourcesContent": [
+		"let lastTime = 0\nlet request: typeof requestAnimationFrame\nlet cancel: typeof cancelAnimationFrame\n\nfunction init (global: Window | typeof globalThis) {\n  request = global.requestAnimationFrame\n  cancel = global.cancelAnimationFrame\n\n  if (!request) {\n    const vendors = ['ms', 'moz', 'webkit', 'o']\n\n    for (const vendor of vendors) {\n      request = global[`${vendor}RequestAnimationFrame` as 'requestAnimationFrame']\n      cancel =\n        global[`${vendor}CancelAnimationFrame` as 'cancelAnimationFrame'] ||\n        global[`${vendor}CancelRequestAnimationFrame` as 'cancelAnimationFrame']\n    }\n  }\n\n  request = request && request.bind(global)\n  cancel = cancel && cancel.bind(global)\n\n  if (!request) {\n    request = (callback) => {\n      const currTime = Date.now()\n      const timeToCall = Math.max(0, 16 - (currTime - lastTime))\n      const token = global.setTimeout(() => {\n        // eslint-disable-next-line node/no-callback-literal\n        callback(currTime + timeToCall)\n      }, timeToCall)\n\n      lastTime = currTime + timeToCall\n      return token as any\n    }\n\n    cancel = (token) => clearTimeout(token)\n  }\n}\n\nexport default {\n  request: (callback: FrameRequestCallback) => request(callback),\n  cancel: (token: number) => cancel(token),\n  init,\n}\n"
+	]
+}

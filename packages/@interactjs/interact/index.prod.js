@@ -1,0 +1,2 @@
+import{Scope as o}from"../core/scope.prod.js";export*from"../core/types.prod.js";const e=new o,t=e.interactStatic;export default t;const i="undefined"!=typeof globalThis?globalThis:"undefined"!=typeof window?window:this;e.init(i);
+//# sourceMappingURL=index.prod.js.map
