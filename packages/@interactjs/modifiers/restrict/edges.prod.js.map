@@ -1,0 +1,48 @@
+{
+	"version": 3,
+	"sources": [
+		"edges.ts"
+	],
+	"names": [
+		"extend",
+		"rectUtils",
+		"makeModifier",
+		"getRestrictionRect",
+		"noInner",
+		"top",
+		"left",
+		"bottom",
+		"right",
+		"noOuter",
+		"fixRect",
+		"rect",
+		"defaults",
+		"edge",
+		"restrictEdges",
+		"start",
+		"interaction",
+		"startOffset",
+		"state",
+		"options",
+		"offset",
+		"offsetRect",
+		"coords",
+		"page",
+		"rectToXY",
+		"x",
+		"y",
+		"set",
+		"edges",
+		"inner",
+		"outer",
+		"Math",
+		"min",
+		"max",
+		"endOnly",
+		"enabled"
+	],
+	"mappings": "OAYOA,MAAY,uCACPC,MAAe,kDAGlBC,MAAoB,+CAGpBC,MAA0B,oBAmBnC,MAAMC,EAAU,CAAEC,IAAK,EAAA,EAAWC,KAAM,EAAA,EAAWC,QAAQ,EAAA,EAAWC,OAAO,EAAA,GACvEC,EAAU,CAAEJ,KAAK,EAAA,EAAWC,MAAM,EAAA,EAAWC,OAAQ,EAAA,EAAWC,MAAO,EAAA,GAgD7E,SAASE,EAASC,EAAYC,GAC5B,IAAK,MAAMC,IAAQ,CAAC,MAAO,OAAQ,SAAU,SACrCA,KAAQF,IACZA,EAAKE,GAAQD,EAASC,IAI1B,OAAOF,EAGT,MAQMG,EAAgB,CACpBV,QAAAA,EACAK,QAAAA,EACAM,OAnEcC,YAAEA,EAAFC,YAAeA,EAAfC,MAA4BA,IAC1C,MAAMC,QAAEA,GAAYD,EACpB,IAAIE,EAEJ,GAAID,EAAS,CACX,MAAME,EAAalB,EAAmBgB,EAAQC,OAAQJ,EAAaA,EAAYM,OAAOP,MAAMQ,MAE5FH,EAASnB,EAAUuB,SAASH,GAG9BD,EAASA,GAAU,CAAEK,EAAG,EAAGC,EAAG,GAE9BR,EAAME,OAAS,CACbf,IAAKe,EAAOM,EAAIT,EAAYZ,IAC5BC,KAAMc,EAAOK,EAAIR,EAAYX,KAC7BC,OAAQa,EAAOM,EAAIT,EAAYV,OAC/BC,MAAOY,EAAOK,EAAIR,EAAYT,QAoDhCmB,KAhDYL,OAAEA,EAAFM,MAAUA,EAAVZ,YAAiBA,EAAjBE,MAA8BA,IAC1C,MAAME,OAAEA,EAAFD,QAAUA,GAAYD,EAE5B,IAAKU,EACH,OAGF,MAAML,EAAOvB,EAAO,GAAIsB,GAClBO,EAAQ1B,EAAmBgB,EAAQU,MAAOb,EAAaO,IAAU,GACjEO,EAAQ3B,EAAmBgB,EAAQW,MAAOd,EAAaO,IAAU,GAEvEb,EAAQmB,EAAOzB,GACfM,EAAQoB,EAAOrB,GAEXmB,EAAMvB,IACRiB,EAAOI,EAAIK,KAAKC,IAAID,KAAKE,IAAIH,EAAMzB,IAAMe,EAAOf,IAAKkB,EAAKG,GAAIG,EAAMxB,IAAMe,EAAOf,KACxEuB,EAAMrB,SACfe,EAAOI,EAAIK,KAAKE,IAAIF,KAAKC,IAAIF,EAAMvB,OAASa,EAAOb,OAAQgB,EAAKG,GAAIG,EAAMtB,OAASa,EAAOb,SAExFqB,EAAMtB,KACRgB,EAAOG,EAAIM,KAAKC,IAAID,KAAKE,IAAIH,EAAMxB,KAAOc,EAAOd,KAAMiB,EAAKE,GAAII,EAAMvB,KAAOc,EAAOd,MAC3EsB,EAAMpB,QACfc,EAAOG,EAAIM,KAAKE,IAAIF,KAAKC,IAAIF,EAAMtB,MAAQY,EAAOZ,MAAOe,EAAKE,GAAII,EAAMrB,MAAQY,EAAOZ,SA2BzFI,SAbqC,CACrCiB,MAAO,KACPC,MAAO,KACPV,OAAQ,KACRc,SAAS,EACTC,SAAS,mBAWIjC,EAAaY,EAAe,wBAClCA",
+	"sourcesContent": [
+		"// This module adds the options.resize.restrictEdges setting which sets min and\n// max for the top, left, bottom and right edges of the target being resized.\n//\n// interact(target).resize({\n//   edges: { top: true, left: true },\n//   restrictEdges: {\n//     inner: { top: 200, left: 200, right: 400, bottom: 400 },\n//     outer: { top:   0, left:   0, right: 600, bottom: 600 },\n//   },\n// })\n\nimport type { Point, Rect } from '@interactjs/types/index'\nimport extend from '@interactjs/utils/extend'\nimport * as rectUtils from '@interactjs/utils/rect'\n\nimport type { ModifierArg, ModifierState } from '../base'\nimport { makeModifier } from '../base'\n\nimport type { RestrictOptions } from './pointer'\nimport { getRestrictionRect } from './pointer'\n\nexport interface RestrictEdgesOptions {\n  inner: RestrictOptions['restriction']\n  outer: RestrictOptions['restriction']\n  offset?: RestrictOptions['offset']\n  endOnly: boolean\n  enabled?: boolean\n}\n\nexport type RestrictEdgesState = ModifierState<\nRestrictEdgesOptions,\n{\n  inner: Rect\n  outer: Rect\n  offset: RestrictEdgesOptions['offset']\n}\n>\n\nconst noInner = { top: +Infinity, left: +Infinity, bottom: -Infinity, right: -Infinity }\nconst noOuter = { top: -Infinity, left: -Infinity, bottom: +Infinity, right: +Infinity }\n\nfunction start ({ interaction, startOffset, state }: ModifierArg<RestrictEdgesState>) {\n  const { options } = state\n  let offset: Point\n\n  if (options) {\n    const offsetRect = getRestrictionRect(options.offset, interaction, interaction.coords.start.page)\n\n    offset = rectUtils.rectToXY(offsetRect)\n  }\n\n  offset = offset || { x: 0, y: 0 }\n\n  state.offset = {\n    top: offset.y + startOffset.top,\n    left: offset.x + startOffset.left,\n    bottom: offset.y - startOffset.bottom,\n    right: offset.x - startOffset.right,\n  }\n}\n\nfunction set ({ coords, edges, interaction, state }: ModifierArg<RestrictEdgesState>) {\n  const { offset, options } = state\n\n  if (!edges) {\n    return\n  }\n\n  const page = extend({}, coords)\n  const inner = getRestrictionRect(options.inner, interaction, page) || ({} as Rect)\n  const outer = getRestrictionRect(options.outer, interaction, page) || ({} as Rect)\n\n  fixRect(inner, noInner)\n  fixRect(outer, noOuter)\n\n  if (edges.top) {\n    coords.y = Math.min(Math.max(outer.top + offset.top, page.y), inner.top + offset.top)\n  } else if (edges.bottom) {\n    coords.y = Math.max(Math.min(outer.bottom + offset.bottom, page.y), inner.bottom + offset.bottom)\n  }\n  if (edges.left) {\n    coords.x = Math.min(Math.max(outer.left + offset.left, page.x), inner.left + offset.left)\n  } else if (edges.right) {\n    coords.x = Math.max(Math.min(outer.right + offset.right, page.x), inner.right + offset.right)\n  }\n}\n\nfunction fixRect (rect: Rect, defaults: Rect) {\n  for (const edge of ['top', 'left', 'bottom', 'right']) {\n    if (!(edge in rect)) {\n      rect[edge] = defaults[edge]\n    }\n  }\n\n  return rect\n}\n\nconst defaults: RestrictEdgesOptions = {\n  inner: null,\n  outer: null,\n  offset: null,\n  endOnly: false,\n  enabled: false,\n}\n\nconst restrictEdges = {\n  noInner,\n  noOuter,\n  start,\n  set,\n  defaults,\n}\n\nexport default makeModifier(restrictEdges, 'restrictEdges')\nexport { restrictEdges }\n"
+	]
+}

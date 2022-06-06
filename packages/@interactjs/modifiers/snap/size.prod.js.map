@@ -1,0 +1,48 @@
+{
+	"version": 3,
+	"sources": [
+		"size.ts"
+	],
+	"names": [
+		"extend",
+		"is",
+		"makeModifier",
+		"snap",
+		"snapSize",
+		"start",
+		"arg",
+		"state",
+		"edges",
+		"options",
+		"targets",
+		"relativePoints",
+		"x",
+		"left",
+		"y",
+		"top",
+		"offset",
+		"origin",
+		"range",
+		"targetFields",
+		"offsets",
+		"set",
+		"interaction",
+		"coords",
+		"relative",
+		"snapTarget",
+		"target",
+		"func",
+		"xField",
+		"yField",
+		"push",
+		"returnValue",
+		"defaults",
+		"Infinity",
+		"endOnly",
+		"enabled"
+	],
+	"mappings": "OAGOA,MAAY,oCACZC,MAAQ,gDAGNC,MAAoB,iCAGpBC,MAAY,oBAiFrB,MAQMC,EAAW,CACfC,MAtFcC,GACd,MAAMC,MAAEA,EAAFC,MAASA,GAAUF,GACnBG,QAAEA,GAAYF,EAEpB,IAAKC,EACH,OAAO,KAGTF,EAAIC,MAAQ,CACVE,QAAS,CACPC,QAAS,KACTC,eAAgB,CACd,CACEC,EAAGJ,EAAMK,KAAO,EAAI,EACpBC,EAAGN,EAAMO,IAAM,EAAI,IAGvBC,OAAQP,EAAQO,QAAU,OAC1BC,OAAQ,CAAEL,EAAG,EAAGE,EAAG,GACnBI,MAAOT,EAAQS,QAInBX,EAAMY,aAAeZ,EAAMY,cAAgB,CACzC,CAAC,QAAS,UACV,CAAC,IAAK,MAGRhB,EAAKE,MAAMC,GACXC,EAAMa,QAAUd,EAAIC,MAAMa,QAE1Bd,EAAIC,MAAQA,GAwDZc,IArDYf,GACZ,MAAMgB,YAAEA,EAAFf,MAAeA,EAAfgB,OAAsBA,GAAWjB,GACjCG,QAAEA,EAAFW,QAAWA,GAAYb,EACvBiB,EAAW,CACfZ,EAAGW,EAAOX,EAAIQ,EAAQ,GAAGR,EACzBE,EAAGS,EAAOT,EAAIM,EAAQ,GAAGN,GAG3BP,EAAME,QAAUT,EAAO,GAAIS,GAC3BF,EAAME,QAAQC,QAAU,GAExB,IAAK,MAAMe,KAAchB,EAAQC,SAAW,GAAI,CAC9C,IAAIgB,EAQJ,GALEA,EADEzB,EAAG0B,KAAKF,GACDA,EAAWD,EAASZ,EAAGY,EAASV,EAAGQ,GAEnCG,EAGNC,EAAL,CAIA,IAAK,MAAOE,EAAQC,KAAWtB,EAAMY,aACnC,GAAIS,KAAUF,GAAUG,KAAUH,EAAQ,CACxCA,EAAOd,EAAIc,EAAOE,GAClBF,EAAOZ,EAAIY,EAAOG,GAElB,MAIJtB,EAAME,QAAQC,QAAQoB,KAAKJ,IAG7B,MAAMK,EAAc5B,EAAKkB,IAAIf,GAI7B,OAFAC,EAAME,QAAUA,EAETsB,GAcPC,SAXgC,CAChCd,MAAOe,EAAAA,EACPvB,QAAS,KACTM,OAAQ,KACRkB,SAAS,EACTC,SAAS,mBASIjC,EAAaE,EAAU,mBAC7BA",
+	"sourcesContent": [
+		"// This module allows snapping of the size of targets during resize\n// interactions.\n\nimport extend from '@interactjs/utils/extend'\nimport is from '@interactjs/utils/is'\n\nimport type { ModifierArg } from '../base'\nimport { makeModifier } from '../base'\n\nimport type { SnapOptions, SnapState } from './pointer'\nimport { snap } from './pointer'\n\nexport type SnapSizeOptions = Pick<SnapOptions, 'targets' | 'offset' | 'endOnly' | 'range' | 'enabled'>\n\nfunction start (arg: ModifierArg<SnapState>) {\n  const { state, edges } = arg\n  const { options } = state\n\n  if (!edges) {\n    return null\n  }\n\n  arg.state = {\n    options: {\n      targets: null,\n      relativePoints: [\n        {\n          x: edges.left ? 0 : 1,\n          y: edges.top ? 0 : 1,\n        },\n      ],\n      offset: options.offset || 'self',\n      origin: { x: 0, y: 0 },\n      range: options.range,\n    },\n  }\n\n  state.targetFields = state.targetFields || [\n    ['width', 'height'],\n    ['x', 'y'],\n  ]\n\n  snap.start(arg)\n  state.offsets = arg.state.offsets\n\n  arg.state = state\n}\n\nfunction set (arg) {\n  const { interaction, state, coords } = arg\n  const { options, offsets } = state\n  const relative = {\n    x: coords.x - offsets[0].x,\n    y: coords.y - offsets[0].y,\n  }\n\n  state.options = extend({}, options)\n  state.options.targets = []\n\n  for (const snapTarget of options.targets || []) {\n    let target\n\n    if (is.func(snapTarget)) {\n      target = snapTarget(relative.x, relative.y, interaction)\n    } else {\n      target = snapTarget\n    }\n\n    if (!target) {\n      continue\n    }\n\n    for (const [xField, yField] of state.targetFields) {\n      if (xField in target || yField in target) {\n        target.x = target[xField]\n        target.y = target[yField]\n\n        break\n      }\n    }\n\n    state.options.targets.push(target)\n  }\n\n  const returnValue = snap.set(arg)\n\n  state.options = options\n\n  return returnValue\n}\n\nconst defaults: SnapSizeOptions = {\n  range: Infinity,\n  targets: null,\n  offset: null,\n  endOnly: false,\n  enabled: false,\n}\n\nconst snapSize = {\n  start,\n  set,\n  defaults,\n}\n\nexport default makeModifier(snapSize, 'snapSize')\nexport { snapSize }\n"
+	]
+}

@@ -1,0 +1,27 @@
+{
+	"version": 3,
+	"sources": [
+		"plugin.ts"
+	],
+	"names": [
+		"snappers",
+		"all",
+		"base",
+		"modifiers",
+		"id",
+		"install",
+		"scope",
+		"interactStatic",
+		"interact",
+		"usePlugin",
+		"type",
+		"_defaults",
+		"_methods",
+		"defaults",
+		"perAction"
+	],
+	"mappings": "OACOA,MAAc,oCAEdC,MAAS,uBACTC,MAAU,iBAQjB,MAAMC,EAAoB,CACxBC,GAAI,YACJC,QAASC,GACP,MAAQC,eAAgBC,GAAaF,EAErCA,EAAMG,UAAUP,GAChBI,EAAMG,UAAUT,GAEhBQ,EAASL,UAAYF,EAGrB,IAAK,MAAMS,KAAQT,EAAK,CACtB,MAAMU,UAAEA,EAAFC,SAAaA,GAAaX,EAAIS,GAElCC,EAAkBC,SAAWA,EAC7BN,EAAMO,SAASC,UAAkBJ,GAAQC,oBAKlCR",
+	"sourcesContent": [
+		"import type { Plugin } from '@interactjs/core/scope'\nimport snappers from '@interactjs/snappers/plugin'\n\nimport all from './all'\nimport base from './base'\n\ndeclare module '@interactjs/core/InteractStatic' {\n  export interface InteractStatic {\n    modifiers: typeof all\n  }\n}\n\nconst modifiers: Plugin = {\n  id: 'modifiers',\n  install (scope) {\n    const { interactStatic: interact } = scope\n\n    scope.usePlugin(base)\n    scope.usePlugin(snappers)\n\n    interact.modifiers = all\n\n    // for backwrads compatibility\n    for (const type in all) {\n      const { _defaults, _methods } = all[type as keyof typeof all]\n\n      ;(_defaults as any)._methods = _methods\n      ;(scope.defaults.perAction as any)[type] = _defaults\n    }\n  },\n}\n\nexport default modifiers\n"
+	]
+}

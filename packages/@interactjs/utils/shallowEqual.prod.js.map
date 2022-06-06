@@ -1,0 +1,20 @@
+{
+	"version": 3,
+	"sources": [
+		"shallowEqual.ts"
+	],
+	"names": [
+		"shallowEqual",
+		"left",
+		"right",
+		"leftKeys",
+		"Object",
+		"keys",
+		"length",
+		"key"
+	],
+	"mappings": "eAAe,SAASA,EAAcC,EAAWC,GAC/C,GAAID,IAASC,EACX,OAAO,EAGT,IAAKD,IAASC,EACZ,OAAO,EAGT,MAAMC,EAAWC,OAAOC,KAAKJ,GAE7B,GAAIE,EAASG,SAAWF,OAAOC,KAAKH,GAAOI,OACzC,OAAO,EAGT,IAAK,MAAMC,KAAOJ,EAChB,GAAIF,EAAKM,KAASL,EAAMK,GACtB,OAAO,EAIX,OAAO",
+	"sourcesContent": [
+		"export default function shallowEqual (left: any, right: any) {\n  if (left === right) {\n    return true\n  }\n\n  if (!left || !right) {\n    return false\n  }\n\n  const leftKeys = Object.keys(left)\n\n  if (leftKeys.length !== Object.keys(right).length) {\n    return false\n  }\n\n  for (const key of leftKeys) {\n    if (left[key] !== right[key]) {\n      return false\n    }\n  }\n\n  return true\n}\n"
+	]
+}

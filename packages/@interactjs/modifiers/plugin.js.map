@@ -1,0 +1,27 @@
+{
+	"version": 3,
+	"sources": [
+		"plugin.ts"
+	],
+	"names": [
+		"snappers",
+		"all",
+		"base",
+		"modifiers",
+		"id",
+		"install",
+		"scope",
+		"interactStatic",
+		"interact",
+		"usePlugin",
+		"type",
+		"_defaults",
+		"_methods",
+		"defaults",
+		"perAction"
+	],
+	"mappings": "AACA,OAAOA,QAAP,MAAqB,uBAArB;AAEA,OAAOC,GAAP,MAAgB,UAAhB;AACA,OAAOC,IAAP,MAAiB,WAAjB;AAQA,MAAMC,SAAiB,GAAG;AACxBC,EAAAA,EAAE,EAAE,WADoB;;AAExBC,EAAAA,OAAO,CAAEC,KAAF,EAAS;AACd,UAAM;AAAEC,MAAAA,cAAc,EAAEC;AAAlB,QAA+BF,KAArC;AAEAA,IAAAA,KAAK,CAACG,SAAN,CAAgBP,IAAhB;AACAI,IAAAA,KAAK,CAACG,SAAN,CAAgBT,QAAhB;AAEAQ,IAAAA,QAAQ,CAACL,SAAT,GAAqBF,GAArB,CANc,CAQd;;AACA,SAAK,MAAMS,IAAX,IAAmBT,GAAnB,EAAwB;AACtB,YAAM;AAAEU,QAAAA,SAAF;AAAaC,QAAAA;AAAb,UAA0BX,GAAG,CAACS,IAAD,CAAnC;AAEEC,MAAAA,SAAD,CAAmBC,QAAnB,GAA8BA,QAA9B;AACCN,MAAAA,KAAK,CAACO,QAAN,CAAeC,SAAhB,CAAkCJ,IAAlC,IAA0CC,SAA1C;AACF;AACF;;AAjBuB,CAA1B;AAoBA,eAAeR,SAAf",
+	"sourcesContent": [
+		"import type { Plugin } from '@interactjs/core/scope'\nimport snappers from '@interactjs/snappers/plugin'\n\nimport all from './all'\nimport base from './base'\n\ndeclare module '@interactjs/core/InteractStatic' {\n  export interface InteractStatic {\n    modifiers: typeof all\n  }\n}\n\nconst modifiers: Plugin = {\n  id: 'modifiers',\n  install (scope) {\n    const { interactStatic: interact } = scope\n\n    scope.usePlugin(base)\n    scope.usePlugin(snappers)\n\n    interact.modifiers = all\n\n    // for backwrads compatibility\n    for (const type in all) {\n      const { _defaults, _methods } = all[type as keyof typeof all]\n\n      ;(_defaults as any)._methods = _methods\n      ;(scope.defaults.perAction as any)[type] = _defaults\n    }\n  },\n}\n\nexport default modifiers\n"
+	]
+}

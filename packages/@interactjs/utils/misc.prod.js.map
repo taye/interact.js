@@ -1,0 +1,30 @@
+{
+	"version": 3,
+	"sources": [
+		"misc.ts"
+	],
+	"names": [
+		"window",
+		"warnOnce",
+		"method",
+		"message",
+		"warned",
+		"console",
+		"warn",
+		"apply",
+		"this",
+		"arguments",
+		"copyAction",
+		"dest",
+		"src",
+		"name",
+		"axis",
+		"edges",
+		"sign",
+		"n"
+	],
+	"mappings": "iBAGSA,MAAc,0BAEhB,SAASC,SAAsBC,EAAiCC,GACrE,IAAIC,GAAS,EAEb,OAAO,WAML,OALKA,IACDJ,EAAeK,QAAQC,KAAKH,GAC9BC,GAAS,GAGJF,EAAOK,MAAMC,KAAMC,mBAIvB,SAASC,WAAkCC,EAAwBC,GAKxE,OAJAD,EAAKE,KAAOD,EAAIC,KAChBF,EAAKG,KAAOF,EAAIE,KAChBH,EAAKI,MAAQH,EAAIG,MAEVJ,SAGF,MAAMK,KAAQC,GAAeA,GAAK,EAAI,GAAK",
+	"sourcesContent": [
+		"import type { ActionProps } from '@interactjs/core/Interaction'\nimport type { ActionName } from '@interactjs/core/scope'\n\nimport { window } from './window'\n\nexport function warnOnce<T> (this: T, method: (...args: any[]) => any, message: string) {\n  let warned = false\n\n  return function (this: T) {\n    if (!warned) {\n      ;(window as any).console.warn(message)\n      warned = true\n    }\n\n    return method.apply(this, arguments)\n  }\n}\n\nexport function copyAction<T extends ActionName> (dest: ActionProps<any>, src: ActionProps<T>) {\n  dest.name = src.name\n  dest.axis = src.axis\n  dest.edges = src.edges\n\n  return dest\n}\n\nexport const sign = (n: number) => (n >= 0 ? 1 : -1)\n"
+	]
+}

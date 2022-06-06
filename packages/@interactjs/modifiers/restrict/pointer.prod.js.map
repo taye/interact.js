@@ -1,0 +1,52 @@
+{
+	"version": 3,
+	"sources": [
+		"pointer.ts"
+	],
+	"names": [
+		"extend",
+		"is",
+		"rectUtils",
+		"makeModifier",
+		"getRestrictionRect",
+		"value",
+		"interaction",
+		"coords",
+		"func",
+		"resolveRectLike",
+		"interactable",
+		"element",
+		"x",
+		"y",
+		"restrict",
+		"start",
+		"rect",
+		"startOffset",
+		"state",
+		"pageCoords",
+		"options",
+		"elementRect",
+		"offset",
+		"left",
+		"top",
+		"right",
+		"bottom",
+		"restriction",
+		"widthDiff",
+		"width",
+		"heightDiff",
+		"height",
+		"set",
+		"xywhToTlbr",
+		"Math",
+		"max",
+		"min",
+		"defaults",
+		"endOnly",
+		"enabled"
+	],
+	"mappings": "OAEOA,MAAY,oCACZC,MAAQ,mCACHC,MAAe,kDAGlBC,MAAoB,yBAyEtB,SAASC,mBACdC,EACAC,EACAC,GAEA,OAAIN,EAAGO,KAAKH,GACHH,EAAUO,gBAAgBJ,EAAOC,EAAYI,aAAcJ,EAAYK,QAAS,CACrFJ,EAAOK,EACPL,EAAOM,EACPP,IAGKJ,EAAUO,gBAAgBJ,EAAOC,EAAYI,aAAcJ,EAAYK,SAIlF,MAQMG,EAA2D,CAC/DC,OA9EcC,KAAEA,EAAFC,YAAQA,EAARC,MAAqBA,EAArBZ,YAA4BA,EAA5Ba,WAAyCA,IACvD,MAAMC,QAAEA,GAAYF,GACdG,YAAEA,GAAgBD,EAClBE,EAAetB,EACnB,CACEuB,KAAM,EACNC,IAAK,EACLC,MAAO,EACPC,OAAQ,GAEVN,EAAQE,QAAU,IAGpB,GAAIN,GAAQK,EAAa,CACvB,MAAMM,EAAcvB,mBAAmBgB,EAAQO,YAAarB,EAAaa,GAEzE,GAAIQ,EAAa,CACf,MAAMC,EAAYD,EAAYF,MAAQE,EAAYJ,KAAOP,EAAKa,MACxDC,EAAaH,EAAYD,OAASC,EAAYH,IAAMR,EAAKe,OAE3DH,EAAY,IACdN,EAAOC,MAAQK,EACfN,EAAOG,OAASG,GAEdE,EAAa,IACfR,EAAOE,KAAOM,EACdR,EAAOI,QAAUI,GAIrBR,EAAOC,MAAQN,EAAYM,KAAOP,EAAKa,MAAQR,EAAYE,KAC3DD,EAAOE,KAAOP,EAAYO,IAAMR,EAAKe,OAASV,EAAYG,IAE1DF,EAAOG,OAASR,EAAYQ,MAAQT,EAAKa,OAAS,EAAIR,EAAYI,OAClEH,EAAOI,QAAUT,EAAYS,OAASV,EAAKe,QAAU,EAAIV,EAAYK,QAGvER,EAAMI,OAASA,GA0CfU,KAvCYzB,OAAEA,EAAFD,YAAUA,EAAVY,MAAuBA,IACnC,MAAME,QAAEA,EAAFE,OAAWA,GAAWJ,EAEtBS,EAAcvB,mBAAmBgB,EAAQO,YAAarB,EAAaC,GAEzE,IAAKoB,EAAa,OAElB,MAAMX,EAAOd,EAAU+B,WAAWN,GAElCpB,EAAOK,EAAIsB,KAAKC,IAAID,KAAKE,IAAIpB,EAAKS,MAAQH,EAAOG,MAAOlB,EAAOK,GAAII,EAAKO,KAAOD,EAAOC,MACtFhB,EAAOM,EAAIqB,KAAKC,IAAID,KAAKE,IAAIpB,EAAKU,OAASJ,EAAOI,OAAQnB,EAAOM,GAAIG,EAAKQ,IAAMF,EAAOE,MA8BvFa,SAXgC,CAChCV,YAAa,KACbN,YAAa,KACbC,OAAQ,KACRgB,SAAS,EACTC,SAAS,mBASIpC,EAAaW,EAAU,mBAC7BA",
+	"sourcesContent": [
+		"import type Interaction from '@interactjs/core/Interaction'\nimport type { RectResolvable, Rect, Point } from '@interactjs/types/index'\nimport extend from '@interactjs/utils/extend'\nimport is from '@interactjs/utils/is'\nimport * as rectUtils from '@interactjs/utils/rect'\n\nimport type { ModifierArg, ModifierModule, ModifierState } from '../base'\nimport { makeModifier } from '../base'\n\nexport interface RestrictOptions {\n  // where to drag over\n  restriction: RectResolvable<[number, number, Interaction]>\n  // what part of self is allowed to drag over\n  elementRect: Rect\n  offset: Rect\n  // restrict just before the end drag\n  endOnly: boolean\n  enabled?: boolean\n}\n\nexport type RestrictState = ModifierState<\nRestrictOptions,\n{\n  offset: Rect\n}\n>\n\nfunction start ({ rect, startOffset, state, interaction, pageCoords }: ModifierArg<RestrictState>) {\n  const { options } = state\n  const { elementRect } = options\n  const offset: Rect = extend(\n    {\n      left: 0,\n      top: 0,\n      right: 0,\n      bottom: 0,\n    },\n    options.offset || {},\n  )\n\n  if (rect && elementRect) {\n    const restriction = getRestrictionRect(options.restriction, interaction, pageCoords)\n\n    if (restriction) {\n      const widthDiff = restriction.right - restriction.left - rect.width\n      const heightDiff = restriction.bottom - restriction.top - rect.height\n\n      if (widthDiff < 0) {\n        offset.left += widthDiff\n        offset.right += widthDiff\n      }\n      if (heightDiff < 0) {\n        offset.top += heightDiff\n        offset.bottom += heightDiff\n      }\n    }\n\n    offset.left += startOffset.left - rect.width * elementRect.left\n    offset.top += startOffset.top - rect.height * elementRect.top\n\n    offset.right += startOffset.right - rect.width * (1 - elementRect.right)\n    offset.bottom += startOffset.bottom - rect.height * (1 - elementRect.bottom)\n  }\n\n  state.offset = offset\n}\n\nfunction set ({ coords, interaction, state }: ModifierArg<RestrictState>) {\n  const { options, offset } = state\n\n  const restriction = getRestrictionRect(options.restriction, interaction, coords)\n\n  if (!restriction) return\n\n  const rect = rectUtils.xywhToTlbr(restriction)\n\n  coords.x = Math.max(Math.min(rect.right - offset.right, coords.x), rect.left + offset.left)\n  coords.y = Math.max(Math.min(rect.bottom - offset.bottom, coords.y), rect.top + offset.top)\n}\n\nexport function getRestrictionRect (\n  value: RectResolvable<[number, number, Interaction]>,\n  interaction: Interaction,\n  coords?: Point,\n) {\n  if (is.func(value)) {\n    return rectUtils.resolveRectLike(value, interaction.interactable, interaction.element, [\n      coords.x,\n      coords.y,\n      interaction,\n    ])\n  } else {\n    return rectUtils.resolveRectLike(value, interaction.interactable, interaction.element)\n  }\n}\n\nconst defaults: RestrictOptions = {\n  restriction: null,\n  elementRect: null,\n  offset: null,\n  endOnly: false,\n  enabled: false,\n}\n\nconst restrict: ModifierModule<RestrictOptions, RestrictState> = {\n  start,\n  set,\n  defaults,\n}\n\nexport default makeModifier(restrict, 'restrict')\nexport { restrict }\n"
+	]
+}

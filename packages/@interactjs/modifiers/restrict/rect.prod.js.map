@@ -1,0 +1,25 @@
+{
+	"version": 3,
+	"sources": [
+		"rect.ts"
+	],
+	"names": [
+		"extend",
+		"makeModifier",
+		"restrict",
+		"defaults",
+		"elementRect",
+		"top",
+		"left",
+		"bottom",
+		"right",
+		"_",
+		"restrictRect",
+		"start",
+		"set"
+	],
+	"mappings": "OAAOA,MAAY,oDAEVC,MAAoB,qCAEpBC,MAAgB,oBAEzB,MAAMC,EAAWH,EACf,CACEI,kBACE,MAAO,CAAEC,IAAK,EAAGC,KAAM,EAAGC,OAAQ,EAAGC,MAAO,IAE9CJ,gBAAiBK,MAEnBP,EAASC,UAGLO,EAAe,CACnBC,MAAOT,EAASS,MAChBC,IAAKV,EAASU,IACdT,SAAAA,kBAGaF,EAAaS,EAAc,uBACjCA",
+	"sourcesContent": [
+		"import extend from '@interactjs/utils/extend'\n\nimport { makeModifier } from '../base'\n\nimport { restrict } from './pointer'\n\nconst defaults = extend(\n  {\n    get elementRect () {\n      return { top: 0, left: 0, bottom: 1, right: 1 }\n    },\n    set elementRect (_) {},\n  },\n  restrict.defaults,\n)\n\nconst restrictRect = {\n  start: restrict.start,\n  set: restrict.set,\n  defaults,\n}\n\nexport default makeModifier(restrictRect, 'restrictRect')\nexport { restrictRect }\n"
+	]
+}
