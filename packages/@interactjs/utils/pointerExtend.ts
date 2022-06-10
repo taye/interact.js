@@ -1,26 +1,20 @@
-function pointerExtend<T> (dest: Partial<T>, source: T) {
+export default function pointerExtend<T> (dest: Partial<T & { __set?: Partial<T> }>, source: T) {
+  dest.__set ||= {} as any
+
   for (const prop in source) {
-    const prefixedPropREs = pointerExtend.prefixedPropREs
-    let deprecated = false
+    if (typeof dest[prop] !== 'function' && prop !== '__set') {
+      Object.defineProperty(dest, prop, {
+        get () {
+          if (prop in dest.__set) return dest.__set[prop]
 
-    // skip deprecated prefixed properties
-    for (const vendor in prefixedPropREs) {
-      if (prop.indexOf(vendor) === 0 && prefixedPropREs[vendor].test(prop)) {
-        deprecated = true
-        break
-      }
-    }
-
-    if (!deprecated && typeof source[prop] !== 'function') {
-      dest[prop] = source[prop]
+          return (dest.__set[prop] = source[prop] as any)
+        },
+        set (value: any) {
+          dest.__set[prop] = value
+        },
+        configurable: true,
+      })
     }
   }
   return dest
 }
-
-pointerExtend.prefixedPropREs = {
-  webkit: /(Movement[XY]|Radius[XY]|RotationAngle|Force)$/,
-  moz: /(Pressure)$/,
-} as { [prefix: string]: RegExp }
-
-export default pointerExtend
