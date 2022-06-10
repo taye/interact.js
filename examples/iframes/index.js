@@ -1,4 +1,4 @@
-window.setInteractables = () => {
+export default function setInteractables () {
   interact('.draggable', { context: document }).draggable({
     onmove: onMove,
     inertia: { enabled: true },

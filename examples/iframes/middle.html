@@ -1,16 +1,18 @@
 <meta charset="utf-8">
 <link href="index.css" rel="stylesheet" type="text/css"/>
 
-<script type="module" src="@interactjs/interactjs"></script>
+<script type="module">
+import interact from '@interactjs/interactjs'
+import setInteractables from './index.js'
 
-<iframe src="bottom.html" style="border: solid 2px black"></iframe>
+window.interact = interact
+setInteractables();
+
+document.getElementById('iframe').src = 'bottom.html'
+</script>
+
+<iframe id="iframe" style="border: solid 2px black"></iframe>
 
 <div id="drag-me" class="draggable">
     <p>An element in the MIDDLE frame</p>
 </div>
-
-<script src="./index.js"></script>
-
-<script>
-setInteractables();
-</script>
