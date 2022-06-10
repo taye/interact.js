@@ -47,14 +47,14 @@ export default class PointerEvent<T extends string = any> extends BaseEvent<neve
 
       const interval = this.timeStamp - interaction.tapTime
 
-      this.double = !!(
-        interaction.prevTap &&
+      this.double =
+        !!interaction.prevTap &&
         interaction.prevTap.type !== 'doubletap' &&
         interaction.prevTap.target === this.target &&
         interval < 500
-      )
     } else if (type === 'doubletap') {
       this.dt = (pointer as PointerEvent<'tap'>).timeStamp - interaction.tapTime
+      this.double = true
     }
   }
 
