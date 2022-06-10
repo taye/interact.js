@@ -3,12 +3,13 @@
 
 <iframe src="middle.html" style="border: solid 2px black"></iframe>
 
-<script type="module" src="./index.js"></script>
-<script>
+<script type="module">
+import setInteractables from './index.js'
+
 document.querySelector('iframe').onload = function (event) {
   window.interact = frames[0].interact;
 
-  window.setInteractables();
+  setInteractables();
 };
 </script>
 
