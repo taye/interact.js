@@ -43,7 +43,7 @@ test('modifiers/aspectRatio', () => {
   options.equalDelta = false
   options.ratio = 2
   downStartMoveUp({ x: -5, y: 2, edges: { left: true } })
-  // equalDelta: false, ratio: 2, edges: { left: true }
+  // equalDelta: false, ratio: 2, edges: left
   expect(lastRect).toEqual(ltrbwh(-5, 12.5, 10, 20, 15, 7.5))
 
   // combine with restrictSize
@@ -54,13 +54,23 @@ test('modifiers/aspectRatio', () => {
   ]
   options.equalDelta = false
   options.ratio = 2
+
   downStartMoveUp({ x: 20, y: 0, edges: { right: true } })
-  // restrictSize with critical prmary edge
+  // restrictSize with critical primary edge
   expect(lastRect).toEqual(ltrbwh(0, 0, 20, 10, 20, 10))
 
   downStartMoveUp({ x: 20, y: 20, edges: { bottom: true } })
   // restrictSize with critical secondary edge
   expect(lastRect).toEqual(ltrbwh(0, 0, 20, 10, 20, 10))
+
+  options.ratio = 0.5
+  downStartMoveUp({ x: 5, y: -5, edges: { left: true, bottom: true } })
+  // equalDelta: false, ratio: 2, edges: left & bottom
+  expect(lastRect).toEqual(ltrbwh(5, 0, 10, 10, 5, 10))
+
+  downStartMoveUp({ x: -5, y: -5, edges: { right: true, top: true } })
+  // equalDelta: false, ratio: 2, edges: right & top
+  expect(lastRect).toEqual(ltrbwh(0, 10, 5, 20, 5, 10))
 
   function downStartMoveUp ({ x, y, edges }: { x: number, y: number, edges: EdgeOptions }) {
     coords.timeStamp = 0
