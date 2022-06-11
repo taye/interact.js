@@ -79,7 +79,7 @@
     "lint-staged": "^13.0.1",
     "mkdirp": "^1.0.4",
     "nodemon": "^2.0.16",
-    "p-queue": "7.2.0",
+    "p-queue": "6",
     "prettier": "^2.6.2",
     "promise-polyfill": "^8.2.3",
     "react": "^18.1.0",
