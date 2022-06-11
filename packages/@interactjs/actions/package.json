@@ -1,6 +1,6 @@
 {
   "name": "@interactjs/actions",
-  "version": "1.10.13",
+  "version": "1.10.14",
   "main": "index",
   "module": "index",
   "repository": {
@@ -9,11 +9,11 @@
     "directory": "packages/@interactjs/actions"
   },
   "peerDependencies": {
-    "@interactjs/core": "1.10.13",
-    "@interactjs/utils": "1.10.13"
+    "@interactjs/core": "1.10.14",
+    "@interactjs/utils": "1.10.14"
   },
   "optionalDependencies": {
-    "@interactjs/interact": "1.10.13"
+    "@interactjs/interact": "1.10.14"
   },
   "publishConfig": {
     "access": "public"

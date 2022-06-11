@@ -1,3 +1,11 @@
+## v1.10.14
+
+- fixed an issue with iframes on Webkit #942. Thanks, @tulps, for PR #943
+- fixed top-right and bottom-left resizing with aspectRatio with sub-modifiers #944. Thanks again, @tulps, for PR #963
+- fixed typings for `@itneractjs/` scoped module packages #933
+- added `doubletap.double === true` event prop for consistency with `tap.double`
+- fixed a bug with calling `interactable.unset()` in a `drop` listener #919
+
 ## v1.10.13
 
 - Added `.d.ts` files to all `@interactjs/*` packages
