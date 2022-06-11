@@ -1,0 +1,2 @@
+export class BaseEvent{immediatePropagationStopped=!1;propagationStopped=!1;constructor(t){this._interaction=t}preventDefault(){}stopPropagation(){this.propagationStopped=!0}stopImmediatePropagation(){this.immediatePropagationStopped=this.propagationStopped=!0}}Object.defineProperty(BaseEvent.prototype,"interaction",{get(){return this._interaction._proxy},set(){}});
+//# sourceMappingURL=BaseEvent.prod.js.map

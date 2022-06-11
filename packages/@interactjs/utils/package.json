@@ -6,10 +6,7 @@
     "url": "https://github.com/taye/interact.js.git",
     "directory": "packages/@interactjs/utils"
   },
-  "peerDependencies": {
-    "@interactjs/feedback": "1.10.14",
-    "@interactjs/symbol-tree": "1.10.14"
-  },
+  "peerDependencies": {},
   "publishConfig": {
     "access": "public"
   },
