@@ -25,7 +25,7 @@ function init (global: Window | typeof globalThis) {
       const currTime = Date.now()
       const timeToCall = Math.max(0, 16 - (currTime - lastTime))
       const token = global.setTimeout(() => {
-        // eslint-disable-next-line node/no-callback-literal
+        // eslint-disable-next-line n/no-callback-literal
         callback(currTime + timeToCall)
       }, timeToCall)
 
