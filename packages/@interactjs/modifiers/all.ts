@@ -1,4 +1,4 @@
-/* eslint-disable node/no-extraneous-import, import/no-unresolved */
+/* eslint-disable n/no-extraneous-import, import/no-unresolved */
 import aspectRatio from './aspectRatio'
 import avoid from './avoid/avoid'
 import restrictEdges from './restrict/edges'

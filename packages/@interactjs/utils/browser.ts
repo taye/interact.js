@@ -31,7 +31,8 @@ function init (window: any) {
     (is.func(window.DocumentTouch) && domObjects.document instanceof window.DocumentTouch)
 
   // Does the browser support PointerEvents
-  browser.supportsPointerEvent = navigator.pointerEnabled !== false && !!domObjects.PointerEvent
+  // https://github.com/taye/interact.js/issues/703#issuecomment-471570492
+  browser.supportsPointerEvent = (navigator as any).pointerEnabled !== false && !!domObjects.PointerEvent
 
   browser.isIOS = /iP(hone|od|ad)/.test(navigator.platform)
 

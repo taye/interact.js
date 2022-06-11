@@ -267,10 +267,12 @@ function checkResizeEdge (
     }
 
     if (name === 'left') {
-      return page.x < (width >= 0 ? rect.left : rect.right) + margin
+      const edge = width >= 0 ? rect.left : rect.right
+      return page.x < edge + margin
     }
     if (name === 'top') {
-      return page.y < (height >= 0 ? rect.top : rect.bottom) + margin
+      const edge = height >= 0 ? rect.top : rect.bottom
+      return page.y < edge + margin
     }
 
     if (name === 'right') {
