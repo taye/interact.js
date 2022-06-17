@@ -10,7 +10,7 @@ module.exports = function transformImportsToAbsolute () {
 
     const { moduleDirectory = getModuleDirectories() } = opts
 
-    if (shouldIgnoreImport(source.value, filename, moduleDirectory)) return
+    if (shouldIgnoreImport(source.value)) return
 
     const { extension = '', prefix } = opts
     const basedir = path.dirname(filename)

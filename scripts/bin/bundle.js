@@ -16,6 +16,7 @@ const options = {
   name,
   browserify: {
     bare: true,
+    external: ['react', 'vue'],
   },
 }
 

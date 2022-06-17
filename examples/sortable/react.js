@@ -1,6 +1,6 @@
 import interact from '@interactjs/interactjs'
 import { createElement as h, useState } from 'react'
-import ReactDOM from 'react-dom'
+import { createRoot } from 'react-dom/client'
 
 import { getData } from './shared.js'
 
@@ -8,9 +8,9 @@ import { getData } from './shared.js'
 const data = getData()
 
 const { Interactable, Sortable } = interact.react.components
+const root = createRoot(document.getElementById('react-app'))
 
-// eslint-disable-next-line no-undef
-ReactDOM.render(
+root.render(
   h(() => {
     return h(
       'div',
@@ -36,5 +36,4 @@ ReactDOM.render(
       }),
     )
   }),
-  document.getElementById('react-app'),
 )

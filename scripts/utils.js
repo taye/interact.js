@@ -95,10 +95,8 @@ async function getPackageJsons (packages = getPackages()) {
   )
 }
 
-function shouldIgnoreImport (sourceValue, filename, moduleDirectory) {
-  return (
-    !/^(\.{1-2}|(@interactjs))[\\/]/.test(sourceValue) && !moduleDirectory.some((d) => filename.startsWith(d))
-  )
+function shouldIgnoreImport (sourceValue) {
+  return !/^(\.{1-2}|(@interactjs))[\\/]/.test(sourceValue)
 }
 
 const isPro = process.env.INTERACTJS_TIER === 'pro'
