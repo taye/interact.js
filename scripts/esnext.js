@@ -16,30 +16,33 @@ const {
   getModuleDirectories,
   getRelativeToRoot,
   resolveImport,
+  isPro,
 } = require('./utils')
 
+const postMinify = async (result) => {
+  const { code, map, error } = await minify(result)
+
+  if (error) {
+    throw error
+  }
+
+  return {
+    code,
+    map: JSON.parse(map),
+  }
+}
 const OUTPUT_VERSIONS = [
   // development
   {
     extension: '.js',
     nodeEnv: 'development',
+    post: isPro ? postMinify : null,
   },
   // production
   {
     extension: '.prod.js',
     nodeEnv: 'production',
-    async post (result) {
-      const { code, map, error } = await minify(result)
-
-      if (error) {
-        throw error
-      }
-
-      return {
-        code,
-        map: JSON.parse(map),
-      }
-    },
+    post: postMinify,
   },
 ]
 
