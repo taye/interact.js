@@ -1,3 +1,7 @@
+## v1.10.15
+
+- fixed an issue with broken `@interactjs/types` #972
+
 ## v1.10.14
 
 - fixed an issue with iframes on Webkit #942. Thanks, @tulps, for PR #943

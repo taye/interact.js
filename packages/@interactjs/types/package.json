@@ -1,6 +1,6 @@
 {
   "name": "@interactjs/types",
-  "version": "1.10.14",
+  "version": "1.10.15",
   "main": "index",
   "module": "index",
   "repository": {
@@ -10,20 +10,20 @@
   },
   "typings": "typings.d.ts",
   "devDependencies": {
-    "@interactjs/actions": "1.10.14",
-    "@interactjs/arrange": "1.10.14",
-    "@interactjs/auto-scroll": "1.10.14",
-    "@interactjs/auto-start": "1.10.14",
-    "@interactjs/core": "1.10.14",
-    "@interactjs/dev-tools": "1.10.14",
-    "@interactjs/inertia": "1.10.14",
-    "@interactjs/interact": "1.10.14",
-    "@interactjs/interactjs": "1.10.14",
-    "@interactjs/modifiers": "1.10.14",
-    "@interactjs/pointer-events": "1.10.14",
-    "@interactjs/reflow": "1.10.14",
-    "@interactjs/snappers": "1.10.14",
-    "@interactjs/utils": "1.10.14"
+    "@interactjs/actions": "1.10.15",
+    "@interactjs/arrange": "1.10.15",
+    "@interactjs/auto-scroll": "1.10.15",
+    "@interactjs/auto-start": "1.10.15",
+    "@interactjs/core": "1.10.15",
+    "@interactjs/dev-tools": "1.10.15",
+    "@interactjs/inertia": "1.10.15",
+    "@interactjs/interact": "1.10.15",
+    "@interactjs/interactjs": "1.10.15",
+    "@interactjs/modifiers": "1.10.15",
+    "@interactjs/pointer-events": "1.10.15",
+    "@interactjs/reflow": "1.10.15",
+    "@interactjs/snappers": "1.10.15",
+    "@interactjs/utils": "1.10.15"
   },
   "publishConfig": {
     "access": "public"
