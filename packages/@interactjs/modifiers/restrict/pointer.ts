@@ -4,8 +4,8 @@ import extend from '@interactjs/utils/extend'
 import is from '@interactjs/utils/is'
 import * as rectUtils from '@interactjs/utils/rect'
 
-import type { ModifierArg, ModifierModule, ModifierState } from '../base'
 import { makeModifier } from '../base'
+import type { ModifierArg, ModifierModule, ModifierState } from '../types'
 
 export interface RestrictOptions {
   // where to drag over

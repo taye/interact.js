@@ -1,9 +1,12 @@
 /** @jest-environment node */
 import path from 'path'
 
+import * as execTypes from '@interactjs/_dev/scripts/execTypes'
 import mkdirp from 'mkdirp'
 import * as shell from 'shelljs'
 import temp from 'temp'
+
+jest.setTimeout(15000)
 
 test('typings', async () => {
   shell.config.fatal = true
@@ -15,8 +18,8 @@ test('typings', async () => {
 
   await mkdirp(interactDir)
 
-  // run .d.ts generation script with output to temp dir
-  shell.exec(`${getBin('_types')} ${modulesDir}`)
+  // run .d.ts generation script with output to temp dir node_modules
+  await execTypes.combined(tempTypesDir)
 
   // copy .d.ts and package.json files of deps to temp dir
   shell.cp(path.join('packages', 'interactjs', '{*.d.ts,package.json}'), interactDir)

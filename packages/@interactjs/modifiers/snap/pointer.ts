@@ -6,8 +6,8 @@ import hypot from '@interactjs/utils/hypot'
 import is from '@interactjs/utils/is'
 import { resolveRectLike, rectToXY } from '@interactjs/utils/rect'
 
-import type { ModifierArg, ModifierState } from '../base'
 import { makeModifier } from '../base'
+import type { ModifierArg, ModifierState } from '../types'
 
 export interface Offset {
   x: number

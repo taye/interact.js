@@ -30,8 +30,8 @@
 import clone from '@interactjs/utils/clone'
 import extend from '@interactjs/utils/extend'
 
-import type { ModifierArg, ModifierModule } from '../base'
 import { makeModifier } from '../base'
+import type { ModifierArg, ModifierModule } from '../types'
 
 import type { SnapOptions, SnapState } from './pointer'
 import { snapSize } from './size'

@@ -1,4 +1,4 @@
-import type { ModifierFunction } from '@interactjs/modifiers/base'
+import type { ModifierFunction } from './types'
 
 const noop = (() => {}) as unknown as ModifierFunction<any, any, 'noop'>
 

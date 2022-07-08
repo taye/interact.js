@@ -2,8 +2,8 @@ import type { Point, Rect, Size } from '@interactjs/core/types'
 import extend from '@interactjs/utils/extend'
 import * as rectUtils from '@interactjs/utils/rect'
 
-import type { ModifierArg, ModifierState } from '../base'
 import { makeModifier } from '../base'
+import type { ModifierArg, ModifierState } from '../types'
 
 import type { RestrictEdgesState } from './edges'
 import { restrictEdges } from './edges'

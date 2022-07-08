@@ -21,8 +21,8 @@ import extend from '@interactjs/utils/extend'
 import { addEdges } from '@interactjs/utils/rect'
 
 import Modification from './Modification'
-import type { Modifier, ModifierModule, ModifierState } from './base'
 import { makeModifier } from './base'
+import type { Modifier, ModifierModule, ModifierState } from './types'
 
 export interface AspectRatioOptions {
   ratio?: number | 'preserve'

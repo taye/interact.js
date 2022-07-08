@@ -3,6 +3,7 @@ import type { Scope, SignalArgs, Plugin } from '@interactjs/core/scope'
 import type { ActionName, Point, PointerEventType } from '@interactjs/core/types'
 import Modification from '@interactjs/modifiers/Modification'
 import * as modifiers from '@interactjs/modifiers/base'
+import type { ModifierArg } from '@interactjs/modifiers/types'
 import offset from '@interactjs/offset/plugin'
 import * as dom from '@interactjs/utils/domUtils'
 import hypot from '@interactjs/utils/hypot'
@@ -73,7 +74,7 @@ export class InertiaState {
 
   modification!: Modification
   modifierCount = 0
-  modifierArg!: modifiers.ModifierArg
+  modifierArg!: ModifierArg
 
   startCoords!: Point
   t0 = 0

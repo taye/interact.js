@@ -4,8 +4,8 @@
 import extend from '@interactjs/utils/extend'
 import is from '@interactjs/utils/is'
 
-import type { ModifierArg } from '../base'
 import { makeModifier } from '../base'
+import type { ModifierArg } from '../types'
 
 import type { SnapOptions, SnapState } from './pointer'
 import { snap } from './pointer'

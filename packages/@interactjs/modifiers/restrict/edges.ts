@@ -13,8 +13,8 @@ import type { Point, Rect } from '@interactjs/core/types'
 import extend from '@interactjs/utils/extend'
 import * as rectUtils from '@interactjs/utils/rect'
 
-import type { ModifierArg, ModifierState } from '../base'
 import { makeModifier } from '../base'
+import type { ModifierArg, ModifierState } from '../types'
 
 import type { RestrictOptions } from './pointer'
 import { getRestrictionRect } from './pointer'
