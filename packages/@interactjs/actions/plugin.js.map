@@ -1,0 +1,20 @@
+{
+	"version": 3,
+	"names": [
+		"drag",
+		"drop",
+		"gesture",
+		"resize",
+		"id",
+		"install",
+		"scope",
+		"usePlugin"
+	],
+	"sources": [
+		"plugin.ts"
+	],
+	"sourcesContent": [
+		"import type { Scope } from '@interactjs/core/scope'\n\nimport drag from './drag/plugin'\nimport drop from './drop/plugin'\nimport gesture from './gesture/plugin'\nimport resize from './resize/plugin'\n\nexport default {\n  id: 'actions',\n  install (scope: Scope) {\n    scope.usePlugin(gesture)\n    scope.usePlugin(resize)\n    scope.usePlugin(drag)\n    scope.usePlugin(drop)\n  },\n}\n"
+	],
+	"mappings": "AAEA,OAAOA,IAAP,MAAiB,eAAjB;AACA,OAAOC,IAAP,MAAiB,eAAjB;AACA,OAAOC,OAAP,MAAoB,kBAApB;AACA,OAAOC,MAAP,MAAmB,iBAAnB;AAEA,eAAe;EACbC,EAAE,EAAE,SADS;;EAEbC,OAAO,CAAEC,KAAF,EAAgB;IACrBA,KAAK,CAACC,SAAN,CAAgBL,OAAhB;IACAI,KAAK,CAACC,SAAN,CAAgBJ,MAAhB;IACAG,KAAK,CAACC,SAAN,CAAgBP,IAAhB;IACAM,KAAK,CAACC,SAAN,CAAgBN,IAAhB;EACD;;AAPY,CAAf"
+}

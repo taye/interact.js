@@ -1,0 +1,47 @@
+{
+	"version": 3,
+	"names": [
+		"dom",
+		"finder",
+		"methodOrder",
+		"search",
+		"details",
+		"method",
+		"interaction",
+		"simulationResume",
+		"pointerType",
+		"eventType",
+		"eventTarget",
+		"scope",
+		"test",
+		"interactions",
+		"list",
+		"element",
+		"simulation",
+		"allowResume",
+		"parentNode",
+		"mouseOrPen",
+		"pointerId",
+		"firstNonActive",
+		"hasPointerId",
+		"interacting",
+		"hasPointer",
+		"idle",
+		"pointers",
+		"length",
+		"target",
+		"interactable",
+		"options",
+		"gesture",
+		"enabled",
+		"some",
+		"id"
+	],
+	"sources": [
+		"interactionFinder.ts"
+	],
+	"sourcesContent": [
+		"import type Interaction from '@interactjs/core/Interaction'\nimport type { Scope } from '@interactjs/core/scope'\nimport type { PointerType } from '@interactjs/core/types'\nimport * as dom from '@interactjs/utils/domUtils'\n\nexport interface SearchDetails {\n  pointer: PointerType\n  pointerId: number\n  pointerType: string\n  eventType: string\n  eventTarget: EventTarget\n  curEventTarget: EventTarget\n  scope: Scope\n}\n\nconst finder = {\n  methodOrder: ['simulationResume', 'mouseOrPen', 'hasPointer', 'idle'] as const,\n\n  search (details: SearchDetails) {\n    for (const method of finder.methodOrder) {\n      const interaction = finder[method](details)\n\n      if (interaction) {\n        return interaction\n      }\n    }\n\n    return null\n  },\n\n  // try to resume simulation with a new pointer\n  simulationResume ({ pointerType, eventType, eventTarget, scope }: SearchDetails) {\n    if (!/down|start/i.test(eventType)) {\n      return null\n    }\n\n    for (const interaction of scope.interactions.list) {\n      let element = eventTarget as Node\n\n      if (\n        interaction.simulation &&\n        interaction.simulation.allowResume &&\n        interaction.pointerType === pointerType\n      ) {\n        while (element) {\n          // if the element is the interaction element\n          if (element === interaction.element) {\n            return interaction\n          }\n          element = dom.parentNode(element)\n        }\n      }\n    }\n\n    return null\n  },\n\n  // if it's a mouse or pen interaction\n  mouseOrPen ({ pointerId, pointerType, eventType, scope }: SearchDetails) {\n    if (pointerType !== 'mouse' && pointerType !== 'pen') {\n      return null\n    }\n\n    let firstNonActive\n\n    for (const interaction of scope.interactions.list) {\n      if (interaction.pointerType === pointerType) {\n        // if it's a down event, skip interactions with running simulations\n        if (interaction.simulation && !hasPointerId(interaction, pointerId)) {\n          continue\n        }\n\n        // if the interaction is active, return it immediately\n        if (interaction.interacting()) {\n          return interaction\n        }\n        // otherwise save it and look for another active interaction\n        else if (!firstNonActive) {\n          firstNonActive = interaction\n        }\n      }\n    }\n\n    // if no active mouse interaction was found use the first inactive mouse\n    // interaction\n    if (firstNonActive) {\n      return firstNonActive\n    }\n\n    // find any mouse or pen interaction.\n    // ignore the interaction if the eventType is a *down, and a simulation\n    // is active\n    for (const interaction of scope.interactions.list) {\n      if (interaction.pointerType === pointerType && !(/down/i.test(eventType) && interaction.simulation)) {\n        return interaction\n      }\n    }\n\n    return null\n  },\n\n  // get interaction that has this pointer\n  hasPointer ({ pointerId, scope }: SearchDetails) {\n    for (const interaction of scope.interactions.list) {\n      if (hasPointerId(interaction, pointerId)) {\n        return interaction\n      }\n    }\n\n    return null\n  },\n\n  // get first idle interaction with a matching pointerType\n  idle ({ pointerType, scope }: SearchDetails) {\n    for (const interaction of scope.interactions.list) {\n      // if there's already a pointer held down\n      if (interaction.pointers.length === 1) {\n        const target = interaction.interactable\n        // don't add this pointer if there is a target interactable and it\n        // isn't gesturable\n        if (target && !(target.options.gesture && target.options.gesture.enabled)) {\n          continue\n        }\n      }\n      // maximum of 2 pointers per interaction\n      else if (interaction.pointers.length >= 2) {\n        continue\n      }\n\n      if (!interaction.interacting() && pointerType === interaction.pointerType) {\n        return interaction\n      }\n    }\n\n    return null\n  },\n}\n\nfunction hasPointerId (interaction: Interaction, pointerId: number) {\n  return interaction.pointers.some(({ id }) => id === pointerId)\n}\n\nexport default finder\n"
+	],
+	"mappings": "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"
+}

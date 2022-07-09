@@ -1,0 +1,25 @@
+{
+	"version": 3,
+	"names": [
+		"extend",
+		"makeModifier",
+		"restrict",
+		"defaults",
+		"elementRect",
+		"top",
+		"left",
+		"bottom",
+		"right",
+		"_",
+		"restrictRect",
+		"start",
+		"set"
+	],
+	"sources": [
+		"rect.ts"
+	],
+	"sourcesContent": [
+		"import extend from '@interactjs/utils/extend'\n\nimport { makeModifier } from '../base'\n\nimport { restrict } from './pointer'\n\nconst defaults = extend(\n  {\n    get elementRect () {\n      return { top: 0, left: 0, bottom: 1, right: 1 }\n    },\n    set elementRect (_) {},\n  },\n  restrict.defaults,\n)\n\nconst restrictRect = {\n  start: restrict.start,\n  set: restrict.set,\n  defaults,\n}\n\nexport default makeModifier(restrictRect, 'restrictRect')\nexport { restrictRect }\n"
+	],
+	"mappings": "AAAA,OAAOA,MAAP,MAAmB,uBAAnB;AAEA,SAASC,YAAT,QAA6B,SAA7B;AAEA,SAASC,QAAT,QAAyB,WAAzB;AAEA,MAAMC,QAAQ,GAAGH,MAAM,CACrB;EACE,IAAII,WAAJ,GAAmB;IACjB,OAAO;MAAEC,GAAG,EAAE,CAAP;MAAUC,IAAI,EAAE,CAAhB;MAAmBC,MAAM,EAAE,CAA3B;MAA8BC,KAAK,EAAE;IAArC,CAAP;EACD,CAHH;;EAIE,IAAIJ,WAAJ,CAAiBK,CAAjB,EAAoB,CAAE;;AAJxB,CADqB,EAOrBP,QAAQ,CAACC,QAPY,CAAvB;AAUA,MAAMO,YAAY,GAAG;EACnBC,KAAK,EAAET,QAAQ,CAACS,KADG;EAEnBC,GAAG,EAAEV,QAAQ,CAACU,GAFK;EAGnBT;AAHmB,CAArB;AAMA,eAAeF,YAAY,CAACS,YAAD,EAAe,cAAf,CAA3B;AACA,SAASA,YAAT"
+}

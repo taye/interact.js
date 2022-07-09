@@ -1,0 +1,28 @@
+{
+	"version": 3,
+	"names": [
+		"BaseEvent",
+		"immediatePropagationStopped",
+		"propagationStopped",
+		"constructor",
+		"interaction",
+		"this",
+		"_interaction",
+		"preventDefault",
+		"stopPropagation",
+		"stopImmediatePropagation",
+		"Object",
+		"defineProperty",
+		"prototype",
+		"get",
+		"_proxy",
+		"set"
+	],
+	"sources": [
+		"BaseEvent.ts"
+	],
+	"sourcesContent": [
+		"import type { Interactable } from '@interactjs/core/Interactable'\nimport type { Interaction, InteractionProxy } from '@interactjs/core/Interaction'\nimport type { ActionName } from '@interactjs/core/types'\n\nexport class BaseEvent<T extends ActionName | null = never> {\n  declare type: string\n  declare target: EventTarget\n  declare currentTarget: Node\n  declare interactable: Interactable\n  declare _interaction: Interaction<T>\n  declare timeStamp: number\n  immediatePropagationStopped = false\n  propagationStopped = false\n\n  constructor (interaction: Interaction<T>) {\n    this._interaction = interaction\n  }\n\n  preventDefault () {}\n\n  /**\n   * Don't call any other listeners (even on the current target)\n   */\n  stopPropagation () {\n    this.propagationStopped = true\n  }\n\n  /**\n   * Don't call listeners on the remaining targets\n   */\n  stopImmediatePropagation () {\n    this.immediatePropagationStopped = this.propagationStopped = true\n  }\n}\n\n// defined outside of class definition to avoid assignment of undefined during\n// construction\nexport interface BaseEvent<T extends ActionName> {\n  interaction: InteractionProxy<T>\n}\n\n// getters and setters defined here to support typescript 3.6 and below which\n// don't support getter and setters in .d.ts files\nObject.defineProperty(BaseEvent.prototype, 'interaction', {\n  get (this: BaseEvent) {\n    return this._interaction._proxy\n  },\n  set (this: BaseEvent) {},\n})\n"
+	],
+	"mappings": "OAIO,MAAMA,UAOXC,6BAA8B,EAC9BC,oBAAqB,EAErBC,YAAaC,GACXC,KAAKC,aAAeF,EAGtBG,kBAKAC,kBACEH,KAAKH,oBAAqB,EAM5BO,2BACEJ,KAAKJ,4BAA8BI,KAAKH,oBAAqB,GAYjEQ,OAAOC,eAAeX,UAAUY,UAAW,cAAe,CACxDC,MACE,OAAOR,KAAKC,aAAaQ,QAE3BC"
+}

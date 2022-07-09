@@ -1,0 +1,13 @@
+{
+	"version": 3,
+	"names": [
+		"from"
+	],
+	"sources": [
+		"index.ts"
+	],
+	"sourcesContent": [
+		"/* eslint-disable import/no-extraneous-dependencies */\nimport type { InteractEvent as _InteractEvent, EventPhase } from '@interactjs/core/InteractEvent'\nimport type * as interaction from '@interactjs/core/Interaction'\nimport type { ActionName, ActionProps as _ActionProps } from '@interactjs/core/types'\n// import module augmentations\nimport type * as _ from '@interactjs/interactjs'\n\nexport * from '@interactjs/core/types'\nexport type { Plugin } from '@interactjs/core/scope'\nexport type { EventPhase } from '@interactjs/core/InteractEvent'\nexport type { Options } from '@interactjs/core/options'\nexport type { PointerEvent } from '@interactjs/pointer-events/PointerEvent'\nexport type { Interactable } from '@interactjs/core/Interactable'\nexport type { DragEvent } from '@interactjs/actions/drag/plugin'\nexport type { DropEvent } from '@interactjs/actions/drop/DropEvent'\nexport type { GestureEvent } from '@interactjs/actions/gesture/plugin'\nexport type { ResizeEvent } from '@interactjs/actions/resize/plugin'\nexport type { SnapFunction, SnapTarget } from '@interactjs/modifiers/snap/pointer'\n\nexport type ActionProps<T extends ActionName = ActionName> = _ActionProps<T>\nexport type Interaction<T extends ActionName = ActionName> = interaction.Interaction<T>\nexport type InteractionProxy<T extends ActionName = ActionName> = interaction.InteractionProxy<T>\nexport type PointerArgProps<T extends {} = {}> = interaction.PointerArgProps<T>\nexport type InteractEvent<T extends ActionName = never, P extends EventPhase = EventPhase> = _InteractEvent<\nT,\nP\n>\n"
+	],
+	"mappings": "MAOAA,KAAc"
+}

@@ -13,7 +13,6 @@
   },
   "peerDependencies": {
     "@interactjs/core": "1.10.17",
-    "@interactjs/rebound": "1.10.17",
     "@interactjs/utils": "1.10.17"
   },
   "optionalDependencies": {

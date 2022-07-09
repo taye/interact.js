@@ -1,0 +1,48 @@
+{
+	"version": 3,
+	"names": [
+		"extend",
+		"rectUtils",
+		"makeModifier",
+		"restrictEdges",
+		"getRestrictionRect",
+		"noMin",
+		"width",
+		"Infinity",
+		"height",
+		"noMax",
+		"start",
+		"arg",
+		"set",
+		"interaction",
+		"state",
+		"rect",
+		"edges",
+		"options",
+		"minSize",
+		"tlbrToXywh",
+		"min",
+		"coords",
+		"maxSize",
+		"max",
+		"endOnly",
+		"inner",
+		"noInner",
+		"outer",
+		"noOuter",
+		"top",
+		"bottom",
+		"left",
+		"right",
+		"defaults",
+		"enabled",
+		"restrictSize"
+	],
+	"sources": [
+		"size.ts"
+	],
+	"sourcesContent": [
+		"import type { Point, Rect, Size } from '@interactjs/core/types'\nimport extend from '@interactjs/utils/extend'\nimport * as rectUtils from '@interactjs/utils/rect'\n\nimport { makeModifier } from '../base'\nimport type { ModifierArg, ModifierState } from '../types'\n\nimport type { RestrictEdgesState } from './edges'\nimport { restrictEdges } from './edges'\nimport type { RestrictOptions } from './pointer'\nimport { getRestrictionRect } from './pointer'\n\nconst noMin = { width: -Infinity, height: -Infinity }\nconst noMax = { width: +Infinity, height: +Infinity }\n\nexport interface RestrictSizeOptions {\n  min?: Size | Point | RestrictOptions['restriction']\n  max?: Size | Point | RestrictOptions['restriction']\n  endOnly: boolean\n  enabled?: boolean\n}\n\nfunction start (arg: ModifierArg<RestrictEdgesState>) {\n  return restrictEdges.start(arg)\n}\n\nexport type RestrictSizeState = RestrictEdgesState &\nModifierState<\nRestrictSizeOptions & { inner: Rect, outer: Rect },\n{\n  min: Rect\n  max: Rect\n}\n>\n\nfunction set (arg: ModifierArg<RestrictSizeState>) {\n  const { interaction, state, rect, edges } = arg\n  const { options } = state\n\n  if (!edges) {\n    return\n  }\n\n  const minSize =\n    rectUtils.tlbrToXywh(getRestrictionRect(options.min as any, interaction, arg.coords)) || noMin\n  const maxSize =\n    rectUtils.tlbrToXywh(getRestrictionRect(options.max as any, interaction, arg.coords)) || noMax\n\n  state.options = {\n    endOnly: options.endOnly,\n    inner: extend({}, restrictEdges.noInner),\n    outer: extend({}, restrictEdges.noOuter),\n  }\n\n  if (edges.top) {\n    state.options.inner.top = rect.bottom - minSize.height\n    state.options.outer.top = rect.bottom - maxSize.height\n  } else if (edges.bottom) {\n    state.options.inner.bottom = rect.top + minSize.height\n    state.options.outer.bottom = rect.top + maxSize.height\n  }\n  if (edges.left) {\n    state.options.inner.left = rect.right - minSize.width\n    state.options.outer.left = rect.right - maxSize.width\n  } else if (edges.right) {\n    state.options.inner.right = rect.left + minSize.width\n    state.options.outer.right = rect.left + maxSize.width\n  }\n\n  restrictEdges.set(arg)\n\n  state.options = options\n}\n\nconst defaults: RestrictSizeOptions = {\n  min: null,\n  max: null,\n  endOnly: false,\n  enabled: false,\n}\n\nconst restrictSize = {\n  start,\n  set,\n  defaults,\n}\n\nexport default makeModifier(restrictSize, 'restrictSize')\nexport { restrictSize }\n"
+	],
+	"mappings": "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"
+}

@@ -1,0 +1,11 @@
+{
+	"version": 3,
+	"names": [],
+	"sources": [
+		"NativePointerEventType.ts"
+	],
+	"sourcesContent": [
+		"const NativePointerEvent = null as unknown as InstanceType<typeof PointerEvent>\nexport default NativePointerEvent\n"
+	],
+	"mappings": "eAA2B"
+}

@@ -106,5 +106,8 @@
   "lint-staged": {
     "**/*.((ts|js)?(x)|vue|md)": "bin/_lint --fix"
   },
-  "license": "MIT"
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  }
 }

@@ -1,0 +1,53 @@
+{
+	"version": 3,
+	"names": [
+		"Modification",
+		"makeModifier",
+		"module",
+		"name",
+		"defaults",
+		"methods",
+		"start",
+		"set",
+		"beforeEnd",
+		"stop",
+		"modifier",
+		"_options",
+		"options",
+		"enabled",
+		"prop",
+		"m",
+		"enable",
+		"disable",
+		"_defaults",
+		"_methods",
+		"addEventModifiers",
+		"iEvent",
+		"interaction",
+		"result",
+		"modification",
+		"modifiers",
+		"eventProps",
+		"modifiersBase",
+		"id",
+		"before",
+		"install",
+		"scope",
+		"perAction",
+		"listeners",
+		"arg",
+		"coords",
+		"page",
+		"edges",
+		"applyToInteraction",
+		"setAndApply",
+		"restoreInteractionCoords"
+	],
+	"sources": [
+		"base.ts"
+	],
+	"sourcesContent": [
+		"import type { InteractEvent } from '@interactjs/core/InteractEvent'\nimport type Interaction from '@interactjs/core/Interaction'\nimport type { Plugin } from '@interactjs/core/scope'\n\nimport Modification from './Modification'\nimport type { Modifier, ModifierModule, ModifierState } from './types'\n\ndeclare module '@interactjs/core/Interaction' {\n  interface Interaction {\n    modification?: Modification\n  }\n}\n\ndeclare module '@interactjs/core/InteractEvent' {\n  interface InteractEvent {\n    modifiers?: Array<{\n      name: string\n      [key: string]: any\n    }>\n  }\n}\n\ndeclare module '@interactjs/core/options' {\n  interface PerActionDefaults {\n    modifiers?: Modifier[]\n  }\n}\n\nexport function makeModifier<\n  Defaults extends { enabled?: boolean },\n  State extends ModifierState,\n  Name extends string,\n  Result,\n> (module: ModifierModule<Defaults, State, Result>, name?: Name) {\n  const { defaults } = module\n  const methods = {\n    start: module.start,\n    set: module.set,\n    beforeEnd: module.beforeEnd,\n    stop: module.stop,\n  }\n\n  const modifier = (_options?: Partial<Defaults>) => {\n    const options = (_options || {}) as Defaults\n\n    options.enabled = options.enabled !== false\n\n    // add missing defaults to options\n    for (const prop in defaults) {\n      if (!(prop in options)) {\n        ;(options as any)[prop] = defaults[prop]\n      }\n    }\n\n    const m: Modifier<Defaults, State, Name, Result> = {\n      options,\n      methods,\n      name,\n      enable: () => {\n        options.enabled = true\n        return m\n      },\n      disable: () => {\n        options.enabled = false\n        return m\n      },\n    }\n\n    return m\n  }\n\n  if (name && typeof name === 'string') {\n    // for backwrads compatibility\n    modifier._defaults = defaults\n    modifier._methods = methods\n  }\n\n  return modifier\n}\n\nexport function addEventModifiers ({\n  iEvent,\n  interaction,\n}: {\n  iEvent: InteractEvent<any>\n  interaction: Interaction<any>\n}) {\n  const result = interaction.modification!.result\n\n  if (result) {\n    iEvent.modifiers = result.eventProps\n  }\n}\n\nconst modifiersBase: Plugin = {\n  id: 'modifiers/base',\n  before: ['actions'],\n  install: (scope) => {\n    scope.defaults.perAction.modifiers = []\n  },\n  listeners: {\n    'interactions:new': ({ interaction }) => {\n      interaction.modification = new Modification(interaction)\n    },\n\n    'interactions:before-action-start': (arg) => {\n      const modification = arg.interaction.modification!\n\n      modification.start(arg, arg.interaction.coords.start.page)\n      arg.interaction.edges = modification.edges\n      modification.applyToInteraction(arg)\n    },\n\n    'interactions:before-action-move': (arg) => arg.interaction.modification.setAndApply(arg),\n\n    'interactions:before-action-end': (arg) => arg.interaction.modification.beforeEnd(arg),\n\n    'interactions:action-start': addEventModifiers,\n    'interactions:action-move': addEventModifiers,\n    'interactions:action-end': addEventModifiers,\n\n    'interactions:after-action-start': (arg) => arg.interaction.modification.restoreInteractionCoords(arg),\n    'interactions:after-action-move': (arg) => arg.interaction.modification.restoreInteractionCoords(arg),\n\n    'interactions:stop': (arg) => arg.interaction.modification.stop(arg),\n  },\n}\n\nexport default modifiersBase\n"
+	],
+	"mappings": "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"
+}
