@@ -150,12 +150,14 @@ async function pushAndPublish () {
 }
 
 async function editPackageJsons (func) {
-  await ['.', ...packages].map(async (packageDir) => {
-    const file = path.resolve(packageDir, 'package.json')
-    const pkg = JSON.parse((await fs.readFile(file)).toString())
+  await Promise.all(
+    ['.', ...packages].map(async (packageDir) => {
+      const file = path.resolve(packageDir, 'package.json')
+      const pkg = JSON.parse((await fs.readFile(file)).toString())
 
-    func(pkg)
+      func(pkg)
 
-    await fs.writeFile(file, `${JSON.stringify(pkg, null, 2)}\n`)
-  })
+      await fs.writeFile(file, `${JSON.stringify(pkg, null, 2)}\n`)
+    }),
+  )
 }
