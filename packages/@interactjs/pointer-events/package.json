@@ -1,6 +1,6 @@
 {
   "name": "@interactjs/pointer-events",
-  "version": "1.10.16",
+  "version": "1.10.17",
   "main": "index",
   "module": "index",
   "repository": {
@@ -9,11 +9,11 @@
     "directory": "packages/@interactjs/pointer-events"
   },
   "peerDependencies": {
-    "@interactjs/core": "1.10.16",
-    "@interactjs/utils": "1.10.16"
+    "@interactjs/core": "1.10.17",
+    "@interactjs/utils": "1.10.17"
   },
   "optionalDependencies": {
-    "@interactjs/interact": "1.10.16"
+    "@interactjs/interact": "1.10.17"
   },
   "publishConfig": {
     "access": "public"

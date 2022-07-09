@@ -1,6 +1,6 @@
 {
   "name": "@interactjs/interact",
-  "version": "1.10.16",
+  "version": "1.10.17",
   "main": "index",
   "module": "index",
   "_typings": "typings.d.ts",
@@ -10,9 +10,9 @@
     "directory": "packages/@interactjs/interact"
   },
   "dependencies": {
-    "@interactjs/core": "1.10.16",
-    "@interactjs/types": "1.10.16",
-    "@interactjs/utils": "1.10.16"
+    "@interactjs/core": "1.10.17",
+    "@interactjs/types": "1.10.17",
+    "@interactjs/utils": "1.10.17"
   },
   "publishConfig": {
     "access": "public"

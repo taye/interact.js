@@ -1,3 +1,9 @@
+## v1.10.17
+
+- fixed missing typings when only the `@interactjs/interactjs` package is
+  installed and imported
+- added index to vue package for installing with side effect import
+
 ## v1.10.16
 
 - remove vue and react deps fron pro `@interactjs/interactjs` package
