@@ -17,7 +17,7 @@ require('../addPluginIndexes')([
   ...(isPro
     ? [
       'react/plugin',
-      // 'vue/plugin',
+      'vue/plugin',
       'multi-target/plugin',
       'feedback/plugin',
       'clone/plugin',
