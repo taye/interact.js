@@ -1,6 +1,6 @@
 {
   "name": "@interactjs/reflow",
-  "version": "1.10.15",
+  "version": "1.10.16",
   "main": "index",
   "module": "index",
   "repository": {
@@ -9,11 +9,11 @@
     "directory": "packages/@interactjs/reflow"
   },
   "peerDependencies": {
-    "@interactjs/core": "1.10.15",
-    "@interactjs/utils": "1.10.15"
+    "@interactjs/core": "1.10.16",
+    "@interactjs/utils": "1.10.16"
   },
   "optionalDependencies": {
-    "@interactjs/interact": "1.10.15"
+    "@interactjs/interact": "1.10.16"
   },
   "publishConfig": {
     "access": "public"

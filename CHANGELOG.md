@@ -1,3 +1,7 @@
+## v1.10.16
+
+- remove vue and react deps fron pro `@interactjs/interactjs` package
+
 ## v1.10.15
 
 - fixed an issue with broken `@interactjs/types` #972
