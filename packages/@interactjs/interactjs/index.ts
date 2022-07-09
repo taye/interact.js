@@ -64,9 +64,6 @@ const _ = {
   reflow,
 }
 
-/**
- * @private
- * Exported so that the related module augmentations will be referenced in
- * generated .d.ts file
- **/
+// Exported so that the related module augmentations will be referenced in
+// generated .d.ts file
 export type __internal_plugin_types__ = typeof _
