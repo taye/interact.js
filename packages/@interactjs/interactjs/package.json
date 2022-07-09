@@ -23,6 +23,8 @@
     "@interactjs/offset": "1.10.15",
     "@interactjs/pointer-events": "1.10.15",
     "@interactjs/react": "1.10.15",
+    "@interactjs/rebound": "1.10.15",
+    "@interactjs/symbol-tree": "1.10.15",
     "@interactjs/reflow": "1.10.15",
     "@interactjs/utils": "1.10.15",
     "@interactjs/vue": "1.10.15"
