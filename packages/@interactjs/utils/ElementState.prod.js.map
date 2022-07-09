@@ -1,0 +1,11 @@
+{
+	"version": 3,
+	"names": [],
+	"sources": [
+		"ElementState.ts"
+	],
+	"sourcesContent": [
+		"export default {}\n"
+	],
+	"mappings": "cAAe"
+}

@@ -1,0 +1,24 @@
+{
+	"version": 3,
+	"names": [
+		"aspectRatio",
+		"avoid",
+		"restrictEdges",
+		"restrict",
+		"restrictRect",
+		"restrictSize",
+		"rubberband",
+		"snapEdges",
+		"snap",
+		"snapSize",
+		"spring",
+		"transform"
+	],
+	"sources": [
+		"all.ts"
+	],
+	"sourcesContent": [
+		"/* eslint-disable n/no-extraneous-import, import/no-unresolved */\nimport aspectRatio from './aspectRatio'\nimport avoid from './avoid/avoid'\nimport restrictEdges from './restrict/edges'\nimport restrict from './restrict/pointer'\nimport restrictRect from './restrict/rect'\nimport restrictSize from './restrict/size'\nimport rubberband from './rubberband/rubberband'\nimport snapEdges from './snap/edges'\nimport snap from './snap/pointer'\nimport snapSize from './snap/size'\nimport spring from './spring/spring'\nimport transform from './transform/transform'\n\nexport default {\n  aspectRatio,\n  restrictEdges,\n  restrict,\n  restrictRect,\n  restrictSize,\n  snapEdges,\n  snap,\n  snapSize,\n\n  spring,\n  avoid,\n  transform,\n  rubberband,\n}\n"
+	],
+	"mappings": "OACOA,MAAiB,uBACjBC,MAAW,uBACXC,MAAmB,0BACnBC,MAAc,4BACdC,MAAkB,yBAClBC,MAAkB,yBAClBC,MAAgB,iCAChBC,MAAe,sBACfC,MAAU,wBACVC,MAAc,qBACdC,MAAY,yBACZC,MAAe,sCAEP,CACbX,cACAE,gBACAC,WACAC,eACAC,eACAE,YACAC,OACAC,WAEAC,SACAT,QACAU,YACAL"
+}

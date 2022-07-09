@@ -1,0 +1,2 @@
+export default function e(e,t){e.__set||={};for(const _ in t)"function"!=typeof e[_]&&"__set"!==_&&Object.defineProperty(e,_,{get(){return _ in e.__set?e.__set[_]:e.__set[_]=t[_]},set(t){e.__set[_]=t},configurable:!0});return e}
+//# sourceMappingURL=pointerExtend.prod.js.map

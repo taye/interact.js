@@ -1,0 +1,2 @@
+export class PointerInfo{id;pointer;event;downTime;downTarget;constructor(t,e,i,n,o){this.id=t,this.pointer=e,this.event=i,this.downTime=n,this.downTarget=o}}
+//# sourceMappingURL=PointerInfo.prod.js.map
