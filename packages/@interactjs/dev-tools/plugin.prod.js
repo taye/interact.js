@@ -1,0 +1,2 @@
+import o from"./visualizer/plugin.prod.js";import i from"../utils/domObjects.prod.js";import{parentNode as t}from"../utils/domUtils.prod.js";import s from"../utils/extend.prod.js";import r from"../utils/is.prod.js";import*as n from"../utils/window.prod.js";var m;(o=>{o.touchAction="touchAction",o.boxSizing="boxSizing",o.noListeners="noListeners"})(m||(m={}));m.touchAction,m.boxSizing,m.noListeners;const p={id:"dev-tools",install(){}};export default p;
+//# sourceMappingURL=plugin.prod.js.map

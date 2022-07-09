@@ -1,0 +1,46 @@
+{
+	"version": 3,
+	"names": [
+		"_ProxyMethods",
+		"rectUtils",
+		"offsetBy",
+		"addTotal",
+		"interaction",
+		"pointerIsDown",
+		"addToCoords",
+		"coords",
+		"cur",
+		"offset",
+		"total",
+		"pending",
+		"x",
+		"y",
+		"beforeAction",
+		"applyPending",
+		"beforeEnd",
+		"hadPending",
+		"move",
+		"end",
+		"hasPending",
+		"delta",
+		"addEdges",
+		"edges",
+		"rect",
+		"page",
+		"client",
+		"id",
+		"before",
+		"install",
+		"scope",
+		"Interaction",
+		"prototype",
+		"listeners"
+	],
+	"sources": [
+		"plugin.ts"
+	],
+	"sourcesContent": [
+		"import type Interaction from '@interactjs/core/Interaction'\nimport { _ProxyMethods } from '@interactjs/core/Interaction'\nimport type { Plugin } from '@interactjs/core/scope'\nimport type { Point } from '@interactjs/core/types'\nimport * as rectUtils from '@interactjs/utils/rect'\n\ndeclare module '@interactjs/core/Interaction' {\n  interface Interaction {\n    offsetBy?: typeof offsetBy\n    offset: {\n      total: Point\n      pending: Point\n    }\n  }\n\n  enum _ProxyMethods {\n    offsetBy = '',\n  }\n}\n\n;(_ProxyMethods as any).offsetBy = ''\n\nexport function addTotal (interaction: Interaction) {\n  if (!interaction.pointerIsDown) {\n    return\n  }\n\n  addToCoords(interaction.coords.cur, interaction.offset.total)\n\n  interaction.offset.pending.x = 0\n  interaction.offset.pending.y = 0\n}\n\nfunction beforeAction ({ interaction }: { interaction: Interaction }) {\n  applyPending(interaction)\n}\n\nfunction beforeEnd ({ interaction }: { interaction: Interaction }): boolean | void {\n  const hadPending = applyPending(interaction)\n\n  if (!hadPending) return\n\n  interaction.move({ offset: true })\n  interaction.end()\n\n  return false\n}\n\nfunction end ({ interaction }: { interaction: Interaction }) {\n  interaction.offset.total.x = 0\n  interaction.offset.total.y = 0\n  interaction.offset.pending.x = 0\n  interaction.offset.pending.y = 0\n}\n\nexport function applyPending (interaction: Interaction) {\n  if (!hasPending(interaction)) {\n    return false\n  }\n\n  const { pending } = interaction.offset\n\n  addToCoords(interaction.coords.cur, pending)\n  addToCoords(interaction.coords.delta, pending)\n  rectUtils.addEdges(interaction.edges, interaction.rect, pending)\n\n  pending.x = 0\n  pending.y = 0\n\n  return true\n}\n\nfunction offsetBy (this: Interaction, { x, y }: Point) {\n  this.offset.pending.x += x\n  this.offset.pending.y += y\n\n  this.offset.total.x += x\n  this.offset.total.y += y\n}\n\nfunction addToCoords ({ page, client }, { x, y }: Point) {\n  page.x += x\n  page.y += y\n  client.x += x\n  client.y += y\n}\n\nfunction hasPending (interaction: Interaction) {\n  return !!(interaction.offset.pending.x || interaction.offset.pending.y)\n}\n\nconst offset: Plugin = {\n  id: 'offset',\n  before: ['modifiers', 'pointer-events', 'actions', 'inertia'],\n  install (scope) {\n    scope.Interaction.prototype.offsetBy = offsetBy\n  },\n  listeners: {\n    'interactions:new': ({ interaction }) => {\n      interaction.offset = {\n        total: { x: 0, y: 0 },\n        pending: { x: 0, y: 0 },\n      }\n    },\n    'interactions:update-pointer': ({ interaction }) => addTotal(interaction),\n    'interactions:before-action-start': beforeAction,\n    'interactions:before-action-move': beforeAction,\n    'interactions:before-action-end': beforeEnd,\n    'interactions:stop': end,\n  },\n}\n\nexport default offset\n"
+	],
+	"mappings": "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"
+}

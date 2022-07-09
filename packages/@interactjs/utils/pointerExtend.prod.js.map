@@ -1,0 +1,23 @@
+{
+	"version": 3,
+	"names": [
+		"pointerExtend",
+		"dest",
+		"source",
+		"__set",
+		"prop",
+		"Object",
+		"defineProperty",
+		"get",
+		"set",
+		"value",
+		"configurable"
+	],
+	"sources": [
+		"pointerExtend.ts"
+	],
+	"sourcesContent": [
+		"export default function pointerExtend<T> (dest: Partial<T & { __set?: Partial<T> }>, source: T) {\n  dest.__set ||= {} as any\n\n  for (const prop in source) {\n    if (typeof dest[prop] !== 'function' && prop !== '__set') {\n      Object.defineProperty(dest, prop, {\n        get () {\n          if (prop in dest.__set) return dest.__set[prop]\n\n          return (dest.__set[prop] = source[prop] as any)\n        },\n        set (value: any) {\n          dest.__set[prop] = value\n        },\n        configurable: true,\n      })\n    }\n  }\n  return dest\n}\n"
+	],
+	"mappings": "eAAe,SAASA,EAAkBC,EAA2CC,GACnFD,EAAKE,QAAU,GAEf,IAAK,MAAMC,KAAQF,EACS,mBAAfD,EAAKG,IAAiC,UAATA,GACtCC,OAAOC,eAAeL,EAAMG,EAAM,CAChCG,MACE,OAAIH,KAAQH,EAAKE,MAAcF,EAAKE,MAAMC,GAElCH,EAAKE,MAAMC,GAAQF,EAAOE,IAEpCI,IAAKC,GACHR,EAAKE,MAAMC,GAAQK,GAErBC,cAAc,IAIpB,OAAOT"
+}

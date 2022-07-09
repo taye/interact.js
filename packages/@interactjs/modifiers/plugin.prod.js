@@ -1,0 +1,2 @@
+import t from"../snappers/plugin.prod.js";import o from"./all";import s from"./base";const i={id:"modifiers",install(i){const{interactStatic:e}=i;i.usePlugin(s),i.usePlugin(t),e.modifiers=o;for(const t in o){const{_defaults:s,_methods:e}=o[t];s._methods=e,i.defaults.perAction[t]=s}}};export default i;
+//# sourceMappingURL=plugin.prod.js.map

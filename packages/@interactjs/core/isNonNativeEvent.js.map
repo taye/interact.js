@@ -1,0 +1,22 @@
+{
+	"version": 3,
+	"names": [
+		"isNonNativeEvent",
+		"type",
+		"actions",
+		"phaselessTypes",
+		"name",
+		"map",
+		"indexOf",
+		"substr",
+		"length",
+		"phases"
+	],
+	"sources": [
+		"isNonNativeEvent.ts"
+	],
+	"sourcesContent": [
+		"import type { Actions } from '@interactjs/core/types'\n\nexport default function isNonNativeEvent (type: string, actions: Actions) {\n  if (actions.phaselessTypes[type]) {\n    return true\n  }\n\n  for (const name in actions.map) {\n    if (type.indexOf(name) === 0 && type.substr(name.length) in actions.phases) {\n      return true\n    }\n  }\n\n  return false\n}\n"
+	],
+	"mappings": "AAEA,eAAe,SAASA,gBAAT,CAA2BC,IAA3B,EAAyCC,OAAzC,EAA2D;EACxE,IAAIA,OAAO,CAACC,cAAR,CAAuBF,IAAvB,CAAJ,EAAkC;IAChC,OAAO,IAAP;EACD;;EAED,KAAK,MAAMG,IAAX,IAAmBF,OAAO,CAACG,GAA3B,EAAgC;IAC9B,IAAIJ,IAAI,CAACK,OAAL,CAAaF,IAAb,MAAuB,CAAvB,IAA4BH,IAAI,CAACM,MAAL,CAAYH,IAAI,CAACI,MAAjB,KAA4BN,OAAO,CAACO,MAApE,EAA4E;MAC1E,OAAO,IAAP;IACD;EACF;;EAED,OAAO,KAAP;AACD"
+}
