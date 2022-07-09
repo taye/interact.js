@@ -49,3 +49,24 @@ if (typeof module === 'object' && !!module) {
 }
 
 ;(interact as any).default = interact
+
+const _ = {
+  actions,
+  autoScroll,
+  autoStart,
+  interactablePreventDefault,
+  devTools,
+  inertia,
+  interact,
+  modifiers,
+  offset,
+  pointerEvents,
+  reflow,
+}
+
+/**
+ * @private
+ * Exported so that the related module augmentations will be referenced in
+ * generated .d.ts file
+ **/
+export type __internal_plugin_types__ = typeof _
