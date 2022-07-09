@@ -1,6 +1,7 @@
 const fs = require('fs').promises
 const path = require('path')
 
+const del = require('del')
 const shell = require('shelljs')
 
 const { getPackages, isPro, registryUrl, errorExit } = require('../utils')
@@ -135,6 +136,8 @@ async function pushAndPublish () {
   await editPackageJsons((pkg) => {
     pkg.gitHead = gitHead
   })
+
+  if (isPro) await del('packages/**/*.map')
 
   const npmPublishCommand = 'npm publish' + (NPM_TAG ? ` --tag ${NPM_TAG}` : '')
   const packagesToPublish = isPro ? packages.filter((p) => /@interactjs\//.test(p)) : packages

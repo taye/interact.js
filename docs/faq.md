@@ -149,7 +149,7 @@ currently browser inconsistencies and other issues which have yet to be
 addressed.
 
 [gitter]: https://gitter.im/taye/interact.js
-[gh-issues]: http://git.io/srWhdg
+[gh-issues]: https://github.com/taye/interact.js/issues
 [manual-start]: /docs#manualstart
 [interaction-start]: /api/Interaction.html#start
 [prevent-default]: /api/Interactable.html#preventDefault
