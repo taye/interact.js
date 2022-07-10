@@ -3,7 +3,7 @@
   "version": "1.10.17",
   "main": "index",
   "module": "index",
-  "_typings": "typings.d.ts",
+  "type": "module",
   "repository": {
     "type": "git",
     "url": "https://github.com/taye/interact.js.git",

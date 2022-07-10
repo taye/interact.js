@@ -1,6 +1,7 @@
 {
   "name": "@interactjs/utils",
   "version": "1.10.17",
+  "type": "module",
   "repository": {
     "type": "git",
     "url": "https://github.com/taye/interact.js.git",
