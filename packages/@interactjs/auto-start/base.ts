@@ -128,7 +128,7 @@ function prepareOnMove (
   { interaction, pointer, event, eventTarget }: SignalArgs['interactions:move'],
   scope: Scope,
 ) {
-  if (interaction.pointerType !== 'mouse' || interaction.pointerIsDown || interaction.interacting()) return
+  if ((interaction.pointerType !== 'mouse' && interaction.pointerType !== 'pen') || interaction.pointerIsDown || interaction.interacting()) return
 
   const actionInfo = getActionInfo(interaction, pointer, event, eventTarget as Element, scope)
   prepare(interaction, actionInfo, scope)
@@ -373,7 +373,7 @@ function setCursor (element: Element, cursor: string, scope: Scope) {
 function setInteractionCursor<T extends ActionName> (interaction: Interaction<T>, scope: Scope) {
   const { interactable, element, prepared } = interaction
 
-  if (!(interaction.pointerType === 'mouse' && interactable && interactable.options.styleCursor)) {
+  if (!((interaction.pointerType === 'mouse' || interaction.pointerType === 'pen') && interactable && interactable.options.styleCursor)) {
     // clear previous target element cursor
     if (scope.autoStart.cursorElement) {
       setCursor(scope.autoStart.cursorElement, '', scope)
