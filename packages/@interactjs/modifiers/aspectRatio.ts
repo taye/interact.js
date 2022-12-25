@@ -50,8 +50,8 @@ AspectRatioOptions,
 
 const aspectRatio: ModifierModule<AspectRatioOptions, AspectRatioState> = {
   start (arg) {
-    const { state, rect, edges: originalEdges, pageCoords: coords } = arg
-    let { ratio } = state.options
+    const { state, rect, edges, pageCoords: coords } = arg
+    let { ratio, enabled } = state.options
     const { equalDelta, modifiers } = state.options
 
     if (ratio === 'preserve') {
@@ -64,13 +64,13 @@ const aspectRatio: ModifierModule<AspectRatioOptions, AspectRatioState> = {
     state.equalDelta = equalDelta
 
     const linkedEdges = (state.linkedEdges = {
-      top: originalEdges.top || (originalEdges.left && !originalEdges.bottom),
-      left: originalEdges.left || (originalEdges.top && !originalEdges.right),
-      bottom: originalEdges.bottom || (originalEdges.right && !originalEdges.top),
-      right: originalEdges.right || (originalEdges.bottom && !originalEdges.left),
+      top: edges.top || (edges.left && !edges.bottom),
+      left: edges.left || (edges.top && !edges.right),
+      bottom: edges.bottom || (edges.right && !edges.top),
+      right: edges.right || (edges.bottom && !edges.left),
     })
 
-    state.xIsPrimaryAxis = !!(originalEdges.left || originalEdges.right)
+    state.xIsPrimaryAxis = !!(edges.left || edges.right)
 
     if (state.equalDelta) {
       const sign = (linkedEdges.left ? 1 : -1) * (linkedEdges.top ? 1 : -1)
@@ -85,9 +85,11 @@ const aspectRatio: ModifierModule<AspectRatioOptions, AspectRatioState> = {
       }
     }
 
-    extend(arg.edges, linkedEdges)
+    if (enabled !== false) {
+      extend(edges, linkedEdges)
+    }
 
-    if (!modifiers || !modifiers.length) return
+    if (!modifiers?.length) return
 
     const subModification = new Modification(arg.interaction)
 
@@ -100,9 +102,11 @@ const aspectRatio: ModifierModule<AspectRatioOptions, AspectRatioState> = {
 
   set (arg) {
     const { state, rect, coords } = arg
+    const { linkedEdges } = state
     const initialCoords = extend({}, coords)
     const aspectMethod = state.equalDelta ? setEqualDelta : setRatio
 
+    extend(arg.edges, linkedEdges)
     aspectMethod(state, state.xIsPrimaryAxis, coords, rect)
 
     if (!state.subModification) {
@@ -111,7 +115,7 @@ const aspectRatio: ModifierModule<AspectRatioOptions, AspectRatioState> = {
 
     const correctedRect = extend({}, rect)
 
-    addEdges(state.linkedEdges, correctedRect, {
+    addEdges(linkedEdges, correctedRect, {
       x: coords.x - initialCoords.x,
       y: coords.y - initialCoords.y,
     })
@@ -119,7 +123,7 @@ const aspectRatio: ModifierModule<AspectRatioOptions, AspectRatioState> = {
     const result = state.subModification.setAll({
       ...arg,
       rect: correctedRect,
-      edges: state.linkedEdges,
+      edges: linkedEdges,
       pageCoords: coords,
       prevCoords: coords,
       prevRect: correctedRect,
