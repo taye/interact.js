@@ -31,12 +31,19 @@ export default class Modification {
   startDelta!: Point
   result!: ModificationResult
   endResult!: Point
-  edges!: EdgeOptions
+  startEdges!: EdgeOptions
+  edges: EdgeOptions
   readonly interaction: Readonly<Interaction>
 
   constructor (interaction: Interaction) {
     this.interaction = interaction
     this.result = createResult()
+    this.edges = {
+      left: false,
+      right: false,
+      top: false,
+      bottom: false,
+    }
   }
 
   start ({ phase }: { phase: EventPhase }, pageCoords: Point) {
@@ -44,7 +51,8 @@ export default class Modification {
     const modifierList = getModifierList(interaction)
     this.prepareStates(modifierList)
 
-    this.edges = extend({}, interaction.edges)
+    this.startEdges = extend({}, interaction.edges)
+    this.edges = extend({}, this.startEdges)
     this.startOffset = getRectOffset(interaction.rect, pageCoords)
     this.startDelta = { x: 0, y: 0 }
 
@@ -68,8 +76,8 @@ export default class Modification {
     arg.interaction = interaction
     arg.interactable = interaction.interactable
     arg.element = interaction.element
-    arg.rect = arg.rect || interaction.rect
-    arg.edges = this.edges
+    arg.rect ||= interaction.rect
+    arg.edges ||= this.startEdges
     arg.startOffset = this.startOffset
 
     return arg as ModifierArg
@@ -85,10 +93,11 @@ export default class Modification {
   }
 
   setAll (arg: MethodArg & Partial<ModifierArg>): ModificationResult {
-    const { phase, preEnd, skipModifiers, rect: unmodifiedRect } = arg
+    const { phase, preEnd, skipModifiers, rect: unmodifiedRect, edges: unmodifiedEdges } = arg
 
     arg.coords = extend({}, arg.pageCoords)
     arg.rect = extend({}, unmodifiedRect)
+    arg.edges = extend({}, unmodifiedEdges)
 
     const states = skipModifiers ? this.states.slice(skipModifiers) : this.states
 
@@ -103,7 +112,7 @@ export default class Modification {
         arg.state = state
         returnValue = state.methods.set(arg as ModifierArg<never>)
 
-        rectUtils.addEdges(this.interaction.edges, arg.rect, {
+        rectUtils.addEdges(arg.edges, arg.rect, {
           x: arg.coords.x - lastModifierCoords.x,
           y: arg.coords.y - lastModifierCoords.y,
         })
@@ -111,6 +120,8 @@ export default class Modification {
 
       newResult.eventProps.push(returnValue)
     }
+
+    extend(this.edges, arg.edges)
 
     newResult.delta.x = arg.coords.x - arg.pageCoords.x
     newResult.delta.y = arg.coords.y - arg.pageCoords.y
@@ -341,6 +352,7 @@ export default class Modification {
   copyFrom (other: Modification) {
     this.startOffset = other.startOffset
     this.startDelta = other.startDelta
+    this.startEdges = other.startEdges
     this.edges = other.edges
     this.states = other.states.map((s) => clone(s) as ModifierState)
     this.result = createResult(extend({}, other.result.coords), extend({}, other.result.rect))

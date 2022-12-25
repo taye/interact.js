@@ -104,16 +104,31 @@ const modifiersBase: Plugin = {
     },
 
     'interactions:before-action-start': (arg) => {
+      const { interaction } = arg
       const modification = arg.interaction.modification!
 
-      modification.start(arg, arg.interaction.coords.start.page)
-      arg.interaction.edges = modification.edges
+      modification.start(arg, interaction.coords.start.page)
+      interaction.edges = modification.edges
       modification.applyToInteraction(arg)
     },
 
-    'interactions:before-action-move': (arg) => arg.interaction.modification.setAndApply(arg),
+    'interactions:before-action-move': (arg) => {
+      const { interaction } = arg
+      const { modification } = interaction
+      const ret = modification.setAndApply(arg)
+      interaction.edges = modification.edges
 
-    'interactions:before-action-end': (arg) => arg.interaction.modification.beforeEnd(arg),
+      return ret
+    },
+
+    'interactions:before-action-end': (arg) => {
+      const { interaction } = arg
+      const { modification } = interaction
+      const ret = modification.beforeEnd(arg)
+      interaction.edges = modification.startEdges
+
+      return ret
+    },
 
     'interactions:action-start': addEventModifiers,
     'interactions:action-move': addEventModifiers,
