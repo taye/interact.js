@@ -1,7 +1,10 @@
+// eslint-disable-next-line import/no-extraneous-dependencies, import/no-duplicates
+import '@interactjs/dev-tools/visualizer/plugin'
+
 import type Interaction from '@interactjs/core/Interaction'
 import type { Scope, Plugin } from '@interactjs/core/scope'
 import type { Element, OptionMethod } from '@interactjs/core/types'
-// eslint-disable-next-line import/no-extraneous-dependencies
+// eslint-disable-next-line import/no-extraneous-dependencies, import/no-duplicates
 import visualizer from '@interactjs/dev-tools/visualizer/plugin'
 import domObjects from '@interactjs/utils/domObjects'
 import { parentNode } from '@interactjs/utils/domUtils'
