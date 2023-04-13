@@ -5,7 +5,7 @@ module.exports = {
     [require.resolve('@babel/preset-env'), { exclude: ['transform-regenerator'] }],
     [
       require.resolve('@babel/preset-typescript'),
-      { isTsx: false, onlyRemoveTypeImports: true, allExtensions: true, allowDeclareFields: true },
+      { isTSX: false, onlyRemoveTypeImports: true, allExtensions: true, allowDeclareFields: true },
     ],
   ].filter(Boolean),
 
