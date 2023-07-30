@@ -1,3 +1,11 @@
+## v1.10.18
+
+- fix(interact): remove types dependency
+- fix: set "type": "module" for scoped packages
+- fix(modifiers): allow toggling aspectRatio modifier during interaction
+- fix(types): import plugins for module augmentations
+- fix(interactjs): don't assign module.exports in esm package
+
 ## v1.10.17
 
 - fixed missing typings when only the `@interactjs/interactjs` package is

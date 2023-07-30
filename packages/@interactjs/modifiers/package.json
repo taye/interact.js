@@ -1,6 +1,6 @@
 {
   "name": "@interactjs/modifiers",
-  "version": "1.10.17",
+  "version": "1.10.18",
   "main": "index",
   "module": "index",
   "type": "module",
@@ -10,15 +10,15 @@
     "directory": "packages/@interactjs/modifiers"
   },
   "dependencies": {
-    "@interactjs/snappers": "1.10.17"
+    "@interactjs/snappers": "1.10.18"
   },
   "peerDependencies": {
-    "@interactjs/core": "1.10.17",
-    "@interactjs/rebound": "1.10.17",
-    "@interactjs/utils": "1.10.17"
+    "@interactjs/core": "1.10.18",
+    "@interactjs/rebound": "1.10.18",
+    "@interactjs/utils": "1.10.18"
   },
   "optionalDependencies": {
-    "@interactjs/interact": "1.10.17"
+    "@interactjs/interact": "1.10.18"
   },
   "publishConfig": {
     "access": "public"

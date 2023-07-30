@@ -1,6 +1,6 @@
 {
   "name": "@interactjs/core",
-  "version": "1.10.17",
+  "version": "1.10.18",
   "main": "index",
   "module": "index",
   "type": "module",
@@ -10,7 +10,7 @@
     "directory": "packages/@interactjs/core"
   },
   "peerDependencies": {
-    "@interactjs/utils": "1.10.17"
+    "@interactjs/utils": "1.10.18"
   },
   "publishConfig": {
     "access": "public"
