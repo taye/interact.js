@@ -1,0 +1,52 @@
+{
+	"version": 3,
+	"names": [
+		"BaseEvent",
+		"pointerUtils",
+		"PointerEvent",
+		"constructor",
+		"type",
+		"pointer",
+		"event",
+		"eventTarget",
+		"interaction",
+		"timeStamp",
+		"super",
+		"pointerExtend",
+		"this",
+		"originalEvent",
+		"pointerId",
+		"getPointerId",
+		"pointerType",
+		"getPointerType",
+		"target",
+		"currentTarget",
+		"pointerIndex",
+		"getPointerIndex",
+		"dt",
+		"pointers",
+		"downTime",
+		"interval",
+		"tapTime",
+		"double",
+		"prevTap",
+		"_subtractOrigin",
+		"x",
+		"originX",
+		"y",
+		"originY",
+		"pageX",
+		"pageY",
+		"clientX",
+		"clientY",
+		"_addOrigin",
+		"preventDefault"
+	],
+	"sources": [
+		"PointerEvent.ts"
+	],
+	"sourcesContent": [
+		"import { BaseEvent } from '@interactjs/core/BaseEvent'\nimport type Interaction from '@interactjs/core/Interaction'\nimport type { PointerEventType, PointerType, Point } from '@interactjs/core/types'\nimport * as pointerUtils from '@interactjs/utils/pointerUtils'\n\nexport default class PointerEvent<T extends string = any> extends BaseEvent<never> {\n  declare type: T\n  declare originalEvent: PointerEventType\n  declare pointerId: number\n  declare pointerType: string\n  declare double: boolean\n  declare pageX: number\n  declare pageY: number\n  declare clientX: number\n  declare clientY: number\n  declare dt: number\n  declare eventable: any;\n  [key: string]: any\n\n  /** */\n  constructor (\n    type: T,\n    pointer: PointerType | PointerEvent<any>,\n    event: PointerEventType,\n    eventTarget: Node,\n    interaction: Interaction<never>,\n    timeStamp: number,\n  ) {\n    super(interaction)\n    pointerUtils.pointerExtend(this, event)\n\n    if (event !== pointer) {\n      pointerUtils.pointerExtend(this, pointer)\n    }\n\n    this.timeStamp = timeStamp\n    this.originalEvent = event\n    this.type = type\n    this.pointerId = pointerUtils.getPointerId(pointer)\n    this.pointerType = pointerUtils.getPointerType(pointer)\n    this.target = eventTarget\n    this.currentTarget = null\n\n    if (type === 'tap') {\n      const pointerIndex = interaction.getPointerIndex(pointer)\n      this.dt = this.timeStamp - interaction.pointers[pointerIndex].downTime\n\n      const interval = this.timeStamp - interaction.tapTime\n\n      this.double =\n        !!interaction.prevTap &&\n        interaction.prevTap.type !== 'doubletap' &&\n        interaction.prevTap.target === this.target &&\n        interval < 500\n    } else if (type === 'doubletap') {\n      this.dt = (pointer as PointerEvent<'tap'>).timeStamp - interaction.tapTime\n      this.double = true\n    }\n  }\n\n  _subtractOrigin ({ x: originX, y: originY }: Point) {\n    this.pageX -= originX\n    this.pageY -= originY\n    this.clientX -= originX\n    this.clientY -= originY\n\n    return this\n  }\n\n  _addOrigin ({ x: originX, y: originY }: Point) {\n    this.pageX += originX\n    this.pageY += originY\n    this.clientX += originX\n    this.clientY += originY\n\n    return this\n  }\n\n  /**\n   * Prevent the default behaviour of the original Event\n   */\n  preventDefault () {\n    this.originalEvent.preventDefault()\n  }\n}\n\nexport { PointerEvent }\n"
+	],
+	"mappings": "oBAASA,MAAiB,sCAGdC,MAAkB,+CAEf,MAAMC,UAA6CF,EAehEG,YACEC,EACAC,EACAC,EACAC,EACAC,EACAC,GAiBA,GAfAC,MAAMF,GACNP,EAAaU,cAAcC,KAAMN,GAE7BA,IAAUD,GACZJ,EAAaU,cAAcC,KAAMP,GAGnCO,KAAKH,UAAYA,EACjBG,KAAKC,cAAgBP,EACrBM,KAAKR,KAAOA,EACZQ,KAAKE,UAAYb,EAAac,aAAaV,GAC3CO,KAAKI,YAAcf,EAAagB,eAAeZ,GAC/CO,KAAKM,OAASX,EACdK,KAAKO,cAAgB,KAER,QAATf,EAAgB,CAClB,MAAMgB,EAAeZ,EAAYa,gBAAgBhB,GACjDO,KAAKU,GAAKV,KAAKH,UAAYD,EAAYe,SAASH,GAAcI,SAE9D,MAAMC,EAAWb,KAAKH,UAAYD,EAAYkB,QAE9Cd,KAAKe,SACDnB,EAAYoB,SACe,cAA7BpB,EAAYoB,QAAQxB,MACpBI,EAAYoB,QAAQV,SAAWN,KAAKM,QACpCO,EAAW,QACK,cAATrB,IACTQ,KAAKU,GAAMjB,EAAgCI,UAAYD,EAAYkB,QACnEd,KAAKe,QAAS,GAIlBE,iBAAmBC,EAAGC,EAASC,EAAGC,IAMhC,OALArB,KAAKsB,OAASH,EACdnB,KAAKuB,OAASF,EACdrB,KAAKwB,SAAWL,EAChBnB,KAAKyB,SAAWJ,EAETrB,KAGT0B,YAAcR,EAAGC,EAASC,EAAGC,IAM3B,OALArB,KAAKsB,OAASH,EACdnB,KAAKuB,OAASF,EACdrB,KAAKwB,SAAWL,EAChBnB,KAAKyB,SAAWJ,EAETrB,KAMT2B,iBACE3B,KAAKC,cAAc0B,yBAIdrC"
+}

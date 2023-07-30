@@ -1,0 +1,2 @@
+import*as e from"./base";import t from"./holdRepeat";import i from"./interactableTargets";const o={id:"pointer-events",install(o){o.usePlugin(e),o.usePlugin(t),o.usePlugin(i)}};export default o;
+//# sourceMappingURL=plugin.prod.js.map

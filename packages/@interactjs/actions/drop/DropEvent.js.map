@@ -1,0 +1,45 @@
+{
+	"version": 3,
+	"names": [
+		"BaseEvent",
+		"arr",
+		"DropEvent",
+		"dropzone",
+		"dragEvent",
+		"relatedTarget",
+		"draggable",
+		"propagationStopped",
+		"immediatePropagationStopped",
+		"constructor",
+		"dropState",
+		"type",
+		"_interaction",
+		"element",
+		"prev",
+		"cur",
+		"target",
+		"currentTarget",
+		"interactable",
+		"timeStamp",
+		"reject",
+		"rejected",
+		"events",
+		"enter",
+		"stopImmediatePropagation",
+		"activeDrops",
+		"index",
+		"findIndex",
+		"splice",
+		"deactivateEvent",
+		"fire",
+		"preventDefault",
+		"stopPropagation"
+	],
+	"sources": [
+		"DropEvent.ts"
+	],
+	"sourcesContent": [
+		"import { BaseEvent } from '@interactjs/core/BaseEvent'\nimport type { InteractEvent } from '@interactjs/core/InteractEvent'\nimport type { Interactable } from '@interactjs/core/Interactable'\nimport type { Element } from '@interactjs/core/types'\nimport * as arr from '@interactjs/utils/arr'\n\nimport type { DropState } from './plugin'\n\nexport class DropEvent extends BaseEvent<'drag'> {\n  declare target: Element\n  dropzone: Interactable\n  dragEvent: InteractEvent<'drag'>\n  relatedTarget: Element\n  draggable: Interactable\n  propagationStopped = false\n  immediatePropagationStopped = false\n\n  /**\n   * Class of events fired on dropzones during drags with acceptable targets.\n   */\n  constructor (dropState: DropState, dragEvent: InteractEvent<'drag'>, type: string) {\n    super(dragEvent._interaction)\n\n    const { element, dropzone } = type === 'dragleave' ? dropState.prev : dropState.cur\n\n    this.type = type\n    this.target = element\n    this.currentTarget = element\n    this.dropzone = dropzone\n    this.dragEvent = dragEvent\n    this.relatedTarget = dragEvent.target\n    this.draggable = dragEvent.interactable\n    this.timeStamp = dragEvent.timeStamp\n  }\n\n  /**\n   * If this is a `dropactivate` event, the dropzone element will be\n   * deactivated.\n   *\n   * If this is a `dragmove` or `dragenter`, a `dragleave` will be fired on the\n   * dropzone element and more.\n   */\n  reject () {\n    const { dropState } = this._interaction\n\n    if (\n      this.type !== 'dropactivate' &&\n      (!this.dropzone || dropState.cur.dropzone !== this.dropzone || dropState.cur.element !== this.target)\n    ) {\n      return\n    }\n\n    dropState.prev.dropzone = this.dropzone\n    dropState.prev.element = this.target\n\n    dropState.rejected = true\n    dropState.events.enter = null\n\n    this.stopImmediatePropagation()\n\n    if (this.type === 'dropactivate') {\n      const activeDrops = dropState.activeDrops\n      const index = arr.findIndex(\n        activeDrops,\n        ({ dropzone, element }) => dropzone === this.dropzone && element === this.target,\n      )\n\n      dropState.activeDrops.splice(index, 1)\n\n      const deactivateEvent = new DropEvent(dropState, this.dragEvent, 'dropdeactivate')\n\n      deactivateEvent.dropzone = this.dropzone\n      deactivateEvent.target = this.target\n\n      this.dropzone.fire(deactivateEvent)\n    } else {\n      this.dropzone.fire(new DropEvent(dropState, this.dragEvent, 'dragleave'))\n    }\n  }\n\n  preventDefault () {}\n\n  stopPropagation () {\n    this.propagationStopped = true\n  }\n\n  stopImmediatePropagation () {\n    this.immediatePropagationStopped = this.propagationStopped = true\n  }\n}\n"
+	],
+	"mappings": "AAAA,SAASA,SAAT,QAA0B,yBAA1B;AAIA,OAAO,KAAKC,GAAZ,MAAqB,oBAArB;AAIA,OAAO,MAAMC,SAAN,SAAwBF,SAAxB,CAA0C;EAE/CG,QAAQ;EACRC,SAAS;EACTC,aAAa;EACbC,SAAS;EACTC,kBAAkB,GAAG,KAAH;EAClBC,2BAA2B,GAAG,KAAH;EAE3B;AACF;AACA;;EACEC,WAAW,CAAEC,SAAF,EAAwBN,SAAxB,EAA0DO,IAA1D,EAAwE;IACjF,MAAMP,SAAS,CAACQ,YAAhB;IAEA,MAAM;MAAEC,OAAF;MAAWV;IAAX,IAAwBQ,IAAI,KAAK,WAAT,GAAuBD,SAAS,CAACI,IAAjC,GAAwCJ,SAAS,CAACK,GAAhF;IAEA,KAAKJ,IAAL,GAAYA,IAAZ;IACA,KAAKK,MAAL,GAAcH,OAAd;IACA,KAAKI,aAAL,GAAqBJ,OAArB;IACA,KAAKV,QAAL,GAAgBA,QAAhB;IACA,KAAKC,SAAL,GAAiBA,SAAjB;IACA,KAAKC,aAAL,GAAqBD,SAAS,CAACY,MAA/B;IACA,KAAKV,SAAL,GAAiBF,SAAS,CAACc,YAA3B;IACA,KAAKC,SAAL,GAAiBf,SAAS,CAACe,SAA3B;EACD;EAED;AACF;AACA;AACA;AACA;AACA;AACA;;;EACEC,MAAM,GAAI;IACR,MAAM;MAAEV;IAAF,IAAgB,KAAKE,YAA3B;;IAEA,IACE,KAAKD,IAAL,KAAc,cAAd,KACC,CAAC,KAAKR,QAAN,IAAkBO,SAAS,CAACK,GAAV,CAAcZ,QAAd,KAA2B,KAAKA,QAAlD,IAA8DO,SAAS,CAACK,GAAV,CAAcF,OAAd,KAA0B,KAAKG,MAD9F,CADF,EAGE;MACA;IACD;;IAEDN,SAAS,CAACI,IAAV,CAAeX,QAAf,GAA0B,KAAKA,QAA/B;IACAO,SAAS,CAACI,IAAV,CAAeD,OAAf,GAAyB,KAAKG,MAA9B;IAEAN,SAAS,CAACW,QAAV,GAAqB,IAArB;IACAX,SAAS,CAACY,MAAV,CAAiBC,KAAjB,GAAyB,IAAzB;IAEA,KAAKC,wBAAL;;IAEA,IAAI,KAAKb,IAAL,KAAc,cAAlB,EAAkC;MAChC,MAAMc,WAAW,GAAGf,SAAS,CAACe,WAA9B;MACA,MAAMC,KAAK,GAAGzB,GAAG,CAAC0B,SAAJ,CACZF,WADY,EAEZ,CAAC;QAAEtB,QAAF;QAAYU;MAAZ,CAAD,KAA2BV,QAAQ,KAAK,KAAKA,QAAlB,IAA8BU,OAAO,KAAK,KAAKG,MAF9D,CAAd;MAKAN,SAAS,CAACe,WAAV,CAAsBG,MAAtB,CAA6BF,KAA7B,EAAoC,CAApC;MAEA,MAAMG,eAAe,GAAG,IAAI3B,SAAJ,CAAcQ,SAAd,EAAyB,KAAKN,SAA9B,EAAyC,gBAAzC,CAAxB;MAEAyB,eAAe,CAAC1B,QAAhB,GAA2B,KAAKA,QAAhC;MACA0B,eAAe,CAACb,MAAhB,GAAyB,KAAKA,MAA9B;MAEA,KAAKb,QAAL,CAAc2B,IAAd,CAAmBD,eAAnB;IACD,CAfD,MAeO;MACL,KAAK1B,QAAL,CAAc2B,IAAd,CAAmB,IAAI5B,SAAJ,CAAcQ,SAAd,EAAyB,KAAKN,SAA9B,EAAyC,WAAzC,CAAnB;IACD;EACF;;EAED2B,cAAc,GAAI,CAAE;;EAEpBC,eAAe,GAAI;IACjB,KAAKzB,kBAAL,GAA0B,IAA1B;EACD;;EAEDiB,wBAAwB,GAAI;IAC1B,KAAKhB,2BAAL,GAAmC,KAAKD,kBAAL,GAA0B,IAA7D;EACD;;AAhF8C"
+}

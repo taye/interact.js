@@ -1,0 +1,52 @@
+{
+	"version": 3,
+	"names": [
+		"extend",
+		"is",
+		"rectUtils",
+		"makeModifier",
+		"start",
+		"rect",
+		"startOffset",
+		"state",
+		"interaction",
+		"pageCoords",
+		"options",
+		"elementRect",
+		"offset",
+		"left",
+		"top",
+		"right",
+		"bottom",
+		"restriction",
+		"getRestrictionRect",
+		"widthDiff",
+		"width",
+		"heightDiff",
+		"height",
+		"set",
+		"coords",
+		"xywhToTlbr",
+		"x",
+		"Math",
+		"max",
+		"min",
+		"y",
+		"value",
+		"func",
+		"resolveRectLike",
+		"interactable",
+		"element",
+		"defaults",
+		"endOnly",
+		"enabled",
+		"restrict"
+	],
+	"sources": [
+		"pointer.ts"
+	],
+	"sourcesContent": [
+		"import type Interaction from '@interactjs/core/Interaction'\nimport type { RectResolvable, Rect, Point } from '@interactjs/core/types'\nimport extend from '@interactjs/utils/extend'\nimport is from '@interactjs/utils/is'\nimport * as rectUtils from '@interactjs/utils/rect'\n\nimport { makeModifier } from '../base'\nimport type { ModifierArg, ModifierModule, ModifierState } from '../types'\n\nexport interface RestrictOptions {\n  // where to drag over\n  restriction: RectResolvable<[number, number, Interaction]>\n  // what part of self is allowed to drag over\n  elementRect: Rect\n  offset: Rect\n  // restrict just before the end drag\n  endOnly: boolean\n  enabled?: boolean\n}\n\nexport type RestrictState = ModifierState<\nRestrictOptions,\n{\n  offset: Rect\n}\n>\n\nfunction start ({ rect, startOffset, state, interaction, pageCoords }: ModifierArg<RestrictState>) {\n  const { options } = state\n  const { elementRect } = options\n  const offset: Rect = extend(\n    {\n      left: 0,\n      top: 0,\n      right: 0,\n      bottom: 0,\n    },\n    options.offset || {},\n  )\n\n  if (rect && elementRect) {\n    const restriction = getRestrictionRect(options.restriction, interaction, pageCoords)\n\n    if (restriction) {\n      const widthDiff = restriction.right - restriction.left - rect.width\n      const heightDiff = restriction.bottom - restriction.top - rect.height\n\n      if (widthDiff < 0) {\n        offset.left += widthDiff\n        offset.right += widthDiff\n      }\n      if (heightDiff < 0) {\n        offset.top += heightDiff\n        offset.bottom += heightDiff\n      }\n    }\n\n    offset.left += startOffset.left - rect.width * elementRect.left\n    offset.top += startOffset.top - rect.height * elementRect.top\n\n    offset.right += startOffset.right - rect.width * (1 - elementRect.right)\n    offset.bottom += startOffset.bottom - rect.height * (1 - elementRect.bottom)\n  }\n\n  state.offset = offset\n}\n\nfunction set ({ coords, interaction, state }: ModifierArg<RestrictState>) {\n  const { options, offset } = state\n\n  const restriction = getRestrictionRect(options.restriction, interaction, coords)\n\n  if (!restriction) return\n\n  const rect = rectUtils.xywhToTlbr(restriction)\n\n  coords.x = Math.max(Math.min(rect.right - offset.right, coords.x), rect.left + offset.left)\n  coords.y = Math.max(Math.min(rect.bottom - offset.bottom, coords.y), rect.top + offset.top)\n}\n\nexport function getRestrictionRect (\n  value: RectResolvable<[number, number, Interaction]>,\n  interaction: Interaction,\n  coords?: Point,\n) {\n  if (is.func(value)) {\n    return rectUtils.resolveRectLike(value, interaction.interactable, interaction.element, [\n      coords.x,\n      coords.y,\n      interaction,\n    ])\n  } else {\n    return rectUtils.resolveRectLike(value, interaction.interactable, interaction.element)\n  }\n}\n\nconst defaults: RestrictOptions = {\n  restriction: null,\n  elementRect: null,\n  offset: null,\n  endOnly: false,\n  enabled: false,\n}\n\nconst restrict: ModifierModule<RestrictOptions, RestrictState> = {\n  start,\n  set,\n  defaults,\n}\n\nexport default makeModifier(restrict, 'restrict')\nexport { restrict }\n"
+	],
+	"mappings": "AAEA,OAAOA,MAAP,MAAmB,uBAAnB;AACA,OAAOC,EAAP,MAAe,mBAAf;AACA,OAAO,KAAKC,SAAZ,MAA2B,qBAA3B;AAEA,SAASC,YAAT,QAA6B,SAA7B;;AAqBA,SAASC,KAAT,CAAgB;EAAEC,IAAF;EAAQC,WAAR;EAAqBC,KAArB;EAA4BC,WAA5B;EAAyCC;AAAzC,CAAhB,EAAmG;EACjG,MAAM;IAAEC;EAAF,IAAcH,KAApB;EACA,MAAM;IAAEI;EAAF,IAAkBD,OAAxB;EACA,MAAME,MAAY,GAAGZ,MAAM,CACzB;IACEa,IAAI,EAAE,CADR;IAEEC,GAAG,EAAE,CAFP;IAGEC,KAAK,EAAE,CAHT;IAIEC,MAAM,EAAE;EAJV,CADyB,EAOzBN,OAAO,CAACE,MAAR,IAAkB,EAPO,CAA3B;;EAUA,IAAIP,IAAI,IAAIM,WAAZ,EAAyB;IACvB,MAAMM,WAAW,GAAGC,kBAAkB,CAACR,OAAO,CAACO,WAAT,EAAsBT,WAAtB,EAAmCC,UAAnC,CAAtC;;IAEA,IAAIQ,WAAJ,EAAiB;MACf,MAAME,SAAS,GAAGF,WAAW,CAACF,KAAZ,GAAoBE,WAAW,CAACJ,IAAhC,GAAuCR,IAAI,CAACe,KAA9D;MACA,MAAMC,UAAU,GAAGJ,WAAW,CAACD,MAAZ,GAAqBC,WAAW,CAACH,GAAjC,GAAuCT,IAAI,CAACiB,MAA/D;;MAEA,IAAIH,SAAS,GAAG,CAAhB,EAAmB;QACjBP,MAAM,CAACC,IAAP,IAAeM,SAAf;QACAP,MAAM,CAACG,KAAP,IAAgBI,SAAhB;MACD;;MACD,IAAIE,UAAU,GAAG,CAAjB,EAAoB;QAClBT,MAAM,CAACE,GAAP,IAAcO,UAAd;QACAT,MAAM,CAACI,MAAP,IAAiBK,UAAjB;MACD;IACF;;IAEDT,MAAM,CAACC,IAAP,IAAeP,WAAW,CAACO,IAAZ,GAAmBR,IAAI,CAACe,KAAL,GAAaT,WAAW,CAACE,IAA3D;IACAD,MAAM,CAACE,GAAP,IAAcR,WAAW,CAACQ,GAAZ,GAAkBT,IAAI,CAACiB,MAAL,GAAcX,WAAW,CAACG,GAA1D;IAEAF,MAAM,CAACG,KAAP,IAAgBT,WAAW,CAACS,KAAZ,GAAoBV,IAAI,CAACe,KAAL,IAAc,IAAIT,WAAW,CAACI,KAA9B,CAApC;IACAH,MAAM,CAACI,MAAP,IAAiBV,WAAW,CAACU,MAAZ,GAAqBX,IAAI,CAACiB,MAAL,IAAe,IAAIX,WAAW,CAACK,MAA/B,CAAtC;EACD;;EAEDT,KAAK,CAACK,MAAN,GAAeA,MAAf;AACD;;AAED,SAASW,GAAT,CAAc;EAAEC,MAAF;EAAUhB,WAAV;EAAuBD;AAAvB,CAAd,EAA0E;EACxE,MAAM;IAAEG,OAAF;IAAWE;EAAX,IAAsBL,KAA5B;EAEA,MAAMU,WAAW,GAAGC,kBAAkB,CAACR,OAAO,CAACO,WAAT,EAAsBT,WAAtB,EAAmCgB,MAAnC,CAAtC;EAEA,IAAI,CAACP,WAAL,EAAkB;EAElB,MAAMZ,IAAI,GAAGH,SAAS,CAACuB,UAAV,CAAqBR,WAArB,CAAb;EAEAO,MAAM,CAACE,CAAP,GAAWC,IAAI,CAACC,GAAL,CAASD,IAAI,CAACE,GAAL,CAASxB,IAAI,CAACU,KAAL,GAAaH,MAAM,CAACG,KAA7B,EAAoCS,MAAM,CAACE,CAA3C,CAAT,EAAwDrB,IAAI,CAACQ,IAAL,GAAYD,MAAM,CAACC,IAA3E,CAAX;EACAW,MAAM,CAACM,CAAP,GAAWH,IAAI,CAACC,GAAL,CAASD,IAAI,CAACE,GAAL,CAASxB,IAAI,CAACW,MAAL,GAAcJ,MAAM,CAACI,MAA9B,EAAsCQ,MAAM,CAACM,CAA7C,CAAT,EAA0DzB,IAAI,CAACS,GAAL,GAAWF,MAAM,CAACE,GAA5E,CAAX;AACD;;AAED,OAAO,SAASI,kBAAT,CACLa,KADK,EAELvB,WAFK,EAGLgB,MAHK,EAIL;EACA,IAAIvB,EAAE,CAAC+B,IAAH,CAAQD,KAAR,CAAJ,EAAoB;IAClB,OAAO7B,SAAS,CAAC+B,eAAV,CAA0BF,KAA1B,EAAiCvB,WAAW,CAAC0B,YAA7C,EAA2D1B,WAAW,CAAC2B,OAAvE,EAAgF,CACrFX,MAAM,CAACE,CAD8E,EAErFF,MAAM,CAACM,CAF8E,EAGrFtB,WAHqF,CAAhF,CAAP;EAKD,CAND,MAMO;IACL,OAAON,SAAS,CAAC+B,eAAV,CAA0BF,KAA1B,EAAiCvB,WAAW,CAAC0B,YAA7C,EAA2D1B,WAAW,CAAC2B,OAAvE,CAAP;EACD;AACF;AAED,MAAMC,QAAyB,GAAG;EAChCnB,WAAW,EAAE,IADmB;EAEhCN,WAAW,EAAE,IAFmB;EAGhCC,MAAM,EAAE,IAHwB;EAIhCyB,OAAO,EAAE,KAJuB;EAKhCC,OAAO,EAAE;AALuB,CAAlC;AAQA,MAAMC,QAAwD,GAAG;EAC/DnC,KAD+D;EAE/DmB,GAF+D;EAG/Da;AAH+D,CAAjE;AAMA,eAAejC,YAAY,CAACoC,QAAD,EAAW,UAAX,CAA3B;AACA,SAASA,QAAT"
+}

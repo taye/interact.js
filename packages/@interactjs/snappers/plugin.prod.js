@@ -1,0 +1,2 @@
+import r from"../utils/extend.prod.js";import*as s from"./all";const t={id:"snappers",install(t){const{interactStatic:p}=t;p.snappers=r(p.snappers||{},s),p.createSnapGrid=p.snappers.grid}};export default t;
+//# sourceMappingURL=plugin.prod.js.map

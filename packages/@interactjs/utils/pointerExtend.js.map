@@ -1,0 +1,23 @@
+{
+	"version": 3,
+	"names": [
+		"pointerExtend",
+		"dest",
+		"source",
+		"__set",
+		"prop",
+		"Object",
+		"defineProperty",
+		"get",
+		"set",
+		"value",
+		"configurable"
+	],
+	"sources": [
+		"pointerExtend.ts"
+	],
+	"sourcesContent": [
+		"export default function pointerExtend<T> (dest: Partial<T & { __set?: Partial<T> }>, source: T) {\n  dest.__set ||= {} as any\n\n  for (const prop in source) {\n    if (typeof dest[prop] !== 'function' && prop !== '__set') {\n      Object.defineProperty(dest, prop, {\n        get () {\n          if (prop in dest.__set) return dest.__set[prop]\n\n          return (dest.__set[prop] = source[prop] as any)\n        },\n        set (value: any) {\n          dest.__set[prop] = value\n        },\n        configurable: true,\n      })\n    }\n  }\n  return dest\n}\n"
+	],
+	"mappings": "AAAA,eAAe,SAASA,aAAT,CAA2BC,IAA3B,EAAsEC,MAAtE,EAAiF;EAC9FD,IAAI,CAACE,KAAL,KAAe,EAAf;;EAEA,KAAK,MAAMC,IAAX,IAAmBF,MAAnB,EAA2B;IACzB,IAAI,OAAOD,IAAI,CAACG,IAAD,CAAX,KAAsB,UAAtB,IAAoCA,IAAI,KAAK,OAAjD,EAA0D;MACxDC,MAAM,CAACC,cAAP,CAAsBL,IAAtB,EAA4BG,IAA5B,EAAkC;QAChCG,GAAG,GAAI;UACL,IAAIH,IAAI,IAAIH,IAAI,CAACE,KAAjB,EAAwB,OAAOF,IAAI,CAACE,KAAL,CAAWC,IAAX,CAAP;UAExB,OAAQH,IAAI,CAACE,KAAL,CAAWC,IAAX,IAAmBF,MAAM,CAACE,IAAD,CAAjC;QACD,CAL+B;;QAMhCI,GAAG,CAAEC,KAAF,EAAc;UACfR,IAAI,CAACE,KAAL,CAAWC,IAAX,IAAmBK,KAAnB;QACD,CAR+B;;QAShCC,YAAY,EAAE;MATkB,CAAlC;IAWD;EACF;;EACD,OAAOT,IAAP;AACD"
+}

@@ -1,0 +1,27 @@
+{
+	"version": 3,
+	"names": [
+		"snappers",
+		"all",
+		"base",
+		"modifiers",
+		"id",
+		"install",
+		"scope",
+		"interactStatic",
+		"interact",
+		"usePlugin",
+		"type",
+		"_defaults",
+		"_methods",
+		"defaults",
+		"perAction"
+	],
+	"sources": [
+		"plugin.ts"
+	],
+	"sourcesContent": [
+		"import type { Plugin } from '@interactjs/core/scope'\nimport snappers from '@interactjs/snappers/plugin'\n\nimport all from './all'\nimport base from './base'\n\ndeclare module '@interactjs/core/InteractStatic' {\n  export interface InteractStatic {\n    modifiers: typeof all\n  }\n}\n\nconst modifiers: Plugin = {\n  id: 'modifiers',\n  install (scope) {\n    const { interactStatic: interact } = scope\n\n    scope.usePlugin(base)\n    scope.usePlugin(snappers)\n\n    interact.modifiers = all\n\n    // for backwrads compatibility\n    for (const type in all) {\n      const { _defaults, _methods } = all[type as keyof typeof all]\n\n      ;(_defaults as any)._methods = _methods\n      ;(scope.defaults.perAction as any)[type] = _defaults\n    }\n  },\n}\n\nexport default modifiers\n"
+	],
+	"mappings": "AACA,OAAOA,QAAP,MAAqB,uBAArB;AAEA,OAAOC,GAAP,MAAgB,OAAhB;AACA,OAAOC,IAAP,MAAiB,QAAjB;AAQA,MAAMC,SAAiB,GAAG;EACxBC,EAAE,EAAE,WADoB;;EAExBC,OAAO,CAAEC,KAAF,EAAS;IACd,MAAM;MAAEC,cAAc,EAAEC;IAAlB,IAA+BF,KAArC;IAEAA,KAAK,CAACG,SAAN,CAAgBP,IAAhB;IACAI,KAAK,CAACG,SAAN,CAAgBT,QAAhB;IAEAQ,QAAQ,CAACL,SAAT,GAAqBF,GAArB,CANc,CAQd;;IACA,KAAK,MAAMS,IAAX,IAAmBT,GAAnB,EAAwB;MACtB,MAAM;QAAEU,SAAF;QAAaC;MAAb,IAA0BX,GAAG,CAACS,IAAD,CAAnC;MAEEC,SAAD,CAAmBC,QAAnB,GAA8BA,QAA9B;MACCN,KAAK,CAACO,QAAN,CAAeC,SAAhB,CAAkCJ,IAAlC,IAA0CC,SAA1C;IACF;EACF;;AAjBuB,CAA1B;AAoBA,eAAeR,SAAf"
+}
