@@ -1,6 +1,6 @@
 {
   "name": "@interactjs/inertia",
-  "version": "1.10.18",
+  "version": "1.10.19",
   "main": "index",
   "module": "index",
   "type": "module",
@@ -10,15 +10,15 @@
     "directory": "packages/@interactjs/inertia"
   },
   "dependencies": {
-    "@interactjs/offset": "1.10.18"
+    "@interactjs/offset": "1.10.19"
   },
   "peerDependencies": {
-    "@interactjs/core": "1.10.18",
-    "@interactjs/modifiers": "1.10.18",
-    "@interactjs/utils": "1.10.18"
+    "@interactjs/core": "1.10.19",
+    "@interactjs/modifiers": "1.10.19",
+    "@interactjs/utils": "1.10.19"
   },
   "optionalDependencies": {
-    "@interactjs/interact": "1.10.18"
+    "@interactjs/interact": "1.10.19"
   },
   "publishConfig": {
     "access": "public"

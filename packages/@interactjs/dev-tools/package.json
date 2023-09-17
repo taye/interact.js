@@ -1,6 +1,6 @@
 {
   "name": "@interactjs/dev-tools",
-  "version": "1.10.18",
+  "version": "1.10.19",
   "main": "index",
   "module": "index",
   "type": "module",
@@ -10,11 +10,11 @@
     "directory": "packages/@interactjs/dev-tools"
   },
   "peerDependencies": {
-    "@interactjs/modifiers": "1.10.18",
-    "@interactjs/utils": "1.10.18"
+    "@interactjs/modifiers": "1.10.19",
+    "@interactjs/utils": "1.10.19"
   },
   "optionalDependencies": {
-    "@interactjs/interact": "1.10.18"
+    "@interactjs/interact": "1.10.19"
   },
   "devDependencies": {
     "vue": "next"
