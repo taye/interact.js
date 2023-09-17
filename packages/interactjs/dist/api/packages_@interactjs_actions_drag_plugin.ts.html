@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>packages/@interactjs/actions/drag/plugin.ts - Documentation</title>
+
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+    <link type="text/css" rel="stylesheet" href="styles/prettify.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav>
+    <li class="nav-link nav-home-link"><a href="index.html">Home</a></li><li class="nav-heading">Classes</li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="DropEvent_DropEvent.html">DropEvent</a></span></li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="Interactable.html">Interactable</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#context">context</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#deltaSource">deltaSource</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#draggable">draggable</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#dropCheck">dropCheck</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#dropzone">dropzone</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#fire">fire</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#gesturable">gesturable</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#getRect">getRect</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#off">off</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#on">on</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#origin">origin</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#rectChecker">rectChecker</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#reflow">reflow</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#resizable">resizable</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#set">set</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#unset">unset</a></span></li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="InteractEvent_InteractEvent.html">InteractEvent</a></span></li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="Interaction_Interaction.html">Interaction</a></span></li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="module.exports_module.exports.html">exports</a></span></li><li class="nav-heading">Modules</li><li class="nav-heading"><span class="nav-item-type type-module">M</span><span class="nav-item-name"><a href="module-interact.html">interact</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="module-interact.html#.isSet">isSet</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="module-interact.html#.maxInteractions">maxInteractions</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="module-interact.html#.pointerMoveTolerance">pointerMoveTolerance</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="module-interact.html#.stop">stop</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="module-interact.html#.supportsPointerEvent">supportsPointerEvent</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="module-interact.html#.supportsTouch">supportsTouch</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="module-interact.html#.use">use</a></span></li><li class="nav-heading"><span class="nav-item-type type-module">M</span><span class="nav-item-name"><a href="module-modifiers_aspectRatio.html">modifiers/aspectRatio</a></span></li><li class="nav-heading"><span class="nav-item-type type-module">M</span><span class="nav-item-name"><a href="module-modifiers_snapEdges.html">modifiers/snapEdges</a></span></li><li class="nav-heading"><a href="global.html">Globals</a></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#interact">interact</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#preventDefault">preventDefault</a></span></li>
+</nav>
+
+<div class="code-col-bg"></div>
+
+<div id="main">
+    
+    <h1 class="page-title">packages/@interactjs/actions/drag/plugin.ts</h1>
+    
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import type { InteractEvent } from '@interactjs/core/InteractEvent'
+import type { Interactable } from '@interactjs/core/Interactable'
+import type { PerActionDefaults } from '@interactjs/core/options'
+import type { Scope, Plugin } from '@interactjs/core/scope'
+import type { ActionMethod, ListenersArg } from '@interactjs/core/types'
+import is from '@interactjs/utils/is'
+
+declare module '@interactjs/core/Interactable' {
+  interface Interactable {
+    draggable: DraggableMethod
+  }
+}
+
+declare module '@interactjs/core/options' {
+  interface ActionDefaults {
+    drag: DraggableOptions
+  }
+}
+
+declare module '@interactjs/core/types' {
+  interface ActionMap {
+    drag?: typeof drag
+  }
+}
+
+export type DragEvent = InteractEvent&lt;'drag'>
+
+export type DraggableMethod = ActionMethod&lt;DraggableOptions>
+
+export interface DraggableOptions extends PerActionDefaults {
+  startAxis?: 'x' | 'y' | 'xy'
+  lockAxis?: 'x' | 'y' | 'xy' | 'start'
+  oninertiastart?: ListenersArg
+  onstart?: ListenersArg
+  onmove?: ListenersArg
+  onend?: ListenersArg
+}
+
+function install (scope: Scope) {
+  const { actions, Interactable, defaults } = scope
+
+  Interactable.prototype.draggable = drag.draggable
+
+  actions.map.drag = drag
+  actions.methodDict.drag = 'draggable'
+
+  defaults.actions.drag = drag.defaults
+}
+
+function beforeMove ({ interaction }) {
+  if (interaction.prepared.name !== 'drag') return
+
+  const axis = interaction.prepared.axis
+
+  if (axis === 'x') {
+    interaction.coords.cur.page.y = interaction.coords.start.page.y
+    interaction.coords.cur.client.y = interaction.coords.start.client.y
+
+    interaction.coords.velocity.client.y = 0
+    interaction.coords.velocity.page.y = 0
+  } else if (axis === 'y') {
+    interaction.coords.cur.page.x = interaction.coords.start.page.x
+    interaction.coords.cur.client.x = interaction.coords.start.client.x
+
+    interaction.coords.velocity.client.x = 0
+    interaction.coords.velocity.page.x = 0
+  }
+}
+
+function move ({ iEvent, interaction }) {
+  if (interaction.prepared.name !== 'drag') return
+
+  const axis = interaction.prepared.axis
+
+  if (axis === 'x' || axis === 'y') {
+    const opposite = axis === 'x' ? 'y' : 'x'
+
+    iEvent.page[opposite] = interaction.coords.start.page[opposite]
+    iEvent.client[opposite] = interaction.coords.start.client[opposite]
+    iEvent.delta[opposite] = 0
+  }
+}
+
+/**
+ * ```js
+ * interact(element).draggable({
+ *     onstart: function (event) {},
+ *     onmove : function (event) {},
+ *     onend  : function (event) {},
+ *
+ *     // the axis in which the first movement must be
+ *     // for the drag sequence to start
+ *     // 'xy' by default - any direction
+ *     startAxis: 'x' || 'y' || 'xy',
+ *
+ *     // 'xy' by default - don't restrict to one axis (move in any direction)
+ *     // 'x' or 'y' to restrict movement to either axis
+ *     // 'start' to restrict movement to the axis the drag started in
+ *     lockAxis: 'x' || 'y' || 'xy' || 'start',
+ *
+ *     // max number of drags that can happen concurrently
+ *     // with elements of this Interactable. Infinity by default
+ *     max: Infinity,
+ *
+ *     // max number of drags that can target the same element+Interactable
+ *     // 1 by default
+ *     maxPerElement: 2
+ * })
+ *
+ * var isDraggable = interact('element').draggable(); // true
+ * ```
+ *
+ * Get or set whether drag actions can be performed on the target
+ *
+ * @alias Interactable.prototype.draggable
+ *
+ * @param {boolean | object} [options] true/false or An object with event
+ * listeners to be fired on drag events (object makes the Interactable
+ * draggable)
+ * @return {boolean | Interactable} boolean indicating if this can be the
+ * target of drag events, or this Interctable
+ */
+const draggable: DraggableMethod = function draggable (
+  this: Interactable,
+  options?: DraggableOptions | boolean,
+): any {
+  if (is.object(options)) {
+    this.options.drag.enabled = options.enabled !== false
+    this.setPerAction('drag', options)
+    this.setOnEvents('drag', options)
+
+    if (/^(xy|x|y|start)$/.test(options.lockAxis)) {
+      this.options.drag.lockAxis = options.lockAxis
+    }
+    if (/^(xy|x|y)$/.test(options.startAxis)) {
+      this.options.drag.startAxis = options.startAxis
+    }
+
+    return this
+  }
+
+  if (is.bool(options)) {
+    this.options.drag.enabled = options
+
+    return this
+  }
+
+  return this.options.drag as DraggableOptions
+}
+
+const drag: Plugin = {
+  id: 'actions/drag',
+  install,
+  listeners: {
+    'interactions:before-action-move': beforeMove,
+    'interactions:action-resume': beforeMove,
+
+    // dragmove
+    'interactions:action-move': move,
+    'auto-start:check': (arg) => {
+      const { interaction, interactable, buttons } = arg
+      const dragOptions = interactable.options.drag
+
+      if (
+        !(dragOptions &amp;&amp; dragOptions.enabled) ||
+        // check mouseButton setting if the pointer is down
+        (interaction.pointerIsDown &amp;&amp;
+          /mouse|pointer/.test(interaction.pointerType) &amp;&amp;
+          (buttons &amp; interactable.options.drag.mouseButtons) === 0)
+      ) {
+        return undefined
+      }
+
+      arg.action = {
+        name: 'drag',
+        axis: dragOptions.lockAxis === 'start' ? dragOptions.startAxis : dragOptions.lockAxis,
+      }
+
+      return false
+    },
+  },
+  draggable,
+  beforeMove,
+  move,
+  defaults: {
+    startAxis: 'xy',
+    lockAxis: 'xy',
+  } as DraggableOptions,
+
+  getCursor () {
+    return 'move'
+  },
+}
+
+export default drag
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<script>prettyPrint();</script>
+<script src="scripts/linenumber.js"></script>
+</body>
+</html>

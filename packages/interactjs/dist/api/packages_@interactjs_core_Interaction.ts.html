@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>packages/@interactjs/core/Interaction.ts - Documentation</title>
+
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+    <link type="text/css" rel="stylesheet" href="styles/prettify.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav>
+    <li class="nav-link nav-home-link"><a href="index.html">Home</a></li><li class="nav-heading">Classes</li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="DropEvent_DropEvent.html">DropEvent</a></span></li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="Interactable.html">Interactable</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#context">context</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#deltaSource">deltaSource</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#draggable">draggable</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#dropCheck">dropCheck</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#dropzone">dropzone</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#fire">fire</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#gesturable">gesturable</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#getRect">getRect</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#off">off</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#on">on</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#origin">origin</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#rectChecker">rectChecker</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#reflow">reflow</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#resizable">resizable</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#set">set</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#unset">unset</a></span></li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="InteractEvent_InteractEvent.html">InteractEvent</a></span></li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="Interaction_Interaction.html">Interaction</a></span></li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="module.exports_module.exports.html">exports</a></span></li><li class="nav-heading">Modules</li><li class="nav-heading"><span class="nav-item-type type-module">M</span><span class="nav-item-name"><a href="module-interact.html">interact</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="module-interact.html#.isSet">isSet</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="module-interact.html#.maxInteractions">maxInteractions</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="module-interact.html#.pointerMoveTolerance">pointerMoveTolerance</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="module-interact.html#.stop">stop</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="module-interact.html#.supportsPointerEvent">supportsPointerEvent</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="module-interact.html#.supportsTouch">supportsTouch</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="module-interact.html#.use">use</a></span></li><li class="nav-heading"><span class="nav-item-type type-module">M</span><span class="nav-item-name"><a href="module-modifiers_aspectRatio.html">modifiers/aspectRatio</a></span></li><li class="nav-heading"><span class="nav-item-type type-module">M</span><span class="nav-item-name"><a href="module-modifiers_snapEdges.html">modifiers/snapEdges</a></span></li><li class="nav-heading"><a href="global.html">Globals</a></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#interact">interact</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#preventDefault">preventDefault</a></span></li>
+</nav>
+
+<div class="code-col-bg"></div>
+
+<div id="main">
+    
+    <h1 class="page-title">packages/@interactjs/core/Interaction.ts</h1>
+    
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import type {
+  Element,
+  EdgeOptions,
+  PointerEventType,
+  PointerType,
+  FullRect,
+  CoordsSet,
+} from '@interactjs/core/types'
+import * as arr from '@interactjs/utils/arr'
+import extend from '@interactjs/utils/extend'
+import hypot from '@interactjs/utils/hypot'
+import { warnOnce, copyAction } from '@interactjs/utils/misc'
+import * as pointerUtils from '@interactjs/utils/pointerUtils'
+import * as rectUtils from '@interactjs/utils/rect'
+
+import type { EventPhase } from './InteractEvent'
+import { InteractEvent } from './InteractEvent'
+import type { Interactable } from './Interactable'
+import { PointerInfo } from './PointerInfo'
+import type { ActionDefaults } from './options'
+import type { Scope } from './scope'
+import type { ActionName, ActionProps } from './types'
+
+export enum _ProxyValues {
+  interactable = '',
+  element = '',
+  prepared = '',
+  pointerIsDown = '',
+  pointerWasMoved = '',
+  _proxy = '',
+}
+
+export enum _ProxyMethods {
+  start = '',
+  move = '',
+  end = '',
+  stop = '',
+  interacting = '',
+}
+
+export type PointerArgProps&lt;T extends {} = {}> = {
+  pointer: PointerType
+  event: PointerEventType
+  eventTarget: Node
+  pointerIndex: number
+  pointerInfo: PointerInfo
+  interaction: Interaction&lt;never>
+} &amp; T
+
+export interface DoPhaseArg&lt;T extends ActionName, P extends EventPhase> {
+  event: PointerEventType
+  phase: EventPhase
+  interaction: Interaction&lt;T>
+  iEvent: InteractEvent&lt;T, P>
+  preEnd?: boolean
+  type?: string
+}
+
+export type DoAnyPhaseArg = DoPhaseArg&lt;ActionName, EventPhase>
+
+declare module '@interactjs/core/scope' {
+  interface SignalArgs {
+    'interactions:new': { interaction: Interaction&lt;ActionName> }
+    'interactions:down': PointerArgProps&lt;{
+      type: 'down'
+    }>
+    'interactions:move': PointerArgProps&lt;{
+      type: 'move'
+      dx: number
+      dy: number
+      duplicate: boolean
+    }>
+    'interactions:up': PointerArgProps&lt;{
+      type: 'up'
+      curEventTarget: EventTarget
+    }>
+    'interactions:cancel': SignalArgs['interactions:up'] &amp; {
+      type: 'cancel'
+      curEventTarget: EventTarget
+    }
+    'interactions:update-pointer': PointerArgProps&lt;{
+      down: boolean
+    }>
+    'interactions:remove-pointer': PointerArgProps
+    'interactions:blur': { interaction: Interaction&lt;never>, event: Event, type: 'blur' }
+    'interactions:before-action-start': Omit&lt;DoAnyPhaseArg, 'iEvent'>
+    'interactions:action-start': DoAnyPhaseArg
+    'interactions:after-action-start': DoAnyPhaseArg
+    'interactions:before-action-move': Omit&lt;DoAnyPhaseArg, 'iEvent'>
+    'interactions:action-move': DoAnyPhaseArg
+    'interactions:after-action-move': DoAnyPhaseArg
+    'interactions:before-action-end': Omit&lt;DoAnyPhaseArg, 'iEvent'>
+    'interactions:action-end': DoAnyPhaseArg
+    'interactions:after-action-end': DoAnyPhaseArg
+    'interactions:stop': { interaction: Interaction }
+  }
+}
+
+export type InteractionProxy&lt;T extends ActionName | null = never> = Pick&lt;
+Interaction&lt;T>,
+keyof typeof _ProxyValues | keyof typeof _ProxyMethods
+>
+
+let idCounter = 0
+
+export class Interaction&lt;T extends ActionName | null = ActionName> {
+  // current interactable being interacted with
+  interactable: Interactable | null = null
+
+  // the target element of the interactable
+  element: Element | null = null
+  rect: FullRect | null = null
+  _rects?: {
+    start: FullRect
+    corrected: FullRect
+    previous: FullRect
+    delta: FullRect
+  }
+  edges: EdgeOptions | null = null
+
+  _scopeFire: Scope['fire']
+
+  // action that's ready to be fired on next move event
+  prepared: ActionProps&lt;T> = {
+    name: null,
+    axis: null,
+    edges: null,
+  }
+
+  pointerType: string
+
+  // keep track of added pointers
+  pointers: PointerInfo[] = []
+
+  // pointerdown/mousedown/touchstart event
+  downEvent: PointerEventType | null = null
+
+  downPointer: PointerType = {} as PointerType
+
+  _latestPointer: {
+    pointer: PointerType
+    event: PointerEventType
+    eventTarget: Node
+  } = {
+      pointer: null,
+      event: null,
+      eventTarget: null,
+    }
+
+  // previous action event
+  prevEvent: InteractEvent&lt;T, EventPhase> = null
+
+  pointerIsDown = false
+  pointerWasMoved = false
+  _interacting = false
+  _ending = false
+  _stopped = true
+  _proxy: InteractionProxy&lt;T> | null = null
+
+  simulation = null
+
+  /** @internal */ get pointerMoveTolerance () {
+    return 1
+  }
+
+  /**
+   * @alias Interaction.prototype.move
+   */
+  doMove = warnOnce(function (this: Interaction, signalArg: any) {
+    this.move(signalArg)
+  }, 'The interaction.doMove() method has been renamed to interaction.move()')
+
+  coords: CoordsSet = {
+    // Starting InteractEvent pointer coordinates
+    start: pointerUtils.newCoords(),
+    // Previous native pointer move event coordinates
+    prev: pointerUtils.newCoords(),
+    // current native pointer move event coordinates
+    cur: pointerUtils.newCoords(),
+    // Change in coordinates and time of the pointer
+    delta: pointerUtils.newCoords(),
+    // pointer velocity
+    velocity: pointerUtils.newCoords(),
+  }
+
+  readonly _id: number = idCounter++
+
+  /** */
+  constructor ({ pointerType, scopeFire }: { pointerType?: string, scopeFire: Scope['fire'] }) {
+    this._scopeFire = scopeFire
+    this.pointerType = pointerType
+
+    const that = this
+
+    this._proxy = {} as InteractionProxy&lt;T>
+
+    for (const key in _ProxyValues) {
+      Object.defineProperty(this._proxy, key, {
+        get () {
+          return that[key]
+        },
+      })
+    }
+
+    for (const key in _ProxyMethods) {
+      Object.defineProperty(this._proxy, key, {
+        value: (...args: any[]) => that[key](...args),
+      })
+    }
+
+    this._scopeFire('interactions:new', { interaction: this })
+  }
+
+  pointerDown (pointer: PointerType, event: PointerEventType, eventTarget: Node) {
+    const pointerIndex = this.updatePointer(pointer, event, eventTarget, true)
+    const pointerInfo = this.pointers[pointerIndex]
+
+    this._scopeFire('interactions:down', {
+      pointer,
+      event,
+      eventTarget,
+      pointerIndex,
+      pointerInfo,
+      type: 'down',
+      interaction: this as unknown as Interaction&lt;never>,
+    })
+  }
+
+  /**
+   * ```js
+   * interact(target)
+   *   .draggable({
+   *     // disable the default drag start by down->move
+   *     manualStart: true
+   *   })
+   *   // start dragging after the user holds the pointer down
+   *   .on('hold', function (event) {
+   *     var interaction = event.interaction
+   *
+   *     if (!interaction.interacting()) {
+   *       interaction.start({ name: 'drag' },
+   *                         event.interactable,
+   *                         event.currentTarget)
+   *     }
+   * })
+   * ```
+   *
+   * Start an action with the given Interactable and Element as tartgets. The
+   * action must be enabled for the target Interactable and an appropriate
+   * number of pointers must be held down - 1 for drag/resize, 2 for gesture.
+   *
+   * Use it with `interactable.&lt;action>able({ manualStart: false })` to always
+   * [start actions manually](https://github.com/taye/interact.js/issues/114)
+   *
+   * @param {object} action   The action to be performed - drag, resize, etc.
+   * @param {Interactable} target  The Interactable to target
+   * @param {Element} element The DOM Element to target
+   * @return {Boolean} Whether the interaction was successfully started
+   */
+  start&lt;A extends ActionName> (action: ActionProps&lt;A>, interactable: Interactable, element: Element): boolean {
+    if (
+      this.interacting() ||
+      !this.pointerIsDown ||
+      this.pointers.length &lt; (action.name === 'gesture' ? 2 : 1) ||
+      !interactable.options[action.name as keyof ActionDefaults].enabled
+    ) {
+      return false
+    }
+
+    copyAction(this.prepared, action)
+
+    this.interactable = interactable
+    this.element = element
+    this.rect = interactable.getRect(element)
+    this.edges = this.prepared.edges
+      ? extend({}, this.prepared.edges)
+      : { left: true, right: true, top: true, bottom: true }
+    this._stopped = false
+    this._interacting =
+      this._doPhase({
+        interaction: this,
+        event: this.downEvent,
+        phase: 'start',
+      }) &amp;&amp; !this._stopped
+
+    return this._interacting
+  }
+
+  pointerMove (pointer: PointerType, event: PointerEventType, eventTarget: Node) {
+    if (!this.simulation &amp;&amp; !(this.modification &amp;&amp; this.modification.endResult)) {
+      this.updatePointer(pointer, event, eventTarget, false)
+    }
+
+    const duplicateMove =
+      this.coords.cur.page.x === this.coords.prev.page.x &amp;&amp;
+      this.coords.cur.page.y === this.coords.prev.page.y &amp;&amp;
+      this.coords.cur.client.x === this.coords.prev.client.x &amp;&amp;
+      this.coords.cur.client.y === this.coords.prev.client.y
+
+    let dx: number
+    let dy: number
+
+    // register movement greater than pointerMoveTolerance
+    if (this.pointerIsDown &amp;&amp; !this.pointerWasMoved) {
+      dx = this.coords.cur.client.x - this.coords.start.client.x
+      dy = this.coords.cur.client.y - this.coords.start.client.y
+
+      this.pointerWasMoved = hypot(dx, dy) > this.pointerMoveTolerance
+    }
+
+    const pointerIndex = this.getPointerIndex(pointer)
+    const signalArg = {
+      pointer,
+      pointerIndex,
+      pointerInfo: this.pointers[pointerIndex],
+      event,
+      type: 'move' as const,
+      eventTarget,
+      dx,
+      dy,
+      duplicate: duplicateMove,
+      interaction: this as unknown as Interaction&lt;never>,
+    }
+
+    if (!duplicateMove) {
+      // set pointer coordinate, time changes and velocity
+      pointerUtils.setCoordVelocity(this.coords.velocity, this.coords.delta)
+    }
+
+    this._scopeFire('interactions:move', signalArg)
+
+    if (!duplicateMove &amp;&amp; !this.simulation) {
+      // if interacting, fire an 'action-move' signal etc
+      if (this.interacting()) {
+        signalArg.type = null
+        this.move(signalArg)
+      }
+
+      if (this.pointerWasMoved) {
+        pointerUtils.copyCoords(this.coords.prev, this.coords.cur)
+      }
+    }
+  }
+
+  /**
+   * ```js
+   * interact(target)
+   *   .draggable(true)
+   *   .on('dragmove', function (event) {
+   *     if (someCondition) {
+   *       // change the snap settings
+   *       event.interactable.draggable({ snap: { targets: [] }})
+   *       // fire another move event with re-calculated snap
+   *       event.interaction.move()
+   *     }
+   *   })
+   * ```
+   *
+   * Force a move of the current action at the same coordinates. Useful if
+   * snap/restrict has been changed and you want a movement with the new
+   * settings.
+   */
+  move (signalArg?: any) {
+    if (!signalArg || !signalArg.event) {
+      pointerUtils.setZeroCoords(this.coords.delta)
+    }
+
+    signalArg = extend(
+      {
+        pointer: this._latestPointer.pointer,
+        event: this._latestPointer.event,
+        eventTarget: this._latestPointer.eventTarget,
+        interaction: this,
+      },
+      signalArg || {},
+    )
+
+    signalArg.phase = 'move'
+
+    this._doPhase(signalArg)
+  }
+
+  // End interact move events and stop auto-scroll unless simulation is running
+  pointerUp (pointer: PointerType, event: PointerEventType, eventTarget: Node, curEventTarget: EventTarget) {
+    let pointerIndex = this.getPointerIndex(pointer)
+
+    if (pointerIndex === -1) {
+      pointerIndex = this.updatePointer(pointer, event, eventTarget, false)
+    }
+
+    const type = /cancel$/i.test(event.type) ? 'cancel' : 'up'
+
+    this._scopeFire(`interactions:${type}` as 'interactions:up' | 'interactions:cancel', {
+      pointer,
+      pointerIndex,
+      pointerInfo: this.pointers[pointerIndex],
+      event,
+      eventTarget,
+      type: type as any,
+      curEventTarget,
+      interaction: this as unknown as Interaction&lt;never>,
+    })
+
+    if (!this.simulation) {
+      this.end(event)
+    }
+
+    this.removePointer(pointer, event)
+  }
+
+  documentBlur (event: Event) {
+    this.end(event as any)
+    this._scopeFire('interactions:blur', {
+      event,
+      type: 'blur',
+      interaction: this as unknown as Interaction&lt;never>,
+    })
+  }
+
+  /**
+   * ```js
+   * interact(target)
+   *   .draggable(true)
+   *   .on('move', function (event) {
+   *     if (event.pageX > 1000) {
+   *       // end the current action
+   *       event.interaction.end()
+   *       // stop all further listeners from being called
+   *       event.stopImmediatePropagation()
+   *     }
+   *   })
+   * ```
+   *
+   * @param {PointerEvent} [event]
+   */
+  end (event?: PointerEventType) {
+    this._ending = true
+    event = event || this._latestPointer.event
+    let endPhaseResult: boolean
+
+    if (this.interacting()) {
+      endPhaseResult = this._doPhase({
+        event,
+        interaction: this,
+        phase: 'end',
+      })
+    }
+
+    this._ending = false
+
+    if (endPhaseResult === true) {
+      this.stop()
+    }
+  }
+
+  currentAction () {
+    return this._interacting ? this.prepared.name : null
+  }
+
+  interacting () {
+    return this._interacting
+  }
+
+  /** */
+  stop () {
+    this._scopeFire('interactions:stop', { interaction: this })
+
+    this.interactable = this.element = null
+
+    this._interacting = false
+    this._stopped = true
+    this.prepared.name = this.prevEvent = null
+  }
+
+  getPointerIndex (pointer: any) {
+    const pointerId = pointerUtils.getPointerId(pointer)
+
+    // mouse and pen interactions may have only one pointer
+    return this.pointerType === 'mouse' || this.pointerType === 'pen'
+      ? this.pointers.length - 1
+      : arr.findIndex(this.pointers, (curPointer) => curPointer.id === pointerId)
+  }
+
+  getPointerInfo (pointer: any) {
+    return this.pointers[this.getPointerIndex(pointer)]
+  }
+
+  updatePointer (pointer: PointerType, event: PointerEventType, eventTarget: Node, down?: boolean) {
+    const id = pointerUtils.getPointerId(pointer)
+    let pointerIndex = this.getPointerIndex(pointer)
+    let pointerInfo = this.pointers[pointerIndex]
+
+    down = down === false ? false : down || /(down|start)$/i.test(event.type)
+
+    if (!pointerInfo) {
+      pointerInfo = new PointerInfo(id, pointer, event, null, null)
+
+      pointerIndex = this.pointers.length
+      this.pointers.push(pointerInfo)
+    } else {
+      pointerInfo.pointer = pointer
+    }
+
+    pointerUtils.setCoords(
+      this.coords.cur,
+      this.pointers.map((p) => p.pointer),
+      this._now(),
+    )
+    pointerUtils.setCoordDeltas(this.coords.delta, this.coords.prev, this.coords.cur)
+
+    if (down) {
+      this.pointerIsDown = true
+
+      pointerInfo.downTime = this.coords.cur.timeStamp
+      pointerInfo.downTarget = eventTarget
+      pointerUtils.pointerExtend(this.downPointer, pointer)
+
+      if (!this.interacting()) {
+        pointerUtils.copyCoords(this.coords.start, this.coords.cur)
+        pointerUtils.copyCoords(this.coords.prev, this.coords.cur)
+
+        this.downEvent = event
+        this.pointerWasMoved = false
+      }
+    }
+
+    this._updateLatestPointer(pointer, event, eventTarget)
+
+    this._scopeFire('interactions:update-pointer', {
+      pointer,
+      event,
+      eventTarget,
+      down,
+      pointerInfo,
+      pointerIndex,
+      interaction: this as unknown as Interaction&lt;never>,
+    })
+
+    return pointerIndex
+  }
+
+  removePointer (pointer: PointerType, event: PointerEventType) {
+    const pointerIndex = this.getPointerIndex(pointer)
+
+    if (pointerIndex === -1) return
+
+    const pointerInfo = this.pointers[pointerIndex]
+
+    this._scopeFire('interactions:remove-pointer', {
+      pointer,
+      event,
+      eventTarget: null,
+      pointerIndex,
+      pointerInfo,
+      interaction: this as unknown as Interaction&lt;never>,
+    })
+
+    this.pointers.splice(pointerIndex, 1)
+    this.pointerIsDown = false
+  }
+
+  _updateLatestPointer (pointer: PointerType, event: PointerEventType, eventTarget: Node) {
+    this._latestPointer.pointer = pointer
+    this._latestPointer.event = event
+    this._latestPointer.eventTarget = eventTarget
+  }
+
+  destroy () {
+    this._latestPointer.pointer = null
+    this._latestPointer.event = null
+    this._latestPointer.eventTarget = null
+  }
+
+  _createPreparedEvent&lt;P extends EventPhase> (
+    event: PointerEventType,
+    phase: P,
+    preEnd?: boolean,
+    type?: string,
+  ) {
+    return new InteractEvent&lt;T, P>(this, event, this.prepared.name, phase, this.element, preEnd, type)
+  }
+
+  _fireEvent&lt;P extends EventPhase> (iEvent: InteractEvent&lt;T, P>) {
+    this.interactable?.fire(iEvent)
+
+    if (!this.prevEvent || iEvent.timeStamp >= this.prevEvent.timeStamp) {
+      this.prevEvent = iEvent
+    }
+  }
+
+  _doPhase&lt;P extends EventPhase> (
+    signalArg: Omit&lt;DoPhaseArg&lt;T, P>, 'iEvent'> &amp; { iEvent?: InteractEvent&lt;T, P> },
+  ) {
+    const { event, phase, preEnd, type } = signalArg
+    const { rect } = this
+
+    if (rect &amp;&amp; phase === 'move') {
+      // update the rect changes due to pointer move
+      rectUtils.addEdges(this.edges, rect, this.coords.delta[this.interactable.options.deltaSource])
+
+      rect.width = rect.right - rect.left
+      rect.height = rect.bottom - rect.top
+    }
+
+    const beforeResult = this._scopeFire(`interactions:before-action-${phase}` as any, signalArg)
+
+    if (beforeResult === false) {
+      return false
+    }
+
+    const iEvent = (signalArg.iEvent = this._createPreparedEvent(event, phase, preEnd, type))
+
+    this._scopeFire(`interactions:action-${phase}` as any, signalArg)
+
+    if (phase === 'start') {
+      this.prevEvent = iEvent
+    }
+
+    this._fireEvent(iEvent)
+
+    this._scopeFire(`interactions:after-action-${phase}` as any, signalArg)
+
+    return true
+  }
+
+  _now () {
+    return Date.now()
+  }
+}
+
+export default Interaction
+export { PointerInfo }
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<script>prettyPrint();</script>
+<script src="scripts/linenumber.js"></script>
+</body>
+</html>

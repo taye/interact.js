@@ -1,0 +1,50 @@
+{
+	"version": 3,
+	"names": [
+		"BaseEvent",
+		"pointerUtils",
+		"PointerEvent",
+		"constructor",
+		"type",
+		"pointer",
+		"event",
+		"eventTarget",
+		"interaction",
+		"timeStamp",
+		"pointerExtend",
+		"originalEvent",
+		"pointerId",
+		"getPointerId",
+		"pointerType",
+		"getPointerType",
+		"target",
+		"currentTarget",
+		"pointerIndex",
+		"getPointerIndex",
+		"dt",
+		"pointers",
+		"downTime",
+		"interval",
+		"tapTime",
+		"double",
+		"prevTap",
+		"_subtractOrigin",
+		"x",
+		"originX",
+		"y",
+		"originY",
+		"pageX",
+		"pageY",
+		"clientX",
+		"clientY",
+		"_addOrigin",
+		"preventDefault"
+	],
+	"sources": [
+		"PointerEvent.ts"
+	],
+	"sourcesContent": [
+		"import { BaseEvent } from '@interactjs/core/BaseEvent'\nimport type Interaction from '@interactjs/core/Interaction'\nimport type { PointerEventType, PointerType, Point } from '@interactjs/core/types'\nimport * as pointerUtils from '@interactjs/utils/pointerUtils'\n\nexport default class PointerEvent<T extends string = any> extends BaseEvent<never> {\n  declare type: T\n  declare originalEvent: PointerEventType\n  declare pointerId: number\n  declare pointerType: string\n  declare double: boolean\n  declare pageX: number\n  declare pageY: number\n  declare clientX: number\n  declare clientY: number\n  declare dt: number\n  declare eventable: any;\n  [key: string]: any\n\n  /** */\n  constructor (\n    type: T,\n    pointer: PointerType | PointerEvent<any>,\n    event: PointerEventType,\n    eventTarget: Node,\n    interaction: Interaction<never>,\n    timeStamp: number,\n  ) {\n    super(interaction)\n    pointerUtils.pointerExtend(this, event)\n\n    if (event !== pointer) {\n      pointerUtils.pointerExtend(this, pointer)\n    }\n\n    this.timeStamp = timeStamp\n    this.originalEvent = event\n    this.type = type\n    this.pointerId = pointerUtils.getPointerId(pointer)\n    this.pointerType = pointerUtils.getPointerType(pointer)\n    this.target = eventTarget\n    this.currentTarget = null\n\n    if (type === 'tap') {\n      const pointerIndex = interaction.getPointerIndex(pointer)\n      this.dt = this.timeStamp - interaction.pointers[pointerIndex].downTime\n\n      const interval = this.timeStamp - interaction.tapTime\n\n      this.double =\n        !!interaction.prevTap &&\n        interaction.prevTap.type !== 'doubletap' &&\n        interaction.prevTap.target === this.target &&\n        interval < 500\n    } else if (type === 'doubletap') {\n      this.dt = (pointer as PointerEvent<'tap'>).timeStamp - interaction.tapTime\n      this.double = true\n    }\n  }\n\n  _subtractOrigin ({ x: originX, y: originY }: Point) {\n    this.pageX -= originX\n    this.pageY -= originY\n    this.clientX -= originX\n    this.clientY -= originY\n\n    return this\n  }\n\n  _addOrigin ({ x: originX, y: originY }: Point) {\n    this.pageX += originX\n    this.pageY += originY\n    this.clientX += originX\n    this.clientY += originY\n\n    return this\n  }\n\n  /**\n   * Prevent the default behaviour of the original Event\n   */\n  preventDefault () {\n    this.originalEvent.preventDefault()\n  }\n}\n\nexport { PointerEvent }\n"
+	],
+	"mappings": "AAAA,SAASA,SAAT,QAA0B,sBAA1B;AAGA,OAAO,KAAKC,YAAZ,MAA8B,0BAA9B;AAEA,eAAe,MAAMC,YAAN,SAAmDF,SAAnD,CAAoE;EAcjF;EACAG,WAAW,CACTC,IADS,EAETC,OAFS,EAGTC,KAHS,EAITC,WAJS,EAKTC,WALS,EAMTC,SANS,EAOT;IACA,MAAMD,WAAN;IACAP,YAAY,CAACS,aAAb,CAA2B,IAA3B,EAAiCJ,KAAjC;;IAEA,IAAIA,KAAK,KAAKD,OAAd,EAAuB;MACrBJ,YAAY,CAACS,aAAb,CAA2B,IAA3B,EAAiCL,OAAjC;IACD;;IAED,KAAKI,SAAL,GAAiBA,SAAjB;IACA,KAAKE,aAAL,GAAqBL,KAArB;IACA,KAAKF,IAAL,GAAYA,IAAZ;IACA,KAAKQ,SAAL,GAAiBX,YAAY,CAACY,YAAb,CAA0BR,OAA1B,CAAjB;IACA,KAAKS,WAAL,GAAmBb,YAAY,CAACc,cAAb,CAA4BV,OAA5B,CAAnB;IACA,KAAKW,MAAL,GAAcT,WAAd;IACA,KAAKU,aAAL,GAAqB,IAArB;;IAEA,IAAIb,IAAI,KAAK,KAAb,EAAoB;MAClB,MAAMc,YAAY,GAAGV,WAAW,CAACW,eAAZ,CAA4Bd,OAA5B,CAArB;MACA,KAAKe,EAAL,GAAU,KAAKX,SAAL,GAAiBD,WAAW,CAACa,QAAZ,CAAqBH,YAArB,EAAmCI,QAA9D;MAEA,MAAMC,QAAQ,GAAG,KAAKd,SAAL,GAAiBD,WAAW,CAACgB,OAA9C;MAEA,KAAKC,MAAL,GACE,CAAC,CAACjB,WAAW,CAACkB,OAAd,IACAlB,WAAW,CAACkB,OAAZ,CAAoBtB,IAApB,KAA6B,WAD7B,IAEAI,WAAW,CAACkB,OAAZ,CAAoBV,MAApB,KAA+B,KAAKA,MAFpC,IAGAO,QAAQ,GAAG,GAJb;IAKD,CAXD,MAWO,IAAInB,IAAI,KAAK,WAAb,EAA0B;MAC/B,KAAKgB,EAAL,GAAWf,OAAD,CAAiCI,SAAjC,GAA6CD,WAAW,CAACgB,OAAnE;MACA,KAAKC,MAAL,GAAc,IAAd;IACD;EACF;;EAEDE,eAAe,CAAE;IAAEC,CAAC,EAAEC,OAAL;IAAcC,CAAC,EAAEC;EAAjB,CAAF,EAAqC;IAClD,KAAKC,KAAL,IAAcH,OAAd;IACA,KAAKI,KAAL,IAAcF,OAAd;IACA,KAAKG,OAAL,IAAgBL,OAAhB;IACA,KAAKM,OAAL,IAAgBJ,OAAhB;IAEA,OAAO,IAAP;EACD;;EAEDK,UAAU,CAAE;IAAER,CAAC,EAAEC,OAAL;IAAcC,CAAC,EAAEC;EAAjB,CAAF,EAAqC;IAC7C,KAAKC,KAAL,IAAcH,OAAd;IACA,KAAKI,KAAL,IAAcF,OAAd;IACA,KAAKG,OAAL,IAAgBL,OAAhB;IACA,KAAKM,OAAL,IAAgBJ,OAAhB;IAEA,OAAO,IAAP;EACD;EAED;AACF;AACA;;;EACEM,cAAc,GAAI;IAChB,KAAK1B,aAAL,CAAmB0B,cAAnB;EACD;;AA9EgF;AAiFnF,SAASnC,YAAT"
+}

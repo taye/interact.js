@@ -1,0 +1,37 @@
+{
+	"version": 3,
+	"names": [
+		"basePlugin",
+		"install",
+		"scope",
+		"defaults",
+		"usePlugin",
+		"perAction",
+		"hold",
+		"delay",
+		"getHoldDuration",
+		"interaction",
+		"actionName",
+		"prepared",
+		"name",
+		"options",
+		"interactable",
+		"id",
+		"listeners",
+		"autoStartHoldTimer",
+		"setTimeout",
+		"start",
+		"element",
+		"duplicate",
+		"pointerWasMoved",
+		"clearTimeout",
+		"holdDuration"
+	],
+	"sources": [
+		"hold.ts"
+	],
+	"sourcesContent": [
+		"import type Interaction from '@interactjs/core/Interaction'\nimport type { Scope, Plugin } from '@interactjs/core/scope'\n\nimport basePlugin from './base'\n\ndeclare module '@interactjs/core/options' {\n  interface PerActionDefaults {\n    hold?: number\n    delay?: number\n  }\n}\n\ndeclare module '@interactjs/core/Interaction' {\n  interface Interaction {\n    autoStartHoldTimer?: any\n  }\n}\n\nfunction install (scope: Scope) {\n  const { defaults } = scope\n\n  scope.usePlugin(basePlugin)\n\n  defaults.perAction.hold = 0\n  defaults.perAction.delay = 0\n}\n\nfunction getHoldDuration (interaction: Interaction) {\n  const actionName = interaction.prepared && interaction.prepared.name\n\n  if (!actionName) {\n    return null\n  }\n\n  const options = interaction.interactable.options\n\n  return options[actionName].hold || options[actionName].delay\n}\n\nconst hold: Plugin = {\n  id: 'auto-start/hold',\n  install,\n  listeners: {\n    'interactions:new': ({ interaction }) => {\n      interaction.autoStartHoldTimer = null\n    },\n\n    'autoStart:prepared': ({ interaction }) => {\n      const hold = getHoldDuration(interaction)\n\n      if (hold > 0) {\n        interaction.autoStartHoldTimer = setTimeout(() => {\n          interaction.start(interaction.prepared, interaction.interactable, interaction.element)\n        }, hold)\n      }\n    },\n\n    'interactions:move': ({ interaction, duplicate }) => {\n      if (interaction.autoStartHoldTimer && interaction.pointerWasMoved && !duplicate) {\n        clearTimeout(interaction.autoStartHoldTimer)\n        interaction.autoStartHoldTimer = null\n      }\n    },\n\n    // prevent regular down->move autoStart\n    'autoStart:before-start': ({ interaction }) => {\n      const holdDuration = getHoldDuration(interaction)\n\n      if (holdDuration > 0) {\n        interaction.prepared.name = null\n      }\n    },\n  },\n  getHoldDuration,\n}\nexport default hold\n"
+	],
+	"mappings": "AAGA,OAAOA,UAAP,MAAuB,QAAvB;;AAeA,SAASC,OAAT,CAAkBC,KAAlB,EAAgC;EAC9B,MAAM;IAAEC;EAAF,IAAeD,KAArB;EAEAA,KAAK,CAACE,SAAN,CAAgBJ,UAAhB;EAEAG,QAAQ,CAACE,SAAT,CAAmBC,IAAnB,GAA0B,CAA1B;EACAH,QAAQ,CAACE,SAAT,CAAmBE,KAAnB,GAA2B,CAA3B;AACD;;AAED,SAASC,eAAT,CAA0BC,WAA1B,EAAoD;EAClD,MAAMC,UAAU,GAAGD,WAAW,CAACE,QAAZ,IAAwBF,WAAW,CAACE,QAAZ,CAAqBC,IAAhE;;EAEA,IAAI,CAACF,UAAL,EAAiB;IACf,OAAO,IAAP;EACD;;EAED,MAAMG,OAAO,GAAGJ,WAAW,CAACK,YAAZ,CAAyBD,OAAzC;EAEA,OAAOA,OAAO,CAACH,UAAD,CAAP,CAAoBJ,IAApB,IAA4BO,OAAO,CAACH,UAAD,CAAP,CAAoBH,KAAvD;AACD;;AAED,MAAMD,IAAY,GAAG;EACnBS,EAAE,EAAE,iBADe;EAEnBd,OAFmB;EAGnBe,SAAS,EAAE;IACT,oBAAoB,CAAC;MAAEP;IAAF,CAAD,KAAqB;MACvCA,WAAW,CAACQ,kBAAZ,GAAiC,IAAjC;IACD,CAHQ;IAKT,sBAAsB,CAAC;MAAER;IAAF,CAAD,KAAqB;MACzC,MAAMH,IAAI,GAAGE,eAAe,CAACC,WAAD,CAA5B;;MAEA,IAAIH,IAAI,GAAG,CAAX,EAAc;QACZG,WAAW,CAACQ,kBAAZ,GAAiCC,UAAU,CAAC,MAAM;UAChDT,WAAW,CAACU,KAAZ,CAAkBV,WAAW,CAACE,QAA9B,EAAwCF,WAAW,CAACK,YAApD,EAAkEL,WAAW,CAACW,OAA9E;QACD,CAF0C,EAExCd,IAFwC,CAA3C;MAGD;IACF,CAbQ;IAeT,qBAAqB,CAAC;MAAEG,WAAF;MAAeY;IAAf,CAAD,KAAgC;MACnD,IAAIZ,WAAW,CAACQ,kBAAZ,IAAkCR,WAAW,CAACa,eAA9C,IAAiE,CAACD,SAAtE,EAAiF;QAC/EE,YAAY,CAACd,WAAW,CAACQ,kBAAb,CAAZ;QACAR,WAAW,CAACQ,kBAAZ,GAAiC,IAAjC;MACD;IACF,CApBQ;IAsBT;IACA,0BAA0B,CAAC;MAAER;IAAF,CAAD,KAAqB;MAC7C,MAAMe,YAAY,GAAGhB,eAAe,CAACC,WAAD,CAApC;;MAEA,IAAIe,YAAY,GAAG,CAAnB,EAAsB;QACpBf,WAAW,CAACE,QAAZ,CAAqBC,IAArB,GAA4B,IAA5B;MACD;IACF;EA7BQ,CAHQ;EAkCnBJ;AAlCmB,CAArB;AAoCA,eAAeF,IAAf"
+}
