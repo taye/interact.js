@@ -1,3 +1,4 @@
+import '@interactjs/react'
 import interact from '@interactjs/interactjs'
 import { createElement as h, useState } from 'react'
 import { createRoot } from 'react-dom/client'

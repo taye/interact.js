@@ -1,11 +1,8 @@
-// import Vue from 'vue/dist/vue.esm.browser.js'
+import '@interactjs/vue'
 import interact from '@interactjs/interactjs'
-import { h } from 'vue'
-import { createApp } from 'vue/dist/vue.esm-browser'
+import { createApp } from 'vue'
 
 import { getData, sortableOptions, swappableOptions } from './shared.js'
-
-interact.vue.setH(h)
 
 createApp({
   components: {
