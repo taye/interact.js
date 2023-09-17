@@ -1,7 +1,12 @@
+const VENDOR_PREFIXES = ['webkit', 'moz']
+
 export default function pointerExtend<T> (dest: Partial<T & { __set?: Partial<T> }>, source: T) {
   dest.__set ||= {} as any
 
   for (const prop in source) {
+    // skip deprecated prefixed properties
+    if (VENDOR_PREFIXES.some((prefix) => prop.indexOf(prefix) === 0)) continue
+
     if (typeof dest[prop] !== 'function' && prop !== '__set') {
       Object.defineProperty(dest, prop, {
         get () {
