@@ -34,6 +34,7 @@
     "@types/node": "^17.0.42",
     "@types/react": "^18.0.12",
     "@types/shelljs": "^0.8.11",
+    "@types/symbol-tree": "^3.2.3",
     "@types/tape": "^4.13.2",
     "@typescript-eslint/eslint-plugin": "^5.27.1",
     "@typescript-eslint/eslint-plugin-tslint": "^5.27.1",
@@ -104,7 +105,8 @@
   },
   "sideEffects": false,
   "lint-staged": {
-    "**/*.((ts|js)?(x)|vue|md)": "bin/_lint --fix"
+    "**/*.((ts|js)?(x)|vue|md)": "bin/_lint --fix",
+    "**/*.(yaml|json|css)": "prettier --write"
   },
   "license": "MIT"
 }

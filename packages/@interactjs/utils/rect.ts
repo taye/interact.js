@@ -44,6 +44,14 @@ export function resolveRectLike<T extends any[]> (
   return returnValue as Rect
 }
 
+export function toFullRect (rect: Rect): FullRect {
+  const { top, left, bottom, right } = rect
+  const width = rect.width ?? rect.right - rect.left
+  const height = rect.height ?? rect.bottom - rect.top
+
+  return { top, left, bottom, right, width, height }
+}
+
 export function rectToXY (rect: Rect | Point) {
   return (
     rect && {

@@ -1606,6 +1606,11 @@
   resolved "https://registry.npmjs.org/@types/stack-utils/-/stack-utils-2.0.1.tgz#20f18294f797f2209b5f65c8e3b5c8e8261d127c"
   integrity sha512-Hl219/BT5fLAaz6NDkSuhzasy49dwQS/DSdu4MdggFB8zcXv7vflBI3xp7FEmkmdDkBUI2bPUNeMttp2knYdxw==
 
+"@types/symbol-tree@^3.2.3":
+  version "3.2.3"
+  resolved "https://registry.npmjs.org/@types/symbol-tree/-/symbol-tree-3.2.3.tgz#0c41e54b473865e67e292062ee28363999c7f320"
+  integrity sha512-xEgtqLaxjlEf4G2LOt9bYBQ/cPFpcuvRVReuuRfSV6yFcAD8KWtq012nQ3Zp9A+kNrtg8pprv6X39iyD/DJ+wA==
+
 "@types/tape@^4.13.2":
   version "4.13.2"
   resolved "https://registry.npmjs.org/@types/tape/-/tape-4.13.2.tgz#77215c065b1c7840da3ca5e061337bb4c7258122"
@@ -5991,7 +5996,7 @@ nanobench@^2.1.1:
     mutexify "^1.1.0"
     pretty-hrtime "^1.0.2"
 
-nanoid@^3.3.4, nanoid@^3.3.6:
+nanoid@^3.3.6:
   version "3.3.6"
   resolved "https://registry.npmjs.org/nanoid/-/nanoid-3.3.6.tgz#443380c856d6e9f9824267d960b4236ad583ea4c"
   integrity sha512-BGcqMMJuToF7i1rt+2PWSNVnWIkGCU78jBG3RxO/bZlnZPK2Cmi2QaffxGO/2RvWi9sL+FAiRiXMgsyxQ1DIDA==
