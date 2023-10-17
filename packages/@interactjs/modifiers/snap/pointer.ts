@@ -33,15 +33,15 @@ export type SnapFunction = (
 ) => SnapPosition
 export type SnapTarget = SnapPosition | SnapFunction
 export interface SnapOptions {
-  targets: SnapTarget[] | null
+  targets?: SnapTarget[]
   // target range
-  range: number
+  range?: number
   // self points for snapping. [0,0] = top left, [1,1] = bottom right
-  relativePoints: Point[] | null
+  relativePoints?: Point[]
   // startCoords = offset snapping from drag start page position
-  offset: Point | RectResolvable<[Interaction]> | 'startCoords' | null
+  offset?: Point | RectResolvable<[Interaction]> | 'startCoords'
   offsetWithOrigin?: boolean
-  origin: RectResolvable<[Element]> | Point | null
+  origin?: RectResolvable<[Element]> | Point
   endOnly?: boolean
   enabled?: boolean
 }
@@ -99,21 +99,21 @@ function set (arg: ModifierArg<SnapState>) {
   const { interaction, coords, state } = arg
   const { options, offsets } = state
 
-  const origin = getOriginXY(interaction.interactable, interaction.element, interaction.prepared.name)
+  const origin = getOriginXY(interaction.interactable!, interaction.element!, interaction.prepared.name)
   const page = extend({}, coords)
-  const targets = []
+  const targets: SnapPosition[] = []
 
   if (!options.offsetWithOrigin) {
     page.x -= origin.x
     page.y -= origin.y
   }
 
-  for (const offset of offsets) {
+  for (const offset of offsets!) {
     const relativeX = page.x - offset.x
     const relativeY = page.y - offset.y
 
-    for (let index = 0, len = options.targets.length; index < len; index++) {
-      const snapTarget = options.targets[index]
+    for (let index = 0, len = options.targets!.length; index < len; index++) {
+      const snapTarget = options.targets![index]
       let target: SnapPosition
 
       if (is.func(snapTarget)) {

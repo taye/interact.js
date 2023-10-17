@@ -48,8 +48,6 @@ export class Interactable implements Partial<Eventable> {
   readonly _doc: Document
   readonly _scopeEvents: Scope['events']
 
-  /** @internal */ _rectChecker?: typeof Interactable.prototype.getRect
-
   /** */
   constructor (
     target: Target,
@@ -84,7 +82,7 @@ export class Interactable implements Partial<Eventable> {
     return this
   }
 
-  updatePerActionListeners (actionName: ActionName, prev: Listeners, cur: Listeners) {
+  updatePerActionListeners (actionName: ActionName, prev: Listeners | undefined, cur: Listeners | undefined) {
     if (is.array(prev) || is.object(prev)) {
       this.off(actionName, prev)
     }
@@ -168,10 +166,8 @@ export class Interactable implements Partial<Eventable> {
   rectChecker(checker: (element: Element) => any): this
   rectChecker (checker?: (element: Element) => any) {
     if (is.func(checker)) {
-      this._rectChecker = checker
-
       this.getRect = (element) => {
-        const rect = extend({}, this._rectChecker(element))
+        const rect = extend({}, checker.apply(this, element))
 
         if (!(('width' in rect) as unknown)) {
           rect.width = rect.right - rect.left
@@ -185,8 +181,7 @@ export class Interactable implements Partial<Eventable> {
     }
 
     if (checker === null) {
-      delete this.getRect
-      delete this._rectChecker
+      delete (this as Partial<typeof this>).getRect
 
       return this
     }
@@ -268,7 +263,7 @@ export class Interactable implements Partial<Eventable> {
     )
   }
 
-  testAllow (this: Interactable, allowFrom: IgnoreValue, targetNode: Node, element: Node) {
+  testAllow (this: Interactable, allowFrom: IgnoreValue | undefined, targetNode: Node, element: Node) {
     if (!allowFrom) {
       return true
     }
@@ -286,7 +281,7 @@ export class Interactable implements Partial<Eventable> {
     return false
   }
 
-  testIgnore (this: Interactable, ignoreFrom: IgnoreValue, targetNode: Node, element: Node) {
+  testIgnore (this: Interactable, ignoreFrom: IgnoreValue | undefined, targetNode: Node, element: Node) {
     if (!ignoreFrom || !is.element(element)) {
       return false
     }

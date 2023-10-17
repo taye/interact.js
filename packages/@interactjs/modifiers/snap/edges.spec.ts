@@ -32,8 +32,8 @@ test('modifiers/snap/edges', () => {
   }
 
   arg.state = { options }
-  snapEdges.start(arg as any)
-  snapEdges.set(arg as any)
+  snapEdges.start!(arg as any)
+  snapEdges.set!(arg as any)
 
   // modified coords are correct
   expect(arg.coords).toEqual({ x: target0.left, y: target0.top })
@@ -42,8 +42,8 @@ test('modifiers/snap/edges', () => {
   arg.edges = { bottom: true, right: true }
 
   arg.state = { options }
-  snapEdges.start(arg as any)
-  snapEdges.set(arg as any)
+  snapEdges.start!(arg as any)
+  snapEdges.set!(arg as any)
 
   // modified coord are correct
   expect(arg.coords).toEqual({ x: target0.right, y: target0.bottom })

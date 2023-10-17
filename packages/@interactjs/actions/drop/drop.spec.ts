@@ -75,7 +75,7 @@ describe('actions/drop', () => {
     })
 
     const onActionsDropStart = jest.fn((arg: { interaction: Interaction }) => {
-      const activeDrops = [...arg.interaction.dropState.activeDrops]
+      const activeDrops = [...arg.interaction.dropState!.activeDrops]
       // actions/drop:start is fired with all activeDrops
       expect(activeDrops.map((activeDrop) => activeDrop.element)).toEqual([dropEl3])
     })
@@ -92,7 +92,7 @@ describe('actions/drop', () => {
     expect(onActionsDropStart).toHaveBeenCalledTimes(1)
 
     // rejected dropzones are removed from activeDrops,
-    expect(interaction.dropState.activeDrops.map((d) => d.element)).toEqual([dropEl3])
+    expect(interaction.dropState!.activeDrops.map((d) => d.element)).toEqual([dropEl3])
 
     // rejected dropzones are deactivated,
     expect(onDeactivate).toHaveBeenNthCalledWith(1, expect.objectContaining({ target: dropEl1 }))

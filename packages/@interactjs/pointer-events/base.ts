@@ -248,7 +248,7 @@ function collectEventTargets<T extends string> (
 
   if (type === 'hold') {
     signalArg.targets = signalArg.targets.filter(
-      (target) => target.eventable.options.holdDuration === interaction.pointers[pointerIndex]?.hold.duration,
+      (target) => target.eventable.options.holdDuration === interaction.pointers[pointerIndex]?.hold?.duration,
     )
   }
 
@@ -302,7 +302,7 @@ function downAndStartHold (
   { interaction, pointer, event, eventTarget, pointerIndex }: SignalArgs['interactions:down'],
   scope: Scope,
 ) {
-  const timer = interaction.pointers[pointerIndex].hold
+  const timer = interaction.pointers[pointerIndex].hold!
   const path = domUtils.getPath(eventTarget as Element | Document)
   const signalArg = {
     interaction,

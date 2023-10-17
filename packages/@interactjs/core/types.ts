@@ -102,7 +102,7 @@ export type CursorChecker = (
 export interface ActionMethod<T> {
   (this: Interactable): T
   // eslint-disable-next-line no-undef
-  (this: Interactable, options: Partial<OrBoolean<T>> | boolean): typeof this
+  (this: Interactable, options?: Partial<OrBoolean<T>> | boolean): typeof this
 }
 
 export interface OptionMethod<T> {

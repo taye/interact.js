@@ -80,7 +80,7 @@ test('utils/domUtils/indexOfDeepestElement', () => {
   // sibling with higher z-index is selected
   expect(indexOfDeepestElement(siblings)).toBe(1)
 
-  const nodeWithoutParent: MockNode = { name: 'd1', ownerDocument, parentNode: undefined, lastChild: null }
+  const nodeWithoutParent: MockNode = { name: 'd1', ownerDocument, parentNode: null, lastChild: null }
   const brokenElementCollection = [nodeWithoutParent, d1, c2] as unknown as HTMLElement[]
   expect(indexOfDeepestElement(brokenElementCollection)).toBe(0)
 })
