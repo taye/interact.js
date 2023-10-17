@@ -45,8 +45,8 @@ export class InteractableSet {
         const targetIndex = arr.findIndex(targetMappings, (m) => m.context === context)
         if (targetMappings[targetIndex]) {
           // Destroying mappingInfo's context and interactable
-          targetMappings[targetIndex].context = null
-          targetMappings[targetIndex].interactable = null
+          targetMappings[targetIndex].context = null as never
+          targetMappings[targetIndex].interactable = null as never
         }
         targetMappings.splice(targetIndex, 1)
       },
@@ -108,9 +108,9 @@ export class InteractableSet {
     return found && found.interactable
   }
 
-  forEachMatch<T> (node: Node, callback: (interactable: Interactable) => T) {
+  forEachMatch<T> (node: Node, callback: (interactable: Interactable) => T): T | void {
     for (const interactable of this.list) {
-      let ret: void | T
+      let ret: T
 
       if (
         (is.string(interactable.target)

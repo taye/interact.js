@@ -41,10 +41,10 @@
     "@typescript-eslint/parser": "^5.27.1",
     "@vitejs/plugin-vue": "^2.3.3",
     "@vue/babel-plugin-jsx": "^1.1.1",
-    "@vue/compiler-sfc": "^3.2.37",
-    "@vue/reactivity": "^3.2.37",
-    "@vue/runtime-dom": "^3.2.37",
-    "@vue/test-utils": "^2.0.0",
+    "@vue/compiler-sfc": "^3.3.4",
+    "@vue/reactivity": "^3.3.4",
+    "@vue/runtime-dom": "^3.3.4",
+    "@vue/test-utils": "^2.4.1",
     "babel-helper-vue-jsx-merge-props": "^2.0.3",
     "babel-plugin-syntax-jsx": "^6.18.0",
     "babelify": "^10.0.0",
@@ -97,7 +97,7 @@
     "typescript": "^4.7.3",
     "vijest": "^0.0.1",
     "vite": "^4.1.4",
-    "vue": "^3.2.37",
+    "vue": "^3.3.4",
     "yargs": "^17.5.1"
   },
   "engines": {

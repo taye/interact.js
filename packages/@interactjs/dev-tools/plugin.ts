@@ -93,7 +93,7 @@ const checks: Check[] = [
   {
     name: CheckName.touchAction,
     perform ({ element }) {
-      return !parentHasStyle(element, 'touchAction', /pan-|pinch|none/)
+      return !!element && !parentHasStyle(element, 'touchAction', /pan-|pinch|none/)
     },
     getInfo ({ element }) {
       return [element, links.touchAction]
@@ -122,7 +122,7 @@ const checks: Check[] = [
     name: CheckName.noListeners,
     perform (interaction) {
       const actionName = interaction.prepared.name
-      const moveListeners = interaction.interactable.events.types[`${actionName}move`] || []
+      const moveListeners = interaction.interactable?.events.types[`${actionName}move`] || []
 
       return !moveListeners.length
     },

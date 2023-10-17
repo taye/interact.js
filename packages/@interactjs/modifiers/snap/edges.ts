@@ -56,8 +56,8 @@ const snapEdges: ModifierModule<SnapEdgesOptions, SnapState, ReturnType<typeof s
   start,
   set: snapSize.set,
   defaults: extend(clone(snapSize.defaults), {
-    targets: null,
-    range: null,
+    targets: undefined,
+    range: undefined,
     offset: { x: 0, y: 0 },
   } as const),
 }

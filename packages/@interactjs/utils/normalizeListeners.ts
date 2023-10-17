@@ -9,7 +9,7 @@ export interface NormalizedListeners {
 
 export default function normalize (
   type: EventTypes,
-  listeners?: ListenersArg | ListenersArg[],
+  listeners?: ListenersArg | ListenersArg[] | null,
   result?: NormalizedListeners,
 ): NormalizedListeners {
   result = result || {}

@@ -243,7 +243,7 @@ function install (scope: Scope) {
 
       return interact
     }
-    return scope.dynamicDrop
+    return scope.dynamicDrop!
   }
 
   extend(actions.phaselessTypes, {
@@ -331,30 +331,28 @@ function getActiveDrops (scope: Scope, dragElement: Element) {
 }
 
 function getDrop (
-  { dropState, interactable: draggable, element: dragElement }: Partial<Interaction>,
+  { dropState, interactable: draggable, element: dragElement }: Interaction,
   dragEvent,
   pointerEvent,
 ) {
-  const validDrops = []
+  const validDrops: Element[] = []
 
   // collect all dropzones and their elements which qualify for a drop
-  for (const { dropzone, element: dropzoneElement, rect } of dropState.activeDrops) {
-    validDrops.push(
-      dropzone.dropCheck(dragEvent, pointerEvent, draggable, dragElement, dropzoneElement, rect)
-        ? dropzoneElement
-        : null,
-    )
+  for (const { dropzone, element: dropzoneElement, rect } of dropState!.activeDrops) {
+    if (dropzone.dropCheck(dragEvent, pointerEvent, draggable!, dragElement!, dropzoneElement, rect)) {
+      validDrops.push(dropzoneElement)
+    }
   }
 
   // get the most appropriate dropzone based on DOM depth and order
   const dropIndex = domUtils.indexOfDeepestElement(validDrops)
 
-  return dropState.activeDrops[dropIndex] || null
+  return dropState!.activeDrops[dropIndex] || null
 }
 
 function getDropEvents (interaction: Interaction, _pointerEvent, dragEvent: DragEvent) {
-  const { dropState } = interaction
-  const dropEvents = {
+  const dropState = interaction.dropState!
+  const dropEvents: Record<string, DropEvent | null> = {
     enter: null,
     leave: null,
     activate: null,
@@ -366,14 +364,14 @@ function getDropEvents (interaction: Interaction, _pointerEvent, dragEvent: Drag
   if (dragEvent.type === 'dragstart') {
     dropEvents.activate = new DropEvent(dropState, dragEvent, 'dropactivate')
 
-    dropEvents.activate.target = null
-    dropEvents.activate.dropzone = null
+    dropEvents.activate.target = null as never
+    dropEvents.activate.dropzone = null as never
   }
   if (dragEvent.type === 'dragend') {
     dropEvents.deactivate = new DropEvent(dropState, dragEvent, 'dropdeactivate')
 
-    dropEvents.deactivate.target = null
-    dropEvents.deactivate.dropzone = null
+    dropEvents.deactivate.target = null as never
+    dropEvents.deactivate.dropzone = null as never
   }
 
   if (dropState.rejected) {
@@ -406,7 +404,6 @@ function getDropEvents (interaction: Interaction, _pointerEvent, dragEvent: Drag
   if (dragEvent.type === 'dragmove' && dropState.cur.dropzone) {
     dropEvents.move = new DropEvent(dropState, dragEvent, 'dropmove')
 
-    dropEvents.move.dragmove = dragEvent
     dragEvent.dropzone = dropState.cur.dropzone
   }
 
@@ -418,7 +415,7 @@ Record<'leave' | 'enter' | 'move' | 'drop' | 'activate' | 'deactivate', DropEven
 >
 
 function fireDropEvents (interaction: Interaction, events: FiredDropEvents) {
-  const { dropState } = interaction
+  const dropState = interaction.dropState!
   const { activeDrops, cur, prev } = dropState
 
   if (events.leave) {
@@ -447,10 +444,10 @@ function onEventCreated ({ interaction, iEvent, event }: DoPhaseArg<'drag', Even
     return
   }
 
-  const { dropState } = interaction
+  const dropState = interaction.dropState!
 
   if (scope.dynamicDrop) {
-    dropState.activeDrops = getActiveDrops(scope, interaction.element)
+    dropState.activeDrops = getActiveDrops(scope, interaction.element!)
   }
 
   const dragEvent = iEvent
@@ -490,7 +487,9 @@ function dropzoneMethod (interactable: Interactable, options?: DropzoneOptions |
         return acc
       }, {})
 
-      interactable.off(interactable.options.drop.listeners)
+      const prevListeners = interactable.options.drop.listeners
+      prevListeners && interactable.off(prevListeners)
+
       interactable.on(corrected)
       interactable.options.drop.listeners = corrected
     }
@@ -646,12 +645,12 @@ const drop: Plugin = {
         return
       }
 
-      const { dropState } = interaction
+      const dropState = interaction.dropState!
 
       // reset active dropzones
-      dropState.activeDrops = null
-      dropState.events = null
-      dropState.activeDrops = getActiveDrops(scope, interaction.element)
+      dropState.activeDrops = []
+      dropState.events = {}
+      dropState.activeDrops = getActiveDrops(scope, interaction.element!)
       dropState.events = getDropEvents(interaction, event, dragEvent)
 
       if (dropState.events.activate) {
@@ -670,10 +669,11 @@ const drop: Plugin = {
         return
       }
 
-      fireDropEvents(interaction, interaction.dropState.events)
+      const dropState = interaction.dropState!
+      fireDropEvents(interaction, dropState.events)
 
       scope.fire('actions/drop:move', { interaction, dragEvent })
-      interaction.dropState.events = {}
+      dropState.events = {}
     },
 
     'interactions:action-end': (arg: DoPhaseArg<'drag', EventPhase>, scope) => {
@@ -684,7 +684,7 @@ const drop: Plugin = {
       const { interaction, iEvent: dragEvent } = arg
 
       onEventCreated(arg, scope)
-      fireDropEvents(interaction, interaction.dropState.events)
+      fireDropEvents(interaction, interaction.dropState!.events)
       scope.fire('actions/drop:end', { interaction, dragEvent })
     },
 
@@ -696,12 +696,12 @@ const drop: Plugin = {
       const { dropState } = interaction
 
       if (dropState) {
-        dropState.activeDrops = null
-        dropState.events = null
-        dropState.cur.dropzone = null
-        dropState.cur.element = null
-        dropState.prev.dropzone = null
-        dropState.prev.element = null
+        dropState.activeDrops = null as never
+        dropState.events = null as never
+        dropState.cur.dropzone = null as never
+        dropState.cur.element = null as never
+        dropState.prev.dropzone = null as never
+        dropState.prev.element = null as never
         dropState.rejected = false
       }
     },
@@ -712,7 +712,7 @@ const drop: Plugin = {
   fireDropEvents,
   defaults: {
     enabled: false,
-    accept: null,
+    accept: null as never,
     overlap: 'pointer',
   } as DropzoneOptions,
 }

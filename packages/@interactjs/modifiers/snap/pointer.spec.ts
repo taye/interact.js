@@ -1,5 +1,6 @@
 import drag from '@interactjs/actions/drag/plugin'
 import * as helpers from '@interactjs/core/tests/_helpers'
+import type { Point } from '@interactjs/core/types'
 import extend from '@interactjs/utils/extend'
 
 import modifiersBase from '../base'
@@ -15,7 +16,8 @@ test('modifiers/snap', () => {
   coords.client = coords.page
 
   const origin = { x: 120, y: 120 }
-  let funcArgs = null
+  let funcArgs!: { x: number, y: number, offset: number, index: number, unexpected: unknown[] }
+
   const target0 = Object.freeze({ x: 50, y: 100 })
   const targetFunc = (x, y, _interaction, offset, index, ...unexpected) => {
     funcArgs = { x, y, offset, index, unexpected }
@@ -24,14 +26,14 @@ test('modifiers/snap', () => {
   const relativePoint = { x: 0, y: 0 }
 
   const options = {
-    offset: null,
+    offset: undefined as Point | undefined,
     offsetWithOrigin: true,
     targets: [target0, targetFunc],
     range: Infinity,
     relativePoints: [relativePoint],
   }
 
-  let lastEventModifiers: any[] = null
+  let lastEventModifiers!: any[]
   interactable
     .draggable({
       origin,
@@ -88,7 +90,7 @@ test('modifiers/snap', () => {
   start({ name: 'drag' })
   move(true)
 
-  const { startOffset } = interaction.modification
+  const { startOffset } = interaction.modification!
   const relativeOffset = {
     x: options.offset.x + startOffset.left,
     y: options.offset.y + startOffset.top,

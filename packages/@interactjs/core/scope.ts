@@ -56,7 +56,7 @@ export class Scope {
   isInitialized = false
   listenerMaps: Array<{
     map: ListenerMap
-    id: string
+    id?: string
   }> = []
 
   browser = browser
@@ -150,7 +150,8 @@ export class Scope {
   }
 
   pluginIsInstalled (plugin: Plugin) {
-    return this._plugins.map[plugin.id] || this._plugins.list.indexOf(plugin) !== -1
+    const { id } = plugin
+    return id ? !!this._plugins.map[id] : this._plugins.list.indexOf(plugin) !== -1
   }
 
   usePlugin (plugin: Plugin, options?: { [key: string]: any }) {
@@ -183,7 +184,7 @@ export class Scope {
       for (; index < len; index++) {
         const otherId = this.listenerMaps[index].id
 
-        if (before[otherId] || before[pluginIdRoot(otherId)]) {
+        if (otherId && (before[otherId] || before[pluginIdRoot(otherId)])) {
           break
         }
       }

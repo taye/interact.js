@@ -155,7 +155,7 @@ export class Interaction<T extends ActionName | null = ActionName> {
   _interacting = false
   _ending = false
   _stopped = true
-  _proxy: InteractionProxy<T> | null = null
+  _proxy: InteractionProxy<T>
 
   simulation = null
 

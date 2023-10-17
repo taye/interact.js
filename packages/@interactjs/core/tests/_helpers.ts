@@ -122,7 +122,7 @@ export function testEnv<T extends Target = HTMLElement> ({
   return {
     scope,
     interaction,
-    target,
+    target: target as T extends undefined ? HTMLElement : T,
     interactable,
     coords,
     event,
