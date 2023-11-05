@@ -1,3 +1,16 @@
+/* eslint-disable import/no-duplicates -- for typescript module augmentations */
+import '@interactjs/actions/plugin'
+import '@interactjs/auto-scroll/plugin'
+import '@interactjs/auto-start/plugin'
+import '@interactjs/core/interactablePreventDefault'
+import '@interactjs/dev-tools/plugin'
+import '@interactjs/inertia/plugin'
+import '@interactjs/interact'
+import '@interactjs/modifiers/plugin'
+import '@interactjs/offset/plugin'
+import '@interactjs/pointer-events/plugin'
+import '@interactjs/reflow/plugin'
+
 import actions from '@interactjs/actions/plugin'
 import autoScroll from '@interactjs/auto-scroll/plugin'
 import autoStart from '@interactjs/auto-start/plugin'
@@ -9,6 +22,7 @@ import modifiers from '@interactjs/modifiers/plugin'
 import offset from '@interactjs/offset/plugin'
 import pointerEvents from '@interactjs/pointer-events/plugin'
 import reflow from '@interactjs/reflow/plugin'
+/* eslint-enable import/no-duplicates */
 
 interact.use(interactablePreventDefault)
 
@@ -42,21 +56,3 @@ if (process.env.NODE_ENV !== 'production') {
 
 export default interact
 ;(interact as any).default = interact
-
-const _ = {
-  actions,
-  autoScroll,
-  autoStart,
-  interactablePreventDefault,
-  devTools,
-  inertia,
-  interact,
-  modifiers,
-  offset,
-  pointerEvents,
-  reflow,
-}
-
-// Exported so that the related module augmentations will be referenced in
-// generated .d.ts file
-export type __internal_plugin_types__ = typeof _

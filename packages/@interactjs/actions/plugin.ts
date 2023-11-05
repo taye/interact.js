@@ -1,6 +1,6 @@
 import type { Scope } from '@interactjs/core/scope'
 
-/* eslint-disable import/no-duplicates */
+/* eslint-disable import/no-duplicates -- for typescript module augmentations */
 import './drag/plugin'
 import './drop/plugin'
 import './gesture/plugin'
