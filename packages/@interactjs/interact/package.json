@@ -1,6 +1,6 @@
 {
   "name": "@interactjs/interact",
-  "version": "1.10.19",
+  "version": "1.10.20",
   "main": "index",
   "module": "index",
   "type": "module",
@@ -10,8 +10,8 @@
     "directory": "packages/@interactjs/interact"
   },
   "dependencies": {
-    "@interactjs/core": "1.10.19",
-    "@interactjs/utils": "1.10.19"
+    "@interactjs/core": "1.10.20",
+    "@interactjs/utils": "1.10.20"
   },
   "publishConfig": {
     "access": "public"
