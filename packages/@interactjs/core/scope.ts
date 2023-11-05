@@ -12,8 +12,12 @@ import { InteractEvent } from './InteractEvent'
 import { createInteractStatic } from './InteractStatic'
 import { Interactable as InteractableBase } from './Interactable'
 import { InteractableSet } from './InteractableSet'
+/* eslint-disable import/no-duplicates -- for typescript module augmentations */
+import './events'
+import './interactions'
 import events from './events'
 import interactions from './interactions'
+/* eslint-enable import/no-duplicates */
 import type { OptionsArg } from './options'
 import { defaults } from './options'
 import type { Actions } from './types'

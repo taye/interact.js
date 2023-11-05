@@ -11,8 +11,12 @@ import is from '@interactjs/utils/is'
 import normalizeListeners from '@interactjs/utils/normalizeListeners'
 import * as pointerUtils from '@interactjs/utils/pointerUtils'
 
+/* eslint-disable import/no-duplicates -- for typescript module augmentations */
+import '../drag/plugin'
+
 import type { DragEvent } from '../drag/plugin'
 import drag from '../drag/plugin'
+/* eslint-enable import/no-duplicates */
 
 import { DropEvent } from './DropEvent'
 

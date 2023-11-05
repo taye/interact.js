@@ -2,7 +2,10 @@ import type Interaction from '@interactjs/core/Interaction'
 import type { ListenerMap, Scope, SignalArgs, Plugin } from '@interactjs/core/scope'
 
 import type PointerEvent from './PointerEvent'
+/* eslint-disable import/no-duplicates -- for typescript module augmentations */
+import './base'
 import basePlugin from './base'
+/* eslint-enable import/no-duplicates */
 
 declare module '@interactjs/core/Interaction' {
   interface Interaction {

@@ -2,9 +2,13 @@ import type { Interaction, DoPhaseArg } from '@interactjs/core/Interaction'
 import type { Scope, SignalArgs, Plugin } from '@interactjs/core/scope'
 import type { ActionName, Point, PointerEventType } from '@interactjs/core/types'
 import Modification from '@interactjs/modifiers/Modification'
+/* eslint-disable import/no-duplicates -- for typescript module augmentations */
+import '@interactjs/modifiers/base'
+import '@interactjs/offset/plugin'
 import * as modifiers from '@interactjs/modifiers/base'
 import type { ModifierArg } from '@interactjs/modifiers/types'
 import offset from '@interactjs/offset/plugin'
+/* eslint-enable import/no-duplicates */
 import * as dom from '@interactjs/utils/domUtils'
 import hypot from '@interactjs/utils/hypot'
 import is from '@interactjs/utils/is'

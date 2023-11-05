@@ -1,7 +1,10 @@
 import type Interaction from '@interactjs/core/Interaction'
 import type { Scope, Plugin } from '@interactjs/core/scope'
 
+/* eslint-disable import/no-duplicates -- for typescript module augmentations */
+import './base'
 import basePlugin from './base'
+/* eslint-enable */
 
 declare module '@interactjs/core/options' {
   interface PerActionDefaults {

@@ -14,7 +14,10 @@ import extend from '@interactjs/utils/extend'
 import is from '@interactjs/utils/is'
 import { copyAction } from '@interactjs/utils/misc'
 
+/* eslint-disable import/no-duplicates -- for typescript module augmentations */
+import './InteractableMethods'
 import InteractableMethods from './InteractableMethods'
+/* eslint-enable import/no-duplicates */
 
 declare module '@interactjs/core/InteractStatic' {
   export interface InteractStatic {

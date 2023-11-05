@@ -3,7 +3,7 @@ import type { InteractEvent as _InteractEvent, EventPhase } from '@interactjs/co
 import type * as interaction from '@interactjs/core/Interaction'
 import type { ActionName, ActionProps as _ActionProps } from '@interactjs/core/types'
 // import module augmentations
-import type * as _ from '@interactjs/interactjs'
+import '@interactjs/interactjs'
 
 export * from '@interactjs/core/types'
 export type { Plugin } from '@interactjs/core/scope'

@@ -1,8 +1,13 @@
 import type { Plugin } from '@interactjs/core/scope'
 import snappers from '@interactjs/snappers/plugin'
 
+/* eslint-disable import/no-duplicates -- for typescript module augmentations */
+import './all'
+import './base'
+
 import all from './all'
 import base from './base'
+/* eslint-enable import/no-duplicates */
 
 declare module '@interactjs/core/InteractStatic' {
   export interface InteractStatic {

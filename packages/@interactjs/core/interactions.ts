@@ -6,7 +6,10 @@ import { nodeContains } from '@interactjs/utils/domUtils'
 import * as pointerUtils from '@interactjs/utils/pointerUtils'
 
 import InteractionBase from './Interaction'
+/* eslint-disable import/no-duplicates -- for typescript module augmentations */
+import './interactablePreventDefault'
 import interactablePreventDefault from './interactablePreventDefault'
+/* eslint-enable import/no-duplicates */
 import type { SearchDetails } from './interactionFinder'
 import finder from './interactionFinder'
 
