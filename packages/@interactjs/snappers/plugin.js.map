@@ -1,0 +1,23 @@
+{
+	"version": 3,
+	"names": [
+		"extend",
+		"allSnappers",
+		"snappersPlugin",
+		"id",
+		"install",
+		"scope",
+		"interactStatic",
+		"interact",
+		"snappers",
+		"createSnapGrid",
+		"grid"
+	],
+	"sources": [
+		"plugin.ts"
+	],
+	"sourcesContent": [
+		"import type { Plugin } from '@interactjs/core/scope'\nimport extend from '@interactjs/utils/extend'\n\nimport * as allSnappers from './all'\n\ndeclare module '@interactjs/core/InteractStatic' {\n  export interface InteractStatic {\n    snappers: typeof allSnappers\n    createSnapGrid: typeof allSnappers.grid\n  }\n}\n\nconst snappersPlugin: Plugin = {\n  id: 'snappers',\n  install (scope) {\n    const { interactStatic: interact } = scope\n\n    interact.snappers = extend(interact.snappers || {}, allSnappers)\n    interact.createSnapGrid = interact.snappers.grid\n  },\n}\n\nexport default snappersPlugin\n"
+	],
+	"mappings": "AACA,OAAOA,MAAP,MAAmB,oBAAnB;AAEA,OAAO,KAAKC,WAAZ,MAA6B,OAA7B;AASA,MAAMC,cAAsB,GAAG;EAC7BC,EAAE,EAAE,UADyB;;EAE7BC,OAAO,CAAEC,KAAF,EAAS;IACd,MAAM;MAAEC,cAAc,EAAEC;IAAlB,IAA+BF,KAArC;IAEAE,QAAQ,CAACC,QAAT,GAAoBR,MAAM,CAACO,QAAQ,CAACC,QAAT,IAAqB,EAAtB,EAA0BP,WAA1B,CAA1B;IACAM,QAAQ,CAACE,cAAT,GAA0BF,QAAQ,CAACC,QAAT,CAAkBE,IAA5C;EACD;;AAP4B,CAA/B;AAUA,eAAeR,cAAf"
+}

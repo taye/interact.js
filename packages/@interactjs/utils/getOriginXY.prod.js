@@ -1,0 +1,2 @@
+import{rectToXY as o,resolveRectLike as t}from"./rect";export default function i(i,n,r){const e=r&&i.options[r],p=e&&e.origin||i.options.origin,c=t(p,i,n,[i&&n]);return o(c)||{x:0,y:0}}
+//# sourceMappingURL=getOriginXY.prod.js.map

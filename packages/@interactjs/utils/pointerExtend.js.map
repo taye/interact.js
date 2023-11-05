@@ -1,0 +1,27 @@
+{
+	"version": 3,
+	"names": [
+		"VENDOR_PREFIXES",
+		"pointerExtend",
+		"dest",
+		"source",
+		"__set",
+		"prop",
+		"some",
+		"prefix",
+		"indexOf",
+		"Object",
+		"defineProperty",
+		"get",
+		"set",
+		"value",
+		"configurable"
+	],
+	"sources": [
+		"pointerExtend.ts"
+	],
+	"sourcesContent": [
+		"const VENDOR_PREFIXES = ['webkit', 'moz']\n\nexport default function pointerExtend<T> (dest: Partial<T & { __set?: Partial<T> }>, source: T) {\n  dest.__set ||= {} as any\n\n  for (const prop in source) {\n    // skip deprecated prefixed properties\n    if (VENDOR_PREFIXES.some((prefix) => prop.indexOf(prefix) === 0)) continue\n\n    if (typeof dest[prop] !== 'function' && prop !== '__set') {\n      Object.defineProperty(dest, prop, {\n        get () {\n          if (prop in dest.__set) return dest.__set[prop]\n\n          return (dest.__set[prop] = source[prop] as any)\n        },\n        set (value: any) {\n          dest.__set[prop] = value\n        },\n        configurable: true,\n      })\n    }\n  }\n  return dest\n}\n"
+	],
+	"mappings": "AAAA,MAAMA,eAAe,GAAG,CAAC,QAAD,EAAW,KAAX,CAAxB;AAEA,eAAe,SAASC,aAAT,CAA2BC,IAA3B,EAAsEC,MAAtE,EAAiF;EAC9FD,IAAI,CAACE,KAAL,KAAe,EAAf;;EAEA,KAAK,MAAMC,IAAX,IAAmBF,MAAnB,EAA2B;IACzB;IACA,IAAIH,eAAe,CAACM,IAAhB,CAAsBC,MAAD,IAAYF,IAAI,CAACG,OAAL,CAAaD,MAAb,MAAyB,CAA1D,CAAJ,EAAkE;;IAElE,IAAI,OAAOL,IAAI,CAACG,IAAD,CAAX,KAAsB,UAAtB,IAAoCA,IAAI,KAAK,OAAjD,EAA0D;MACxDI,MAAM,CAACC,cAAP,CAAsBR,IAAtB,EAA4BG,IAA5B,EAAkC;QAChCM,GAAG,GAAI;UACL,IAAIN,IAAI,IAAIH,IAAI,CAACE,KAAjB,EAAwB,OAAOF,IAAI,CAACE,KAAL,CAAWC,IAAX,CAAP;UAExB,OAAQH,IAAI,CAACE,KAAL,CAAWC,IAAX,IAAmBF,MAAM,CAACE,IAAD,CAAjC;QACD,CAL+B;;QAMhCO,GAAG,CAAEC,KAAF,EAAc;UACfX,IAAI,CAACE,KAAL,CAAWC,IAAX,IAAmBQ,KAAnB;QACD,CAR+B;;QAShCC,YAAY,EAAE;MATkB,CAAlC;IAWD;EACF;;EACD,OAAOZ,IAAP;AACD"
+}

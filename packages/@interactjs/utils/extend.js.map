@@ -1,0 +1,17 @@
+{
+	"version": 3,
+	"names": [
+		"extend",
+		"dest",
+		"source",
+		"prop",
+		"ret"
+	],
+	"sources": [
+		"extend.ts"
+	],
+	"sourcesContent": [
+		"export default function extend<T, U extends object> (dest: U & Partial<T>, source: T): T & U {\n  for (const prop in source) {\n    ;(dest as unknown as T)[prop] = source[prop]\n  }\n\n  const ret = dest as T & U\n\n  return ret\n}\n"
+	],
+	"mappings": "AAAA,eAAe,SAASA,MAAT,CAAsCC,IAAtC,EAA4DC,MAA5D,EAA8E;EAC3F,KAAK,MAAMC,IAAX,IAAmBD,MAAnB,EAA2B;IACzB;IAAED,IAAD,CAAuBE,IAAvB,IAA+BD,MAAM,CAACC,IAAD,CAArC;EACF;;EAED,MAAMC,GAAG,GAAGH,IAAZ;EAEA,OAAOG,GAAP;AACD"
+}

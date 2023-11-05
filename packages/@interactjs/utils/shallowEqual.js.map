@@ -1,0 +1,20 @@
+{
+	"version": 3,
+	"names": [
+		"shallowEqual",
+		"left",
+		"right",
+		"leftKeys",
+		"Object",
+		"keys",
+		"length",
+		"key"
+	],
+	"sources": [
+		"shallowEqual.ts"
+	],
+	"sourcesContent": [
+		"export default function shallowEqual (left: any, right: any) {\n  if (left === right) {\n    return true\n  }\n\n  if (!left || !right) {\n    return false\n  }\n\n  const leftKeys = Object.keys(left)\n\n  if (leftKeys.length !== Object.keys(right).length) {\n    return false\n  }\n\n  for (const key of leftKeys) {\n    if (left[key] !== right[key]) {\n      return false\n    }\n  }\n\n  return true\n}\n"
+	],
+	"mappings": "AAAA,eAAe,SAASA,YAAT,CAAuBC,IAAvB,EAAkCC,KAAlC,EAA8C;EAC3D,IAAID,IAAI,KAAKC,KAAb,EAAoB;IAClB,OAAO,IAAP;EACD;;EAED,IAAI,CAACD,IAAD,IAAS,CAACC,KAAd,EAAqB;IACnB,OAAO,KAAP;EACD;;EAED,MAAMC,QAAQ,GAAGC,MAAM,CAACC,IAAP,CAAYJ,IAAZ,CAAjB;;EAEA,IAAIE,QAAQ,CAACG,MAAT,KAAoBF,MAAM,CAACC,IAAP,CAAYH,KAAZ,EAAmBI,MAA3C,EAAmD;IACjD,OAAO,KAAP;EACD;;EAED,KAAK,MAAMC,GAAX,IAAkBJ,QAAlB,EAA4B;IAC1B,IAAIF,IAAI,CAACM,GAAD,CAAJ,KAAcL,KAAK,CAACK,GAAD,CAAvB,EAA8B;MAC5B,OAAO,KAAP;IACD;EACF;;EAED,OAAO,IAAP;AACD"
+}
