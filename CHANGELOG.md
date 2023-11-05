@@ -1,5 +1,9 @@
 ## v1.10.19
 
+- fix(types): import plugins for module augmentations #933
+
+## v1.10.19
+
 - fix(core/scope): remove duplicate Interactable super.unset
 - fix(utils/pointerExtend): skip all vendor-prefixed props. Close #978
 
