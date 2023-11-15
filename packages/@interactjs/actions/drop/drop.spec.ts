@@ -4,6 +4,10 @@ import * as helpers from '@interactjs/core/tests/_helpers'
 import drop from '../drop/plugin'
 
 describe('actions/drop', () => {
+  afterEach(() => {
+    document.body.innerHTML = ''
+  })
+
   test('options', () => {
     const { interactable } = helpers.testEnv({ plugins: [drop] })
 
@@ -91,13 +95,74 @@ describe('actions/drop', () => {
 
     expect(onActionsDropStart).toHaveBeenCalledTimes(1)
 
-    // rejected dropzones are removed from activeDrops,
+    // rejected dropzones are removed from activeDrops
     expect(interaction.dropState!.activeDrops.map((d) => d.element)).toEqual([dropEl3])
 
-    // rejected dropzones are deactivated,
-    expect(onDeactivate).toHaveBeenNthCalledWith(1, expect.objectContaining({ target: dropEl1 }))
-    expect(onDeactivate).toHaveBeenNthCalledWith(2, expect.objectContaining({ target: dropEl2 }))
+    // rejected dropzones are deactivated
+    expect(onDeactivate.mock.calls.map((arg) => arg[0].target)).toEqual([dropEl1, dropEl2])
 
     interaction.end()
+  })
+
+  test('targeting', () => {
+    const interactionTarget = document.body.appendChild(document.createElement('div'))
+    interactionTarget.id = 'target'
+    const { scope, interactable, down, start, move, up, coords } = helpers.testEnv({
+      plugins: [drop],
+      target: interactionTarget,
+    })
+
+    interactable.draggable({})
+
+    const [dropElA, dropElB, dropElC] = ['a', 'b', 'c'].map((id) => {
+      const dropEl = scope.document.createElement('div')
+
+      dropEl.dataset.drop = id
+      scope.document.body.appendChild(dropEl)
+
+      return dropEl
+    })
+
+    const onActivate = jest.fn((event) => event.target)
+    const onDeactivate = jest.fn((event) => event.target)
+    const onDragenter = jest.fn()
+    const dropzone = scope.interactables
+      .new('[data-drop]')
+      .dropzone({
+        checker: () => true,
+      })
+      .on({ dropactivate: onActivate, dropdeactivate: onDeactivate, dragenter: onDragenter })
+
+    down()
+    start({ name: 'drag' })
+    expect(onActivate.mock.results.map(({ value }) => value)).toEqual([dropElA, dropElB, dropElC])
+    expect(onDeactivate.mock.calls).toEqual([])
+    expect(onDragenter.mock.calls).toEqual([])
+
+    coords.page.x++
+    move()
+
+    expect(onDragenter.mock.calls.map(([{ target, relatedTarget }]) => [target, relatedTarget])).toEqual([
+      [dropElC, interactionTarget],
+    ])
+
+    onDragenter.mockClear()
+
+    // only b drop
+    dropzone.dropzone({
+      checker: (_dragEvent, _event, _dropped, _dropzone, dropElement) => dropElement.dataset.drop === 'b',
+    })
+
+    coords.page.x++
+    move()
+
+    expect(onDragenter.mock.calls.map((args) => [args[0].target, args[0].relatedTarget])).toEqual([
+      [dropElB, interactionTarget],
+    ])
+
+    up()
+
+    // all dropzones are deactivated
+    expect(onDeactivate.mock.results.map(({ value }) => value)).toEqual([dropElA, dropElB, dropElC])
   })
 })

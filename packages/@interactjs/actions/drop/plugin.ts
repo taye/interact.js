@@ -338,10 +338,16 @@ function getDrop (
   const validDrops: Element[] = []
 
   // collect all dropzones and their elements which qualify for a drop
-  for (const { dropzone, element: dropzoneElement, rect } of dropState!.activeDrops) {
-    if (dropzone.dropCheck(dragEvent, pointerEvent, draggable!, dragElement!, dropzoneElement, rect)) {
-      validDrops.push(dropzoneElement)
-    }
+  for (const { dropzone, element: dropzoneElement, rect } of dropState.activeDrops) {
+    const isValid = dropzone.dropCheck(
+      dragEvent,
+      pointerEvent,
+      draggable!,
+      dragElement!,
+      dropzoneElement,
+      rect,
+    )
+    validDrops.push(isValid ? dropzoneElement : null)
   }
 
   // get the most appropriate dropzone based on DOM depth and order
