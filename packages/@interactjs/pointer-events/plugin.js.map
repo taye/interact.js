@@ -1,0 +1,20 @@
+{
+	"version": 3,
+	"names": [
+		"pointerEvents",
+		"holdRepeat",
+		"interactableTargets",
+		"plugin",
+		"id",
+		"install",
+		"scope",
+		"usePlugin"
+	],
+	"sources": [
+		"plugin.ts"
+	],
+	"sourcesContent": [
+		"import type { Plugin } from '@interactjs/core/scope'\n\n/* eslint-disable import/no-duplicates -- for typescript module augmentations */\nimport './base'\nimport './holdRepeat'\nimport './interactableTargets'\n\nimport * as pointerEvents from './base'\nimport holdRepeat from './holdRepeat'\nimport interactableTargets from './interactableTargets'\n/* eslint-enable import/no-duplicates */\n\nconst plugin: Plugin = {\n  id: 'pointer-events',\n  install (scope) {\n    scope.usePlugin(pointerEvents)\n    scope.usePlugin(holdRepeat)\n    scope.usePlugin(interactableTargets)\n  },\n}\n\nexport default plugin\n"
+	],
+	"mappings": "AAEA;AACA,OAAO,QAAP;AACA,OAAO,cAAP;AACA,OAAO,uBAAP;AAEA,OAAO,KAAKA,aAAZ,MAA+B,QAA/B;AACA,OAAOC,UAAP,MAAuB,cAAvB;AACA,OAAOC,mBAAP,MAAgC,uBAAhC;AACA;;AAEA,MAAMC,MAAc,GAAG;EACrBC,EAAE,EAAE,gBADiB;;EAErBC,OAAO,CAAEC,KAAF,EAAS;IACdA,KAAK,CAACC,SAAN,CAAgBP,aAAhB;IACAM,KAAK,CAACC,SAAN,CAAgBN,UAAhB;IACAK,KAAK,CAACC,SAAN,CAAgBL,mBAAhB;EACD;;AANoB,CAAvB;AASA,eAAeC,MAAf"
+}

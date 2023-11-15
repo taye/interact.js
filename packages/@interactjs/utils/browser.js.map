@@ -1,0 +1,46 @@
+{
+	"version": 3,
+	"names": [
+		"domObjects",
+		"is",
+		"browser",
+		"init",
+		"supportsTouch",
+		"supportsPointerEvent",
+		"isIOS7",
+		"isIOS",
+		"isIe9",
+		"isOperaMobile",
+		"prefixedMatchesSelector",
+		"pEventTypes",
+		"wheelEvent",
+		"window",
+		"Element",
+		"navigator",
+		"func",
+		"DocumentTouch",
+		"document",
+		"pointerEnabled",
+		"PointerEvent",
+		"test",
+		"platform",
+		"appVersion",
+		"userAgent",
+		"appName",
+		"prototype",
+		"MSPointerEvent",
+		"up",
+		"down",
+		"over",
+		"out",
+		"move",
+		"cancel"
+	],
+	"sources": [
+		"browser.ts"
+	],
+	"sourcesContent": [
+		"import domObjects from './domObjects'\nimport is from './is'\n\nconst browser = {\n  init,\n  supportsTouch: null as boolean,\n  supportsPointerEvent: null as boolean,\n  isIOS7: null as boolean,\n  isIOS: null as boolean,\n  isIe9: null as boolean,\n  isOperaMobile: null as boolean,\n  prefixedMatchesSelector: null as 'matches',\n  pEventTypes: null as {\n    up: string\n    down: string\n    over: string\n    out: string\n    move: string\n    cancel: string\n  },\n  wheelEvent: null as string,\n}\n\nfunction init (window: any) {\n  const Element = domObjects.Element\n  const navigator: Partial<Navigator> = window.navigator || {}\n\n  // Does the browser support touch input?\n  browser.supportsTouch =\n    'ontouchstart' in window ||\n    (is.func(window.DocumentTouch) && domObjects.document instanceof window.DocumentTouch)\n\n  // Does the browser support PointerEvents\n  // https://github.com/taye/interact.js/issues/703#issuecomment-471570492\n  browser.supportsPointerEvent = (navigator as any).pointerEnabled !== false && !!domObjects.PointerEvent\n\n  browser.isIOS = /iP(hone|od|ad)/.test(navigator.platform)\n\n  // scrolling doesn't change the result of getClientRects on iOS 7\n  browser.isIOS7 = /iP(hone|od|ad)/.test(navigator.platform) && /OS 7[^\\d]/.test(navigator.appVersion)\n\n  browser.isIe9 = /MSIE 9/.test(navigator.userAgent)\n\n  // Opera Mobile must be handled differently\n  browser.isOperaMobile =\n    navigator.appName === 'Opera' && browser.supportsTouch && /Presto/.test(navigator.userAgent)\n\n  // prefix matchesSelector\n  browser.prefixedMatchesSelector = (\n    'matches' in Element.prototype\n      ? 'matches'\n      : 'webkitMatchesSelector' in Element.prototype\n        ? 'webkitMatchesSelector'\n        : 'mozMatchesSelector' in Element.prototype\n          ? 'mozMatchesSelector'\n          : 'oMatchesSelector' in Element.prototype\n            ? 'oMatchesSelector'\n            : 'msMatchesSelector'\n  ) as 'matches'\n\n  browser.pEventTypes = browser.supportsPointerEvent\n    ? domObjects.PointerEvent === window.MSPointerEvent\n      ? {\n        up: 'MSPointerUp',\n        down: 'MSPointerDown',\n        over: 'mouseover',\n        out: 'mouseout',\n        move: 'MSPointerMove',\n        cancel: 'MSPointerCancel',\n      }\n      : {\n        up: 'pointerup',\n        down: 'pointerdown',\n        over: 'pointerover',\n        out: 'pointerout',\n        move: 'pointermove',\n        cancel: 'pointercancel',\n      }\n    : null\n\n  // because Webkit and Opera still use 'mousewheel' event type\n  browser.wheelEvent = domObjects.document && 'onmousewheel' in domObjects.document ? 'mousewheel' : 'wheel'\n}\n\nexport default browser\n"
+	],
+	"mappings": "AAAA,OAAOA,UAAP,MAAuB,cAAvB;AACA,OAAOC,EAAP,MAAe,MAAf;AAEA,MAAMC,OAAO,GAAG;EACdC,IADc;EAEdC,aAAa,EAAE,IAFD;EAGdC,oBAAoB,EAAE,IAHR;EAIdC,MAAM,EAAE,IAJM;EAKdC,KAAK,EAAE,IALO;EAMdC,KAAK,EAAE,IANO;EAOdC,aAAa,EAAE,IAPD;EAQdC,uBAAuB,EAAE,IARX;EASdC,WAAW,EAAE,IATC;EAiBdC,UAAU,EAAE;AAjBE,CAAhB;;AAoBA,SAAST,IAAT,CAAeU,MAAf,EAA4B;EAC1B,MAAMC,OAAO,GAAGd,UAAU,CAACc,OAA3B;EACA,MAAMC,SAA6B,GAAGF,MAAM,CAACE,SAAP,IAAoB,EAA1D,CAF0B,CAI1B;;EACAb,OAAO,CAACE,aAAR,GACE,kBAAkBS,MAAlB,IACCZ,EAAE,CAACe,IAAH,CAAQH,MAAM,CAACI,aAAf,KAAiCjB,UAAU,CAACkB,QAAX,YAA+BL,MAAM,CAACI,aAF1E,CAL0B,CAS1B;EACA;;EACAf,OAAO,CAACG,oBAAR,GAAgCU,SAAD,CAAmBI,cAAnB,KAAsC,KAAtC,IAA+C,CAAC,CAACnB,UAAU,CAACoB,YAA3F;EAEAlB,OAAO,CAACK,KAAR,GAAgB,iBAAiBc,IAAjB,CAAsBN,SAAS,CAACO,QAAhC,CAAhB,CAb0B,CAe1B;;EACApB,OAAO,CAACI,MAAR,GAAiB,iBAAiBe,IAAjB,CAAsBN,SAAS,CAACO,QAAhC,KAA6C,YAAYD,IAAZ,CAAiBN,SAAS,CAACQ,UAA3B,CAA9D;EAEArB,OAAO,CAACM,KAAR,GAAgB,SAASa,IAAT,CAAcN,SAAS,CAACS,SAAxB,CAAhB,CAlB0B,CAoB1B;;EACAtB,OAAO,CAACO,aAAR,GACEM,SAAS,CAACU,OAAV,KAAsB,OAAtB,IAAiCvB,OAAO,CAACE,aAAzC,IAA0D,SAASiB,IAAT,CAAcN,SAAS,CAACS,SAAxB,CAD5D,CArB0B,CAwB1B;;EACAtB,OAAO,CAACQ,uBAAR,GACE,aAAaI,OAAO,CAACY,SAArB,GACI,SADJ,GAEI,2BAA2BZ,OAAO,CAACY,SAAnC,GACE,uBADF,GAEE,wBAAwBZ,OAAO,CAACY,SAAhC,GACE,oBADF,GAEE,sBAAsBZ,OAAO,CAACY,SAA9B,GACE,kBADF,GAEE,mBATZ;EAYAxB,OAAO,CAACS,WAAR,GAAsBT,OAAO,CAACG,oBAAR,GAClBL,UAAU,CAACoB,YAAX,KAA4BP,MAAM,CAACc,cAAnC,GACE;IACAC,EAAE,EAAE,aADJ;IAEAC,IAAI,EAAE,eAFN;IAGAC,IAAI,EAAE,WAHN;IAIAC,GAAG,EAAE,UAJL;IAKAC,IAAI,EAAE,eALN;IAMAC,MAAM,EAAE;EANR,CADF,GASE;IACAL,EAAE,EAAE,WADJ;IAEAC,IAAI,EAAE,aAFN;IAGAC,IAAI,EAAE,aAHN;IAIAC,GAAG,EAAE,YAJL;IAKAC,IAAI,EAAE,aALN;IAMAC,MAAM,EAAE;EANR,CAVgB,GAkBlB,IAlBJ,CArC0B,CAyD1B;;EACA/B,OAAO,CAACU,UAAR,GAAqBZ,UAAU,CAACkB,QAAX,IAAuB,kBAAkBlB,UAAU,CAACkB,QAApD,GAA+D,YAA/D,GAA8E,OAAnG;AACD;;AAED,eAAehB,OAAf"
+}

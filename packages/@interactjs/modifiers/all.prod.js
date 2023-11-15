@@ -1,0 +1,2 @@
+import r from"./aspectRatio";import t from"./avoid/avoid";import o from"./restrict/edges";import i from"./restrict/pointer";import e from"./restrict/rect";import s from"./restrict/size";import m from"./rubberband/rubberband";import p from"./snap/edges";import a from"./snap/pointer";import n from"./snap/size";import f from"./spring/spring";import c from"./transform/transform";export default{aspectRatio:r,restrictEdges:o,restrict:i,restrictRect:e,restrictSize:s,snapEdges:p,snap:a,snapSize:n,spring:f,avoid:t,transform:c,rubberband:m};
+//# sourceMappingURL=all.prod.js.map
