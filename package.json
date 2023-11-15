@@ -1,6 +1,6 @@
 {
   "name": "@interactjs/_dev",
-  "version": "1.10.20",
+  "version": "1.10.21",
   "private": true,
   "directories": {
     "bin": "./bin"

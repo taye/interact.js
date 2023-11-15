@@ -1,4 +1,8 @@
-## v1.10.19
+## v1.10.21
+
+- fix(actions/drop): fix regression with drop event targets #1016
+
+## v1.10.20
 
 - fix(types): import plugins for module augmentations #933
 
