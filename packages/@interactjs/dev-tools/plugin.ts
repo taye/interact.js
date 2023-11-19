@@ -10,6 +10,8 @@ import domObjects from '@interactjs/utils/domObjects'
 import { parentNode } from '@interactjs/utils/domUtils'
 import extend from '@interactjs/utils/extend'
 import is from '@interactjs/utils/is'
+import isNonNativeEvent from '@interactjs/utils/isNonNativeEvent'
+import normalizeListeners from '@interactjs/utils/normalizeListeners'
 import * as win from '@interactjs/utils/window'
 
 declare module '@interactjs/core/scope' {
@@ -86,6 +88,30 @@ function install (scope: Scope, { logger }: { logger?: Logger } = {}) {
     return this.options.devTools
   }
 
+  // can't set native events on non string targets without `addEventListener` prop
+  const { _onOff } = Interactable.prototype
+  Interactable.prototype._onOff = function (method, typeArg, listenerArg, options, filter) {
+    if (is.string(this.target) || this.target.addEventListener) {
+      return _onOff.call(this, method, typeArg, listenerArg, options, filter)
+    }
+
+    if (is.object(typeArg) && !is.array(typeArg)) {
+      options = listenerArg
+      listenerArg = null
+    }
+
+    const normalizedListeners = normalizeListeners(typeArg, listenerArg, filter)
+
+    for (const type in normalizedListeners) {
+      if (isNonNativeEvent(type, scope.actions)) continue
+      scope.logger.warn(
+        prefix +
+          `Can't add native "${type}" event listener to target without \`addEventListener(type, listener, options)\` prop.`,
+      )
+    }
+
+    return _onOff.call(this, method, normalizedListeners, options)
+  }
   scope.usePlugin(visualizer)
 }
 

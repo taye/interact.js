@@ -2,10 +2,11 @@ import type { Scope } from '@interactjs/core/scope'
 import type { Element } from '@interactjs/core/types'
 import * as arr from '@interactjs/utils/arr'
 import * as domUtils from '@interactjs/utils/domUtils'
-import extend from '@interactjs/utils/extend'
 import is from '@interactjs/utils/is'
 import pExtend from '@interactjs/utils/pointerExtend'
 import * as pointerUtils from '@interactjs/utils/pointerUtils'
+
+import type { NativeEventTarget } from './NativeTypes'
 
 declare module '@interactjs/core/scope' {
   interface Scope {
@@ -13,19 +14,26 @@ declare module '@interactjs/core/scope' {
   }
 }
 
-type Listener = (event: Event | FakeEvent) => any
+interface EventOptions {
+  capture: boolean
+  passive: boolean
+}
+
+type PartialEventTarget = Partial<NativeEventTarget>
+
+type ListenerEntry = { func: (event: Event | FakeEvent) => any, options: EventOptions }
 
 function install (scope: Scope) {
   const targets: Array<{
-    eventTarget: EventTarget
-    events: { [type: string]: Listener[] }
+    eventTarget: PartialEventTarget
+    events: { [type: string]: ListenerEntry[] }
   }> = []
 
   const delegatedEvents: {
     [type: string]: Array<{
       selector: string
       context: Node
-      listeners: Array<[Listener, { capture: boolean, passive: boolean }]>
+      listeners: ListenerEntry[]
     }>
   } = {}
   const documents: Document[] = []
@@ -60,7 +68,14 @@ function install (scope: Scope) {
 
   scope.events = eventsMethods
 
-  function add (eventTarget: EventTarget, type: string, listener: Listener, optionalArg?: boolean | any) {
+  function add (
+    eventTarget: PartialEventTarget,
+    type: string,
+    listener: ListenerEntry['func'],
+    optionalArg?: boolean | EventOptions,
+  ) {
+    if (!eventTarget.addEventListener) return
+
     const options = getOptions(optionalArg)
     let target = arr.find(targets, (t) => t.eventTarget === eventTarget)
 
@@ -77,23 +92,24 @@ function install (scope: Scope) {
       target.events[type] = []
     }
 
-    if (eventTarget.addEventListener && !arr.contains(target.events[type], listener)) {
+    if (!arr.find(target.events[type], (l) => l.func === listener && optionsMatch(l.options, options))) {
       eventTarget.addEventListener(
         type,
         listener as any,
         eventsMethods.supportsOptions ? options : options.capture,
       )
-      target.events[type].push(listener)
+      target.events[type].push({ func: listener, options })
     }
   }
 
   function remove (
-    eventTarget: EventTarget,
+    eventTarget: PartialEventTarget,
     type: string,
-    listener?: 'all' | Listener,
-    optionalArg?: boolean | any,
+    listener?: 'all' | ListenerEntry['func'],
+    optionalArg?: boolean | EventOptions,
   ) {
-    const options = getOptions(optionalArg)
+    if (!eventTarget.addEventListener || !eventTarget.removeEventListener) return
+
     const targetIndex = arr.findIndex(targets, (t) => t.eventTarget === eventTarget)
     const target = targets[targetIndex]
 
@@ -116,12 +132,16 @@ function install (scope: Scope) {
     if (typeListeners) {
       if (listener === 'all') {
         for (let i = typeListeners.length - 1; i >= 0; i--) {
-          remove(eventTarget, type, typeListeners[i], options)
+          const entry = typeListeners[i]
+          remove(eventTarget, type, entry.func, entry.options)
         }
         return
       } else {
+        const options = getOptions(optionalArg)
+
         for (let i = 0; i < typeListeners.length; i++) {
-          if (typeListeners[i] === listener) {
+          const entry = typeListeners[i]
+          if (entry.func === listener && optionsMatch(entry.options, options)) {
             eventTarget.removeEventListener(
               type,
               listener as any,
@@ -145,7 +165,13 @@ function install (scope: Scope) {
     }
   }
 
-  function addDelegate (selector: string, context: Node, type: string, listener: Listener, optionalArg?: any) {
+  function addDelegate (
+    selector: string,
+    context: Node,
+    type: string,
+    listener: ListenerEntry['func'],
+    optionalArg?: any,
+  ) {
     const options = getOptions(optionalArg)
     if (!delegatedEvents[type]) {
       delegatedEvents[type] = []
@@ -165,14 +191,14 @@ function install (scope: Scope) {
       delegates.push(delegate)
     }
 
-    delegate.listeners.push([listener, options])
+    delegate.listeners.push({ func: listener, options })
   }
 
   function removeDelegate (
     selector: string,
     context: Document | Element,
     type: string,
-    listener?: Listener,
+    listener?: ListenerEntry['func'],
     optionalArg?: any,
   ) {
     const options = getOptions(optionalArg)
@@ -191,10 +217,10 @@ function install (scope: Scope) {
 
         // each item of the listeners array is an array: [function, capture, passive]
         for (let i = listeners.length - 1; i >= 0; i--) {
-          const [fn, { capture, passive }] = listeners[i]
+          const entry = listeners[i]
 
           // check if the listener functions and capture and passive flags match
-          if (fn === listener && capture === options.capture && passive === options.passive) {
+          if (entry.func === listener && optionsMatch(entry.options, options)) {
             // remove the listener from the array of listeners
             listeners.splice(i, 1)
 
@@ -245,9 +271,9 @@ function install (scope: Scope) {
 
           fakeEvent.currentTarget = element
 
-          for (const [fn, { capture, passive }] of listeners) {
-            if (capture === options.capture && passive === options.passive) {
-              fn(fakeEvent)
+          for (const entry of listeners) {
+            if (optionsMatch(entry.options, options)) {
+              entry.func(fakeEvent)
             }
           }
         }
@@ -294,12 +320,18 @@ function getOptions (param: { [index: string]: any } | boolean): { capture: bool
     return { capture: !!param, passive: false }
   }
 
-  const options = extend({}, param) as any
+  return {
+    capture: !!param.capture,
+    passive: !!param.passive,
+  }
+}
 
-  options.capture = !!param.capture
-  options.passive = !!param.passive
+function optionsMatch (a: Partial<EventOptions> | boolean, b: Partial<EventOptions>) {
+  if (a === b) return true
 
-  return options
+  if (typeof a === 'boolean') return !!b.capture === a && !!b.passive === false
+
+  return !!a.capture === !!b.capture && !!a.passive === !!b.passive
 }
 
 export default {

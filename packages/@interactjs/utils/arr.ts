@@ -24,4 +24,4 @@ export const findIndex = <T>(array: T[], func: Filter<T>) => {
   return -1
 }
 
-export const find = <T = any>(array: T[], func: Filter<T>) => array[findIndex(array, func)]
+export const find = <T = any>(array: T[], func: Filter<T>): T | undefined => array[findIndex(array, func)]

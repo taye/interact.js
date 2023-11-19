@@ -4,11 +4,11 @@ import type { Context, EventTypes, Listener, ListenersArg, Target } from '@inter
 import browser from '@interactjs/utils/browser'
 import * as domUtils from '@interactjs/utils/domUtils'
 import is from '@interactjs/utils/is'
+import isNonNativeEvent from '@interactjs/utils/isNonNativeEvent'
 import { warnOnce } from '@interactjs/utils/misc'
 import * as pointerUtils from '@interactjs/utils/pointerUtils'
 
 import type { Interactable } from './Interactable'
-import isNonNativeEvent from './isNonNativeEvent'
 import type { Options } from './options'
 
 declare module '@interactjs/core/InteractStatic' {

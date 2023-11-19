@@ -716,6 +716,9 @@ const drop: Plugin = {
   getDrop,
   getDropEvents,
   fireDropEvents,
+
+  filterEventType: (type: string) => type.search('drag') === 0 || type.search('drop') === 0,
+
   defaults: {
     enabled: false,
     accept: null as never,

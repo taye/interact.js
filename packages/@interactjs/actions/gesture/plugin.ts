@@ -200,6 +200,8 @@ const gesture: Plugin = {
   getCursor () {
     return ''
   },
+
+  filterEventType: (type: string) => type.search('gesture') === 0,
 }
 
 export default gesture

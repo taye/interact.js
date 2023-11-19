@@ -1,6 +1,5 @@
 import type { EventTypes, Listener, ListenersArg } from '@interactjs/core/types'
 
-import extend from './extend'
 import is from './is'
 
 export interface NormalizedListeners {
@@ -10,6 +9,7 @@ export interface NormalizedListeners {
 export default function normalize (
   type: EventTypes,
   listeners?: ListenersArg | ListenersArg[] | null,
+  filter = (_typeOrPrefix: string) => true,
   result?: NormalizedListeners,
 ): NormalizedListeners {
   result = result || {}
@@ -19,27 +19,29 @@ export default function normalize (
   }
 
   if (is.array(type)) {
-    return type.reduce<NormalizedListeners>((acc, t) => extend(acc, normalize(t, listeners, result)), result)
+    type.forEach((t) => normalize(t, listeners, filter, result))
+    return result
   }
 
-  // ({ type: fn }) -> ('', { type: fn })
+  // before:  type = [{ drag: () => {} }], listeners = undefined
+  // after:   type = ''                  , listeners = [{ drag: () => {} }]
   if (is.object(type)) {
     listeners = type
     type = ''
   }
 
-  if (is.func(listeners)) {
+  if (is.func(listeners) && filter(type)) {
     result[type] = result[type] || []
     result[type].push(listeners)
   } else if (is.array(listeners)) {
     for (const l of listeners) {
-      normalize(type, l, result)
+      normalize(type, l, filter, result)
     }
   } else if (is.object(listeners)) {
     for (const prefix in listeners) {
       const combinedTypes = split(prefix).map((p) => `${type}${p}`)
 
-      normalize(combinedTypes, listeners[prefix], result)
+      normalize(combinedTypes, listeners[prefix], filter, result)
     }
   }
 
