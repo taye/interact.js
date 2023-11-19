@@ -3,7 +3,6 @@ import type { DoAnyPhaseArg, Interaction } from '@interactjs/core/Interaction'
 import type { Scope, Plugin } from '@interactjs/core/scope'
 import type { ActionName, ActionProps, Element } from '@interactjs/core/types'
 import * as arr from '@interactjs/utils/arr'
-import is from '@interactjs/utils/is'
 import { copyAction } from '@interactjs/utils/misc'
 import * as pointerUtils from '@interactjs/utils/pointerUtils'
 import { tlbrToXywh } from '@interactjs/utils/rect'
@@ -69,11 +68,7 @@ function doReflow<T extends ActionName> (
   action: ActionProps<T>,
   scope: Scope,
 ): Promise<Interactable> {
-  const elements = (
-    is.string(interactable.target)
-      ? arr.from(interactable._context.querySelectorAll(interactable.target))
-      : [interactable.target]
-  ) as Element[]
+  const elements = interactable.getAllElements()
 
   // tslint:disable-next-line variable-name
   const Promise = (scope.window as any).Promise

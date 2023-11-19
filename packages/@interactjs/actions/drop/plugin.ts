@@ -261,7 +261,7 @@ function install (scope: Scope) {
   defaults.actions.drop = drop.defaults
 }
 
-function collectDrops ({ interactables }: Scope, draggableElement: Element) {
+function collectDropzones ({ interactables }: Scope, draggableElement: Element) {
   const drops: ActiveDrop[] = []
 
   // collect all dropzones and their elements which qualify for a drop
@@ -281,16 +281,7 @@ function collectDrops ({ interactables }: Scope, draggableElement: Element) {
       continue
     }
 
-    // query for new elements if necessary
-    const dropElements = (
-      is.string(dropzone.target)
-        ? dropzone._context.querySelectorAll(dropzone.target)
-        : is.array(dropzone.target)
-          ? dropzone.target
-          : [dropzone.target]
-    ) as Element[]
-
-    for (const dropzoneElement of dropElements) {
+    for (const dropzoneElement of dropzone.getAllElements()) {
       if (dropzoneElement !== draggableElement) {
         drops.push({
           dropzone,
@@ -321,7 +312,7 @@ function fireActivationEvents (activeDrops: ActiveDrop[], event: DropEvent) {
 // dynamicDrop is true
 function getActiveDrops (scope: Scope, dragElement: Element) {
   // get dropzones and their elements that could receive the draggable
-  const activeDrops = collectDrops(scope, dragElement)
+  const activeDrops = collectDropzones(scope, dragElement)
 
   for (const activeDrop of activeDrops) {
     activeDrop.rect = activeDrop.dropzone.getRect(activeDrop.element)

@@ -45,7 +45,7 @@ test('interact export', () => {
 
   for (const { interactable, target, context } of results) {
     // interactions.get returns correct result with identical targets and different contexts
-    expect(scope.interactables.get(target, { context })).toBe(interactable)
+    expect(scope.interactables.getExisting(target, { context })).toBe(interactable)
   }
 
   const doc3 = makeIframeDoc()

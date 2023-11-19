@@ -37,23 +37,18 @@ describe('core/Interactable', () => {
   })
 
   test('Interactable unset correctly', () => {
-    const scope = helpers.mockScope() as any
+    const scope = helpers.mockScope()
 
     const div = scope.document.createElement('div')
     const interactable = scope.interactables.new(div)
 
-    const mappingInfo = div[scope.id][0]
+    expect(div[scope.id]).toHaveLength(1)
 
-    scope.fire('interactable:unset', { interactable })
+    interactable.unset()
 
-    // unset mappingInfo context
-    expect(mappingInfo.context).toBeNull()
-
-    // unset mappingInfo interactable
-    expect(mappingInfo.interactable).toBeNull()
-
-    // unset target are removed
+    // clears target mapping
     expect(div[scope.id]).toHaveLength(0)
+
     div.remove()
   })
 

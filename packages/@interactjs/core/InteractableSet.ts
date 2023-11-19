@@ -1,7 +1,7 @@
 import type { Interactable } from '@interactjs/core/Interactable'
 import type { OptionsArg, Options } from '@interactjs/core/options'
 import type { Scope } from '@interactjs/core/scope'
-import type { Target, Context } from '@interactjs/core/types'
+import type { Target } from '@interactjs/core/types'
 import * as arr from '@interactjs/utils/arr'
 import * as domUtils from '@interactjs/utils/domUtils'
 import extend from '@interactjs/utils/extend'
@@ -18,17 +18,12 @@ declare module '@interactjs/core/scope' {
   }
 }
 
-interface InteractableScopeProp {
-  context: Context
-  interactable: Interactable
-}
-
 export class InteractableSet {
   // all set interactables
   list: Interactable[] = []
 
   selectorMap: {
-    [selector: string]: InteractableScopeProp[]
+    [selector: string]: Interactable[]
   } = {}
 
   scope: Scope
@@ -37,18 +32,13 @@ export class InteractableSet {
     this.scope = scope
     scope.addListeners({
       'interactable:unset': ({ interactable }) => {
-        const { target, _context: context } = interactable
-        const targetMappings: InteractableScopeProp[] = is.string(target)
+        const { target } = interactable
+        const interactablesOnTarget: Interactable[] = is.string(target)
           ? this.selectorMap[target]
           : (target as any)[this.scope.id]
 
-        const targetIndex = arr.findIndex(targetMappings, (m) => m.context === context)
-        if (targetMappings[targetIndex]) {
-          // Destroying mappingInfo's context and interactable
-          targetMappings[targetIndex].context = null as never
-          targetMappings[targetIndex].interactable = null as never
-        }
-        targetMappings.splice(targetIndex, 1)
+        const targetIndex = arr.findIndex(interactablesOnTarget, (i) => i === interactable)
+        interactablesOnTarget.splice(targetIndex, 1)
       },
     })
   }
@@ -58,7 +48,6 @@ export class InteractableSet {
       actions: this.scope.actions,
     })
     const interactable = new this.scope.Interactable(target, options, this.scope.document, this.scope.events)
-    const mappingInfo = { context: interactable._context, interactable }
 
     this.scope.addDocument(interactable._doc)
     this.list.push(interactable)
@@ -67,7 +56,7 @@ export class InteractableSet {
       if (!this.selectorMap[target]) {
         this.selectorMap[target] = []
       }
-      this.selectorMap[target].push(mappingInfo)
+      this.selectorMap[target].push(interactable)
     } else {
       if (!(interactable.target as any)[this.scope.id]) {
         Object.defineProperty(target, this.scope.id, {
@@ -76,7 +65,7 @@ export class InteractableSet {
         })
       }
 
-      ;(target as any)[this.scope.id].push(mappingInfo)
+      ;(target as any)[this.scope.id].push(interactable)
     }
 
     this.scope.fire('interactable:new', {
@@ -89,23 +78,20 @@ export class InteractableSet {
     return interactable
   }
 
-  get (target: Target, options?: Options) {
+  getExisting (target: Target, options?: Options) {
     const context = (options && options.context) || this.scope.document
     const isSelector = is.string(target)
-    const targetMappings: InteractableScopeProp[] = isSelector
+    const interactablesOnTarget: Interactable[] = isSelector
       ? this.selectorMap[target as string]
       : (target as any)[this.scope.id]
 
-    if (!targetMappings) {
-      return null
-    }
+    if (!interactablesOnTarget) return undefined
 
-    const found = arr.find(
-      targetMappings,
-      (m) => m.context === context && (isSelector || m.interactable.inContext(target as any)),
+    return arr.find(
+      interactablesOnTarget,
+      (interactable) =>
+        interactable._context === context && (isSelector || interactable.inContext(target as any)),
     )
-
-    return found && found.interactable
   }
 
   forEachMatch<T> (node: Node, callback: (interactable: Interactable) => T): T | void {

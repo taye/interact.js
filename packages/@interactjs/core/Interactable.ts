@@ -247,6 +247,21 @@ export class Interactable implements Partial<Eventable> {
     return this.options.deltaSource
   }
 
+  /** @internal */
+  getAllElements (): Element[] {
+    const { target } = this
+
+    if (is.string(target)) {
+      return Array.from(this._context.querySelectorAll(target))
+    }
+
+    if (is.func(target) && (target as any).getAllElements) {
+      return (target as any).getAllElements()
+    }
+
+    return is.element(target) ? [target] : []
+  }
+
   /**
    * Gets the selector context Node of the Interactable. The default is
    * `window.document`.

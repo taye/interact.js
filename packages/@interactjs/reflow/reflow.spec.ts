@@ -27,7 +27,6 @@ describe('reflow', () => {
     interactable.fire = ((iEvent: any) => {
       fired.push(iEvent)
     }) as any
-    ;(interactable.target as any) = {}
     ;(interactable.options as any).TEST = { enabled: true }
     interactable.rectChecker(() => ({ ...rect }))
 
@@ -47,6 +46,7 @@ describe('reflow', () => {
     interactable.reflow(testAction)
 
     const phases = ['reflow', 'start', 'move', 'end']
+    expect(phases.map((_phase, index) => fired[index]?.type)).toEqual(phases.map((phase) => `TEST${phase}`))
 
     for (const index in phases) {
       const phase = phases[index]
@@ -84,7 +84,7 @@ describe('reflow', () => {
     let reflowEvent: any
     let promise: Promise<Interactable>
 
-    const interactable = scope.interactables.new(scope.window)
+    const interactable = scope.interactables.new(scope.document.documentElement)
     const rect = Object.freeze({ top: 100, left: 200, bottom: 300, right: 400 })
     interactable.rectChecker(() => ({ ...rect }))
     interactable.fire = ((iEvent: any) => {
