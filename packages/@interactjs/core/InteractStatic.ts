@@ -74,7 +74,7 @@ export function createInteractStatic (scope: Scope): _InteractStatic {
    * @return {Interactable}
    */
   const interact = ((target: Target, options: Options) => {
-    let interactable = scope.interactables.get(target, options)
+    let interactable = scope.interactables.getExisting(target, options)
 
     if (!interactable) {
       interactable = scope.interactables.new(target, options)
