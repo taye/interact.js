@@ -19,15 +19,20 @@ import clone from '@interactjs/utils/clone'
 import { getElementRect, matchesUpTo, nodeContains, trySelector } from '@interactjs/utils/domUtils'
 import extend from '@interactjs/utils/extend'
 import is from '@interactjs/utils/is'
+import isNonNativeEvent from '@interactjs/utils/isNonNativeEvent'
 import normalizeListeners from '@interactjs/utils/normalizeListeners'
 import { getWindow } from '@interactjs/utils/window'
 
 import { Eventable } from './Eventable'
-import isNonNativeEvent from './isNonNativeEvent'
 import type { ActionDefaults, Defaults, OptionsArg, PerActionDefaults, Options } from './options'
 
 type IgnoreValue = string | Element | boolean
 type DeltaSource = 'page' | 'client'
+
+const enum OnOffMethod {
+  On,
+  Off,
+}
 
 /** */
 export class Interactable implements Partial<Eventable> {
@@ -83,12 +88,17 @@ export class Interactable implements Partial<Eventable> {
   }
 
   updatePerActionListeners (actionName: ActionName, prev: Listeners | undefined, cur: Listeners | undefined) {
+    const actionFilter = (this._actions.map[actionName] as { filterEventType?: (type: string) => boolean })
+      ?.filterEventType
+    const filter = (type: string) =>
+      (actionFilter == null || actionFilter(type)) && isNonNativeEvent(type, this._actions)
+
     if (is.array(prev) || is.object(prev)) {
-      this.off(actionName, prev)
+      this._onOff(OnOffMethod.Off, actionName, prev, undefined, filter)
     }
 
     if (is.array(cur) || is.object(cur)) {
-      this.on(actionName, cur)
+      this._onOff(OnOffMethod.On, actionName, cur, undefined, filter)
     }
   }
 
@@ -309,14 +319,19 @@ export class Interactable implements Partial<Eventable> {
     return this
   }
 
-  _onOff (method: 'on' | 'off', typeArg: EventTypes, listenerArg?: ListenersArg | null, options?: any) {
+  _onOff (
+    method: OnOffMethod,
+    typeArg: EventTypes,
+    listenerArg?: ListenersArg | null,
+    options?: any,
+    filter?: (type: string) => boolean,
+  ) {
     if (is.object(typeArg) && !is.array(typeArg)) {
       options = listenerArg
       listenerArg = null
     }
 
-    const addRemove = method === 'on' ? 'add' : 'remove'
-    const listeners = normalizeListeners(typeArg, listenerArg)
+    const listeners = normalizeListeners(typeArg, listenerArg, filter)
 
     for (let type in listeners) {
       if (type === 'wheel') {
@@ -326,11 +341,11 @@ export class Interactable implements Partial<Eventable> {
       for (const listener of listeners[type]) {
         // if it is an action event type
         if (isNonNativeEvent(type, this._actions)) {
-          this.events[method](type, listener)
+          this.events[method === OnOffMethod.On ? 'on' : 'off'](type, listener)
         }
         // delegated event
         else if (is.string(this.target)) {
-          this._scopeEvents[`${addRemove}Delegate` as 'addDelegate' | 'removeDelegate'](
+          this._scopeEvents[method === OnOffMethod.On ? 'addDelegate' : 'removeDelegate'](
             this.target,
             this._context,
             type,
@@ -340,7 +355,12 @@ export class Interactable implements Partial<Eventable> {
         }
         // remove listener from this Interactable's element
         else {
-          this._scopeEvents[addRemove](this.target, type, listener, options)
+          this._scopeEvents[method === OnOffMethod.On ? 'add' : 'remove'](
+            this.target,
+            type,
+            listener,
+            options,
+          )
         }
       }
     }
@@ -359,7 +379,7 @@ export class Interactable implements Partial<Eventable> {
    * @return {Interactable} This Interactable
    */
   on (types: EventTypes, listener?: ListenersArg, options?: any) {
-    return this._onOff('on', types, listener, options)
+    return this._onOff(OnOffMethod.On, types, listener, options)
   }
 
   /**
@@ -373,7 +393,7 @@ export class Interactable implements Partial<Eventable> {
    * @return {Interactable} This Interactable
    */
   off (types: string | string[] | EventTypes, listener?: ListenersArg, options?: any) {
-    return this._onOff('off', types, listener, options)
+    return this._onOff(OnOffMethod.Off, types, listener, options)
   }
 
   /**
@@ -438,7 +458,7 @@ export class Interactable implements Partial<Eventable> {
         }
       }
     } else {
-      this._scopeEvents.remove(this.target as Node, 'all')
+      this._scopeEvents.remove(this.target, 'all')
     }
   }
 }

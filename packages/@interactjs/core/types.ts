@@ -2,7 +2,7 @@ import type Interaction from '@interactjs/core/Interaction'
 
 import type { PhaseMap, InteractEvent } from './InteractEvent'
 import type { Interactable } from './Interactable'
-import type _NativePointerEventType from './NativePointerEventType'
+import type { NativePointerEvent as NativePointerEvent_ } from './NativeTypes'
 
 export type OrBoolean<T> = {
   [P in keyof T]: T[P] | boolean
@@ -130,7 +130,7 @@ export interface PointerEventsOptions {
 
 export type RectChecker = (element: Element) => Rect
 
-export type NativePointerEventType = typeof _NativePointerEventType
+export type NativePointerEventType = typeof NativePointerEvent_
 export type PointerEventType = MouseEvent | TouchEvent | Partial<NativePointerEventType> | InteractEvent
 export type PointerType = MouseEvent | Touch | Partial<NativePointerEventType> | InteractEvent
 

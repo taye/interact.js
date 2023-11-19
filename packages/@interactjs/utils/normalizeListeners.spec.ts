@@ -57,4 +57,14 @@ test('utils/normalizeListeners', () => {
     prefix_2: [a, b],
     prefix_3: [b, c],
   })
+
+  // filter
+  expect(normalizeListeners('ignore', [{ _1: a, '': b }], (type) => !type.startsWith('ignore'))).toEqual({})
+  expect(
+    normalizeListeners(
+      { ignore: { _1: a }, ig: { nore: b }, allow: { _x: c } },
+      undefined,
+      (type) => !type.startsWith('ignore'),
+    ),
+  ).toEqual({ allow_x: [c] })
 })

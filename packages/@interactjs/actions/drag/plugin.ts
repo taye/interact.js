@@ -190,6 +190,8 @@ const drag: Plugin = {
   getCursor () {
     return 'move'
   },
+
+  filterEventType: (type: string) => type.search('drag') === 0,
 }
 
 export default drag

@@ -514,6 +514,8 @@ const resize: Plugin = {
     return result
   },
 
+  filterEventType: (type: string) => type.search('resize') === 0,
+
   defaultMargin: null as number,
 }
 
