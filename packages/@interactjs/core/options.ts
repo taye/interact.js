@@ -1,4 +1,4 @@
-import type { Point, Listeners, OrBoolean, Element } from '@interactjs/core/types'
+import type { Point, Listeners, OrBoolean, Element, Rect } from '@interactjs/core/types'
 
 export interface Defaults {
   base: BaseDefaults
@@ -13,6 +13,7 @@ export interface BaseDefaults {
   preventDefault?: 'auto' | 'never' | string
   deltaSource?: 'page' | 'client'
   context?: Node
+  getRect?: (element: Element) => Rect
 }
 
 export interface PerActionDefaults {
