@@ -436,6 +436,11 @@ export class Interactable implements Partial<Eventable> {
     }
 
     for (const setting in options) {
+      if (setting === 'getRect') {
+        this.rectChecker(options.getRect)
+        continue
+      }
+
       if (is.func((this as any)[setting])) {
         ;(this as any)[setting](options[setting as keyof typeof options])
       }
