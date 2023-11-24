@@ -1,0 +1,43 @@
+{
+	"version": 3,
+	"names": [
+		"closest",
+		"getElementRect",
+		"parentNode",
+		"extend",
+		"is",
+		"getStringOptionResult",
+		"value",
+		"target",
+		"element",
+		"getRect",
+		"resolveRectLike",
+		"functionArgs",
+		"returnValue",
+		"string",
+		"func",
+		"toFullRect",
+		"rect",
+		"top",
+		"left",
+		"bottom",
+		"right",
+		"width",
+		"height",
+		"rectToXY",
+		"x",
+		"y",
+		"xywhToTlbr",
+		"tlbrToXywh",
+		"addEdges",
+		"edges",
+		"delta"
+	],
+	"sources": [
+		"rect.ts"
+	],
+	"sourcesContent": [
+		"import type {\n  HasGetRect,\n  RectResolvable,\n  Rect,\n  Element,\n  Point,\n  FullRect,\n  EdgeOptions,\n} from '@interactjs/core/types'\n\nimport { closest, getElementRect, parentNode } from './domUtils'\nimport extend from './extend'\nimport is from './is'\n\nexport function getStringOptionResult (value: any, target: HasGetRect, element: Node) {\n  if (value === 'parent') {\n    return parentNode(element)\n  }\n\n  if (value === 'self') {\n    return target.getRect(element as Element)\n  }\n\n  return closest(element, value)\n}\n\nexport function resolveRectLike<T extends any[]> (\n  value: RectResolvable<T>,\n  target?: HasGetRect,\n  element?: Node,\n  functionArgs?: T,\n) {\n  let returnValue: any = value\n  if (is.string(returnValue)) {\n    returnValue = getStringOptionResult(returnValue, target, element)\n  } else if (is.func(returnValue)) {\n    returnValue = returnValue(...functionArgs)\n  }\n\n  if (is.element(returnValue)) {\n    returnValue = getElementRect(returnValue)\n  }\n\n  return returnValue as Rect\n}\n\nexport function toFullRect (rect: Rect): FullRect {\n  const { top, left, bottom, right } = rect\n  const width = rect.width ?? rect.right - rect.left\n  const height = rect.height ?? rect.bottom - rect.top\n\n  return { top, left, bottom, right, width, height }\n}\n\nexport function rectToXY (rect: Rect | Point) {\n  return (\n    rect && {\n      x: 'x' in rect ? rect.x : rect.left,\n      y: 'y' in rect ? rect.y : rect.top,\n    }\n  )\n}\n\nexport function xywhToTlbr<T extends Partial<Rect & Point>> (rect: T) {\n  if (rect && !('left' in rect && 'top' in rect)) {\n    rect = extend({}, rect)\n\n    rect.left = rect.x || 0\n    rect.top = rect.y || 0\n    rect.right = rect.right || rect.left + rect.width\n    rect.bottom = rect.bottom || rect.top + rect.height\n  }\n\n  return rect as Rect & T\n}\n\nexport function tlbrToXywh (rect: Rect & Partial<Point>) {\n  if (rect && !('x' in rect && 'y' in rect)) {\n    rect = extend({}, rect)\n\n    rect.x = rect.left || 0\n    rect.y = rect.top || 0\n    rect.width = rect.width || (rect.right || 0) - rect.x\n    rect.height = rect.height || (rect.bottom || 0) - rect.y\n  }\n\n  return rect as FullRect & Point\n}\n\nexport function addEdges (edges: EdgeOptions, rect: Rect, delta: Point) {\n  if (edges.left) {\n    rect.left += delta.x\n  }\n  if (edges.right) {\n    rect.right += delta.x\n  }\n  if (edges.top) {\n    rect.top += delta.y\n  }\n  if (edges.bottom) {\n    rect.bottom += delta.y\n  }\n\n  rect.width = rect.right - rect.left\n  rect.height = rect.bottom - rect.top\n}\n"
+	],
+	"mappings": "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"
+}

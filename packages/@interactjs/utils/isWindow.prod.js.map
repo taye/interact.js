@@ -1,0 +1,14 @@
+{
+	"version": 3,
+	"names": [
+		"thing",
+		"Window"
+	],
+	"sources": [
+		"isWindow.ts"
+	],
+	"sourcesContent": [
+		"export default (thing: any) => !!(thing && thing.Window) && thing instanceof thing.Window\n"
+	],
+	"mappings": "eAAgBA,MAAkBA,IAASA,EAAMC,SAAWD,aAAiBA,EAAMC"
+}

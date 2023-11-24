@@ -1,0 +1,49 @@
+{
+	"version": 3,
+	"names": [
+		"extend",
+		"rectUtils",
+		"makeModifier",
+		"getRestrictionRect",
+		"noInner",
+		"top",
+		"Infinity",
+		"left",
+		"bottom",
+		"right",
+		"noOuter",
+		"start",
+		"interaction",
+		"startOffset",
+		"state",
+		"options",
+		"offset",
+		"offsetRect",
+		"coords",
+		"page",
+		"rectToXY",
+		"x",
+		"y",
+		"set",
+		"edges",
+		"inner",
+		"outer",
+		"fixRect",
+		"Math",
+		"min",
+		"max",
+		"rect",
+		"defaults",
+		"edge",
+		"endOnly",
+		"enabled",
+		"restrictEdges"
+	],
+	"sources": [
+		"edges.ts"
+	],
+	"sourcesContent": [
+		"// This module adds the options.resize.restrictEdges setting which sets min and\n// max for the top, left, bottom and right edges of the target being resized.\n//\n// interact(target).resize({\n//   edges: { top: true, left: true },\n//   restrictEdges: {\n//     inner: { top: 200, left: 200, right: 400, bottom: 400 },\n//     outer: { top:   0, left:   0, right: 600, bottom: 600 },\n//   },\n// })\n\nimport type { Point, Rect } from '@interactjs/core/types'\nimport extend from '@interactjs/utils/extend'\nimport * as rectUtils from '@interactjs/utils/rect'\n\nimport { makeModifier } from '../base'\nimport type { ModifierArg, ModifierState } from '../types'\n\nimport type { RestrictOptions } from './pointer'\nimport { getRestrictionRect } from './pointer'\n\nexport interface RestrictEdgesOptions {\n  inner: RestrictOptions['restriction']\n  outer: RestrictOptions['restriction']\n  offset?: RestrictOptions['offset']\n  endOnly: boolean\n  enabled?: boolean\n}\n\nexport type RestrictEdgesState = ModifierState<\nRestrictEdgesOptions,\n{\n  inner: Rect\n  outer: Rect\n  offset: RestrictEdgesOptions['offset']\n}\n>\n\nconst noInner = { top: +Infinity, left: +Infinity, bottom: -Infinity, right: -Infinity }\nconst noOuter = { top: -Infinity, left: -Infinity, bottom: +Infinity, right: +Infinity }\n\nfunction start ({ interaction, startOffset, state }: ModifierArg<RestrictEdgesState>) {\n  const { options } = state\n  let offset: Point\n\n  if (options) {\n    const offsetRect = getRestrictionRect(options.offset, interaction, interaction.coords.start.page)\n\n    offset = rectUtils.rectToXY(offsetRect)\n  }\n\n  offset = offset || { x: 0, y: 0 }\n\n  state.offset = {\n    top: offset.y + startOffset.top,\n    left: offset.x + startOffset.left,\n    bottom: offset.y - startOffset.bottom,\n    right: offset.x - startOffset.right,\n  }\n}\n\nfunction set ({ coords, edges, interaction, state }: ModifierArg<RestrictEdgesState>) {\n  const { offset, options } = state\n\n  if (!edges) {\n    return\n  }\n\n  const page = extend({}, coords)\n  const inner = getRestrictionRect(options.inner, interaction, page) || ({} as Rect)\n  const outer = getRestrictionRect(options.outer, interaction, page) || ({} as Rect)\n\n  fixRect(inner, noInner)\n  fixRect(outer, noOuter)\n\n  if (edges.top) {\n    coords.y = Math.min(Math.max(outer.top + offset.top, page.y), inner.top + offset.top)\n  } else if (edges.bottom) {\n    coords.y = Math.max(Math.min(outer.bottom + offset.bottom, page.y), inner.bottom + offset.bottom)\n  }\n  if (edges.left) {\n    coords.x = Math.min(Math.max(outer.left + offset.left, page.x), inner.left + offset.left)\n  } else if (edges.right) {\n    coords.x = Math.max(Math.min(outer.right + offset.right, page.x), inner.right + offset.right)\n  }\n}\n\nfunction fixRect (rect: Rect, defaults: Rect) {\n  for (const edge of ['top', 'left', 'bottom', 'right']) {\n    if (!(edge in rect)) {\n      rect[edge] = defaults[edge]\n    }\n  }\n\n  return rect\n}\n\nconst defaults: RestrictEdgesOptions = {\n  inner: null,\n  outer: null,\n  offset: null,\n  endOnly: false,\n  enabled: false,\n}\n\nconst restrictEdges = {\n  noInner,\n  noOuter,\n  start,\n  set,\n  defaults,\n}\n\nexport default makeModifier(restrictEdges, 'restrictEdges')\nexport { restrictEdges }\n"
+	],
+	"mappings": "AAAA;AACA;AACA;AACA;AACA;AACA;AACA;AACA;AACA;AACA;AAGA,OAAOA,MAAP,MAAmB,uBAAnB;AACA,OAAO,KAAKC,SAAZ,MAA2B,qBAA3B;AAEA,SAASC,YAAT,QAA6B,SAA7B;AAIA,SAASC,kBAAT,QAAmC,WAAnC;AAmBA,MAAMC,OAAO,GAAG;EAAEC,GAAG,EAAE,CAACC,QAAR;EAAkBC,IAAI,EAAE,CAACD,QAAzB;EAAmCE,MAAM,EAAE,CAACF,QAA5C;EAAsDG,KAAK,EAAE,CAACH;AAA9D,CAAhB;AACA,MAAMI,OAAO,GAAG;EAAEL,GAAG,EAAE,CAACC,QAAR;EAAkBC,IAAI,EAAE,CAACD,QAAzB;EAAmCE,MAAM,EAAE,CAACF,QAA5C;EAAsDG,KAAK,EAAE,CAACH;AAA9D,CAAhB;;AAEA,SAASK,KAAT,CAAgB;EAAEC,WAAF;EAAeC,WAAf;EAA4BC;AAA5B,CAAhB,EAAsF;EACpF,MAAM;IAAEC;EAAF,IAAcD,KAApB;EACA,IAAIE,MAAJ;;EAEA,IAAID,OAAJ,EAAa;IACX,MAAME,UAAU,GAAGd,kBAAkB,CAACY,OAAO,CAACC,MAAT,EAAiBJ,WAAjB,EAA8BA,WAAW,CAACM,MAAZ,CAAmBP,KAAnB,CAAyBQ,IAAvD,CAArC;IAEAH,MAAM,GAAGf,SAAS,CAACmB,QAAV,CAAmBH,UAAnB,CAAT;EACD;;EAEDD,MAAM,GAAGA,MAAM,IAAI;IAAEK,CAAC,EAAE,CAAL;IAAQC,CAAC,EAAE;EAAX,CAAnB;EAEAR,KAAK,CAACE,MAAN,GAAe;IACbX,GAAG,EAAEW,MAAM,CAACM,CAAP,GAAWT,WAAW,CAACR,GADf;IAEbE,IAAI,EAAES,MAAM,CAACK,CAAP,GAAWR,WAAW,CAACN,IAFhB;IAGbC,MAAM,EAAEQ,MAAM,CAACM,CAAP,GAAWT,WAAW,CAACL,MAHlB;IAIbC,KAAK,EAAEO,MAAM,CAACK,CAAP,GAAWR,WAAW,CAACJ;EAJjB,CAAf;AAMD;;AAED,SAASc,GAAT,CAAc;EAAEL,MAAF;EAAUM,KAAV;EAAiBZ,WAAjB;EAA8BE;AAA9B,CAAd,EAAsF;EACpF,MAAM;IAAEE,MAAF;IAAUD;EAAV,IAAsBD,KAA5B;;EAEA,IAAI,CAACU,KAAL,EAAY;IACV;EACD;;EAED,MAAML,IAAI,GAAGnB,MAAM,CAAC,EAAD,EAAKkB,MAAL,CAAnB;EACA,MAAMO,KAAK,GAAGtB,kBAAkB,CAACY,OAAO,CAACU,KAAT,EAAgBb,WAAhB,EAA6BO,IAA7B,CAAlB,IAAyD,EAAvE;EACA,MAAMO,KAAK,GAAGvB,kBAAkB,CAACY,OAAO,CAACW,KAAT,EAAgBd,WAAhB,EAA6BO,IAA7B,CAAlB,IAAyD,EAAvE;EAEAQ,OAAO,CAACF,KAAD,EAAQrB,OAAR,CAAP;EACAuB,OAAO,CAACD,KAAD,EAAQhB,OAAR,CAAP;;EAEA,IAAIc,KAAK,CAACnB,GAAV,EAAe;IACba,MAAM,CAACI,CAAP,GAAWM,IAAI,CAACC,GAAL,CAASD,IAAI,CAACE,GAAL,CAASJ,KAAK,CAACrB,GAAN,GAAYW,MAAM,CAACX,GAA5B,EAAiCc,IAAI,CAACG,CAAtC,CAAT,EAAmDG,KAAK,CAACpB,GAAN,GAAYW,MAAM,CAACX,GAAtE,CAAX;EACD,CAFD,MAEO,IAAImB,KAAK,CAAChB,MAAV,EAAkB;IACvBU,MAAM,CAACI,CAAP,GAAWM,IAAI,CAACE,GAAL,CAASF,IAAI,CAACC,GAAL,CAASH,KAAK,CAAClB,MAAN,GAAeQ,MAAM,CAACR,MAA/B,EAAuCW,IAAI,CAACG,CAA5C,CAAT,EAAyDG,KAAK,CAACjB,MAAN,GAAeQ,MAAM,CAACR,MAA/E,CAAX;EACD;;EACD,IAAIgB,KAAK,CAACjB,IAAV,EAAgB;IACdW,MAAM,CAACG,CAAP,GAAWO,IAAI,CAACC,GAAL,CAASD,IAAI,CAACE,GAAL,CAASJ,KAAK,CAACnB,IAAN,GAAaS,MAAM,CAACT,IAA7B,EAAmCY,IAAI,CAACE,CAAxC,CAAT,EAAqDI,KAAK,CAAClB,IAAN,GAAaS,MAAM,CAACT,IAAzE,CAAX;EACD,CAFD,MAEO,IAAIiB,KAAK,CAACf,KAAV,EAAiB;IACtBS,MAAM,CAACG,CAAP,GAAWO,IAAI,CAACE,GAAL,CAASF,IAAI,CAACC,GAAL,CAASH,KAAK,CAACjB,KAAN,GAAcO,MAAM,CAACP,KAA9B,EAAqCU,IAAI,CAACE,CAA1C,CAAT,EAAuDI,KAAK,CAAChB,KAAN,GAAcO,MAAM,CAACP,KAA5E,CAAX;EACD;AACF;;AAED,SAASkB,OAAT,CAAkBI,IAAlB,EAA8BC,QAA9B,EAA8C;EAC5C,KAAK,MAAMC,IAAX,IAAmB,CAAC,KAAD,EAAQ,MAAR,EAAgB,QAAhB,EAA0B,OAA1B,CAAnB,EAAuD;IACrD,IAAI,EAAEA,IAAI,IAAIF,IAAV,CAAJ,EAAqB;MACnBA,IAAI,CAACE,IAAD,CAAJ,GAAaD,QAAQ,CAACC,IAAD,CAArB;IACD;EACF;;EAED,OAAOF,IAAP;AACD;;AAED,MAAMC,QAA8B,GAAG;EACrCP,KAAK,EAAE,IAD8B;EAErCC,KAAK,EAAE,IAF8B;EAGrCV,MAAM,EAAE,IAH6B;EAIrCkB,OAAO,EAAE,KAJ4B;EAKrCC,OAAO,EAAE;AAL4B,CAAvC;AAQA,MAAMC,aAAa,GAAG;EACpBhC,OADoB;EAEpBM,OAFoB;EAGpBC,KAHoB;EAIpBY,GAJoB;EAKpBS;AALoB,CAAtB;AAQA,eAAe9B,YAAY,CAACkC,aAAD,EAAgB,eAAhB,CAA3B;AACA,SAASA,aAAT"
+}
