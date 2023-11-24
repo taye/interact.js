@@ -132,7 +132,7 @@ function updateGestureProps ({ interaction, iEvent, phase }: GestureSignalArg) {
 
     interaction.gesture.startDistance = iEvent.distance
     interaction.gesture.startAngle = iEvent.angle
-  } else if (ending) {
+  } else if (ending || interaction.pointers.length < 2) {
     const prevEvent = interaction.prevEvent as GestureEvent
 
     iEvent.distance = prevEvent.distance
