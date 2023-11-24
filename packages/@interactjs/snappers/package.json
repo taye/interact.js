@@ -1,6 +1,6 @@
 {
   "name": "@interactjs/snappers",
-  "version": "1.10.21",
+  "version": "1.10.22",
   "main": "index",
   "module": "index",
   "type": "module",
@@ -10,10 +10,10 @@
     "directory": "packages/@interactjs/snappers"
   },
   "peerDependencies": {
-    "@interactjs/utils": "1.10.21"
+    "@interactjs/utils": "1.10.22"
   },
   "optionalDependencies": {
-    "@interactjs/interact": "1.10.21"
+    "@interactjs/interact": "1.10.22"
   },
   "publishConfig": {
     "access": "public"

@@ -1,3 +1,7 @@
+## v1.10.22
+
+- fix(actions/gesture): fix error when inertia is enabled for gestures #995
+
 ## v1.10.21
 
 - fix(actions/drop): fix regression with drop event targets #1016

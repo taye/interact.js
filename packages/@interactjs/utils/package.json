@@ -1,6 +1,6 @@
 {
   "name": "@interactjs/utils",
-  "version": "1.10.21",
+  "version": "1.10.22",
   "type": "module",
   "repository": {
     "type": "git",
@@ -8,8 +8,8 @@
     "directory": "packages/@interactjs/utils"
   },
   "peerDependencies": {
-    "@interactjs/feedback": "1.10.21",
-    "@interactjs/symbol-tree": "1.10.21"
+    "@interactjs/feedback": "1.10.22",
+    "@interactjs/symbol-tree": "1.10.22"
   },
   "publishConfig": {
     "access": "public"
