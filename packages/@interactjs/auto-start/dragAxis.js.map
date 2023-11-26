@@ -1,0 +1,50 @@
+{
+	"version": 3,
+	"names": [
+		"parentNode",
+		"is",
+		"autoStart",
+		"beforeStart",
+		"interaction",
+		"eventTarget",
+		"dx",
+		"dy",
+		"scope",
+		"prepared",
+		"name",
+		"absX",
+		"Math",
+		"abs",
+		"absY",
+		"targetOptions",
+		"interactable",
+		"options",
+		"drag",
+		"startAxis",
+		"currentAxis",
+		"axis",
+		"lockAxis",
+		"element",
+		"getDraggable",
+		"manualStart",
+		"testIgnoreAllow",
+		"action",
+		"getAction",
+		"downPointer",
+		"downEvent",
+		"checkStartAxis",
+		"validateAction",
+		"interactables",
+		"forEachMatch",
+		"thisAxis",
+		"id",
+		"listeners"
+	],
+	"sources": [
+		"dragAxis.ts"
+	],
+	"sourcesContent": [
+		"import type { Interactable } from '@interactjs/core/Interactable'\nimport type Interaction from '@interactjs/core/Interaction'\nimport type { SignalArgs, Scope } from '@interactjs/core/scope'\nimport type { ActionName, Element } from '@interactjs/core/types'\nimport { parentNode } from '@interactjs/utils/domUtils'\nimport is from '@interactjs/utils/is'\n\nimport autoStart from './base'\n\nfunction beforeStart ({ interaction, eventTarget, dx, dy }: SignalArgs['interactions:move'], scope: Scope) {\n  if (interaction.prepared.name !== 'drag') return\n\n  // check if a drag is in the correct axis\n  const absX = Math.abs(dx)\n  const absY = Math.abs(dy)\n  const targetOptions = interaction.interactable.options.drag\n  const startAxis = targetOptions.startAxis\n  const currentAxis = absX > absY ? 'x' : absX < absY ? 'y' : 'xy'\n\n  interaction.prepared.axis =\n    targetOptions.lockAxis === 'start'\n      ? (currentAxis[0] as 'x' | 'y') // always lock to one axis even if currentAxis === 'xy'\n      : targetOptions.lockAxis\n\n  // if the movement isn't in the startAxis of the interactable\n  if (currentAxis !== 'xy' && startAxis !== 'xy' && startAxis !== currentAxis) {\n    // cancel the prepared action\n    ;(interaction as Interaction<ActionName>).prepared.name = null\n\n    // then try to get a drag from another ineractable\n    let element = eventTarget as Element\n\n    const getDraggable = function (interactable: Interactable): Interactable | void {\n      if (interactable === interaction.interactable) return\n\n      const options = interaction.interactable.options.drag\n\n      if (!options.manualStart && interactable.testIgnoreAllow(options, element, eventTarget)) {\n        const action = interactable.getAction(\n          interaction.downPointer,\n          interaction.downEvent,\n          interaction,\n          element,\n        )\n\n        if (\n          action &&\n          action.name === 'drag' &&\n          checkStartAxis(currentAxis, interactable) &&\n          autoStart.validateAction(action, interactable, element, eventTarget, scope)\n        ) {\n          return interactable\n        }\n      }\n    }\n\n    // check all interactables\n    while (is.element(element)) {\n      const interactable = scope.interactables.forEachMatch(element, getDraggable)\n\n      if (interactable) {\n        ;(interaction as Interaction<ActionName>).prepared.name = 'drag'\n        interaction.interactable = interactable\n        interaction.element = element\n        break\n      }\n\n      element = parentNode(element) as Element\n    }\n  }\n}\n\nfunction checkStartAxis (startAxis: string, interactable: Interactable) {\n  if (!interactable) {\n    return false\n  }\n\n  const thisAxis = interactable.options.drag.startAxis\n\n  return startAxis === 'xy' || thisAxis === 'xy' || thisAxis === startAxis\n}\n\nexport default {\n  id: 'auto-start/dragAxis',\n  listeners: { 'autoStart:before-start': beforeStart },\n}\n"
+	],
+	"mappings": "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"
+}

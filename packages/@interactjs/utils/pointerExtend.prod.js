@@ -1,0 +1,2 @@
+const e=["webkit","moz"];export default function t(t,n){t.__set||={};for(const _ in n)e.some((e=>0===_.indexOf(e)))||"function"!=typeof t[_]&&"__set"!==_&&Object.defineProperty(t,_,{get(){return _ in t.__set?t.__set[_]:t.__set[_]=n[_]},set(e){t.__set[_]=e},configurable:!0});return t}
+//# sourceMappingURL=pointerExtend.prod.js.map

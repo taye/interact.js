@@ -1,0 +1,2 @@
+let e,t,n=0;export default{request:t=>e(t),cancel:e=>t(e),init(a){if(e=a.requestAnimationFrame,t=a.cancelAnimationFrame,!e){const n=["ms","moz","webkit","o"];for(const i of n)e=a[i+"RequestAnimationFrame"],t=a[i+"CancelAnimationFrame"]||a[i+"CancelRequestAnimationFrame"]}e=e&&e.bind(a),t=t&&t.bind(a),e||(e=e=>{const t=Date.now(),i=Math.max(0,16-(t-n)),o=a.setTimeout((()=>{e(t+i)}),i);return n=t+i,o},t=e=>clearTimeout(e))}};
+//# sourceMappingURL=raf.prod.js.map

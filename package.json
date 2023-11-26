@@ -110,5 +110,8 @@
     "**/*.((ts|js)?(x)|vue|md)": "bin/_lint --fix",
     "**/*.(yaml|json|css)": "prettier --write"
   },
-  "license": "MIT"
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  }
 }
