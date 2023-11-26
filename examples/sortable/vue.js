@@ -1,13 +1,10 @@
 import '@interactjs/vue'
 import interact from '@interactjs/interactjs'
-import { createApp } from 'vue'
+import { createApp } from 'vue/dist/vue.esm-bundler'
 
 import { getData, sortableOptions, swappableOptions } from './shared.js'
 
-createApp({
-  components: {
-    ...interact.vue.components,
-  },
+const app = createApp({
   data () {
     return {
       ...getData(),
@@ -15,4 +12,7 @@ createApp({
       swappableOptions,
     }
   },
-}).mount('#vue-app')
+})
+
+app.use(interact.vue)
+app.mount('#vue-app')

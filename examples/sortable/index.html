@@ -7,23 +7,23 @@
   <div id="react-app"></div>
 
   <div id="vue-app">
-    <div v-for="list of lists" class="box">
+    <div v-for="list of lists" class="box" :key="list.title">
       <h1>{{ list.title }}</h1>
 
       <pre>{{ list.items }}</pre>
 
-      <sortable class="container" :options="sortableOptions" v-model="list.items">
+      <i-sortable class="container" :options="sortableOptions" v-model="list.items">
         <div v-for="(item, index) of list.items" :key="index" disabled="!!(index % 2)" :id="`item-${index}-${item}`" class="item card">
           <div class="card-content">{{ index }}. {{ item }}</div>
         </div>
-      </sortable>
+      </i-sortable>
     </div>
 
     <pre>[ {{ tags.join(', ') }} ]</pre>
 
-    <swappable class="tags" v-model="tags" :options="swappableOptions">
-      <div v-for="tag of tags" :id="'tag-' + tag" class="tag is-info is-large">{{ tag }}</div>
-    </swappable>
+    <i-swappable class="tags" v-model="tags" :options="swappableOptions">
+      <div v-for="tag of tags" :id="'tag-' + tag" class="tag is-info is-large" :key="tag">{{ tag }}</div>
+    </i-swappable>
 
   </div>
 
