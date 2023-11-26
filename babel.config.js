@@ -21,6 +21,7 @@ module.exports = {
     isProd && require.resolve('./scripts/babel/for-of-array'),
     isProd && require.resolve('@babel/plugin-proposal-optional-catch-binding'),
     isProd && [require.resolve('@babel/plugin-proposal-optional-chaining'), { loose: true }],
+    isProd && [require.resolve('@babel/plugin-proposal-nullish-coalescing-operator'), { loose: true }],
     [require.resolve('@babel/plugin-transform-modules-commonjs'), { noInterop: isProd }],
   ].filter(Boolean),
 }
