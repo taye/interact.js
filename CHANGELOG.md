@@ -1,3 +1,7 @@
+## v1.10.23
+
+- fix: transform nullish coalescing; fix symbol-tree build
+
 ## v1.10.22
 
 - fix(actions/gesture): fix error when inertia is enabled for gestures #995

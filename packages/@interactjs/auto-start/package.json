@@ -1,6 +1,6 @@
 {
   "name": "@interactjs/auto-start",
-  "version": "1.10.22",
+  "version": "1.10.23",
   "main": "index",
   "module": "index",
   "type": "module",
@@ -10,11 +10,11 @@
     "directory": "packages/@interactjs/auto-start"
   },
   "peerDependencies": {
-    "@interactjs/core": "1.10.22",
-    "@interactjs/utils": "1.10.22"
+    "@interactjs/core": "1.10.23",
+    "@interactjs/utils": "1.10.23"
   },
   "optionalDependencies": {
-    "@interactjs/interact": "1.10.22"
+    "@interactjs/interact": "1.10.23"
   },
   "publishConfig": {
     "access": "public"

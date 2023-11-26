@@ -1,6 +1,6 @@
 {
   "name": "@interactjs/auto-scroll",
-  "version": "1.10.22",
+  "version": "1.10.23",
   "main": "index",
   "module": "index",
   "type": "module",
@@ -10,10 +10,10 @@
     "directory": "packages/@interactjs/auto-scroll"
   },
   "peerDependencies": {
-    "@interactjs/utils": "1.10.22"
+    "@interactjs/utils": "1.10.23"
   },
   "optionalDependencies": {
-    "@interactjs/interact": "1.10.22"
+    "@interactjs/interact": "1.10.23"
   },
   "publishConfig": {
     "access": "public"
