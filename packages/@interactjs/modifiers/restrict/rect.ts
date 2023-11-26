@@ -6,10 +6,10 @@ import { restrict } from './pointer'
 
 const defaults = extend(
   {
-    get elementRect () {
+    get elementRect() {
       return { top: 0, left: 0, bottom: 1, right: 1 }
     },
-    set elementRect (_) {},
+    set elementRect(_) {},
   },
   restrict.defaults,
 )

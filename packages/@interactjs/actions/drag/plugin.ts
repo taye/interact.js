@@ -1,13 +1,50 @@
-import type { InteractEvent } from '@interactjs/core/InteractEvent'
 import type { Interactable } from '@interactjs/core/Interactable'
+import type { InteractEvent } from '@interactjs/core/InteractEvent'
 import type { PerActionDefaults } from '@interactjs/core/options'
 import type { Scope, Plugin } from '@interactjs/core/scope'
-import type { ActionMethod, ListenersArg } from '@interactjs/core/types'
+import type { ListenersArg, OrBoolean } from '@interactjs/core/types'
 import is from '@interactjs/utils/is'
 
 declare module '@interactjs/core/Interactable' {
   interface Interactable {
-    draggable: DraggableMethod
+    draggable(options: Partial<OrBoolean<DraggableOptions>> | boolean): this
+    draggable(): DraggableOptions
+    /**
+     * ```js
+     * interact(element).draggable({
+     *     onstart: function (event) {},
+     *     onmove : function (event) {},
+     *     onend  : function (event) {},
+     *
+     *     // the axis in which the first movement must be
+     *     // for the drag sequence to start
+     *     // 'xy' by default - any direction
+     *     startAxis: 'x' || 'y' || 'xy',
+     *
+     *     // 'xy' by default - don't restrict to one axis (move in any direction)
+     *     // 'x' or 'y' to restrict movement to either axis
+     *     // 'start' to restrict movement to the axis the drag started in
+     *     lockAxis: 'x' || 'y' || 'xy' || 'start',
+     *
+     *     // max number of drags that can happen concurrently
+     *     // with elements of this Interactable. Infinity by default
+     *     max: Infinity,
+     *
+     *     // max number of drags that can target the same element+Interactable
+     *     // 1 by default
+     *     maxPerElement: 2
+     * })
+     *
+     * var isDraggable = interact('element').draggable(); // true
+     * ```
+     *
+     * Get or set whether drag actions can be performed on the target
+     *
+     * @param options - true/false or An object with event
+     * listeners to be fired on drag events (object makes the Interactable
+     * draggable)
+     */
+    draggable(options?: Partial<OrBoolean<DraggableOptions>> | boolean): this | DraggableOptions
   }
 }
 
@@ -25,8 +62,6 @@ declare module '@interactjs/core/types' {
 
 export type DragEvent = InteractEvent<'drag'>
 
-export type DraggableMethod = ActionMethod<DraggableOptions>
-
 export interface DraggableOptions extends PerActionDefaults {
   startAxis?: 'x' | 'y' | 'xy'
   lockAxis?: 'x' | 'y' | 'xy' | 'start'
@@ -36,7 +71,7 @@ export interface DraggableOptions extends PerActionDefaults {
   onend?: ListenersArg
 }
 
-function install (scope: Scope) {
+function install(scope: Scope) {
   const { actions, Interactable, defaults } = scope
 
   Interactable.prototype.draggable = drag.draggable
@@ -47,7 +82,7 @@ function install (scope: Scope) {
   defaults.actions.drag = drag.defaults
 }
 
-function beforeMove ({ interaction }) {
+function beforeMove({ interaction }) {
   if (interaction.prepared.name !== 'drag') return
 
   const axis = interaction.prepared.axis
@@ -67,7 +102,7 @@ function beforeMove ({ interaction }) {
   }
 }
 
-function move ({ iEvent, interaction }) {
+function move({ iEvent, interaction }) {
   if (interaction.prepared.name !== 'drag') return
 
   const axis = interaction.prepared.axis
@@ -81,46 +116,7 @@ function move ({ iEvent, interaction }) {
   }
 }
 
-/**
- * ```js
- * interact(element).draggable({
- *     onstart: function (event) {},
- *     onmove : function (event) {},
- *     onend  : function (event) {},
- *
- *     // the axis in which the first movement must be
- *     // for the drag sequence to start
- *     // 'xy' by default - any direction
- *     startAxis: 'x' || 'y' || 'xy',
- *
- *     // 'xy' by default - don't restrict to one axis (move in any direction)
- *     // 'x' or 'y' to restrict movement to either axis
- *     // 'start' to restrict movement to the axis the drag started in
- *     lockAxis: 'x' || 'y' || 'xy' || 'start',
- *
- *     // max number of drags that can happen concurrently
- *     // with elements of this Interactable. Infinity by default
- *     max: Infinity,
- *
- *     // max number of drags that can target the same element+Interactable
- *     // 1 by default
- *     maxPerElement: 2
- * })
- *
- * var isDraggable = interact('element').draggable(); // true
- * ```
- *
- * Get or set whether drag actions can be performed on the target
- *
- * @alias Interactable.prototype.draggable
- *
- * @param {boolean | object} [options] true/false or An object with event
- * listeners to be fired on drag events (object makes the Interactable
- * draggable)
- * @return {boolean | Interactable} boolean indicating if this can be the
- * target of drag events, or this Interctable
- */
-const draggable: DraggableMethod = function draggable (
+const draggable: Interactable['draggable'] = function draggable(
   this: Interactable,
   options?: DraggableOptions | boolean,
 ): any {
@@ -187,7 +183,7 @@ const drag: Plugin = {
     lockAxis: 'xy',
   } as DraggableOptions,
 
-  getCursor () {
+  getCursor() {
     return 'move'
   },
 

@@ -1,4 +1,4 @@
-export default function shallowEqual (left: any, right: any) {
+export default function shallowEqual(left: any, right: any) {
   if (left === right) {
     return true
   }

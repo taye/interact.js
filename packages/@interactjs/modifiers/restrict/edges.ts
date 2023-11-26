@@ -1,4 +1,4 @@
-// This module adds the options.resize.restrictEdges setting which sets min and
+// This modifier adds the options.resize.restrictEdges setting which sets min and
 // max for the top, left, bottom and right edges of the target being resized.
 //
 // interact(target).resize({
@@ -28,18 +28,18 @@ export interface RestrictEdgesOptions {
 }
 
 export type RestrictEdgesState = ModifierState<
-RestrictEdgesOptions,
-{
-  inner: Rect
-  outer: Rect
-  offset: RestrictEdgesOptions['offset']
-}
+  RestrictEdgesOptions,
+  {
+    inner: Rect
+    outer: Rect
+    offset: RestrictEdgesOptions['offset']
+  }
 >
 
 const noInner = { top: +Infinity, left: +Infinity, bottom: -Infinity, right: -Infinity }
 const noOuter = { top: -Infinity, left: -Infinity, bottom: +Infinity, right: +Infinity }
 
-function start ({ interaction, startOffset, state }: ModifierArg<RestrictEdgesState>) {
+function start({ interaction, startOffset, state }: ModifierArg<RestrictEdgesState>) {
   const { options } = state
   let offset: Point
 
@@ -59,7 +59,7 @@ function start ({ interaction, startOffset, state }: ModifierArg<RestrictEdgesSt
   }
 }
 
-function set ({ coords, edges, interaction, state }: ModifierArg<RestrictEdgesState>) {
+function set({ coords, edges, interaction, state }: ModifierArg<RestrictEdgesState>) {
   const { offset, options } = state
 
   if (!edges) {
@@ -85,7 +85,7 @@ function set ({ coords, edges, interaction, state }: ModifierArg<RestrictEdgesSt
   }
 }
 
-function fixRect (rect: Rect, defaults: Rect) {
+function fixRect(rect: Rect, defaults: Rect) {
   for (const edge of ['top', 'left', 'bottom', 'right']) {
     if (!(edge in rect)) {
       rect[edge] = defaults[edge]

@@ -1,11 +1,12 @@
-import type { Interactable } from '@interactjs/core/Interactable'
-import type { OptionsArg, Options } from '@interactjs/core/options'
-import type { Scope } from '@interactjs/core/scope'
-import type { Target } from '@interactjs/core/types'
 import * as arr from '@interactjs/utils/arr'
 import * as domUtils from '@interactjs/utils/domUtils'
 import extend from '@interactjs/utils/extend'
 import is from '@interactjs/utils/is'
+
+import type { Interactable } from '@interactjs/core/Interactable'
+import type { OptionsArg, Options } from '@interactjs/core/options'
+import type { Scope } from '@interactjs/core/scope'
+import type { Target } from '@interactjs/core/types'
 
 declare module '@interactjs/core/scope' {
   interface SignalArgs {
@@ -28,7 +29,7 @@ export class InteractableSet {
 
   scope: Scope
 
-  constructor (scope: Scope) {
+  constructor(scope: Scope) {
     this.scope = scope
     scope.addListeners({
       'interactable:unset': ({ interactable }) => {
@@ -43,7 +44,7 @@ export class InteractableSet {
     })
   }
 
-  new (target: Target, options?: any): Interactable {
+  new(target: Target, options?: any): Interactable {
     options = extend(options || {}, {
       actions: this.scope.actions,
     })
@@ -78,7 +79,7 @@ export class InteractableSet {
     return interactable
   }
 
-  getExisting (target: Target, options?: Options) {
+  getExisting(target: Target, options?: Options) {
     const context = (options && options.context) || this.scope.document
     const isSelector = is.string(target)
     const interactablesOnTarget: Interactable[] = isSelector
@@ -94,16 +95,16 @@ export class InteractableSet {
     )
   }
 
-  forEachMatch<T> (node: Node, callback: (interactable: Interactable) => T): T | void {
+  forEachMatch<T>(node: Node, callback: (interactable: Interactable) => T): T | void {
     for (const interactable of this.list) {
       let ret: T
 
       if (
         (is.string(interactable.target)
           ? // target is a selector and the element matches
-          is.element(node) && domUtils.matchesSelector(node, interactable.target)
+            is.element(node) && domUtils.matchesSelector(node, interactable.target)
           : // target is the element
-          node === interactable.target) &&
+            node === interactable.target) &&
         // the element is in context
         interactable.inContext(node)
       ) {

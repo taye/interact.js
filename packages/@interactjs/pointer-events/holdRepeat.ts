@@ -1,11 +1,11 @@
 import type Interaction from '@interactjs/core/Interaction'
 import type { ListenerMap, Scope, SignalArgs, Plugin } from '@interactjs/core/scope'
 
-import type PointerEvent from './PointerEvent'
 /* eslint-disable import/no-duplicates -- for typescript module augmentations */
 import './base'
 import basePlugin from './base'
 /* eslint-enable import/no-duplicates */
+import { type PointerEvent } from './PointerEvent'
 
 declare module '@interactjs/core/Interaction' {
   interface Interaction {
@@ -25,7 +25,7 @@ declare module '@interactjs/pointer-events/base' {
   }
 }
 
-function install (scope: Scope) {
+function install(scope: Scope) {
   scope.usePlugin(basePlugin)
 
   const { pointerEvents } = scope
@@ -35,13 +35,13 @@ function install (scope: Scope) {
   pointerEvents.types.holdrepeat = scope.actions.phaselessTypes.holdrepeat = true
 }
 
-function onNew ({ pointerEvent }: { pointerEvent: PointerEvent<any> }) {
+function onNew({ pointerEvent }: { pointerEvent: PointerEvent<any> }) {
   if (pointerEvent.type !== 'hold') return
 
   pointerEvent.count = (pointerEvent.count || 0) + 1
 }
 
-function onFired (
+function onFired(
   { interaction, pointerEvent, eventTarget, targets }: SignalArgs['pointerEvents:fired'],
   scope: Scope,
 ) {
@@ -68,7 +68,7 @@ function onFired (
   }, interval)
 }
 
-function endHoldRepeat ({ interaction }: { interaction: Interaction }) {
+function endHoldRepeat({ interaction }: { interaction: Interaction }) {
   // set the interaction's holdStopTime property
   // to stop further holdRepeat events
   if (interaction.holdIntervalHandle) {

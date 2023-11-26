@@ -12,7 +12,7 @@ const dtsExt = /\.d\.ts$/
 
 main().catch(errorExit)
 
-async function main () {
+async function main() {
   const sources = fileArgs.length ? fileArgs : await getSources()
 
   console.log(`Linting ${sources.length} 'file${sources.length === 1 ? '' : 's'}...`)
@@ -22,7 +22,7 @@ async function main () {
   }
 
   const eslint = new ESLint({
-    fix: fix,
+    fix,
     useEslintrc: true,
   })
   const results = await eslint.lintFiles(sources)
@@ -41,17 +41,17 @@ async function main () {
   }
 }
 
-async function formatWithPrettier (filepath) {
+async function formatWithPrettier(filepath) {
   const [source, config] = await Promise.all([
     fs.readFile(filepath).then((buffer) => buffer.toString()),
     prettier.resolveConfig(filepath),
   ])
-  const output = prettier.format(source, { ...config, filepath })
+  const output = await prettier.format(source, { ...config, filepath })
 
   if (source !== output) await fs.writeFile(filepath, output)
 }
 
-async function getSources () {
+async function getSources() {
   const glob = require('util').promisify(require('glob'))
 
   const sources = await glob(lintSourcesGlob, {
@@ -62,7 +62,7 @@ async function getSources () {
   return sources.filter((source) => !isGenerated(source))
 }
 
-function isGenerated (source) {
+function isGenerated(source) {
   return (
     (dtsExt.test(source) && existsSync(source.replace(dtsExt, '.ts'))) ||
     (jsExt.test(source) && existsSync(source.replace(jsExt, '.ts')))

@@ -1,10 +1,6 @@
 {
-  "arrowParens": "avoid",
-  "embeddedLanguageFormatting": "off",
   "printWidth": 110,
   "semi": false,
   "singleQuote": true,
-  "tabWidth": 2,
-  "trailingComma": "all",
-  "useTabs": false
+  "trailingComma": "all"
 }

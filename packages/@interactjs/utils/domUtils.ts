@@ -5,7 +5,7 @@ import domObjects from './domObjects'
 import is from './is'
 import * as win from './window'
 
-export function nodeContains (parent: Node, child: Node) {
+export function nodeContains(parent: Node, child: Node) {
   if (parent.contains) {
     return parent.contains(child as Node)
   }
@@ -21,7 +21,7 @@ export function nodeContains (parent: Node, child: Node) {
   return false
 }
 
-export function closest (element: Node, selector: string) {
+export function closest(element: Node, selector: string) {
   while (is.element(element)) {
     if (matchesSelector(element, selector)) {
       return element
@@ -33,7 +33,7 @@ export function closest (element: Node, selector: string) {
   return null
 }
 
-export function parentNode (node: Node | Document) {
+export function parentNode(node: Node | Document) {
   let parent = node.parentNode
 
   if (is.docFrag(parent)) {
@@ -49,7 +49,7 @@ export function parentNode (node: Node | Document) {
   return parent
 }
 
-export function matchesSelector (element: Element, selector: string) {
+export function matchesSelector(element: Element, selector: string) {
   // remove /deep/ from selectors if shadowDOM polyfill is used
   if (win.window !== win.realWindow) {
     selector = selector.replace(/\/deep\//g, ' ')
@@ -61,7 +61,7 @@ export function matchesSelector (element: Element, selector: string) {
 const getParent = (el: Node | Document | ShadowRoot) => el.parentNode || (el as ShadowRoot).host
 
 // Test for the element that's "above" all other qualifiers
-export function indexOfDeepestElement (elements: Element[] | NodeListOf<globalThis.Element>) {
+export function indexOfDeepestElement(elements: Element[] | NodeListOf<globalThis.Element>) {
   let deepestNodeParents: Node[] = []
   let deepestNodeIndex: number
 
@@ -161,7 +161,7 @@ export function indexOfDeepestElement (elements: Element[] | NodeListOf<globalTh
   return deepestNodeIndex
 }
 
-function getNodeParents (node: Node, limit?: Node) {
+function getNodeParents(node: Node, limit?: Node) {
   const parents: Node[] = []
   let parent: Node = node
   let parentParent: Node
@@ -174,14 +174,14 @@ function getNodeParents (node: Node, limit?: Node) {
   return parents
 }
 
-function zIndexIsHigherThan (higherNode: Node, lowerNode: Node) {
+function zIndexIsHigherThan(higherNode: Node, lowerNode: Node) {
   const higherIndex = parseInt(win.getWindow(higherNode).getComputedStyle(higherNode).zIndex, 10) || 0
   const lowerIndex = parseInt(win.getWindow(lowerNode).getComputedStyle(lowerNode).zIndex, 10) || 0
 
   return higherIndex >= lowerIndex
 }
 
-export function matchesUpTo (element: Element, selector: string, limit: Node) {
+export function matchesUpTo(element: Element, selector: string, limit: Node) {
   while (is.element(element)) {
     if (matchesSelector(element, selector)) {
       return true
@@ -197,11 +197,11 @@ export function matchesUpTo (element: Element, selector: string, limit: Node) {
   return false
 }
 
-export function getActualElement (element: Element) {
+export function getActualElement(element: Element) {
   return (element as any).correspondingUseElement || element
 }
 
-export function getScrollXY (relevantWindow?: Window) {
+export function getScrollXY(relevantWindow?: Window) {
   relevantWindow = relevantWindow || win.window
   return {
     x: relevantWindow.scrollX || relevantWindow.document.documentElement.scrollLeft,
@@ -209,7 +209,7 @@ export function getScrollXY (relevantWindow?: Window) {
   }
 }
 
-export function getElementClientRect (element: Element): Required<Rect> {
+export function getElementClientRect(element: Element): Required<Rect> {
   const clientRect =
     element instanceof domObjects.SVGElement ? element.getBoundingClientRect() : element.getClientRects()[0]
 
@@ -225,7 +225,7 @@ export function getElementClientRect (element: Element): Required<Rect> {
   )
 }
 
-export function getElementRect (element: Element) {
+export function getElementRect(element: Element) {
   const clientRect = getElementClientRect(element)
 
   if (!browser.isIOS7 && clientRect) {
@@ -240,7 +240,7 @@ export function getElementRect (element: Element) {
   return clientRect
 }
 
-export function getPath (node: Node | Document) {
+export function getPath(node: Node | Document) {
   const path = []
 
   while (node) {
@@ -251,7 +251,7 @@ export function getPath (node: Node | Document) {
   return path
 }
 
-export function trySelector (value: Target) {
+export function trySelector(value: Target) {
   if (!is.string(value)) {
     return false
   }

@@ -1,11 +1,11 @@
 import type { Interaction, DoPhaseArg } from '@interactjs/core/Interaction'
 import type { Scope, SignalArgs, Plugin } from '@interactjs/core/scope'
 import type { ActionName, Point, PointerEventType } from '@interactjs/core/types'
-import Modification from '@interactjs/modifiers/Modification'
 /* eslint-disable import/no-duplicates -- for typescript module augmentations */
 import '@interactjs/modifiers/base'
 import '@interactjs/offset/plugin'
 import * as modifiers from '@interactjs/modifiers/base'
+import { Modification } from '@interactjs/modifiers/Modification'
 import type { ModifierArg } from '@interactjs/modifiers/types'
 import offset from '@interactjs/offset/plugin'
 /* eslint-enable import/no-duplicates */
@@ -52,7 +52,7 @@ declare module '@interactjs/core/scope' {
   }
 }
 
-function install (scope: Scope) {
+function install(scope: Scope) {
   const { defaults } = scope
 
   scope.usePlugin(offset)
@@ -94,11 +94,11 @@ export class InertiaState {
   timeout!: number
   readonly interaction: Interaction
 
-  constructor (interaction: Interaction) {
+  constructor(interaction: Interaction) {
     this.interaction = interaction
   }
 
-  start (event: PointerEventType) {
+  start(event: PointerEventType) {
     const { interaction } = this
     const options = getOptions(interaction)
 
@@ -161,7 +161,7 @@ export class InertiaState {
     return true
   }
 
-  startInertia () {
+  startInertia() {
     const startVelocity = this.interaction.coords.velocity.client
     const options = getOptions(this.interaction)
     const lambda = options.resistance
@@ -196,7 +196,7 @@ export class InertiaState {
     this.onNextFrame(() => this.inertiaTick())
   }
 
-  startSmoothEnd () {
+  startSmoothEnd() {
     this.smoothEnd = true
     this.isModified = true
     this.targetOffset = {
@@ -207,7 +207,7 @@ export class InertiaState {
     this.onNextFrame(() => this.smoothEndTick())
   }
 
-  onNextFrame (tickFn: () => void) {
+  onNextFrame(tickFn: () => void) {
     this.timeout = raf.request(() => {
       if (this.active) {
         tickFn()
@@ -215,7 +215,7 @@ export class InertiaState {
     })
   }
 
-  inertiaTick () {
+  inertiaTick() {
     const { interaction } = this
     const options = getOptions(interaction)
     const lambda = options.resistance
@@ -261,7 +261,7 @@ export class InertiaState {
     }
   }
 
-  smoothEndTick () {
+  smoothEndTick() {
     const { interaction } = this
     const t = interaction._now() - this.t0
     const { smoothEndDuration: duration } = getOptions(interaction)
@@ -293,7 +293,7 @@ export class InertiaState {
     }
   }
 
-  resume ({ pointer, event, eventTarget }: SignalArgs['interactions:down']) {
+  resume({ pointer, event, eventTarget }: SignalArgs['interactions:down']) {
     const { interaction } = this
 
     // undo inertia changes to interaction coords
@@ -316,20 +316,20 @@ export class InertiaState {
     this.stop()
   }
 
-  end () {
+  end() {
     this.interaction.move()
     this.interaction.end()
     this.stop()
   }
 
-  stop () {
+  stop() {
     this.active = this.smoothEnd = false
     this.interaction.simulation = null
     raf.cancel(this.timeout)
   }
 }
 
-function start ({ interaction, event }: DoPhaseArg<ActionName, 'end'>) {
+function start({ interaction, event }: DoPhaseArg<ActionName, 'end'>) {
   if (!interaction._interacting || interaction.simulation) {
     return null
   }
@@ -342,7 +342,7 @@ function start ({ interaction, event }: DoPhaseArg<ActionName, 'end'>) {
 
 // Check if the down event hits the current inertia target
 // control should be return to the user
-function resume (arg: SignalArgs['interactions:down']) {
+function resume(arg: SignalArgs['interactions:down']) {
   const { interaction, eventTarget } = arg
   const state = interaction.inertia
 
@@ -362,7 +362,7 @@ function resume (arg: SignalArgs['interactions:down']) {
   }
 }
 
-function stop ({ interaction }: { interaction: Interaction }) {
+function stop({ interaction }: { interaction: Interaction }) {
   const state = interaction.inertia
 
   if (state.active) {
@@ -370,7 +370,7 @@ function stop ({ interaction }: { interaction: Interaction }) {
   }
 }
 
-function getOptions ({ interactable, prepared }: Interaction) {
+function getOptions({ interactable, prepared }: Interaction) {
   return interactable && interactable.options && prepared.name && interactable.options[prepared.name].inertia
 }
 
@@ -405,12 +405,12 @@ const inertia: Plugin = {
 }
 
 // http://stackoverflow.com/a/5634528/2280888
-function _getQBezierValue (t: number, p1: number, p2: number, p3: number) {
+function _getQBezierValue(t: number, p1: number, p2: number, p3: number) {
   const iT = 1 - t
   return iT * iT * p1 + 2 * iT * t * p2 + t * t * p3
 }
 
-function getQuadraticCurvePoint (
+function getQuadraticCurvePoint(
   startX: number,
   startY: number,
   cpX: number,
@@ -426,7 +426,7 @@ function getQuadraticCurvePoint (
 }
 
 // http://gizma.com/easing/
-function easeOutQuad (t: number, b: number, c: number, d: number) {
+function easeOutQuad(t: number, b: number, c: number, d: number) {
   t /= d
   return -c * t * (t - 2) + b
 }

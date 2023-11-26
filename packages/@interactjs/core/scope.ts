@@ -1,4 +1,3 @@
-import type Interaction from '@interactjs/core/Interaction'
 import browser from '@interactjs/utils/browser'
 import clone from '@interactjs/utils/clone'
 import domObjects from '@interactjs/utils/domObjects'
@@ -7,17 +6,19 @@ import is from '@interactjs/utils/is'
 import raf from '@interactjs/utils/raf'
 import * as win from '@interactjs/utils/window'
 
+import type Interaction from '@interactjs/core/Interaction'
+
 import { Eventable } from './Eventable'
-import { InteractEvent } from './InteractEvent'
-import { createInteractStatic } from './InteractStatic'
-import { Interactable as InteractableBase } from './Interactable'
-import { InteractableSet } from './InteractableSet'
 /* eslint-disable import/no-duplicates -- for typescript module augmentations */
 import './events'
 import './interactions'
 import events from './events'
+import { Interactable as InteractableBase } from './Interactable'
+import { InteractableSet } from './InteractableSet'
+import { InteractEvent } from './InteractEvent'
 import interactions from './interactions'
 /* eslint-enable import/no-duplicates */
+import { createInteractStatic } from './InteractStatic'
 import type { OptionsArg } from './options'
 import { defaults } from './options'
 import type { Actions } from './types'
@@ -26,7 +27,7 @@ export interface SignalArgs {
   'scope:add-document': DocSignalArg
   'scope:remove-document': DocSignalArg
   'interactable:unset': { interactable: InteractableBase }
-  'interactable:set': { interactable: InteractableBase, options: OptionsArg }
+  'interactable:set': { interactable: InteractableBase; options: OptionsArg }
   'interactions:destroy': { interaction: Interaction }
 }
 
@@ -43,6 +44,7 @@ interface DocSignalArg {
   options: Record<string, any>
 }
 
+/** @internal */
 export interface Plugin {
   [key: string]: any
   id?: string
@@ -51,6 +53,7 @@ export interface Plugin {
   install?(scope: Scope, options?: any): void
 }
 
+/** @internal */
 export class Scope {
   id = `__interact_scope_${Math.floor(Math.random() * 100)}`
   isInitialized = false
@@ -88,25 +91,25 @@ export class Scope {
   window!: Window
 
   // all documents being listened to
-  documents: Array<{ doc: Document, options: any }> = []
+  documents: Array<{ doc: Document; options: any }> = []
 
   _plugins: {
     list: Plugin[]
     map: { [id: string]: Plugin }
   } = {
-      list: [],
-      map: {},
-    }
+    list: [],
+    map: {},
+  }
 
-  constructor () {
+  constructor() {
     const scope = this
 
     this.Interactable = class extends InteractableBase {
-      get _defaults () {
+      get _defaults() {
         return scope.defaults
       }
 
-      set<T extends InteractableBase> (this: T, options: OptionsArg) {
+      set<T extends InteractableBase>(this: T, options: OptionsArg) {
         super.set(options)
 
         scope.fire('interactable:set', {
@@ -117,7 +120,7 @@ export class Scope {
         return this
       }
 
-      unset (this: InteractableBase) {
+      unset(this: InteractableBase) {
         super.unset()
 
         const index = scope.interactables.list.indexOf(this)
@@ -129,11 +132,11 @@ export class Scope {
     }
   }
 
-  addListeners (map: ListenerMap, id?: string) {
+  addListeners(map: ListenerMap, id?: string) {
     this.listenerMaps.push({ id, map })
   }
 
-  fire<T extends ListenerName> (name: T, arg: SignalArgs[T]): void | false {
+  fire<T extends ListenerName>(name: T, arg: SignalArgs[T]): void | false {
     for (const {
       map: { [name]: listener },
     } of this.listenerMaps) {
@@ -145,16 +148,16 @@ export class Scope {
 
   onWindowUnload = (event: BeforeUnloadEvent) => this.removeDocument(event.target as Document)
 
-  init (window: Window | typeof globalThis) {
+  init(window: Window | typeof globalThis) {
     return this.isInitialized ? this : initScope(this, window)
   }
 
-  pluginIsInstalled (plugin: Plugin) {
+  pluginIsInstalled(plugin: Plugin) {
     const { id } = plugin
     return id ? !!this._plugins.map[id] : this._plugins.list.indexOf(plugin) !== -1
   }
 
-  usePlugin (plugin: Plugin, options?: { [key: string]: any }) {
+  usePlugin(plugin: Plugin, options?: { [key: string]: any }) {
     if (!this.isInitialized) {
       return this
     }
@@ -197,7 +200,7 @@ export class Scope {
     return this
   }
 
-  addDocument (doc: Document, options?: any): void | false {
+  addDocument(doc: Document, options?: any): void | false {
     // do nothing if document is already known
     if (this.getDocIndex(doc) !== -1) {
       return false
@@ -219,7 +222,7 @@ export class Scope {
     this.fire('scope:add-document', { doc, window, scope: this, options })
   }
 
-  removeDocument (doc: Document) {
+  removeDocument(doc: Document) {
     const index = this.getDocIndex(doc)
 
     const window = win.getWindow(doc)
@@ -233,7 +236,7 @@ export class Scope {
     this.fire('scope:remove-document', { doc, window, scope: this, options })
   }
 
-  getDocIndex (doc: Document) {
+  getDocIndex(doc: Document) {
     for (let i = 0; i < this.documents.length; i++) {
       if (this.documents[i].doc === doc) {
         return i
@@ -243,18 +246,19 @@ export class Scope {
     return -1
   }
 
-  getDocOptions (doc: Document) {
+  getDocOptions(doc: Document) {
     const docIndex = this.getDocIndex(doc)
 
     return docIndex === -1 ? null : this.documents[docIndex].options
   }
 
-  now () {
+  now() {
     return (((this.window as any).Date as typeof Date) || Date).now()
   }
 }
 
-export function initScope (scope: Scope, window: Window | typeof globalThis) {
+/** @internal */
+export function initScope(scope: Scope, window: Window | typeof globalThis) {
   scope.isInitialized = true
 
   if (is.window(window)) {
@@ -275,6 +279,6 @@ export function initScope (scope: Scope, window: Window | typeof globalThis) {
   return scope
 }
 
-function pluginIdRoot (id: string) {
+function pluginIdRoot(id: string) {
   return id && id.replace(/\/.*$/, '')
 }

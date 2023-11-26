@@ -6,7 +6,7 @@ import { coordsToEvent, newCoords } from '@interactjs/utils/pointerUtils'
 import type { GestureEvent } from './plugin'
 import gesture from './plugin'
 
-function getGestureProps (event: GestureEvent) {
+function getGestureProps(event: GestureEvent) {
   return helpers.getProps(event, ['type', 'angle', 'distance', 'scale', 'ds', 'da'])
 }
 

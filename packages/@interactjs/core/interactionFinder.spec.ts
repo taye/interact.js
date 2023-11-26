@@ -9,10 +9,10 @@ test('modifiers/snap', () => {
   const { list } = scope.interactions
   const details = {
     pointer: event,
-    get pointerId (): number {
+    get pointerId(): number {
       return details.pointer.pointerId
     },
-    get pointerType (): string {
+    get pointerType(): string {
       return details.pointer.pointerType
     },
     eventType: null as string,

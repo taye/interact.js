@@ -17,7 +17,7 @@ declare module '@interactjs/core/InteractStatic' {
 
 const modifiers: Plugin = {
   id: 'modifiers',
-  install (scope) {
+  install(scope) {
     const { interactStatic: interact } = scope
 
     scope.usePlugin(base)

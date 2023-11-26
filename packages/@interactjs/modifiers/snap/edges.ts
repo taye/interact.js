@@ -2,7 +2,7 @@
  * @module modifiers/snapEdges
  *
  * @description
- * WOW> This module allows snapping of the edges of targets during resize
+ * This modifier allows snapping of the edges of targets during resize
  * interactions.
  *
  * ```js
@@ -38,7 +38,7 @@ import { snapSize } from './size'
 
 export type SnapEdgesOptions = Pick<SnapOptions, 'targets' | 'range' | 'offset' | 'endOnly' | 'enabled'>
 
-function start (arg: ModifierArg<SnapState>) {
+function start(arg: ModifierArg<SnapState>) {
   const { edges } = arg
 
   if (!edges) {

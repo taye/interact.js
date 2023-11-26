@@ -2,7 +2,7 @@
  * @module modifiers/aspectRatio
  *
  * @description
- * This module forces elements to be resized with a specified dx/dy ratio.
+ * This modifier forces elements to be resized with a specified dx/dy ratio.
  *
  * ```js
  * interact(target).resizable({
@@ -20,8 +20,8 @@ import type { Point, Rect, EdgeOptions } from '@interactjs/core/types'
 import extend from '@interactjs/utils/extend'
 import { addEdges } from '@interactjs/utils/rect'
 
-import Modification from './Modification'
 import { makeModifier } from './base'
+import { Modification } from './Modification'
 import type { Modifier, ModifierModule, ModifierState } from './types'
 
 export interface AspectRatioOptions {
@@ -32,24 +32,24 @@ export interface AspectRatioOptions {
 }
 
 export type AspectRatioState = ModifierState<
-AspectRatioOptions,
-{
-  startCoords: Point
-  startRect: Rect
-  linkedEdges: EdgeOptions
-  ratio: number
-  equalDelta: boolean
-  xIsPrimaryAxis: boolean
-  edgeSign: {
-    x: number
-    y: number
+  AspectRatioOptions,
+  {
+    startCoords: Point
+    startRect: Rect
+    linkedEdges: EdgeOptions
+    ratio: number
+    equalDelta: boolean
+    xIsPrimaryAxis: boolean
+    edgeSign: {
+      x: number
+      y: number
+    }
+    subModification: Modification
   }
-  subModification: Modification
-}
 >
 
 const aspectRatio: ModifierModule<AspectRatioOptions, AspectRatioState> = {
-  start (arg) {
+  start(arg) {
     const { state, rect, edges, pageCoords: coords } = arg
     let { ratio, enabled } = state.options
     const { equalDelta, modifiers } = state.options
@@ -100,7 +100,7 @@ const aspectRatio: ModifierModule<AspectRatioOptions, AspectRatioState> = {
     subModification.startAll({ ...arg })
   },
 
-  set (arg) {
+  set(arg) {
     const { state, rect, coords } = arg
     const { linkedEdges } = state
     const initialCoords = extend({}, coords)
@@ -150,7 +150,7 @@ const aspectRatio: ModifierModule<AspectRatioOptions, AspectRatioState> = {
   },
 }
 
-function setEqualDelta ({ startCoords, edgeSign }: AspectRatioState, xIsPrimaryAxis: boolean, coords: Point) {
+function setEqualDelta({ startCoords, edgeSign }: AspectRatioState, xIsPrimaryAxis: boolean, coords: Point) {
   if (xIsPrimaryAxis) {
     coords.y = startCoords.y + (coords.x - startCoords.x) * edgeSign.y
   } else {
@@ -158,7 +158,7 @@ function setEqualDelta ({ startCoords, edgeSign }: AspectRatioState, xIsPrimaryA
   }
 }
 
-function setRatio (
+function setRatio(
   { startRect, startCoords, ratio, edgeSign }: AspectRatioState,
   xIsPrimaryAxis: boolean,
   coords: Point,

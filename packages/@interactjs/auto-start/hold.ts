@@ -19,7 +19,7 @@ declare module '@interactjs/core/Interaction' {
   }
 }
 
-function install (scope: Scope) {
+function install(scope: Scope) {
   const { defaults } = scope
 
   scope.usePlugin(basePlugin)
@@ -28,7 +28,7 @@ function install (scope: Scope) {
   defaults.perAction.delay = 0
 }
 
-function getHoldDuration (interaction: Interaction) {
+function getHoldDuration(interaction: Interaction) {
   const actionName = interaction.prepared && interaction.prepared.name
 
   if (!actionName) {

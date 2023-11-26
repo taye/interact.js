@@ -138,6 +138,6 @@ describe('actions/resize', () => {
   })
 })
 
-function hasResizeProps (event: ResizeEvent) {
+function hasResizeProps(event: ResizeEvent) {
   return !!(event.deltaRect && event.rect && event.edges)
 }

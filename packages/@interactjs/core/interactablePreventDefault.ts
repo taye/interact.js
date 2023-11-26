@@ -1,22 +1,34 @@
-import type { Interactable } from '@interactjs/core/Interactable'
-import type Interaction from '@interactjs/core/Interaction'
-import type { Scope } from '@interactjs/core/scope'
-import type { PointerEventType } from '@interactjs/core/types'
 import { matchesSelector, nodeContains } from '@interactjs/utils/domUtils'
 import is from '@interactjs/utils/is'
 import { getWindow } from '@interactjs/utils/window'
 
+import type { Interactable } from '@interactjs/core/Interactable'
+import type Interaction from '@interactjs/core/Interaction'
+import type { Scope } from '@interactjs/core/scope'
+import type { PointerEventType } from '@interactjs/core/types'
+
+type PreventDefaultValue = 'always' | 'never' | 'auto'
+
 declare module '@interactjs/core/Interactable' {
   interface Interactable {
-    preventDefault: typeof preventDefault
-    checkAndPreventDefault: (event: Event) => void
+    preventDefault(newValue: PreventDefaultValue): this
+    preventDefault(): PreventDefaultValue
+    /**
+     * Returns or sets whether to prevent the browser's default behaviour in
+     * response to pointer events. Can be set to:
+     *  - `'always'` to always prevent
+     *  - `'never'` to never prevent
+     *  - `'auto'` to let interact.js try to determine what would be best
+     *
+     * @param newValue - `'always'`, `'never'` or `'auto'`
+     * @returns The current setting or this Interactable
+     */
+    preventDefault(newValue?: PreventDefaultValue): PreventDefaultValue | this
+    checkAndPreventDefault(event: Event): void
   }
 }
 
-type PreventDefaultValue = 'always' | 'never' | 'auto'
-function preventDefault(this: Interactable): PreventDefaultValue
-function preventDefault(this: Interactable, newValue: PreventDefaultValue): typeof this
-function preventDefault (this: Interactable, newValue?: PreventDefaultValue) {
+const preventDefault = function preventDefault(this: Interactable, newValue?: PreventDefaultValue) {
   if (/^(always|never|auto)$/.test(newValue)) {
     this.options.preventDefault = newValue
     return this
@@ -28,9 +40,9 @@ function preventDefault (this: Interactable, newValue?: PreventDefaultValue) {
   }
 
   return this.options.preventDefault
-}
+} as Interactable['preventDefault']
 
-function checkAndPreventDefault (interactable: Interactable, scope: Scope, event: Event) {
+function checkAndPreventDefault(interactable: Interactable, scope: Scope, event: Event) {
   const setting = interactable.options.preventDefault
 
   if (setting === 'never') return
@@ -70,26 +82,15 @@ function checkAndPreventDefault (interactable: Interactable, scope: Scope, event
   event.preventDefault()
 }
 
-function onInteractionEvent ({ interaction, event }: { interaction: Interaction, event: PointerEventType }) {
+function onInteractionEvent({ interaction, event }: { interaction: Interaction; event: PointerEventType }) {
   if (interaction.interactable) {
     interaction.interactable.checkAndPreventDefault(event as Event)
   }
 }
 
-export function install (scope: Scope) {
-  /** @lends Interactable */
+export function install(scope: Scope) {
   const { Interactable } = scope
 
-  /**
-   * Returns or sets whether to prevent the browser's default behaviour in
-   * response to pointer events. Can be set to:
-   *  - `'always'` to always prevent
-   *  - `'never'` to never prevent
-   *  - `'auto'` to let interact.js try to determine what would be best
-   *
-   * @param {string} [newValue] `'always'`, `'never'` or `'auto'`
-   * @return {string | Interactable} The current setting or this Interactable
-   */
   Interactable.prototype.preventDefault = preventDefault
 
   Interactable.prototype.checkAndPreventDefault = function (event) {
@@ -99,7 +100,7 @@ export function install (scope: Scope) {
   // prevent native HTML5 drag on interact.js target elements
   scope.interactions.docEvents.push({
     type: 'dragstart',
-    listener (event) {
+    listener(event) {
       for (const interaction of scope.interactions.list) {
         if (
           interaction.element &&

@@ -6,7 +6,7 @@ const glob = promisify(require('glob'))
 const resolveSync = require('resolve').sync
 
 const sourcesGlob = 'packages/{,@}interactjs/**/**/*{.ts,.tsx,.vue}'
-const lintSourcesGlob = `{${sourcesGlob},{scripts,examples,jsdoc}/**/*.js,bin/**/*}`
+const lintSourcesGlob = `{${sourcesGlob},{scripts,examples,jsdoc}/**/*.{js,cjs},bin/**/*}`
 const commonIgnoreGlobs = ['**/node_modules/**', '**/*_*', '**/*.d.ts', '**/dist/**', 'examples/js/**']
 const lintIgnoreGlobs = [...commonIgnoreGlobs]
 const sourcesIgnoreGlobs = [...commonIgnoreGlobs, '**/*.spec.ts']
@@ -35,7 +35,7 @@ const getBuiltJsFiles = ({ cwd = process.cwd() } = {}) =>
     nodir: true,
   })
 
-function getBabelConfig () {
+function getBabelConfig() {
   let babelConfig
 
   try {
@@ -47,7 +47,7 @@ function getBabelConfig () {
   return babelConfig
 }
 
-function getEsnextBabelOptions () {
+function getEsnextBabelOptions() {
   return {
     babelrc: false,
     configFile: false,
@@ -63,29 +63,29 @@ function getEsnextBabelOptions () {
   }
 }
 
-function getDevPackageDir () {
+function getDevPackageDir() {
   return path.join(__dirname, '..')
 }
 
-function getModuleName (tsName) {
+function getModuleName(tsName) {
   return tsName.replace(/\.[jt]sx?$/, '')
 }
 
-function getModuleDirectories () {
+function getModuleDirectories() {
   return [path.join(__dirname, '..', 'packages'), path.join(process.cwd(), 'node_modules')]
 }
 
-async function getPackages (options) {
+async function getPackages(options) {
   const packageJsonPaths = await glob('packages/{@interactjs/*,interactjs}/package.json', {
     ignore: commonIgnoreGlobs,
     ...options,
   })
   const packageDirs = packageJsonPaths.map(path.dirname)
 
-  return [...new Set(packageDirs)]
+  return [...new Set(packageDirs)].sort()
 }
 
-async function getPackageJsons (packages = getPackages()) {
+async function getPackageJsons(packages = getPackages()) {
   return Promise.all(
     (await packages).map(async (p) => {
       const jsonPath = path.resolve(p, 'package.json')
@@ -95,14 +95,14 @@ async function getPackageJsons (packages = getPackages()) {
   )
 }
 
-function shouldIgnoreImport (sourceValue) {
+function shouldIgnoreImport(sourceValue) {
   return !/^(\.{1-2}|(@interactjs))[\\/]/.test(sourceValue)
 }
 
 const isPro = process.env.INTERACTJS_TIER === 'pro'
 const registryUrl = isPro ? 'https://registry.interactjs.io' : undefined
 
-function extendBabelOptions (
+function extendBabelOptions(
   { ignore = [], plugins = [], presets = [], ...others },
   base = getEsnextBabelOptions(),
 ) {
@@ -115,7 +115,7 @@ function extendBabelOptions (
   }
 }
 
-function getPackageDir (filename) {
+function getPackageDir(filename) {
   let packageDir = filename
 
   while (!fs.existsSync(path.join(packageDir, 'package.json'))) {
@@ -129,7 +129,7 @@ function getPackageDir (filename) {
   return packageDir
 }
 
-function getRelativeToRoot (filename, moduleDirectory, prefix = '/') {
+function getRelativeToRoot(filename, moduleDirectory, prefix = '/') {
   filename = path.normalize(filename)
 
   const ret = withBestRoot((root) => {
@@ -150,7 +150,7 @@ function getRelativeToRoot (filename, moduleDirectory, prefix = '/') {
 /**
  * use the result of `func` most shallow valid root
  */
-function withBestRoot (func, moduleDirectory) {
+function withBestRoot(func, moduleDirectory) {
   const roots = moduleDirectory.map(path.normalize)
 
   return (
@@ -170,7 +170,7 @@ function withBestRoot (func, moduleDirectory) {
   )
 }
 
-function resolveImport (specifier, basedir, moduleDirectory) {
+function resolveImport(specifier, basedir, moduleDirectory) {
   if (specifier.startsWith('.')) {
     specifier = path.join(basedir, specifier)
   }
@@ -181,7 +181,7 @@ function resolveImport (specifier, basedir, moduleDirectory) {
   })
 }
 
-function getShims () {
+function getShims() {
   try {
     return require('../scripts/shims')
   } catch {
@@ -189,7 +189,7 @@ function getShims () {
   }
 }
 
-function errorExit (error) {
+function errorExit(error) {
   console.error(error)
   process.exit(1)
 }

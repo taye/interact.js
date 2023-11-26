@@ -1,14 +1,15 @@
-import type { Scope, SignalArgs, Plugin } from '@interactjs/core/scope'
-import type { ActionName, Listener } from '@interactjs/core/types'
 import browser from '@interactjs/utils/browser'
 import domObjects from '@interactjs/utils/domObjects'
 import { nodeContains } from '@interactjs/utils/domUtils'
 import * as pointerUtils from '@interactjs/utils/pointerUtils'
 
-import InteractionBase from './Interaction'
+import type { Scope, SignalArgs, Plugin } from '@interactjs/core/scope'
+import type { ActionName, Listener } from '@interactjs/core/types'
+
 /* eslint-disable import/no-duplicates -- for typescript module augmentations */
 import './interactablePreventDefault'
 import interactablePreventDefault from './interactablePreventDefault'
+import InteractionBase from './Interaction'
 /* eslint-enable import/no-duplicates */
 import type { SearchDetails } from './interactionFinder'
 import finder from './interactionFinder'
@@ -20,7 +21,7 @@ declare module '@interactjs/core/scope' {
       new: <T extends ActionName>(options: any) => InteractionBase<T>
       list: Array<InteractionBase<ActionName>>
       listeners: { [type: string]: Listener }
-      docEvents: Array<{ type: string, listener: Listener }>
+      docEvents: Array<{ type: string; listener: Listener }>
       pointerMoveTolerance: number
     }
     prevTouchTime: number
@@ -43,7 +44,7 @@ const methodNames = [
   'windowBlur',
 ]
 
-function install (scope: Scope) {
+function install(scope: Scope) {
   const listeners = {} as any
 
   for (const method of methodNames) {
@@ -77,7 +78,7 @@ function install (scope: Scope) {
 
   docEvents.push({
     type: 'blur',
-    listener (event) {
+    listener(event) {
       for (const interaction of scope.interactions.list) {
         interaction.documentBlur(event)
       }
@@ -87,16 +88,16 @@ function install (scope: Scope) {
   // for ignoring browser's simulated mouse events
   scope.prevTouchTime = 0
 
-  scope.Interaction = class <T extends ActionName> extends InteractionBase<T> {
-    get pointerMoveTolerance () {
+  scope.Interaction = class<T extends ActionName> extends InteractionBase<T> {
+    get pointerMoveTolerance() {
       return scope.interactions.pointerMoveTolerance
     }
 
-    set pointerMoveTolerance (value) {
+    set pointerMoveTolerance(value) {
       scope.interactions.pointerMoveTolerance = value
     }
 
-    _now () {
+    _now() {
       return scope.now()
     }
   }
@@ -104,7 +105,7 @@ function install (scope: Scope) {
   scope.interactions = {
     // all active and idle interactions
     list: [],
-    new<T extends ActionName> (options: { pointerType?: string, scopeFire?: Scope['fire'] }) {
+    new<T extends ActionName>(options: { pointerType?: string; scopeFire?: Scope['fire'] }) {
       options.scopeFire = (name, arg) => scope.fire(name, arg)
 
       const interaction = new scope.Interaction<T>(options as Required<typeof options>)
@@ -117,7 +118,7 @@ function install (scope: Scope) {
     pointerMoveTolerance: 1,
   }
 
-  function releasePointersOnRemovedEls () {
+  function releasePointersOnRemovedEls() {
     // for all inactive touch interactions with pointers down
     for (const interaction of scope.interactions.list) {
       if (!interaction.pointerIsDown || interaction.pointerType !== 'touch' || interaction._interacting) {
@@ -137,7 +138,7 @@ function install (scope: Scope) {
   scope.usePlugin(interactablePreventDefault)
 }
 
-function doOnInteractions (method: string, scope: Scope) {
+function doOnInteractions(method: string, scope: Scope) {
   return function (event: Event) {
     const interactions = scope.interactions.list
 
@@ -217,7 +218,7 @@ function doOnInteractions (method: string, scope: Scope) {
   }
 }
 
-function getInteraction (searchDetails: SearchDetails) {
+function getInteraction(searchDetails: SearchDetails) {
   const { pointerType, scope } = searchDetails
 
   const foundInteraction = finder.search(searchDetails)
@@ -228,7 +229,7 @@ function getInteraction (searchDetails: SearchDetails) {
   return signalArg.interaction || scope.interactions.new({ pointerType })
 }
 
-function onDocSignal<T extends 'scope:add-document' | 'scope:remove-document'> (
+function onDocSignal<T extends 'scope:add-document' | 'scope:remove-document'>(
   { doc, scope, options }: SignalArgs[T],
   eventMethodName: 'add' | 'remove',
 ) {

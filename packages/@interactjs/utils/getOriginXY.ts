@@ -3,7 +3,7 @@ import type { ActionName, HasGetRect } from '@interactjs/core/types'
 
 import { rectToXY, resolveRectLike } from './rect'
 
-export default function getOriginXY (
+export default function getOriginXY(
   target: HasGetRect & { options: PerActionDefaults },
   element: Node,
   actionName?: ActionName,

@@ -2,7 +2,7 @@ let lastTime = 0
 let request: typeof requestAnimationFrame
 let cancel: typeof cancelAnimationFrame
 
-function init (global: Window | typeof globalThis) {
+function init(global: Window | typeof globalThis) {
   request = global.requestAnimationFrame
   cancel = global.cancelAnimationFrame
 

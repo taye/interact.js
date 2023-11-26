@@ -5,7 +5,7 @@ import { snapSize } from '../snap/size'
 test('modifiers/snapSize', () => {
   const { interaction, interactable } = helpers.testEnv()
   interaction.interactable = interactable
-  interactable.getRect = () => ({ top: 0, left: 0, bottom: 100, right: 100 } as any)
+  interactable.getRect = () => ({ top: 0, left: 0, bottom: 100, right: 100 }) as any
   interaction._interacting = true
 
   const target0 = Object.freeze({ x: 50, y: 100 })

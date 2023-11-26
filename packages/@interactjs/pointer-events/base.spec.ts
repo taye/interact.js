@@ -90,7 +90,7 @@ test('pointerEvents.collectEventTargets', () => {
   }
   let collectedTargets: EventTargetList
 
-  function onCollect ({ targets }: { targets?: EventTargetList }) {
+  function onCollect({ targets }: { targets?: EventTargetList }) {
     targets.push(target)
 
     collectedTargets = targets

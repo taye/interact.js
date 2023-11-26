@@ -21,6 +21,15 @@ import InteractableMethods from './InteractableMethods'
 
 declare module '@interactjs/core/InteractStatic' {
   export interface InteractStatic {
+    /**
+     * Returns or sets the maximum number of concurrent interactions allowed.  By
+     * default only 1 interaction is allowed at a time (for backwards
+     * compatibility). To allow multiple interactions on the same Interactables and
+     * elements, you need to enable it in the draggable, resizable and gesturable
+     * `'max'` and `'maxPerElement'` options.
+     *
+     * @param {number} [newValue] Any number. newValue <= 0 means no interactions.
+     */
     maxInteractions: (newValue: any) => any
   }
 }
@@ -76,7 +85,7 @@ export interface AutoStart {
   cursorElement: Element
 }
 
-function install (scope: Scope) {
+function install(scope: Scope) {
   const { interactStatic: interact, defaults } = scope
 
   scope.usePlugin(InteractableMethods)
@@ -96,17 +105,6 @@ function install (scope: Scope) {
     mouseButtons: 1,
   })
 
-  /**
-   * Returns or sets the maximum number of concurrent interactions allowed.  By
-   * default only 1 interaction is allowed at a time (for backwards
-   * compatibility). To allow multiple interactions on the same Interactables and
-   * elements, you need to enable it in the draggable, resizable and gesturable
-   * `'max'` and `'maxPerElement'` options.
-   *
-   * @alias module:interact.maxInteractions
-   *
-   * @param {number} [newValue] Any number. newValue <= 0 means no interactions.
-   */
   interact.maxInteractions = (newValue: number) => maxInteractions(newValue, scope)
 
   scope.autoStart = {
@@ -117,7 +115,7 @@ function install (scope: Scope) {
   }
 }
 
-function prepareOnDown (
+function prepareOnDown(
   { interaction, pointer, event, eventTarget }: SignalArgs['interactions:down'],
   scope: Scope,
 ) {
@@ -127,7 +125,7 @@ function prepareOnDown (
   prepare(interaction, actionInfo, scope)
 }
 
-function prepareOnMove (
+function prepareOnMove(
   { interaction, pointer, event, eventTarget }: SignalArgs['interactions:move'],
   scope: Scope,
 ) {
@@ -137,7 +135,7 @@ function prepareOnMove (
   prepare(interaction, actionInfo, scope)
 }
 
-function startOnMove (arg: SignalArgs['interactions:move'], scope: Scope) {
+function startOnMove(arg: SignalArgs['interactions:move'], scope: Scope) {
   const { interaction } = arg
 
   if (
@@ -168,7 +166,7 @@ function startOnMove (arg: SignalArgs['interactions:move'], scope: Scope) {
   }
 }
 
-function clearCursorOnStop ({ interaction }: { interaction: Interaction }, scope: Scope) {
+function clearCursorOnStop({ interaction }: { interaction: Interaction }, scope: Scope) {
   const { interactable } = interaction
 
   if (interactable && interactable.options.styleCursor) {
@@ -178,7 +176,7 @@ function clearCursorOnStop ({ interaction }: { interaction: Interaction }, scope
 
 // Check if the current interactable supports the action.
 // If so, return the validated action. Otherwise, return null
-function validateAction<T extends ActionName> (
+function validateAction<T extends ActionName>(
   action: ActionProps<T>,
   interactable: Interactable,
   element: Element,
@@ -196,7 +194,7 @@ function validateAction<T extends ActionName> (
   return null
 }
 
-function validateMatches (
+function validateMatches(
   interaction: Interaction,
   pointer: PointerType,
   event: PointerEventType,
@@ -228,7 +226,7 @@ function validateMatches (
   return { action: null, interactable: null, element: null }
 }
 
-function getActionInfo (
+function getActionInfo(
   interaction: Interaction,
   pointer: PointerType,
   event: PointerEventType,
@@ -240,7 +238,7 @@ function getActionInfo (
 
   let element = eventTarget as Element
 
-  function pushMatches (interactable: Interactable) {
+  function pushMatches(interactable: Interactable) {
     matches.push(interactable)
     matchElements.push(element)
   }
@@ -271,7 +269,7 @@ function getActionInfo (
   return { action: null, interactable: null, element: null }
 }
 
-function prepare (
+function prepare(
   interaction: Interaction,
   {
     action,
@@ -297,7 +295,7 @@ function prepare (
   scope.fire('autoStart:prepared', { interaction })
 }
 
-function withinInteractionLimit<T extends ActionName> (
+function withinInteractionLimit<T extends ActionName>(
   interactable: Interactable,
   element: Element,
   action: ActionProps<T>,
@@ -351,7 +349,7 @@ function withinInteractionLimit<T extends ActionName> (
   return autoStartMax > 0
 }
 
-function maxInteractions (newValue: any, scope: Scope) {
+function maxInteractions(newValue: any, scope: Scope) {
   if (is.number(newValue)) {
     scope.autoStart.maxInteractions = newValue
 
@@ -361,7 +359,7 @@ function maxInteractions (newValue: any, scope: Scope) {
   return scope.autoStart.maxInteractions
 }
 
-function setCursor (element: Element, cursor: string, scope: Scope) {
+function setCursor(element: Element, cursor: string, scope: Scope) {
   const { cursorElement: prevCursorElement } = scope.autoStart
 
   if (prevCursorElement && prevCursorElement !== element) {
@@ -373,7 +371,7 @@ function setCursor (element: Element, cursor: string, scope: Scope) {
   scope.autoStart.cursorElement = cursor ? element : null
 }
 
-function setInteractionCursor<T extends ActionName> (interaction: Interaction<T>, scope: Scope) {
+function setInteractionCursor<T extends ActionName>(interaction: Interaction<T>, scope: Scope) {
   const { interactable, element, prepared } = interaction
 
   if (!(interaction.pointerType === 'mouse' && interactable && interactable.options.styleCursor)) {

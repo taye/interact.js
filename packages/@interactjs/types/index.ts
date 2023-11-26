@@ -22,6 +22,6 @@ export type Interaction<T extends ActionName = ActionName> = interaction.Interac
 export type InteractionProxy<T extends ActionName = ActionName> = interaction.InteractionProxy<T>
 export type PointerArgProps<T extends {} = {}> = interaction.PointerArgProps<T>
 export type InteractEvent<T extends ActionName = never, P extends EventPhase = EventPhase> = _InteractEvent<
-T,
-P
+  T,
+  P
 >

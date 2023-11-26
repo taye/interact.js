@@ -21,7 +21,7 @@ const browser = {
   wheelEvent: null as string,
 }
 
-function init (window: any) {
+function init(window: any) {
   const Element = domObjects.Element
   const navigator: Partial<Navigator> = window.navigator || {}
 
@@ -61,21 +61,21 @@ function init (window: any) {
   browser.pEventTypes = browser.supportsPointerEvent
     ? domObjects.PointerEvent === window.MSPointerEvent
       ? {
-        up: 'MSPointerUp',
-        down: 'MSPointerDown',
-        over: 'mouseover',
-        out: 'mouseout',
-        move: 'MSPointerMove',
-        cancel: 'MSPointerCancel',
-      }
+          up: 'MSPointerUp',
+          down: 'MSPointerDown',
+          over: 'mouseover',
+          out: 'mouseout',
+          move: 'MSPointerMove',
+          cancel: 'MSPointerCancel',
+        }
       : {
-        up: 'pointerup',
-        down: 'pointerdown',
-        over: 'pointerover',
-        out: 'pointerout',
-        move: 'pointermove',
-        cancel: 'pointercancel',
-      }
+          up: 'pointerup',
+          down: 'pointerdown',
+          over: 'pointerover',
+          out: 'pointerout',
+          move: 'pointermove',
+          cancel: 'pointercancel',
+        }
     : null
 
   // because Webkit and Opera still use 'mousewheel' event type

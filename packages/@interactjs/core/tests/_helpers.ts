@@ -1,19 +1,19 @@
-import type { PointerType, Rect, Target } from '@interactjs/core/types'
 import extend from '@interactjs/utils/extend'
 import is from '@interactjs/utils/is'
 import * as pointerUtils from '@interactjs/utils/pointerUtils'
 
+import type { PointerType, Rect, Target, ActionName, ActionProps } from '@interactjs/core/types'
+
 import type { Plugin } from '../scope'
 import { Scope } from '../scope'
-import type { ActionName, ActionProps } from '../types'
 
 let counter = 0
 
-export function unique () {
+export function unique() {
   return counter++
 }
 
-export function uniqueProps (obj: any) {
+export function uniqueProps(obj: any) {
   for (const prop in obj) {
     if (!obj.hasOwnProperty(prop)) {
       continue
@@ -27,7 +27,7 @@ export function uniqueProps (obj: any) {
   }
 }
 
-export function newCoordsSet (n = 0) {
+export function newCoordsSet(n = 0) {
   return {
     start: {
       page: { x: n++, y: n++ },
@@ -57,7 +57,7 @@ export function newCoordsSet (n = 0) {
   }
 }
 
-export function newPointer (n = 50) {
+export function newPointer(n = 50) {
   return {
     pointerId: n++,
     pageX: n++,
@@ -67,7 +67,7 @@ export function newPointer (n = 50) {
   } as PointerType
 }
 
-export function mockScope ({ document = window.document } = {} as any) {
+export function mockScope({ document = window.document } = {} as any) {
   const window = document.defaultView
 
   const scope = new Scope().init(window)
@@ -77,17 +77,20 @@ export function mockScope ({ document = window.document } = {} as any) {
   return scope
 }
 
-export function getProps<T extends { [key: string]: any }, K extends keyof T> (src: T, props: readonly K[]) {
-  return props.reduce((acc, prop) => {
-    if (prop in src) {
-      acc[prop] = src[prop]
-    }
+export function getProps<T extends { [key: string]: any }, K extends keyof T>(src: T, props: readonly K[]) {
+  return props.reduce(
+    (acc, prop) => {
+      if (prop in src) {
+        acc[prop] = src[prop]
+      }
 
-    return acc
-  }, {} as Pick<T, K>)
+      return acc
+    },
+    {} as Pick<T, K>,
+  )
 }
 
-export function testEnv<T extends Target = HTMLElement> ({
+export function testEnv<T extends Target = HTMLElement>({
   plugins = [],
   target,
   rect,
@@ -137,11 +140,11 @@ export function testEnv<T extends Target = HTMLElement> ({
   }
 }
 
-export function timeout (n: number) {
+export function timeout(n: number) {
   return new Promise((resolve) => setTimeout(resolve, n))
 }
 
-export function ltrbwh (
+export function ltrbwh(
   left: number,
   top: number,
   right: number,

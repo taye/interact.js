@@ -1,10 +1,11 @@
-import type { Listener, ListenersArg, Rect } from '@interactjs/core/types'
 import * as arr from '@interactjs/utils/arr'
 import extend from '@interactjs/utils/extend'
 import type { NormalizedListeners } from '@interactjs/utils/normalizeListeners'
 import normalize from '@interactjs/utils/normalizeListeners'
 
-function fireUntilImmediateStopped (event: any, listeners: Listener[]) {
+import type { Listener, ListenersArg, Rect } from '@interactjs/core/types'
+
+function fireUntilImmediateStopped(event: any, listeners: Listener[]) {
   for (const listener of listeners) {
     if (event.immediatePropagationStopped) {
       break
@@ -21,11 +22,11 @@ export class Eventable {
   immediatePropagationStopped = false
   global: any
 
-  constructor (options?: { [index: string]: any }) {
+  constructor(options?: { [index: string]: any }) {
     this.options = extend({}, options || {})
   }
 
-  fire<T extends { type: string, propagationStopped?: boolean }> (event: T) {
+  fire<T extends { type: string; propagationStopped?: boolean }>(event: T) {
     let listeners: Listener[]
     const global = this.global
 
@@ -41,7 +42,7 @@ export class Eventable {
     }
   }
 
-  on (type: string, listener: ListenersArg) {
+  on(type: string, listener: ListenersArg) {
     const listeners = normalize(type, listener)
 
     for (type in listeners) {
@@ -49,7 +50,7 @@ export class Eventable {
     }
   }
 
-  off (type: string, listener: ListenersArg) {
+  off(type: string, listener: ListenersArg) {
     const listeners = normalize(type, listener)
 
     for (type in listeners) {
@@ -69,7 +70,7 @@ export class Eventable {
     }
   }
 
-  getRect (_element: Element): Rect {
+  getRect(_element: Element): Rect {
     return null
   }
 }

@@ -1,12 +1,11 @@
+import type { Interactable } from '@interactjs/core/Interactable'
 import type { InteractEvent, EventPhase } from '@interactjs/core/InteractEvent'
 import type { Interaction, DoPhaseArg } from '@interactjs/core/Interaction'
 import type { PerActionDefaults } from '@interactjs/core/options'
 import type { Scope, Plugin } from '@interactjs/core/scope'
-import type { ActionMethod, Rect, PointerType, ListenersArg } from '@interactjs/core/types'
+import type { Rect, PointerType, ListenersArg, OrBoolean } from '@interactjs/core/types'
 import is from '@interactjs/utils/is'
 import * as pointerUtils from '@interactjs/utils/pointerUtils'
-
-export type GesturableMethod = ActionMethod<GesturableOptions>
 
 declare module '@interactjs/core/Interaction' {
   interface Interaction {
@@ -22,7 +21,30 @@ declare module '@interactjs/core/Interaction' {
 
 declare module '@interactjs/core/Interactable' {
   interface Interactable {
-    gesturable: GesturableMethod
+    gesturable(options: Partial<OrBoolean<GesturableOptions>> | boolean): this
+    gesturable(): GesturableOptions
+    /**
+     * ```js
+     * interact(element).gesturable({
+     *     onstart: function (event) {},
+     *     onmove : function (event) {},
+     *     onend  : function (event) {},
+     *
+     *     // limit multiple gestures.
+     *     // See the explanation in {@link Interactable.draggable} example
+     *     max: Infinity,
+     *     maxPerElement: 1,
+     * })
+     *
+     * var isGestureable = interact(element).gesturable()
+     * ```
+     *
+     * Gets or sets whether multitouch gestures can be performed on the target
+     *
+     * @param options - true/false or An object with event listeners to be fired on gesture events (makes the Interactable gesturable)
+     * @returns A boolean indicating if this can be the target of gesture events, or this Interactable
+     */
+    gesturable(options?: Partial<OrBoolean<GesturableOptions>> | boolean): this | GesturableOptions
   }
 }
 
@@ -59,32 +81,9 @@ export interface GestureSignalArg extends DoPhaseArg<'gesture', EventPhase> {
   interaction: Interaction<'gesture'>
 }
 
-function install (scope: Scope) {
+function install(scope: Scope) {
   const { actions, Interactable, defaults } = scope
 
-  /**
-   * ```js
-   * interact(element).gesturable({
-   *     onstart: function (event) {},
-   *     onmove : function (event) {},
-   *     onend  : function (event) {},
-   *
-   *     // limit multiple gestures.
-   *     // See the explanation in {@link Interactable.draggable} example
-   *     max: Infinity,
-   *     maxPerElement: 1,
-   * })
-   *
-   * var isGestureable = interact(element).gesturable()
-   * ```
-   *
-   * Gets or sets whether multitouch gestures can be performed on the target
-   *
-   * @param {boolean | object} [options] true/false or An object with event
-   * listeners to be fired on gesture events (makes the Interactable gesturable)
-   * @return {boolean | Interactable} A boolean indicating if this can be the
-   * target of gesture events, or this Interactable
-   */
   Interactable.prototype.gesturable = function (
     this: InstanceType<typeof Interactable>,
     options: GesturableOptions | boolean,
@@ -104,7 +103,7 @@ function install (scope: Scope) {
     }
 
     return this.options.gesture as GesturableOptions
-  } as GesturableMethod
+  } as Interactable['gesturable']
 
   actions.map.gesture = gesture
   actions.methodDict.gesture = 'gesturable'
@@ -112,7 +111,7 @@ function install (scope: Scope) {
   defaults.actions.gesture = gesture.defaults
 }
 
-function updateGestureProps ({ interaction, iEvent, phase }: GestureSignalArg) {
+function updateGestureProps({ interaction, iEvent, phase }: GestureSignalArg) {
   if (interaction.prepared.name !== 'gesture') return
 
   const pointers = interaction.pointers.map((p) => p.pointer)
@@ -197,7 +196,7 @@ const gesture: Plugin = {
 
   defaults: {},
 
-  getCursor () {
+  getCursor() {
     return ''
   },
 

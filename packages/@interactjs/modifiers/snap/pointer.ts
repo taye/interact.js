@@ -47,15 +47,15 @@ export interface SnapOptions {
 }
 
 export type SnapState = ModifierState<
-SnapOptions,
-{
-  offsets?: Offset[]
-  closest?: any
-  targetFields?: string[][]
-}
+  SnapOptions,
+  {
+    offsets?: Offset[]
+    closest?: any
+    targetFields?: string[][]
+  }
 >
 
-function start (arg: ModifierArg<SnapState>) {
+function start(arg: ModifierArg<SnapState>) {
   const { interaction, interactable, element, rect, state, startOffset } = arg
   const { options } = state
   const origin = options.offsetWithOrigin ? getOrigin(arg) : { x: 0, y: 0 }
@@ -80,22 +80,22 @@ function start (arg: ModifierArg<SnapState>) {
   state.offsets =
     rect && relativePoints && relativePoints.length
       ? relativePoints.map((relativePoint, index) => ({
-        index,
-        relativePoint,
-        x: startOffset.left - rect.width * relativePoint.x + snapOffset.x,
-        y: startOffset.top - rect.height * relativePoint.y + snapOffset.y,
-      }))
+          index,
+          relativePoint,
+          x: startOffset.left - rect.width * relativePoint.x + snapOffset.x,
+          y: startOffset.top - rect.height * relativePoint.y + snapOffset.y,
+        }))
       : [
-        {
-          index: 0,
-          relativePoint: null,
-          x: snapOffset.x,
-          y: snapOffset.y,
-        },
-      ]
+          {
+            index: 0,
+            relativePoint: null,
+            x: snapOffset.x,
+            y: snapOffset.y,
+          },
+        ]
 }
 
-function set (arg: ModifierArg<SnapState>) {
+function set(arg: ModifierArg<SnapState>) {
   const { interaction, coords, state } = arg
   const { options, offsets } = state
 
@@ -163,15 +163,15 @@ function set (arg: ModifierArg<SnapState>) {
       !closest.target ||
       (inRange
         ? // is the closest target in range?
-        closest.inRange && range !== Infinity
+          closest.inRange && range !== Infinity
           ? // the pointer is relatively deeper in this target
-          distance / range < closest.distance / closest.range
+            distance / range < closest.distance / closest.range
           : // this target has Infinite range and the closest doesn't
-          (range === Infinity && closest.range !== Infinity) ||
+            (range === Infinity && closest.range !== Infinity) ||
             // OR this target is closer that the previous closest
             distance < closest.distance
         : // The other is not in range and the pointer is closer to this target
-        !closest.inRange && distance < closest.distance)
+          !closest.inRange && distance < closest.distance)
     ) {
       closest.target = target
       closest.distance = distance
@@ -191,7 +191,7 @@ function set (arg: ModifierArg<SnapState>) {
   return closest
 }
 
-function getOrigin (arg: Partial<ModifierArg<SnapState>>) {
+function getOrigin(arg: Partial<ModifierArg<SnapState>>) {
   const { element } = arg.interaction
   const optionsOrigin = rectToXY(resolveRectLike(arg.state.options.origin as any, null, null, [element]))
   const origin = optionsOrigin || getOriginXY(arg.interactable, element, arg.interaction.prepared.name)

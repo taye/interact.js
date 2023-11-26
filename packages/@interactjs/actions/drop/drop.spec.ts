@@ -12,12 +12,12 @@ describe('actions/drop', () => {
     const { interactable } = helpers.testEnv({ plugins: [drop] })
 
     const funcs = Object.freeze({
-      drop () {},
-      activate () {},
-      deactivate () {},
-      dropmove () {},
-      dragenter () {},
-      dragleave () {},
+      drop() {},
+      activate() {},
+      deactivate() {},
+      dropmove() {},
+      dragenter() {},
+      dragleave() {},
     })
 
     interactable.dropzone({

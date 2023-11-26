@@ -1,4 +1,4 @@
-// This module allows snapping of the size of targets during resize
+// This modifier allows snapping of the size of targets during resize
 // interactions.
 
 import extend from '@interactjs/utils/extend'
@@ -12,7 +12,7 @@ import { snap } from './pointer'
 
 export type SnapSizeOptions = Pick<SnapOptions, 'targets' | 'offset' | 'endOnly' | 'range' | 'enabled'>
 
-function start (arg: ModifierArg<SnapState>) {
+function start(arg: ModifierArg<SnapState>) {
   const { state, edges } = arg
   const { options } = state
 
@@ -46,7 +46,7 @@ function start (arg: ModifierArg<SnapState>) {
   arg.state = state
 }
 
-function set (arg) {
+function set(arg) {
   const { interaction, state, coords } = arg
   const { options, offsets } = state
   const relative = {

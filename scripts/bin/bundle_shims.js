@@ -1,8 +1,6 @@
-const fs = require('fs')
 const os = require('os')
 const path = require('path')
 
-const mkdirp = require('mkdirp')
 const { default: PQueue } = require('p-queue')
 
 const bundleShim = require('../shimBundler')
@@ -20,21 +18,12 @@ for (const shimConfig of shims) {
   queue.add(() => bundle(shimConfig).catch(errorExit))
 }
 
-async function bundle (shimConfig) {
+async function bundle(shimConfig) {
   const { source } = shimConfig
-  const outFile = `${destDir}/${source}`
-
-  if (fs.existsSync(outFile)) {
-    console.log(`${source} bundle already exists`)
-    return
-  }
 
   console.log(`Bundling ${source}`)
 
-  const code = await bundleShim({ ...shimConfig })
-  await mkdirp(path.dirname(outFile))
-
-  await fs.promises.writeFile(outFile, code)
+  await bundleShim({ ...shimConfig, destDir })
 }
 
 queue.onIdle().then((bundled) => {

@@ -64,14 +64,14 @@ test('interact export', () => {
 
   const plugin1 = {
     id: 'test-1',
-    install () {
+    install() {
       plugin1.count++
     },
     count: 0,
   }
   const plugin2 = {
     id: '',
-    install () {
+    install() {
       plugin2.count++
     },
     count: 0,

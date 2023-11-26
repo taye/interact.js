@@ -12,7 +12,7 @@ import interactableTargets from './interactableTargets'
 
 const plugin: Plugin = {
   id: 'pointer-events',
-  install (scope) {
+  install(scope) {
     scope.usePlugin(pointerEvents)
     scope.usePlugin(holdRepeat)
     scope.usePlugin(interactableTargets)

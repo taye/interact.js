@@ -12,7 +12,7 @@ declare module '@interactjs/core/InteractStatic' {
 
 const snappersPlugin: Plugin = {
   id: 'snappers',
-  install (scope) {
+  install(scope) {
     const { interactStatic: interact } = scope
 
     interact.snappers = extend(interact.snappers || {}, allSnappers)

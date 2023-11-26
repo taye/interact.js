@@ -141,9 +141,9 @@ module.exports = function ({ template, types: t }) {
     return {
       name: '@interactjs/_dev:for-of-array',
       replaceParent: isLabeledParent,
-      declar: declar,
+      declar,
       node: labeled || loop,
-      loop: loop,
+      loop,
     }
   }
 }

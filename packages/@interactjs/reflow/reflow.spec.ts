@@ -1,5 +1,5 @@
-import type { InteractEvent } from '@interactjs/core/InteractEvent'
 import type { Interactable } from '@interactjs/core/Interactable'
+import type { InteractEvent } from '@interactjs/core/InteractEvent'
 import * as helpers from '@interactjs/core/tests/_helpers'
 import type { ActionName, Point } from '@interactjs/core/types'
 import PromisePolyfill from 'promise-polyfill'

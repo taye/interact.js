@@ -1,12 +1,12 @@
-import type { Point, FullRect, PointerEventType, Element } from '@interactjs/core/types'
 import extend from '@interactjs/utils/extend'
 import getOriginXY from '@interactjs/utils/getOriginXY'
 import hypot from '@interactjs/utils/hypot'
 
+import type { Point, FullRect, PointerEventType, Element, ActionName } from '@interactjs/core/types'
+
 import { BaseEvent } from './BaseEvent'
 import type { Interaction } from './Interaction'
 import { defaults } from './options'
-import type { ActionName } from './types'
 
 export type EventPhase = keyof PhaseMap
 
@@ -63,10 +63,10 @@ export class InteractEvent<
   swipe: ReturnType<InteractEvent<T>['getSwipe']>
   // resize
   axes?: 'x' | 'y' | 'xy'
+  /** @internal */
   preEnd?: boolean
 
-  /** */
-  constructor (
+  constructor(
     interaction: Interaction<T>,
     event: PointerEventType,
     actionName: T,
@@ -142,7 +142,7 @@ export class InteractEvent<
     this.swipe = ending || phase === 'inertiastart' ? this.getSwipe() : null
   }
 
-  getSwipe () {
+  getSwipe() {
     const interaction = this._interaction
 
     if (interaction.prevEvent.speed < 600 || this.timeStamp - interaction.prevEvent.timeStamp > 150) {
@@ -176,19 +176,19 @@ export class InteractEvent<
     }
   }
 
-  preventDefault () {}
+  preventDefault() {}
 
   /**
    * Don't call listeners on the remaining targets
    */
-  stopImmediatePropagation () {
+  stopImmediatePropagation() {
     this.immediatePropagationStopped = this.propagationStopped = true
   }
 
   /**
    * Don't call any other listeners (even on the current target)
    */
-  stopPropagation () {
+  stopPropagation() {
     this.propagationStopped = true
   }
 }
@@ -197,69 +197,69 @@ export class InteractEvent<
 // don't support getter and setters in .d.ts files
 Object.defineProperties(InteractEvent.prototype, {
   pageX: {
-    get () {
+    get() {
       return this.page.x
     },
-    set (value) {
+    set(value) {
       this.page.x = value
     },
   },
   pageY: {
-    get () {
+    get() {
       return this.page.y
     },
-    set (value) {
+    set(value) {
       this.page.y = value
     },
   },
 
   clientX: {
-    get () {
+    get() {
       return this.client.x
     },
-    set (value) {
+    set(value) {
       this.client.x = value
     },
   },
   clientY: {
-    get () {
+    get() {
       return this.client.y
     },
-    set (value) {
+    set(value) {
       this.client.y = value
     },
   },
 
   dx: {
-    get () {
+    get() {
       return this.delta.x
     },
-    set (value) {
+    set(value) {
       this.delta.x = value
     },
   },
   dy: {
-    get () {
+    get() {
       return this.delta.y
     },
-    set (value) {
+    set(value) {
       this.delta.y = value
     },
   },
 
   velocityX: {
-    get () {
+    get() {
       return this.velocity.x
     },
-    set (value) {
+    set(value) {
       this.velocity.x = value
     },
   },
   velocityY: {
-    get () {
+    get() {
       return this.velocity.y
     },
-    set (value) {
+    set(value) {
       this.velocity.y = value
     },
   },

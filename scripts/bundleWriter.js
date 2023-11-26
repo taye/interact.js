@@ -7,7 +7,7 @@ const mkdirp = require('mkdirp')
 const bundleHeader = require('./bundleHeader')
 const minify = require('./minify')
 
-module.exports = async function bundleWriter (
+module.exports = async function bundleWriter(
   bundleCode,
   { bundleStream, headerFile, minHeaderFile, destDir, name, headers = {}, writeMin = true },
 ) {
@@ -40,7 +40,7 @@ module.exports = async function bundleWriter (
 
   return Promise.all([rawWritePromise, write(min)])
 
-  function getHeaderOpts (content, filename, code, map) {
+  function getHeaderOpts(content, filename, code, map) {
     return {
       destDir,
       filename,
@@ -51,7 +51,7 @@ module.exports = async function bundleWriter (
   }
 }
 
-async function write ({ destDir, filename, code, map }, env) {
+async function write({ destDir, filename, code, map }, env) {
   if (env) {
     ;({ code, map } = await babel.transformAsync(code, {
       filename,

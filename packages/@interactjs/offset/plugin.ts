@@ -20,7 +20,7 @@ declare module '@interactjs/core/Interaction' {
 
 ;(_ProxyMethods as any).offsetBy = ''
 
-export function addTotal (interaction: Interaction) {
+export function addTotal(interaction: Interaction) {
   if (!interaction.pointerIsDown) {
     return
   }
@@ -31,11 +31,11 @@ export function addTotal (interaction: Interaction) {
   interaction.offset.pending.y = 0
 }
 
-function beforeAction ({ interaction }: { interaction: Interaction }) {
+function beforeAction({ interaction }: { interaction: Interaction }) {
   applyPending(interaction)
 }
 
-function beforeEnd ({ interaction }: { interaction: Interaction }): boolean | void {
+function beforeEnd({ interaction }: { interaction: Interaction }): boolean | void {
   const hadPending = applyPending(interaction)
 
   if (!hadPending) return
@@ -46,14 +46,14 @@ function beforeEnd ({ interaction }: { interaction: Interaction }): boolean | vo
   return false
 }
 
-function end ({ interaction }: { interaction: Interaction }) {
+function end({ interaction }: { interaction: Interaction }) {
   interaction.offset.total.x = 0
   interaction.offset.total.y = 0
   interaction.offset.pending.x = 0
   interaction.offset.pending.y = 0
 }
 
-export function applyPending (interaction: Interaction) {
+export function applyPending(interaction: Interaction) {
   if (!hasPending(interaction)) {
     return false
   }
@@ -70,7 +70,7 @@ export function applyPending (interaction: Interaction) {
   return true
 }
 
-function offsetBy (this: Interaction, { x, y }: Point) {
+function offsetBy(this: Interaction, { x, y }: Point) {
   this.offset.pending.x += x
   this.offset.pending.y += y
 
@@ -78,21 +78,21 @@ function offsetBy (this: Interaction, { x, y }: Point) {
   this.offset.total.y += y
 }
 
-function addToCoords ({ page, client }, { x, y }: Point) {
+function addToCoords({ page, client }, { x, y }: Point) {
   page.x += x
   page.y += y
   client.x += x
   client.y += y
 }
 
-function hasPending (interaction: Interaction) {
+function hasPending(interaction: Interaction) {
   return !!(interaction.offset.pending.x || interaction.offset.pending.y)
 }
 
 const offset: Plugin = {
   id: 'offset',
   before: ['modifiers', 'pointer-events', 'actions', 'inertia'],
-  install (scope) {
+  install(scope) {
     scope.Interaction.prototype.offsetBy = offsetBy
   },
   listeners: {

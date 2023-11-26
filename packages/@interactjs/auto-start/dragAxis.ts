@@ -7,7 +7,7 @@ import is from '@interactjs/utils/is'
 
 import autoStart from './base'
 
-function beforeStart ({ interaction, eventTarget, dx, dy }: SignalArgs['interactions:move'], scope: Scope) {
+function beforeStart({ interaction, eventTarget, dx, dy }: SignalArgs['interactions:move'], scope: Scope) {
   if (interaction.prepared.name !== 'drag') return
 
   // check if a drag is in the correct axis
@@ -70,7 +70,7 @@ function beforeStart ({ interaction, eventTarget, dx, dy }: SignalArgs['interact
   }
 }
 
-function checkStartAxis (startAxis: string, interactable: Interactable) {
+function checkStartAxis(startAxis: string, interactable: Interactable) {
   if (!interactable) {
     return false
   }

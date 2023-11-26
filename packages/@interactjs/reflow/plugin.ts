@@ -17,7 +17,23 @@ declare module '@interactjs/core/scope' {
 
 declare module '@interactjs/core/Interactable' {
   interface Interactable {
-    reflow: <T extends ActionName>(action: ActionProps<T>) => ReturnType<typeof doReflow>
+    /**
+     * ```js
+     * const interactable = interact(target)
+     * const drag = { name: drag, axis: 'x' }
+     * const resize = { name: resize, edges: { left: true, bottom: true }
+     *
+     * interactable.reflow(drag)
+     * interactable.reflow(resize)
+     * ```
+     *
+     * Start an action sequence to re-apply modifiers, check drops, etc.
+     *
+     * @param { Object } action The action to begin
+     * @param { string } action.name The name of the action
+     * @returns { Promise } A promise that resolves to the `Interactable` when actions on all targets have ended
+     */
+    reflow<T extends ActionName>(action: ActionProps<T>): ReturnType<typeof doReflow>
   }
 }
 
@@ -34,36 +50,17 @@ declare module '@interactjs/core/InteractEvent' {
   }
 }
 
-export function install (scope: Scope) {
-  const {
-    /** @lends Interactable */
-    Interactable,
-  } = scope
+function install(scope: Scope) {
+  const { Interactable } = scope
 
   scope.actions.phases.reflow = true
 
-  /**
-   * ```js
-   * const interactable = interact(target)
-   * const drag = { name: drag, axis: 'x' }
-   * const resize = { name: resize, edges: { left: true, bottom: true }
-   *
-   * interactable.reflow(drag)
-   * interactable.reflow(resize)
-   * ```
-   *
-   * Start an action sequence to re-apply modifiers, check drops, etc.
-   *
-   * @param { Object } action The action to begin
-   * @param { string } action.name The name of the action
-   * @returns { Promise } A promise that resolves to the `Interactable` when actions on all targets have ended
-   */
   Interactable.prototype.reflow = function (action: ActionProps) {
     return doReflow(this, action, scope)
   }
 }
 
-function doReflow<T extends ActionName> (
+function doReflow<T extends ActionName>(
   interactable: Interactable,
   action: ActionProps<T>,
   scope: Scope,
@@ -121,7 +118,7 @@ function doReflow<T extends ActionName> (
   return promises && Promise.all(promises).then(() => interactable)
 }
 
-function startReflow<T extends ActionName> (
+function startReflow<T extends ActionName>(
   scope: Scope,
   interactable: Interactable,
   element: Element,
@@ -149,8 +146,8 @@ function startReflow<T extends ActionName> (
   const { Promise } = scope.window as unknown as { Promise: PromiseConstructor }
   const reflowPromise = Promise
     ? new Promise<undefined>((resolve) => {
-      interaction._reflowResolve = resolve
-    })
+        interaction._reflowResolve = resolve
+      })
     : undefined
 
   interaction._reflowPromise = reflowPromise

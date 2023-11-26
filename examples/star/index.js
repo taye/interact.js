@@ -25,7 +25,7 @@ document.addEventListener('DOMContentLoaded', () => {
     root.appendChild(handle)
   }
 
-  function applyTransforms (event) {
+  function applyTransforms(event) {
     rootMatrix = root.getScreenCTM()
 
     transformedPoints = originalPoints.map((point) => {

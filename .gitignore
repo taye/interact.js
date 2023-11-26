@@ -27,3 +27,4 @@ coverage
 cc-test-reporter
 lerna-debug.log
 .vim
+.cjsescache

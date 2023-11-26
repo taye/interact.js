@@ -1,6 +1,6 @@
 import { BaseEvent } from '@interactjs/core/BaseEvent'
-import type { InteractEvent } from '@interactjs/core/InteractEvent'
 import type { Interactable } from '@interactjs/core/Interactable'
+import type { InteractEvent } from '@interactjs/core/InteractEvent'
 import type { Element } from '@interactjs/core/types'
 import * as arr from '@interactjs/utils/arr'
 
@@ -18,7 +18,7 @@ export class DropEvent extends BaseEvent<'drag'> {
   /**
    * Class of events fired on dropzones during drags with acceptable targets.
    */
-  constructor (dropState: DropState, dragEvent: InteractEvent<'drag'>, type: string) {
+  constructor(dropState: DropState, dragEvent: InteractEvent<'drag'>, type: string) {
     super(dragEvent._interaction)
 
     const { element, dropzone } = type === 'dragleave' ? dropState.prev : dropState.cur
@@ -40,7 +40,7 @@ export class DropEvent extends BaseEvent<'drag'> {
    * If this is a `dragmove` or `dragenter`, a `dragleave` will be fired on the
    * dropzone element and more.
    */
-  reject () {
+  reject() {
     const { dropState } = this._interaction
 
     if (
@@ -78,13 +78,13 @@ export class DropEvent extends BaseEvent<'drag'> {
     }
   }
 
-  preventDefault () {}
+  preventDefault() {}
 
-  stopPropagation () {
+  stopPropagation() {
     this.propagationStopped = true
   }
 
-  stopImmediatePropagation () {
+  stopImmediatePropagation() {
     this.immediatePropagationStopped = this.propagationStopped = true
   }
 }

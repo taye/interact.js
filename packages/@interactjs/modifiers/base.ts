@@ -2,7 +2,7 @@ import type { InteractEvent } from '@interactjs/core/InteractEvent'
 import type Interaction from '@interactjs/core/Interaction'
 import type { Plugin } from '@interactjs/core/scope'
 
-import Modification from './Modification'
+import { Modification } from './Modification'
 import type { Modifier, ModifierModule, ModifierState } from './types'
 
 declare module '@interactjs/core/Interaction' {
@@ -31,7 +31,7 @@ export function makeModifier<
   State extends ModifierState,
   Name extends string,
   Result,
-> (module: ModifierModule<Defaults, State, Result>, name?: Name) {
+>(module: ModifierModule<Defaults, State, Result>, name?: Name) {
   const { defaults } = module
   const methods = {
     start: module.start,
@@ -78,7 +78,7 @@ export function makeModifier<
   return modifier
 }
 
-export function addEventModifiers ({
+export function addEventModifiers({
   iEvent,
   interaction,
 }: {

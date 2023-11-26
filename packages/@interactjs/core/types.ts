@@ -1,7 +1,7 @@
 import type Interaction from '@interactjs/core/Interaction'
 
-import type { PhaseMap, InteractEvent } from './InteractEvent'
 import type { Interactable } from './Interactable'
+import type { PhaseMap, InteractEvent } from './InteractEvent'
 import type { NativePointerEvent as NativePointerEvent_ } from './NativeTypes'
 
 export type OrBoolean<T> = {
@@ -101,7 +101,6 @@ export type CursorChecker = (
 
 export interface ActionMethod<T> {
   (this: Interactable): T
-  // eslint-disable-next-line no-undef
   (this: Interactable, options?: Partial<OrBoolean<T>> | boolean): typeof this
 }
 

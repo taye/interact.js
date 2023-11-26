@@ -5,7 +5,7 @@ export let realWindow = undefined as Window
 let win = undefined as Window
 export { win as window }
 
-export function init (window: Window & { wrap?: (...args: any[]) => any }) {
+export function init(window: Window & { wrap?: (...args: any[]) => any }) {
   // get wrapped window if using Shadow DOM polyfill
 
   realWindow = window
@@ -26,7 +26,7 @@ if (typeof window !== 'undefined' && !!window) {
   init(window)
 }
 
-export function getWindow (node: any) {
+export function getWindow(node: any) {
   if (isWindow(node)) {
     return node
   }

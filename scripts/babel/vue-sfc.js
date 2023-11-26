@@ -1,10 +1,10 @@
 const { parse, compileScript, compileStyle } = require('@vue/compiler-sfc')
 const hash = require('hash-sum')
 
-module.exports = function transformVueSfc () {
+module.exports = function transformVueSfc() {
   return {
     name: '@interactjs/_dev:vue-sfc',
-    parserOverride (source, options, babelParse) {
+    parserOverride(source, options, babelParse) {
       const { sourceFileName, filename = sourceFileName } = options
 
       if (!filename?.endsWith('.vue')) return
@@ -22,7 +22,7 @@ module.exports = function transformVueSfc () {
   }
 }
 
-function compileSfc (source, { filename, isProd = true }) {
+function compileSfc(source, { filename, isProd = true }) {
   const id = hash([filename, source].join('\0'))
   const { descriptor: sfc, errors: parseErrors } = parse(source, {
     filename,
@@ -48,7 +48,7 @@ function compileSfc (source, { filename, isProd = true }) {
   }
 }
 
-function getStyleStatement (styles) {
+function getStyleStatement(styles) {
   if (!styles.length) return ''
 
   const css = styles.map((style) => style.code).join('\n')

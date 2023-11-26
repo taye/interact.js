@@ -120,7 +120,7 @@ const pointerEvents: Plugin = {
   } as { [type: string]: true },
 }
 
-function fire<T extends string> (
+function fire<T extends string>(
   arg: {
     pointer: PointerType | PointerEvent<any>
     event: PointerEventType | PointerEvent<any>
@@ -181,15 +181,15 @@ function fire<T extends string> (
     // PointerEvent and use that as the prevTap
     const prevTap = pointerEvent.double
       ? fire(
-        {
-          interaction,
-          pointer,
-          event,
-          eventTarget,
-          type: 'doubletap',
-        },
-        scope,
-      )
+          {
+            interaction,
+            pointer,
+            event,
+            eventTarget,
+            type: 'doubletap',
+          },
+          scope,
+        )
       : pointerEvent
 
     interaction.prevTap = prevTap
@@ -199,7 +199,7 @@ function fire<T extends string> (
   return pointerEvent
 }
 
-function collectEventTargets<T extends string> (
+function collectEventTargets<T extends string>(
   {
     interaction,
     pointer,
@@ -248,19 +248,20 @@ function collectEventTargets<T extends string> (
 
   if (type === 'hold') {
     signalArg.targets = signalArg.targets.filter(
-      (target) => target.eventable.options.holdDuration === interaction.pointers[pointerIndex]?.hold?.duration,
+      (target) =>
+        target.eventable.options.holdDuration === interaction.pointers[pointerIndex]?.hold?.duration,
     )
   }
 
   return signalArg.targets
 }
 
-function addInteractionProps ({ interaction }) {
+function addInteractionProps({ interaction }) {
   interaction.prevTap = null // the most recent tap event on this interaction
   interaction.tapTime = 0 // time of the most recent tap event
 }
 
-function addHoldInfo ({ down, pointerInfo }: SignalArgs['interactions:update-pointer']) {
+function addHoldInfo({ down, pointerInfo }: SignalArgs['interactions:update-pointer']) {
   if (!down && pointerInfo.hold) {
     return
   }
@@ -268,7 +269,7 @@ function addHoldInfo ({ down, pointerInfo }: SignalArgs['interactions:update-poi
   pointerInfo.hold = { duration: Infinity, timeout: null }
 }
 
-function clearHold ({ interaction, pointerIndex }) {
+function clearHold({ interaction, pointerIndex }) {
   const hold = interaction.pointers[pointerIndex].hold
 
   if (hold && hold.timeout) {
@@ -277,7 +278,7 @@ function clearHold ({ interaction, pointerIndex }) {
   }
 }
 
-function moveAndClearHold (arg: SignalArgs['interactions:move'], scope: Scope) {
+function moveAndClearHold(arg: SignalArgs['interactions:move'], scope: Scope) {
   const { interaction, pointer, event, eventTarget, duplicate } = arg
 
   if (!duplicate && (!interaction.pointerIsDown || interaction.pointerWasMoved)) {
@@ -298,7 +299,7 @@ function moveAndClearHold (arg: SignalArgs['interactions:move'], scope: Scope) {
   }
 }
 
-function downAndStartHold (
+function downAndStartHold(
   { interaction, pointer, event, eventTarget, pointerIndex }: SignalArgs['interactions:down'],
   scope: Scope,
 ) {
@@ -348,7 +349,7 @@ function downAndStartHold (
   }, minDuration)
 }
 
-function tapAfterUp (
+function tapAfterUp(
   { interaction, pointer, event, eventTarget }: SignalArgs['interactions:up'],
   scope: Scope,
 ) {
@@ -357,7 +358,7 @@ function tapAfterUp (
   }
 }
 
-function install (scope: Scope) {
+function install(scope: Scope) {
   scope.pointerEvents = pointerEvents
   scope.defaults.actions.pointerEvents = pointerEvents.defaults
   extend(scope.actions.phaselessTypes, pointerEvents.types)

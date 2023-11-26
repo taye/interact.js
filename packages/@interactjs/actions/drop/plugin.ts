@@ -1,5 +1,5 @@
-import type { EventPhase, InteractEvent } from '@interactjs/core/InteractEvent'
 import type { Interactable } from '@interactjs/core/Interactable'
+import type { EventPhase, InteractEvent } from '@interactjs/core/InteractEvent'
 import type { Interaction, DoPhaseArg } from '@interactjs/core/Interaction'
 import type { PerActionDefaults } from '@interactjs/core/options'
 import type { Scope, Plugin } from '@interactjs/core/scope'
@@ -32,9 +32,9 @@ export type DropFunctionChecker = (
 
 export interface DropzoneOptions extends PerActionDefaults {
   accept?:
-  | string
-  | Element
-  | (({ dropzone, draggableElement }: { dropzone: Interactable, draggableElement: Element }) => boolean)
+    | string
+    | Element
+    | (({ dropzone, draggableElement }: { dropzone: Interactable; draggableElement: Element }) => boolean)
   // How the overlap is checked on the drop zone
   overlap?: 'pointer' | 'center' | number
   checker?: DropFunctionChecker
@@ -54,15 +54,72 @@ export interface DropzoneMethod {
 
 declare module '@interactjs/core/Interactable' {
   interface Interactable {
-    dropzone: DropzoneMethod
-    dropCheck: (
+    /**
+     *
+     * ```js
+     * interact('.drop').dropzone({
+     *   accept: '.can-drop' || document.getElementById('single-drop'),
+     *   overlap: 'pointer' || 'center' || zeroToOne
+     * }
+     * ```
+     *
+     * Returns or sets whether draggables can be dropped onto this target to
+     * trigger drop events
+     *
+     * Dropzones can receive the following events:
+     *  - `dropactivate` and `dropdeactivate` when an acceptable drag starts and ends
+     *  - `dragenter` and `dragleave` when a draggable enters and leaves the dropzone
+     *  - `dragmove` when a draggable that has entered the dropzone is moved
+     *  - `drop` when a draggable is dropped into this dropzone
+     *
+     * Use the `accept` option to allow only elements that match the given CSS
+     * selector or element. The value can be:
+     *
+     *  - **an Element** - only that element can be dropped into this dropzone.
+     *  - **a string**, - the element being dragged must match it as a CSS selector.
+     *  - **`null`** - accept options is cleared - it accepts any element.
+     *
+     * Use the `overlap` option to set how drops are checked for. The allowed
+     * values are:
+     *
+     *   - `'pointer'`, the pointer must be over the dropzone (default)
+     *   - `'center'`, the draggable element's center must be over the dropzone
+     *   - a number from 0-1 which is the `(intersection area) / (draggable area)`.
+     *   e.g. `0.5` for drop to happen when half of the area of the draggable is
+     *   over the dropzone
+     *
+     * Use the `checker` option to specify a function to check if a dragged element
+     * is over this Interactable.
+     *
+     * @param options - The new options to be set
+     */
+    dropzone(options: DropzoneOptions | boolean): Interactable
+    /** @returns The current setting */
+    dropzone(): DropzoneOptions
+
+    /**
+     * ```js
+     * interact(target)
+     * .dropChecker(function(dragEvent,         // related dragmove or dragend event
+     *                       event,             // TouchEvent/PointerEvent/MouseEvent
+     *                       dropped,           // bool result of the default checker
+     *                       dropzone,          // dropzone Interactable
+     *                       dropElement,       // dropzone elemnt
+     *                       draggable,         // draggable Interactable
+     *                       draggableElement) {// draggable element
+     *
+     *   return dropped && event.target.hasAttribute('allow-drop')
+     * }
+     * ```
+     */
+    dropCheck(
       dragEvent: InteractEvent,
       event: PointerEventType,
       draggable: Interactable,
       draggableElement: Element,
       dropElemen: Element,
       rect: any,
-    ) => boolean
+    ): boolean
   }
 }
 
@@ -74,6 +131,7 @@ declare module '@interactjs/core/Interaction' {
 
 declare module '@interactjs/core/InteractEvent' {
   interface InteractEvent {
+    /** @internal */
     prevDropzone?: Interactable
     dropzone?: Interactable
     dragEnter?: Element
@@ -107,7 +165,15 @@ declare module '@interactjs/core/types' {
 
 declare module '@interactjs/core/InteractStatic' {
   interface InteractStatic {
-    dynamicDrop: (this: InteractStatic, newValue?: boolean) => boolean | this
+    /**
+     * Returns or sets whether the dimensions of dropzone elements are calculated
+     * on every dragmove or only on dragstart for the default dropChecker
+     *
+     * @param {boolean} [newValue] True to check on each move. False to check only
+     * before start
+     * @return {boolean | interact} The current setting or interact
+     */
+    dynamicDrop: (newValue?: boolean) => boolean | this
   }
 }
 
@@ -142,77 +208,15 @@ export interface DropState {
   activeDrops: ActiveDrop[]
 }
 
-function install (scope: Scope) {
-  const {
-    actions,
-    /** @lends module:interact */
-    interactStatic: interact,
-    /** @lends Interactable */
-    Interactable,
-    defaults,
-  } = scope
+function install(scope: Scope) {
+  const { actions, interactStatic: interact, Interactable, defaults } = scope
 
   scope.usePlugin(drag)
 
-  /**
-   *
-   * ```js
-   * interact('.drop').dropzone({
-   *   accept: '.can-drop' || document.getElementById('single-drop'),
-   *   overlap: 'pointer' || 'center' || zeroToOne
-   * }
-   * ```
-   *
-   * Returns or sets whether draggables can be dropped onto this target to
-   * trigger drop events
-   *
-   * Dropzones can receive the following events:
-   *  - `dropactivate` and `dropdeactivate` when an acceptable drag starts and ends
-   *  - `dragenter` and `dragleave` when a draggable enters and leaves the dropzone
-   *  - `dragmove` when a draggable that has entered the dropzone is moved
-   *  - `drop` when a draggable is dropped into this dropzone
-   *
-   * Use the `accept` option to allow only elements that match the given CSS
-   * selector or element. The value can be:
-   *
-   *  - **an Element** - only that element can be dropped into this dropzone.
-   *  - **a string**, - the element being dragged must match it as a CSS selector.
-   *  - **`null`** - accept options is cleared - it accepts any element.
-   *
-   * Use the `overlap` option to set how drops are checked for. The allowed
-   * values are:
-   *
-   *   - `'pointer'`, the pointer must be over the dropzone (default)
-   *   - `'center'`, the draggable element's center must be over the dropzone
-   *   - a number from 0-1 which is the `(intersection area) / (draggable area)`.
-   *   e.g. `0.5` for drop to happen when half of the area of the draggable is
-   *   over the dropzone
-   *
-   * Use the `checker` option to specify a function to check if a dragged element
-   * is over this Interactable.
-   *
-   * @param {boolean | object | null} [options] The new options to be set.
-   * @return {object | Interactable} The current setting or this Interactable
-   */
   Interactable.prototype.dropzone = function (this: Interactable, options) {
     return dropzoneMethod(this, options)
   } as Interactable['dropzone']
 
-  /**
-   * ```js
-   * interact(target)
-   * .dropChecker(function(dragEvent,         // related dragmove or dragend event
-   *                       event,             // TouchEvent/PointerEvent/MouseEvent
-   *                       dropped,           // bool result of the default checker
-   *                       dropzone,          // dropzone Interactable
-   *                       dropElement,       // dropzone elemnt
-   *                       draggable,         // draggable Interactable
-   *                       draggableElement) {// draggable element
-   *
-   *   return dropped && event.target.hasAttribute('allow-drop')
-   * }
-   * ```
-   */
   Interactable.prototype.dropCheck = function (
     this: Interactable,
     dragEvent,
@@ -225,14 +229,6 @@ function install (scope: Scope) {
     return dropCheckMethod(this, dragEvent, event, draggable, draggableElement, dropElement, rect)
   }
 
-  /**
-   * Returns or sets whether the dimensions of dropzone elements are calculated
-   * on every dragmove or only on dragstart for the default dropChecker
-   *
-   * @param {boolean} [newValue] True to check on each move. False to check only
-   * before start
-   * @return {boolean | interact} The current setting or interact
-   */
   interact.dynamicDrop = function (newValue?: boolean) {
     if (is.bool(newValue)) {
       // if (dragging && scope.dynamicDrop !== newValue && !newValue) {
@@ -261,7 +257,7 @@ function install (scope: Scope) {
   defaults.actions.drop = drop.defaults
 }
 
-function collectDropzones ({ interactables }: Scope, draggableElement: Element) {
+function collectDropzones({ interactables }: Scope, draggableElement: Element) {
   const drops: ActiveDrop[] = []
 
   // collect all dropzones and their elements which qualify for a drop
@@ -295,7 +291,7 @@ function collectDropzones ({ interactables }: Scope, draggableElement: Element) 
   return drops
 }
 
-function fireActivationEvents (activeDrops: ActiveDrop[], event: DropEvent) {
+function fireActivationEvents(activeDrops: ActiveDrop[], event: DropEvent) {
   // loop through all active dropzones and trigger event
   for (const { dropzone, element } of activeDrops.slice()) {
     event.dropzone = dropzone
@@ -310,7 +306,7 @@ function fireActivationEvents (activeDrops: ActiveDrop[], event: DropEvent) {
 // return a new array of possible drops. getActiveDrops should always be
 // called when a drag has just started or a drag event happens while
 // dynamicDrop is true
-function getActiveDrops (scope: Scope, dragElement: Element) {
+function getActiveDrops(scope: Scope, dragElement: Element) {
   // get dropzones and their elements that could receive the draggable
   const activeDrops = collectDropzones(scope, dragElement)
 
@@ -321,7 +317,7 @@ function getActiveDrops (scope: Scope, dragElement: Element) {
   return activeDrops
 }
 
-function getDrop (
+function getDrop(
   { dropState, interactable: draggable, element: dragElement }: Interaction,
   dragEvent,
   pointerEvent,
@@ -347,7 +343,7 @@ function getDrop (
   return dropState!.activeDrops[dropIndex] || null
 }
 
-function getDropEvents (interaction: Interaction, _pointerEvent, dragEvent: DragEvent) {
+function getDropEvents(interaction: Interaction, _pointerEvent, dragEvent: DragEvent) {
   const dropState = interaction.dropState!
   const dropEvents: Record<string, DropEvent | null> = {
     enter: null,
@@ -408,10 +404,10 @@ function getDropEvents (interaction: Interaction, _pointerEvent, dragEvent: Drag
 }
 
 type FiredDropEvents = Partial<
-Record<'leave' | 'enter' | 'move' | 'drop' | 'activate' | 'deactivate', DropEvent>
+  Record<'leave' | 'enter' | 'move' | 'drop' | 'activate' | 'deactivate', DropEvent>
 >
 
-function fireDropEvents (interaction: Interaction, events: FiredDropEvents) {
+function fireDropEvents(interaction: Interaction, events: FiredDropEvents) {
   const dropState = interaction.dropState!
   const { activeDrops, cur, prev } = dropState
 
@@ -436,7 +432,7 @@ function fireDropEvents (interaction: Interaction, events: FiredDropEvents) {
   dropState.prev.element = cur.element
 }
 
-function onEventCreated ({ interaction, iEvent, event }: DoPhaseArg<'drag', EventPhase>, scope: Scope) {
+function onEventCreated({ interaction, iEvent, event }: DoPhaseArg<'drag', EventPhase>, scope: Scope) {
   if (iEvent.type !== 'dragmove' && iEvent.type !== 'dragend') {
     return
   }
@@ -465,7 +461,7 @@ function onEventCreated ({ interaction, iEvent, event }: DoPhaseArg<'drag', Even
 
 function dropzoneMethod(interactable: Interactable): DropzoneOptions
 function dropzoneMethod(interactable: Interactable, options: DropzoneOptions | boolean): Interactable
-function dropzoneMethod (interactable: Interactable, options?: DropzoneOptions | boolean) {
+function dropzoneMethod(interactable: Interactable, options?: DropzoneOptions | boolean) {
   if (is.object(options)) {
     interactable.options.drop.enabled = options.enabled !== false
 
@@ -534,7 +530,7 @@ function dropzoneMethod (interactable: Interactable, options?: DropzoneOptions |
   return interactable.options.drop
 }
 
-function dropCheckMethod (
+function dropCheckMethod(
   interactable: Interactable,
   dragEvent: InteractEvent,
   event: PointerEventType,
@@ -550,14 +546,14 @@ function dropCheckMethod (
   if (!(rect = rect || interactable.getRect(dropElement))) {
     return interactable.options.drop.checker
       ? interactable.options.drop.checker(
-        dragEvent,
-        event,
-        dropped,
-        interactable,
-        dropElement,
-        draggable,
-        draggableElement,
-      )
+          dragEvent,
+          event,
+          dropped,
+          interactable,
+          dropElement,
+          draggable,
+          draggableElement,
+        )
       : false
   }
 

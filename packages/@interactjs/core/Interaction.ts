@@ -1,11 +1,3 @@
-import type {
-  Element,
-  EdgeOptions,
-  PointerEventType,
-  PointerType,
-  FullRect,
-  CoordsSet,
-} from '@interactjs/core/types'
 import * as arr from '@interactjs/utils/arr'
 import extend from '@interactjs/utils/extend'
 import hypot from '@interactjs/utils/hypot'
@@ -13,13 +5,23 @@ import { warnOnce, copyAction } from '@interactjs/utils/misc'
 import * as pointerUtils from '@interactjs/utils/pointerUtils'
 import * as rectUtils from '@interactjs/utils/rect'
 
+import type {
+  Element,
+  EdgeOptions,
+  PointerEventType,
+  PointerType,
+  FullRect,
+  CoordsSet,
+  ActionName,
+  ActionProps,
+} from '@interactjs/core/types'
+
+import type { Interactable } from './Interactable'
 import type { EventPhase } from './InteractEvent'
 import { InteractEvent } from './InteractEvent'
-import type { Interactable } from './Interactable'
-import { PointerInfo } from './PointerInfo'
 import type { ActionDefaults } from './options'
+import { PointerInfo } from './PointerInfo'
 import type { Scope } from './scope'
-import type { ActionName, ActionProps } from './types'
 
 export enum _ProxyValues {
   interactable = '',
@@ -82,7 +84,7 @@ declare module '@interactjs/core/scope' {
       down: boolean
     }>
     'interactions:remove-pointer': PointerArgProps
-    'interactions:blur': { interaction: Interaction<never>, event: Event, type: 'blur' }
+    'interactions:blur': { interaction: Interaction<never>; event: Event; type: 'blur' }
     'interactions:before-action-start': Omit<DoAnyPhaseArg, 'iEvent'>
     'interactions:action-start': DoAnyPhaseArg
     'interactions:after-action-start': DoAnyPhaseArg
@@ -97,27 +99,30 @@ declare module '@interactjs/core/scope' {
 }
 
 export type InteractionProxy<T extends ActionName | null = never> = Pick<
-Interaction<T>,
-keyof typeof _ProxyValues | keyof typeof _ProxyMethods
+  Interaction<T>,
+  keyof typeof _ProxyValues | keyof typeof _ProxyMethods
 >
 
 let idCounter = 0
 
 export class Interaction<T extends ActionName | null = ActionName> {
-  // current interactable being interacted with
+  /** current interactable being interacted with */
   interactable: Interactable | null = null
 
-  // the target element of the interactable
+  /** the target element of the interactable */
   element: Element | null = null
   rect: FullRect | null = null
+  /** @internal */
   _rects?: {
     start: FullRect
     corrected: FullRect
     previous: FullRect
     delta: FullRect
   }
+  /** @internal */
   edges: EdgeOptions | null = null
 
+  /** @internal */
   _scopeFire: Scope['fire']
 
   // action that's ready to be fired on next move event
@@ -129,43 +134,40 @@ export class Interaction<T extends ActionName | null = ActionName> {
 
   pointerType: string
 
-  // keep track of added pointers
+  /** @internal keep track of added pointers */
   pointers: PointerInfo[] = []
 
-  // pointerdown/mousedown/touchstart event
+  /** @internal pointerdown/mousedown/touchstart event */
   downEvent: PointerEventType | null = null
 
-  downPointer: PointerType = {} as PointerType
+  /** @internal */ downPointer: PointerType = {} as PointerType
 
+  /** @internal */
   _latestPointer: {
     pointer: PointerType
     event: PointerEventType
     eventTarget: Node
   } = {
-      pointer: null,
-      event: null,
-      eventTarget: null,
-    }
+    pointer: null,
+    event: null,
+    eventTarget: null,
+  }
 
-  // previous action event
-  prevEvent: InteractEvent<T, EventPhase> = null
+  /** @internal */ prevEvent: InteractEvent<T, EventPhase> = null
 
   pointerIsDown = false
   pointerWasMoved = false
-  _interacting = false
-  _ending = false
-  _stopped = true
-  _proxy: InteractionProxy<T>
+  /** @internal */ _interacting = false
+  /** @internal */ _ending = false
+  /** @internal */ _stopped = true
+  /** @internal */ _proxy: InteractionProxy<T>
 
-  simulation = null
+  /** @internal */ simulation = null
 
-  /** @internal */ get pointerMoveTolerance () {
+  /** @internal */ get pointerMoveTolerance() {
     return 1
   }
 
-  /**
-   * @alias Interaction.prototype.move
-   */
   doMove = warnOnce(function (this: Interaction, signalArg: any) {
     this.move(signalArg)
   }, 'The interaction.doMove() method has been renamed to interaction.move()')
@@ -183,10 +185,9 @@ export class Interaction<T extends ActionName | null = ActionName> {
     velocity: pointerUtils.newCoords(),
   }
 
-  readonly _id: number = idCounter++
+  /** @internal */ readonly _id: number = idCounter++
 
-  /** */
-  constructor ({ pointerType, scopeFire }: { pointerType?: string, scopeFire: Scope['fire'] }) {
+  constructor({ pointerType, scopeFire }: { pointerType?: string; scopeFire: Scope['fire'] }) {
     this._scopeFire = scopeFire
     this.pointerType = pointerType
 
@@ -196,7 +197,7 @@ export class Interaction<T extends ActionName | null = ActionName> {
 
     for (const key in _ProxyValues) {
       Object.defineProperty(this._proxy, key, {
-        get () {
+        get() {
           return that[key]
         },
       })
@@ -211,7 +212,7 @@ export class Interaction<T extends ActionName | null = ActionName> {
     this._scopeFire('interactions:new', { interaction: this })
   }
 
-  pointerDown (pointer: PointerType, event: PointerEventType, eventTarget: Node) {
+  pointerDown(pointer: PointerType, event: PointerEventType, eventTarget: Node) {
     const pointerIndex = this.updatePointer(pointer, event, eventTarget, true)
     const pointerInfo = this.pointers[pointerIndex]
 
@@ -252,12 +253,12 @@ export class Interaction<T extends ActionName | null = ActionName> {
    * Use it with `interactable.<action>able({ manualStart: false })` to always
    * [start actions manually](https://github.com/taye/interact.js/issues/114)
    *
-   * @param {object} action   The action to be performed - drag, resize, etc.
-   * @param {Interactable} target  The Interactable to target
-   * @param {Element} element The DOM Element to target
-   * @return {Boolean} Whether the interaction was successfully started
+   * @param action - The action to be performed - drag, resize, etc.
+   * @param target - The Interactable to target
+   * @param element - The DOM Element to target
+   * @returns Whether the interaction was successfully started
    */
-  start<A extends ActionName> (action: ActionProps<A>, interactable: Interactable, element: Element): boolean {
+  start<A extends ActionName>(action: ActionProps<A>, interactable: Interactable, element: Element): boolean {
     if (
       this.interacting() ||
       !this.pointerIsDown ||
@@ -286,7 +287,7 @@ export class Interaction<T extends ActionName | null = ActionName> {
     return this._interacting
   }
 
-  pointerMove (pointer: PointerType, event: PointerEventType, eventTarget: Node) {
+  pointerMove(pointer: PointerType, event: PointerEventType, eventTarget: Node) {
     if (!this.simulation && !(this.modification && this.modification.endResult)) {
       this.updatePointer(pointer, event, eventTarget, false)
     }
@@ -360,7 +361,7 @@ export class Interaction<T extends ActionName | null = ActionName> {
    * snap/restrict has been changed and you want a movement with the new
    * settings.
    */
-  move (signalArg?: any) {
+  move(signalArg?: any) {
     if (!signalArg || !signalArg.event) {
       pointerUtils.setZeroCoords(this.coords.delta)
     }
@@ -380,8 +381,11 @@ export class Interaction<T extends ActionName | null = ActionName> {
     this._doPhase(signalArg)
   }
 
-  // End interact move events and stop auto-scroll unless simulation is running
-  pointerUp (pointer: PointerType, event: PointerEventType, eventTarget: Node, curEventTarget: EventTarget) {
+  /**
+   * @internal
+   * End interact move events and stop auto-scroll unless simulation is running
+   */
+  pointerUp(pointer: PointerType, event: PointerEventType, eventTarget: Node, curEventTarget: EventTarget) {
     let pointerIndex = this.getPointerIndex(pointer)
 
     if (pointerIndex === -1) {
@@ -408,7 +412,8 @@ export class Interaction<T extends ActionName | null = ActionName> {
     this.removePointer(pointer, event)
   }
 
-  documentBlur (event: Event) {
+  /** @internal */
+  documentBlur(event: Event) {
     this.end(event as any)
     this._scopeFire('interactions:blur', {
       event,
@@ -430,10 +435,8 @@ export class Interaction<T extends ActionName | null = ActionName> {
    *     }
    *   })
    * ```
-   *
-   * @param {PointerEvent} [event]
    */
-  end (event?: PointerEventType) {
+  end(event?: PointerEventType) {
     this._ending = true
     event = event || this._latestPointer.event
     let endPhaseResult: boolean
@@ -453,16 +456,15 @@ export class Interaction<T extends ActionName | null = ActionName> {
     }
   }
 
-  currentAction () {
+  currentAction() {
     return this._interacting ? this.prepared.name : null
   }
 
-  interacting () {
+  interacting() {
     return this._interacting
   }
 
-  /** */
-  stop () {
+  stop() {
     this._scopeFire('interactions:stop', { interaction: this })
 
     this.interactable = this.element = null
@@ -472,7 +474,8 @@ export class Interaction<T extends ActionName | null = ActionName> {
     this.prepared.name = this.prevEvent = null
   }
 
-  getPointerIndex (pointer: any) {
+  /** @internal */
+  getPointerIndex(pointer: any) {
     const pointerId = pointerUtils.getPointerId(pointer)
 
     // mouse and pen interactions may have only one pointer
@@ -481,11 +484,13 @@ export class Interaction<T extends ActionName | null = ActionName> {
       : arr.findIndex(this.pointers, (curPointer) => curPointer.id === pointerId)
   }
 
-  getPointerInfo (pointer: any) {
+  /** @internal */
+  getPointerInfo(pointer: any) {
     return this.pointers[this.getPointerIndex(pointer)]
   }
 
-  updatePointer (pointer: PointerType, event: PointerEventType, eventTarget: Node, down?: boolean) {
+  /** @internal */
+  updatePointer(pointer: PointerType, event: PointerEventType, eventTarget: Node, down?: boolean) {
     const id = pointerUtils.getPointerId(pointer)
     let pointerIndex = this.getPointerIndex(pointer)
     let pointerInfo = this.pointers[pointerIndex]
@@ -539,7 +544,8 @@ export class Interaction<T extends ActionName | null = ActionName> {
     return pointerIndex
   }
 
-  removePointer (pointer: PointerType, event: PointerEventType) {
+  /** @internal */
+  removePointer(pointer: PointerType, event: PointerEventType) {
     const pointerIndex = this.getPointerIndex(pointer)
 
     if (pointerIndex === -1) return
@@ -559,19 +565,21 @@ export class Interaction<T extends ActionName | null = ActionName> {
     this.pointerIsDown = false
   }
 
-  _updateLatestPointer (pointer: PointerType, event: PointerEventType, eventTarget: Node) {
+  /** @internal */
+  _updateLatestPointer(pointer: PointerType, event: PointerEventType, eventTarget: Node) {
     this._latestPointer.pointer = pointer
     this._latestPointer.event = event
     this._latestPointer.eventTarget = eventTarget
   }
 
-  destroy () {
+  destroy() {
     this._latestPointer.pointer = null
     this._latestPointer.event = null
     this._latestPointer.eventTarget = null
   }
 
-  _createPreparedEvent<P extends EventPhase> (
+  /** @internal */
+  _createPreparedEvent<P extends EventPhase>(
     event: PointerEventType,
     phase: P,
     preEnd?: boolean,
@@ -580,7 +588,8 @@ export class Interaction<T extends ActionName | null = ActionName> {
     return new InteractEvent<T, P>(this, event, this.prepared.name, phase, this.element, preEnd, type)
   }
 
-  _fireEvent<P extends EventPhase> (iEvent: InteractEvent<T, P>) {
+  /** @internal */
+  _fireEvent<P extends EventPhase>(iEvent: InteractEvent<T, P>) {
     this.interactable?.fire(iEvent)
 
     if (!this.prevEvent || iEvent.timeStamp >= this.prevEvent.timeStamp) {
@@ -588,7 +597,8 @@ export class Interaction<T extends ActionName | null = ActionName> {
     }
   }
 
-  _doPhase<P extends EventPhase> (
+  /** @internal */
+  _doPhase<P extends EventPhase>(
     signalArg: Omit<DoPhaseArg<T, P>, 'iEvent'> & { iEvent?: InteractEvent<T, P> },
   ) {
     const { event, phase, preEnd, type } = signalArg
@@ -623,7 +633,8 @@ export class Interaction<T extends ActionName | null = ActionName> {
     return true
   }
 
-  _now () {
+  /** @internal */
+  _now() {
     return Date.now()
   }
 }

@@ -4,7 +4,7 @@ const resolveSync = require('resolve').sync
 
 const { getModuleDirectories, shouldIgnoreImport, getRelativeToRoot } = require('../utils')
 
-module.exports = function transformImportsToAbsolute () {
+module.exports = function transformImportsToAbsolute() {
   const fixImportSource = ({ node: { source } }, { opts, filename }) => {
     if (!source || (opts.ignore && opts.ignore(filename, source.value))) return
 

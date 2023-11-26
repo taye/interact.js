@@ -26,7 +26,7 @@ interact('#swipe')
 
 const pointerEvents = ['tap', 'doubletap', 'hold', 'down', 'move', 'up']
 
-function logEvent (event) {
+function logEvent(event) {
   event.currentTarget.innerHTML = event.pointerType
 
   if (/tap|up|click|down/.test(event.type) && event.interaction.prevTap) {
@@ -63,7 +63,7 @@ for (let i = 0; i < pointerEvents.length; i++) {
   interact('#swipe').on(eventType, logEvent)
 }
 
-function changeTolerance (event) {
+function changeTolerance(event) {
   const value = event.target.value | 0
 
   interact.pointerMoveTolerance(value)

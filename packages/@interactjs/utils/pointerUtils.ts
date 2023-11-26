@@ -8,7 +8,7 @@ import hypot from './hypot'
 import is from './is'
 import pointerExtend from './pointerExtend'
 
-export function copyCoords (dest: CoordsSetMember, src: CoordsSetMember) {
+export function copyCoords(dest: CoordsSetMember, src: CoordsSetMember) {
   dest.page = dest.page || ({} as any)
   dest.page.x = src.page.x
   dest.page.y = src.page.y
@@ -20,7 +20,7 @@ export function copyCoords (dest: CoordsSetMember, src: CoordsSetMember) {
   dest.timeStamp = src.timeStamp
 }
 
-export function setCoordDeltas (targetObj: CoordsSetMember, prev: CoordsSetMember, cur: CoordsSetMember) {
+export function setCoordDeltas(targetObj: CoordsSetMember, prev: CoordsSetMember, cur: CoordsSetMember) {
   targetObj.page.x = cur.page.x - prev.page.x
   targetObj.page.y = cur.page.y - prev.page.y
   targetObj.client.x = cur.client.x - prev.client.x
@@ -28,7 +28,7 @@ export function setCoordDeltas (targetObj: CoordsSetMember, prev: CoordsSetMembe
   targetObj.timeStamp = cur.timeStamp - prev.timeStamp
 }
 
-export function setCoordVelocity (targetObj: CoordsSetMember, delta: CoordsSetMember) {
+export function setCoordVelocity(targetObj: CoordsSetMember, delta: CoordsSetMember) {
   const dt = Math.max(delta.timeStamp / 1000, 0.001)
 
   targetObj.page.x = delta.page.x / dt
@@ -38,19 +38,19 @@ export function setCoordVelocity (targetObj: CoordsSetMember, delta: CoordsSetMe
   targetObj.timeStamp = dt
 }
 
-export function setZeroCoords (targetObj: CoordsSetMember) {
+export function setZeroCoords(targetObj: CoordsSetMember) {
   targetObj.page.x = 0
   targetObj.page.y = 0
   targetObj.client.x = 0
   targetObj.client.y = 0
 }
 
-export function isNativePointer (pointer: any) {
+export function isNativePointer(pointer: any) {
   return pointer instanceof dom.Event || pointer instanceof dom.Touch
 }
 
 // Get specified X/Y coords for mouse or event.touches[0]
-export function getXY (type: string, pointer: PointerType | InteractEvent, xy: Point) {
+export function getXY(type: string, pointer: PointerType | InteractEvent, xy: Point) {
   xy = xy || ({} as Point)
   type = type || 'page'
 
@@ -60,7 +60,7 @@ export function getXY (type: string, pointer: PointerType | InteractEvent, xy: P
   return xy
 }
 
-export function getPageXY (pointer: PointerType | InteractEvent, page?: Point) {
+export function getPageXY(pointer: PointerType | InteractEvent, page?: Point) {
   page = page || { x: 0, y: 0 }
 
   // Opera Mobile handles the viewport and scrolling oddly
@@ -76,7 +76,7 @@ export function getPageXY (pointer: PointerType | InteractEvent, page?: Point) {
   return page
 }
 
-export function getClientXY (pointer: PointerType, client: Point) {
+export function getClientXY(pointer: PointerType, client: Point) {
   client = client || ({} as any)
 
   if (browser.isOperaMobile && isNativePointer(pointer)) {
@@ -89,11 +89,11 @@ export function getClientXY (pointer: PointerType, client: Point) {
   return client
 }
 
-export function getPointerId (pointer: { pointerId?: number, identifier?: number, type?: string }) {
+export function getPointerId(pointer: { pointerId?: number; identifier?: number; type?: string }) {
   return is.number(pointer.pointerId) ? pointer.pointerId! : pointer.identifier!
 }
 
-export function setCoords (dest: CoordsSetMember, pointers: any[], timeStamp: number) {
+export function setCoords(dest: CoordsSetMember, pointers: any[], timeStamp: number) {
   const pointer = pointers.length > 1 ? pointerAverage(pointers) : pointers[0]
 
   getPageXY(pointer, dest.page)
@@ -102,7 +102,7 @@ export function setCoords (dest: CoordsSetMember, pointers: any[], timeStamp: nu
   dest.timeStamp = timeStamp
 }
 
-export function getTouchPair (event: TouchEvent | PointerType[]) {
+export function getTouchPair(event: TouchEvent | PointerType[]) {
   const touches: PointerType[] = []
 
   // array of touches is supplied
@@ -129,7 +129,7 @@ export function getTouchPair (event: TouchEvent | PointerType[]) {
   return touches
 }
 
-export function pointerAverage (pointers: PointerType[]) {
+export function pointerAverage(pointers: PointerType[]) {
   const average = {
     pageX: 0,
     pageY: 0,
@@ -153,7 +153,7 @@ export function pointerAverage (pointers: PointerType[]) {
   return average
 }
 
-export function touchBBox (event: PointerType[]) {
+export function touchBBox(event: PointerType[]) {
   if (!event.length) {
     return null
   }
@@ -176,7 +176,7 @@ export function touchBBox (event: PointerType[]) {
   }
 }
 
-export function touchDistance (event: PointerType[] | TouchEvent, deltaSource: string) {
+export function touchDistance(event: PointerType[] | TouchEvent, deltaSource: string) {
   const sourceX = (deltaSource + 'X') as 'pageX'
   const sourceY = (deltaSource + 'Y') as 'pageY'
   const touches = getTouchPair(event)
@@ -187,7 +187,7 @@ export function touchDistance (event: PointerType[] | TouchEvent, deltaSource: s
   return hypot(dx, dy)
 }
 
-export function touchAngle (event: PointerType[] | TouchEvent, deltaSource: string) {
+export function touchAngle(event: PointerType[] | TouchEvent, deltaSource: string) {
   const sourceX = (deltaSource + 'X') as 'pageX'
   const sourceY = (deltaSource + 'Y') as 'pageY'
   const touches = getTouchPair(event)
@@ -198,20 +198,20 @@ export function touchAngle (event: PointerType[] | TouchEvent, deltaSource: stri
   return angle
 }
 
-export function getPointerType (pointer: { pointerType?: string, identifier?: number, type?: string }) {
+export function getPointerType(pointer: { pointerType?: string; identifier?: number; type?: string }) {
   return is.string(pointer.pointerType)
     ? pointer.pointerType
     : is.number(pointer.pointerType)
       ? [undefined, undefined, 'touch', 'pen', 'mouse'][pointer.pointerType]!
       : // if the PointerEvent API isn't available, then the "pointer" must
-    // be either a MouseEvent, TouchEvent, or Touch object
-      /touch/.test(pointer.type || '') || pointer instanceof dom.Touch
+        // be either a MouseEvent, TouchEvent, or Touch object
+        /touch/.test(pointer.type || '') || pointer instanceof dom.Touch
         ? 'touch'
         : 'mouse'
 }
 
 // [ event.target, event.currentTarget ]
-export function getEventTargets (event: Event) {
+export function getEventTargets(event: Event) {
   const path = is.func(event.composedPath)
     ? (event.composedPath() as Element[])
     : (event as unknown as { path: Element[] }).path
@@ -222,7 +222,7 @@ export function getEventTargets (event: Event) {
   ]
 }
 
-export function newCoords (): CoordsSetMember {
+export function newCoords(): CoordsSetMember {
   return {
     page: { x: 0, y: 0 },
     client: { x: 0, y: 0 },
@@ -230,46 +230,46 @@ export function newCoords (): CoordsSetMember {
   }
 }
 
-export function coordsToEvent (coords: MockCoords) {
+export function coordsToEvent(coords: MockCoords) {
   const event = {
     coords,
-    get page () {
+    get page() {
       return this.coords.page
     },
-    get client () {
+    get client() {
       return this.coords.client
     },
-    get timeStamp () {
+    get timeStamp() {
       return this.coords.timeStamp
     },
-    get pageX () {
+    get pageX() {
       return this.coords.page.x
     },
-    get pageY () {
+    get pageY() {
       return this.coords.page.y
     },
-    get clientX () {
+    get clientX() {
       return this.coords.client.x
     },
-    get clientY () {
+    get clientY() {
       return this.coords.client.y
     },
-    get pointerId () {
+    get pointerId() {
       return this.coords.pointerId
     },
-    get target () {
+    get target() {
       return this.coords.target
     },
-    get type () {
+    get type() {
       return this.coords.type
     },
-    get pointerType () {
+    get pointerType() {
       return this.coords.pointerType
     },
-    get buttons () {
+    get buttons() {
       return this.coords.buttons
     },
-    preventDefault () {},
+    preventDefault() {},
   }
 
   return event as typeof event & PointerType & PointerEventType

@@ -1,7 +1,8 @@
+import * as dom from '@interactjs/utils/domUtils'
+
 import type Interaction from '@interactjs/core/Interaction'
 import type { Scope } from '@interactjs/core/scope'
 import type { PointerType } from '@interactjs/core/types'
-import * as dom from '@interactjs/utils/domUtils'
 
 export interface SearchDetails {
   pointer: PointerType
@@ -16,7 +17,7 @@ export interface SearchDetails {
 const finder = {
   methodOrder: ['simulationResume', 'mouseOrPen', 'hasPointer', 'idle'] as const,
 
-  search (details: SearchDetails) {
+  search(details: SearchDetails) {
     for (const method of finder.methodOrder) {
       const interaction = finder[method](details)
 
@@ -29,7 +30,7 @@ const finder = {
   },
 
   // try to resume simulation with a new pointer
-  simulationResume ({ pointerType, eventType, eventTarget, scope }: SearchDetails) {
+  simulationResume({ pointerType, eventType, eventTarget, scope }: SearchDetails) {
     if (!/down|start/i.test(eventType)) {
       return null
     }
@@ -56,7 +57,7 @@ const finder = {
   },
 
   // if it's a mouse or pen interaction
-  mouseOrPen ({ pointerId, pointerType, eventType, scope }: SearchDetails) {
+  mouseOrPen({ pointerId, pointerType, eventType, scope }: SearchDetails) {
     if (pointerType !== 'mouse' && pointerType !== 'pen') {
       return null
     }
@@ -100,7 +101,7 @@ const finder = {
   },
 
   // get interaction that has this pointer
-  hasPointer ({ pointerId, scope }: SearchDetails) {
+  hasPointer({ pointerId, scope }: SearchDetails) {
     for (const interaction of scope.interactions.list) {
       if (hasPointerId(interaction, pointerId)) {
         return interaction
@@ -111,7 +112,7 @@ const finder = {
   },
 
   // get first idle interaction with a matching pointerType
-  idle ({ pointerType, scope }: SearchDetails) {
+  idle({ pointerType, scope }: SearchDetails) {
     for (const interaction of scope.interactions.list) {
       // if there's already a pointer held down
       if (interaction.pointers.length === 1) {
@@ -136,7 +137,7 @@ const finder = {
   },
 }
 
-function hasPointerId (interaction: Interaction, pointerId: number) {
+function hasPointerId(interaction: Interaction, pointerId: number) {
   return interaction.pointers.some(({ id }) => id === pointerId)
 }
 

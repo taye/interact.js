@@ -19,13 +19,13 @@ export interface RestrictOptions {
 }
 
 export type RestrictState = ModifierState<
-RestrictOptions,
-{
-  offset: Rect
-}
+  RestrictOptions,
+  {
+    offset: Rect
+  }
 >
 
-function start ({ rect, startOffset, state, interaction, pageCoords }: ModifierArg<RestrictState>) {
+function start({ rect, startOffset, state, interaction, pageCoords }: ModifierArg<RestrictState>) {
   const { options } = state
   const { elementRect } = options
   const offset: Rect = extend(
@@ -65,7 +65,7 @@ function start ({ rect, startOffset, state, interaction, pageCoords }: ModifierA
   state.offset = offset
 }
 
-function set ({ coords, interaction, state }: ModifierArg<RestrictState>) {
+function set({ coords, interaction, state }: ModifierArg<RestrictState>) {
   const { options, offset } = state
 
   const restriction = getRestrictionRect(options.restriction, interaction, coords)
@@ -78,7 +78,7 @@ function set ({ coords, interaction, state }: ModifierArg<RestrictState>) {
   coords.y = Math.max(Math.min(rect.bottom - offset.bottom, coords.y), rect.top + offset.top)
 }
 
-export function getRestrictionRect (
+export function getRestrictionRect(
   value: RectResolvable<[number, number, Interaction]>,
   interaction: Interaction,
   coords?: Point,

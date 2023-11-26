@@ -14,7 +14,7 @@ import resize from './resize/plugin'
 
 export default {
   id: 'actions',
-  install (scope: Scope) {
+  install(scope: Scope) {
     scope.usePlugin(gesture)
     scope.usePlugin(resize)
     scope.usePlugin(drag)

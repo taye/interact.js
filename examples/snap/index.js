@@ -35,7 +35,7 @@ const prevCoords = { x: 0, y: 0 }
 let prevClosest = { target: { x: 0, y: 0 }, range: 0 }
 const cursorRadius = 10
 
-function drawGrid (grid, gridOffset, range) {
+function drawGrid(grid, gridOffset, range) {
   if (!grid.x || !grid.y) return
 
   const barLength = 16
@@ -71,7 +71,7 @@ function drawGrid (grid, gridOffset, range) {
   }
 }
 
-function drawAnchors (defaultRange) {
+function drawAnchors(defaultRange) {
   const barLength = 16
 
   guidesContext.clearRect(0, 0, width, height)
@@ -105,7 +105,7 @@ function drawAnchors (defaultRange) {
   }
 }
 
-function drawSnap (snap) {
+function drawSnap(snap) {
   context.clearRect(0, 0, width, height)
   guidesContext.clearRect(0, 0, width, height)
 
@@ -116,7 +116,7 @@ function drawSnap (snap) {
   }
 }
 
-function circle (x, y, radius, color) {
+function circle(x, y, radius, color) {
   this.fillStyle = color || this.fillStyle
   this.beginPath()
   this.arc(x, y, radius, 0, 2 * Math.PI)
@@ -125,7 +125,7 @@ function circle (x, y, radius, color) {
 }
 window.CanvasRenderingContext2D.prototype.circle = circle
 
-function dragMove (event) {
+function dragMove(event) {
   const snap = event._interaction.modification.states.find((m) => m.name === 'snap')
   const closest = snap && snap.closest
   const rect = interact.getElementRect(canvas)
@@ -160,7 +160,7 @@ function dragMove (event) {
   prevClosest = closest || prevClosest
 }
 
-function dragEnd (event) {
+function dragEnd(event) {
   context.clearRect(0, 0, width, height)
   context.circle(event.pageX, event.pageY, cursorRadius, tango).fill()
 
@@ -168,14 +168,14 @@ function dragEnd (event) {
   prevCoords.y = event.pageY
 }
 
-function anchorDragStart (event) {
+function anchorDragStart(event) {
   if (event.snap.locked) {
     interact(canvas).snap(false)
     draggingAnchor = event.snap.anchors.closest
   }
 }
 
-function anchorDragMove (event) {
+function anchorDragMove(event) {
   if (draggingAnchor) {
     const snap = interact(canvas).snap().drag
 
@@ -186,12 +186,12 @@ function anchorDragMove (event) {
   }
 }
 
-function anchorDragEnd (event) {
+function anchorDragEnd(event) {
   interact(canvas).draggable(true)
   draggingAnchor = null
 }
 
-function sliderChange () {
+function sliderChange() {
   snapGrid.x = Number(status.gridX.value)
   snapGrid.y = Number(status.gridY.value)
   snapGrid.range = Number(status.range.value)
@@ -206,7 +206,7 @@ function sliderChange () {
   drawSnap(interact(canvas).draggable().snap)
 }
 
-function modeChange (event) {
+function modeChange(event) {
   if (status.anchorDrag.checked && !status.anchorMode.checked) {
     status.anchorMode.checked = true
   }
@@ -258,7 +258,7 @@ function modeChange (event) {
   drawSnap(interact(canvas).draggable().snap)
 }
 
-function sliderInput (event) {
+function sliderInput(event) {
   // eslint-disable-next-line no-mixed-operators
   if (
     (event.target.type === 'range' &&
@@ -325,5 +325,5 @@ interact(document).on('DOMContentLoaded', () => {
 })
 
 window.grid = {
-  drawGrid: drawGrid,
+  drawGrid,
 }

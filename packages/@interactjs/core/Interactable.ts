@@ -1,4 +1,14 @@
 /* eslint-disable no-dupe-class-members */
+import * as arr from '@interactjs/utils/arr'
+import browser from '@interactjs/utils/browser'
+import clone from '@interactjs/utils/clone'
+import { getElementRect, matchesUpTo, nodeContains, trySelector } from '@interactjs/utils/domUtils'
+import extend from '@interactjs/utils/extend'
+import is from '@interactjs/utils/is'
+import isNonNativeEvent from '@interactjs/utils/isNonNativeEvent'
+import normalizeListeners from '@interactjs/utils/normalizeListeners'
+import { getWindow } from '@interactjs/utils/window'
+
 import type { Scope } from '@interactjs/core/scope'
 import type {
   ActionMap,
@@ -13,15 +23,6 @@ import type {
   OrBoolean,
   Target,
 } from '@interactjs/core/types'
-import * as arr from '@interactjs/utils/arr'
-import browser from '@interactjs/utils/browser'
-import clone from '@interactjs/utils/clone'
-import { getElementRect, matchesUpTo, nodeContains, trySelector } from '@interactjs/utils/domUtils'
-import extend from '@interactjs/utils/extend'
-import is from '@interactjs/utils/is'
-import isNonNativeEvent from '@interactjs/utils/isNonNativeEvent'
-import normalizeListeners from '@interactjs/utils/normalizeListeners'
-import { getWindow } from '@interactjs/utils/window'
 
 import { Eventable } from './Eventable'
 import type { ActionDefaults, Defaults, OptionsArg, PerActionDefaults, Options } from './options'
@@ -34,9 +35,20 @@ const enum OnOffMethod {
   Off,
 }
 
-/** */
+/**
+ * ```ts
+ * const interactable = interact('.cards')
+ *   .draggable({
+ *     listeners: { move: event => console.log(event.type, event.pageX, event.pageY) }
+ *   })
+ *   .resizable({
+ *     listeners: { move: event => console.log(event.rect) },
+ *     modifiers: [interact.modifiers.restrictEdges({ outer: 'parent' })]
+ *   })
+ * ```
+ */
 export class Interactable implements Partial<Eventable> {
-  /** @internal */ get _defaults (): Defaults {
+  /** @internal */ get _defaults(): Defaults {
     return {
       base: {},
       perAction: {},
@@ -44,17 +56,16 @@ export class Interactable implements Partial<Eventable> {
     }
   }
 
-  readonly options!: Required<Options>
-  readonly _actions: Actions
   readonly target: Target
-  readonly events = new Eventable()
-  readonly _context: Context
-  readonly _win: Window
-  readonly _doc: Document
-  readonly _scopeEvents: Scope['events']
+  /** @internal */ readonly options!: Required<Options>
+  /** @internal */ readonly _actions: Actions
+  /** @internal */ readonly events = new Eventable()
+  /** @internal */ readonly _context: Context
+  /** @internal */ readonly _win: Window
+  /** @internal */ readonly _doc: Document
+  /** @internal */ readonly _scopeEvents: Scope['events']
 
-  /** */
-  constructor (
+  constructor(
     target: Target,
     options: any,
     defaultContext: Document | Element,
@@ -70,7 +81,7 @@ export class Interactable implements Partial<Eventable> {
     this.set(options)
   }
 
-  setOnEvents (actionName: ActionName, phases: NonNullable<any>) {
+  setOnEvents(actionName: ActionName, phases: NonNullable<any>) {
     if (is.func(phases.onstart)) {
       this.on(`${actionName}start`, phases.onstart)
     }
@@ -87,7 +98,7 @@ export class Interactable implements Partial<Eventable> {
     return this
   }
 
-  updatePerActionListeners (actionName: ActionName, prev: Listeners | undefined, cur: Listeners | undefined) {
+  updatePerActionListeners(actionName: ActionName, prev: Listeners | undefined, cur: Listeners | undefined) {
     const actionFilter = (this._actions.map[actionName] as { filterEventType?: (type: string) => boolean })
       ?.filterEventType
     const filter = (type: string) =>
@@ -102,7 +113,7 @@ export class Interactable implements Partial<Eventable> {
     }
   }
 
-  setPerAction (actionName: ActionName, options: OrBoolean<Options>) {
+  setPerAction(actionName: ActionName, options: OrBoolean<Options>) {
     const defaults = this._defaults
 
     // for all the default per-action options
@@ -154,7 +165,7 @@ export class Interactable implements Partial<Eventable> {
    * @param {Element} [element] The element to measure.
    * @return {Rect} The object's bounding rectangle.
    */
-  getRect (element: Element) {
+  getRect(element: Element) {
     element = element || (is.element(this.target) ? this.target : null)
 
     if (is.string(this.target)) {
@@ -174,7 +185,7 @@ export class Interactable implements Partial<Eventable> {
    */
   rectChecker(): (element: Element) => any | null
   rectChecker(checker: (element: Element) => any): this
-  rectChecker (checker?: (element: Element) => any) {
+  rectChecker(checker?: (element: Element) => any) {
     if (is.func(checker)) {
       this.getRect = (element) => {
         const rect = extend({}, checker.apply(this, element))
@@ -199,7 +210,8 @@ export class Interactable implements Partial<Eventable> {
     return this.getRect
   }
 
-  _backCompatOption (optionName: keyof Options, newValue: any) {
+  /** @internal */
+  _backCompatOption(optionName: keyof Options, newValue: any) {
     if (trySelector(newValue) || is.object(newValue)) {
       ;(this.options[optionName] as any) = newValue
 
@@ -223,7 +235,7 @@ export class Interactable implements Partial<Eventable> {
    *
    * @return {object} The current origin or this Interactable
    */
-  origin (newValue: any) {
+  origin(newValue: any) {
     return this._backCompatOption('origin', newValue)
   }
 
@@ -237,7 +249,7 @@ export class Interactable implements Partial<Eventable> {
    */
   deltaSource(): DeltaSource
   deltaSource(newValue: DeltaSource): this
-  deltaSource (newValue?: DeltaSource) {
+  deltaSource(newValue?: DeltaSource) {
     if (newValue === 'page' || newValue === 'client') {
       this.options.deltaSource = newValue
 
@@ -248,7 +260,7 @@ export class Interactable implements Partial<Eventable> {
   }
 
   /** @internal */
-  getAllElements (): Element[] {
+  getAllElements(): Element[] {
     const { target } = this
 
     if (is.string(target)) {
@@ -268,17 +280,18 @@ export class Interactable implements Partial<Eventable> {
    *
    * @return {Node} The context Node of this Interactable
    */
-  context () {
+  context() {
     return this._context
   }
 
-  inContext (element: Document | Node) {
+  inContext(element: Document | Node) {
     return this._context === element.ownerDocument || nodeContains(this._context, element)
   }
 
-  testIgnoreAllow (
+  /** @internal */
+  testIgnoreAllow(
     this: Interactable,
-    options: { ignoreFrom?: IgnoreValue, allowFrom?: IgnoreValue },
+    options: { ignoreFrom?: IgnoreValue; allowFrom?: IgnoreValue },
     targetNode: Node,
     eventTarget: Node,
   ) {
@@ -288,7 +301,8 @@ export class Interactable implements Partial<Eventable> {
     )
   }
 
-  testAllow (this: Interactable, allowFrom: IgnoreValue | undefined, targetNode: Node, element: Node) {
+  /** @internal */
+  testAllow(this: Interactable, allowFrom: IgnoreValue | undefined, targetNode: Node, element: Node) {
     if (!allowFrom) {
       return true
     }
@@ -306,7 +320,8 @@ export class Interactable implements Partial<Eventable> {
     return false
   }
 
-  testIgnore (this: Interactable, ignoreFrom: IgnoreValue | undefined, targetNode: Node, element: Node) {
+  /** @internal */
+  testIgnore(this: Interactable, ignoreFrom: IgnoreValue | undefined, targetNode: Node, element: Node) {
     if (!ignoreFrom || !is.element(element)) {
       return false
     }
@@ -328,13 +343,14 @@ export class Interactable implements Partial<Eventable> {
    * Interactable
    * @return {Interactable} this Interactable
    */
-  fire<E extends { type: string }> (iEvent: E) {
+  fire<E extends { type: string }>(iEvent: E) {
     this.events.fire(iEvent)
 
     return this
   }
 
-  _onOff (
+  /** @internal */
+  _onOff(
     method: OnOffMethod,
     typeArg: EventTypes,
     listenerArg?: ListenersArg | null,
@@ -393,7 +409,7 @@ export class Interactable implements Partial<Eventable> {
    * addEventListener
    * @return {Interactable} This Interactable
    */
-  on (types: EventTypes, listener?: ListenersArg, options?: any) {
+  on(types: EventTypes, listener?: ListenersArg, options?: any) {
     return this._onOff(OnOffMethod.On, types, listener, options)
   }
 
@@ -407,7 +423,7 @@ export class Interactable implements Partial<Eventable> {
    * removeEventListener
    * @return {Interactable} This Interactable
    */
-  off (types: string | string[] | EventTypes, listener?: ListenersArg, options?: any) {
+  off(types: string | string[] | EventTypes, listener?: ListenersArg, options?: any) {
     return this._onOff(OnOffMethod.Off, types, listener, options)
   }
 
@@ -417,7 +433,7 @@ export class Interactable implements Partial<Eventable> {
    * @param {object} options The new settings to apply
    * @return {object} This Interactable
    */
-  set (options: OptionsArg) {
+  set(options: OptionsArg) {
     const defaults = this._defaults
 
     if (!is.object(options)) {
@@ -453,7 +469,7 @@ export class Interactable implements Partial<Eventable> {
    * Remove this interactable from the list of interactables and remove it's
    * action capabilities and event listeners
    */
-  unset () {
+  unset() {
     if (is.string(this.target)) {
       // remove delegated events
       for (const type in this._scopeEvents.delegatedEvents) {

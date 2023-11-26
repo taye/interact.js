@@ -50,7 +50,7 @@ const queue = new PQueue({ concurrency: os.cpus().length })
 const packagesDir = path.join(process.cwd(), 'packages')
 const sourcePromises = new Map()
 
-async function generate ({
+async function generate({
   sources,
   shim,
   babelOptions = getEsnextBabelOptions(),
@@ -133,7 +133,7 @@ async function generate ({
     console.log('watching for changes')
   }
 
-  async function queueFile (source, initial) {
+  async function queueFile(source, initial) {
     if (initial) {
       watcher.add(source)
     }

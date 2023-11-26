@@ -6,7 +6,7 @@ export interface NormalizedListeners {
   [type: string]: Listener[]
 }
 
-export default function normalize (
+export default function normalize(
   type: EventTypes,
   listeners?: ListenersArg | ListenersArg[] | null,
   filter = (_typeOrPrefix: string) => true,
@@ -48,6 +48,6 @@ export default function normalize (
   return result as NormalizedListeners
 }
 
-function split (type: string) {
+function split(type: string) {
   return type.trim().split(/ +/)
 }

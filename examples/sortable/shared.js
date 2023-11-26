@@ -1,10 +1,10 @@
 import interact from '@interactjs/interactjs'
 
-function sortListener (event) {
+function sortListener(event) {
   console.log(event.type, event.position)
 }
 
-export function getData () {
+export function getData() {
   return {
     lists: [
       {

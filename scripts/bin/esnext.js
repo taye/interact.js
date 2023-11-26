@@ -30,7 +30,7 @@ const sourcesPromise = fileArgs.length ? Promise.resolve(fileArgs) : getSources(
 sourcesPromise.then(async (sources) => {
   await generate({
     sources,
-    async shim (filename) {
+    async shim(filename) {
       const shimConfig = shims.find((s) => filename.endsWith(s.source))
 
       if (shimConfig) {

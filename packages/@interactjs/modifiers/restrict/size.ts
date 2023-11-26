@@ -20,20 +20,20 @@ export interface RestrictSizeOptions {
   enabled?: boolean
 }
 
-function start (arg: ModifierArg<RestrictEdgesState>) {
+function start(arg: ModifierArg<RestrictEdgesState>) {
   return restrictEdges.start(arg)
 }
 
 export type RestrictSizeState = RestrictEdgesState &
-ModifierState<
-RestrictSizeOptions & { inner: Rect, outer: Rect },
-{
-  min: Rect
-  max: Rect
-}
->
+  ModifierState<
+    RestrictSizeOptions & { inner: Rect; outer: Rect },
+    {
+      min: Rect
+      max: Rect
+    }
+  >
 
-function set (arg: ModifierArg<RestrictSizeState>) {
+function set(arg: ModifierArg<RestrictSizeState>) {
   const { interaction, state, rect, edges } = arg
   const { options } = state
 

@@ -16,7 +16,7 @@ test('modifiers/snap', () => {
   coords.client = coords.page
 
   const origin = { x: 120, y: 120 }
-  let funcArgs!: { x: number, y: number, offset: number, index: number, unexpected: unknown[] }
+  let funcArgs!: { x: number; y: number; offset: number; index: number; unexpected: unknown[] }
 
   const target0 = Object.freeze({ x: 50, y: 100 })
   const targetFunc = (x, y, _interaction, offset, index, ...unexpected) => {

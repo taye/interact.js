@@ -1,5 +1,5 @@
-import type { InteractEvent } from '@interactjs/core/InteractEvent'
 import type { Interactable } from '@interactjs/core/Interactable'
+import type { InteractEvent } from '@interactjs/core/InteractEvent'
 import * as helpers from '@interactjs/core/tests/_helpers'
 import extend from '@interactjs/utils/extend'
 import * as pointerUtils from '@interactjs/utils/pointerUtils'
@@ -132,7 +132,7 @@ describe('actions/drag', () => {
       })
     }
 
-    function resetCoords () {
+    function resetCoords() {
       pointerUtils.copyCoords(iEvent, eventCoords)
       extend(iEvent.delta, eventCoords.delta)
 

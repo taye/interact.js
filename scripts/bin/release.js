@@ -20,7 +20,7 @@ let packages
 
 main().catch(errorExit)
 
-async function main (ps) {
+async function main(ps) {
   configGitUser()
   gitDetatch()
 
@@ -34,12 +34,12 @@ async function main (ps) {
   await pushAndPublish()
 }
 
-function configGitUser () {
+function configGitUser() {
   shell.exec('git config user.name "CI"')
   shell.exec('git config user.email "<>"')
 }
 
-function ensureCleanIndex () {
+function ensureCleanIndex() {
   // make sure the repo is clean
   try {
     shell.exec('git diff-index -G . HEAD --stat --exit-code')
@@ -48,7 +48,7 @@ function ensureCleanIndex () {
   }
 }
 
-function checkVersion () {
+function checkVersion() {
   const getVersion = require('../getVersion')
   const version = require('semver').clean(getVersion())
 
@@ -62,15 +62,15 @@ function checkVersion () {
   }
 }
 
-function gitDetatch () {
+function gitDetatch() {
   shell.exec('git checkout --detach')
 }
 
-function clean () {
+function clean() {
   shell.exec('_clean')
 }
 
-async function runBuild () {
+async function runBuild() {
   // copy README to interactjs package
   await Promise.all(
     packages
@@ -94,10 +94,10 @@ async function runBuild () {
 
   if (!isPro) {
     // bundle interactjs
-    shell.exec('npm run bundle')
+    shell.exec('npm run build:bundle')
 
     // generate docs
-    shell.exec('npm run docs')
+    shell.exec('npm run build:docs')
   }
 
   // create @interactjs/**/use/* modules
@@ -115,15 +115,15 @@ async function runBuild () {
   })
 }
 
-function commit () {
+function commit() {
   // commit and add new version tag
   shell.exec('git add --all .')
-  shell.exec('git add --force packages')
+  shell.exec('git add --force packages dist/docs')
   shell.exec('git reset **/node_modules')
   shell.exec(`git commit --no-verify -m ${gitTag}`)
 }
 
-async function pushAndPublish () {
+async function pushAndPublish() {
   const { NPM_TAG } = process.env
 
   try {
@@ -149,7 +149,7 @@ async function pushAndPublish () {
   shell.exec('git checkout $(git ls-files "**package.json")')
 }
 
-async function editPackageJsons (func) {
+async function editPackageJsons(func) {
   await Promise.all(
     ['.', ...packages].map(async (packageDir) => {
       const file = path.resolve(packageDir, 'package.json')

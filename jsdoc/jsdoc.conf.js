@@ -29,7 +29,10 @@ module.exports = {
     babelrc: false,
     configFile: false,
     presets: [[require.resolve('@babel/preset-typescript'), { allowDeclareFields: true }]],
-    plugins: [require.resolve('@babel/plugin-proposal-logical-assignment-operators')],
+    plugins: [
+      require.resolve('@babel/plugin-transform-logical-assignment-operators'),
+      require.resolve('@babel/plugin-transform-nullish-coalescing-operator'),
+    ],
   },
 
   markdown: {

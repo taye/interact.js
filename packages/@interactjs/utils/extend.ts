@@ -1,4 +1,4 @@
-export default function extend<T, U extends object> (dest: U & Partial<T>, source: T): T & U {
+export default function extend<T, U extends object>(dest: U & Partial<T>, source: T): T & U {
   for (const prop in source) {
     ;(dest as unknown as T)[prop] = source[prop]
   }

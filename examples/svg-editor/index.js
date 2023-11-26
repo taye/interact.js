@@ -12,7 +12,7 @@ const svgNS = 'http://www.w3.org/2000/svg'
 const rectangles = []
 
 class Rectangle {
-  constructor (x, y, w, h) {
+  constructor(x, y, w, h) {
     this.x = x
     this.y = y
     this.w = w
@@ -28,7 +28,7 @@ class Rectangle {
     this.draw()
   }
 
-  draw () {
+  draw() {
     let x = this.x
     let y = this.y
     let w = this.w
@@ -104,7 +104,7 @@ interact('.edit-rectangle')
       }),
     ],
     listeners: {
-      move (event) {
+      move(event) {
         const rectangle = rectangles[event.target.getAttribute('data-index')]
 
         rectangle.x = event.rect.left

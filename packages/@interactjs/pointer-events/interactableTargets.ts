@@ -3,17 +3,27 @@ import type { Scope, Plugin } from '@interactjs/core/scope'
 import type { Element } from '@interactjs/core/types'
 import extend from '@interactjs/utils/extend'
 
+import type { PointerEventOptions } from '@interactjs/pointer-events/base'
+
 declare module '@interactjs/core/Interactable' {
   interface Interactable {
-    pointerEvents: typeof pointerEventsMethod
+    pointerEvents(options: Partial<PointerEventOptions>): this
+    /** @internal */
     __backCompatOption: (optionName: string, newValue: any) => any
   }
 }
 
-function install (scope: Scope) {
+function install(scope: Scope) {
   const { Interactable } = scope
 
-  Interactable.prototype.pointerEvents = pointerEventsMethod
+  Interactable.prototype.pointerEvents = function (
+    this: Interactable,
+    options: Partial<PointerEventOptions>,
+  ) {
+    extend(this.events.options, options)
+
+    return this
+  }
 
   const __backCompatOption = Interactable.prototype._backCompatOption
 
@@ -26,12 +36,6 @@ function install (scope: Scope) {
 
     return ret
   }
-}
-
-function pointerEventsMethod (this: Interactable, options: any) {
-  extend(this.events.options, options)
-
-  return this
 }
 
 const plugin: Plugin = {

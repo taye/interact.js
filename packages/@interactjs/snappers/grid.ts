@@ -1,11 +1,29 @@
 import type { Rect, Point } from '@interactjs/core/types'
 import type { SnapFunction, SnapTarget } from '@interactjs/modifiers/snap/pointer'
 
-export type GridOptions = (Partial<Rect> | Point) & {
+export interface GridOptionsBase {
   range?: number
   limits?: Rect
   offset?: Point
 }
+export interface GridOptionsXY extends GridOptionsBase {
+  x: number
+  y: number
+}
+export interface GridOptionsTopLeft extends GridOptionsBase {
+  top?: number
+  left?: number
+}
+export interface GridOptionsBottomRight extends GridOptionsBase {
+  bottom?: number
+  right?: number
+}
+export interface GridOptionsWidthHeight extends GridOptionsBase {
+  width?: number
+  height?: number
+}
+
+export type GridOptions = GridOptionsXY | GridOptionsTopLeft | GridOptionsBottomRight | GridOptionsWidthHeight
 
 export default (grid: GridOptions) => {
   const coordFields = (

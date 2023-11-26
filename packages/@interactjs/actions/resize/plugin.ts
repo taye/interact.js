@@ -1,12 +1,11 @@
-import type { EventPhase, InteractEvent } from '@interactjs/core/InteractEvent'
 import type { Interactable } from '@interactjs/core/Interactable'
+import type { EventPhase, InteractEvent } from '@interactjs/core/InteractEvent'
 import type { Interaction } from '@interactjs/core/Interaction'
 import type { PerActionDefaults } from '@interactjs/core/options'
 import type { Scope, Plugin } from '@interactjs/core/scope'
 import type {
   ActionName,
   ActionProps,
-  ActionMethod,
   EdgeOptions,
   FullRect,
   ListenersArg,
@@ -20,17 +19,64 @@ import is from '@interactjs/utils/is'
 
 export type EdgeName = 'top' | 'left' | 'bottom' | 'right'
 
-export type ResizableMethod = ActionMethod<ResizableOptions>
-
 declare module '@interactjs/core/Interactable' {
   interface Interactable {
-    resizable: ResizableMethod
+    resizable(): ResizableOptions
+    resizable(options: Partial<OrBoolean<ResizableOptions>> | boolean): this
+    /**
+     * ```js
+     * interact(element).resizable({
+     *   onstart: function (event) {},
+     *   onmove : function (event) {},
+     *   onend  : function (event) {},
+     *
+     *   edges: {
+     *     top   : true,       // Use pointer coords to check for resize.
+     *     left  : false,      // Disable resizing from left edge.
+     *     bottom: '.resize-s',// Resize if pointer target matches selector
+     *     right : handleEl    // Resize if pointer target is the given Element
+     *   },
+     *
+     *   // Width and height can be adjusted independently. When `true`, width and
+     *   // height are adjusted at a 1:1 ratio.
+     *   square: false,
+     *
+     *   // Width and height can be adjusted independently. When `true`, width and
+     *   // height maintain the aspect ratio they had when resizing started.
+     *   preserveAspectRatio: false,
+     *
+     *   // a value of 'none' will limit the resize rect to a minimum of 0x0
+     *   // 'negate' will allow the rect to have negative width/height
+     *   // 'reposition' will keep the width/height positive by swapping
+     *   // the top and bottom edges and/or swapping the left and right edges
+     *   invert: 'none' || 'negate' || 'reposition'
+     *
+     *   // limit multiple resizes.
+     *   // See the explanation in the {@link Interactable.draggable} example
+     *   max: Infinity,
+     *   maxPerElement: 1,
+     * })
+     *
+     * var isResizeable = interact(element).resizable()
+     * ```
+     *
+     * Gets or sets whether resize actions can be performed on the target
+     *
+     * @param options - true/false or An object with event
+     * listeners to be fired on resize events (object makes the Interactable
+     * resizable)
+     * @returns A boolean indicating if this can be the
+     * target of resize elements, or this Interactable
+     */
+    resizable(options?: Partial<OrBoolean<ResizableOptions>> | boolean): this | ResizableOptions
   }
 }
 
 declare module '@interactjs/core/Interaction' {
   interface Interaction<T extends ActionName | null = ActionName> {
     resizeAxes: 'x' | 'y' | 'xy'
+    styleCursor(newValue: boolean): this
+    styleCursor(): boolean
     resizeStartAspectRatio: number
   }
 }
@@ -66,11 +112,10 @@ export interface ResizeEvent<P extends EventPhase = EventPhase> extends Interact
   edges?: ActionProps['edges']
 }
 
-function install (scope: Scope) {
+function install(scope: Scope) {
   const {
     actions,
     browser,
-    /** @lends Interactable */
     Interactable, // tslint:disable-line no-shadowed-variable
     defaults,
   } = scope
@@ -80,54 +125,9 @@ function install (scope: Scope) {
   resize.cursors = initCursors(browser)
   resize.defaultMargin = browser.supportsTouch || browser.supportsPointerEvent ? 20 : 10
 
-  /**
-   * ```js
-   * interact(element).resizable({
-   *   onstart: function (event) {},
-   *   onmove : function (event) {},
-   *   onend  : function (event) {},
-   *
-   *   edges: {
-   *     top   : true,       // Use pointer coords to check for resize.
-   *     left  : false,      // Disable resizing from left edge.
-   *     bottom: '.resize-s',// Resize if pointer target matches selector
-   *     right : handleEl    // Resize if pointer target is the given Element
-   *   },
-   *
-   *     // Width and height can be adjusted independently. When `true`, width and
-   *     // height are adjusted at a 1:1 ratio.
-   *     square: false,
-   *
-   *     // Width and height can be adjusted independently. When `true`, width and
-   *     // height maintain the aspect ratio they had when resizing started.
-   *     preserveAspectRatio: false,
-   *
-   *   // a value of 'none' will limit the resize rect to a minimum of 0x0
-   *   // 'negate' will allow the rect to have negative width/height
-   *   // 'reposition' will keep the width/height positive by swapping
-   *   // the top and bottom edges and/or swapping the left and right edges
-   *   invert: 'none' || 'negate' || 'reposition'
-   *
-   *   // limit multiple resizes.
-   *   // See the explanation in the {@link Interactable.draggable} example
-   *   max: Infinity,
-   *   maxPerElement: 1,
-   * })
-   *
-   * var isResizeable = interact(element).resizable()
-   * ```
-   *
-   * Gets or sets whether resize actions can be performed on the target
-   *
-   * @param {boolean | object} [options] true/false or An object with event
-   * listeners to be fired on resize events (object makes the Interactable
-   * resizable)
-   * @return {boolean | Interactable} A boolean indicating if this can be the
-   * target of resize elements, or this Interactable
-   */
   Interactable.prototype.resizable = function (this: Interactable, options: ResizableOptions | boolean) {
     return resizable(this, options, scope)
-  } as ResizableMethod
+  } as Interactable['resizable']
 
   actions.map.resize = resize
   actions.methodDict.resize = 'resizable'
@@ -135,7 +135,7 @@ function install (scope: Scope) {
   defaults.actions.resize = resize.defaults
 }
 
-function resizeChecker (arg) {
+function resizeChecker(arg) {
   const { interaction, interactable, element, rect, buttons } = arg
 
   if (!rect) {
@@ -200,7 +200,7 @@ function resizeChecker (arg) {
   return arg.action ? false : undefined
 }
 
-function resizable (interactable: Interactable, options: OrBoolean<ResizableOptions> | boolean, scope: Scope) {
+function resizable(interactable: Interactable, options: OrBoolean<ResizableOptions> | boolean, scope: Scope) {
   if (is.object(options)) {
     interactable.options.resize.enabled = options.enabled !== false
     interactable.setPerAction('resize', options)
@@ -228,7 +228,7 @@ function resizable (interactable: Interactable, options: OrBoolean<ResizableOpti
   return interactable.options.resize
 }
 
-function checkResizeEdge (
+function checkResizeEdge(
   name: string,
   value: any,
   page: Point,
@@ -290,47 +290,47 @@ function checkResizeEdge (
 
   return is.element(value)
     ? // the value is an element to use as a resize handle
-    value === element
+      value === element
     : // otherwise check if element matches value as selector
-    dom.matchesUpTo(element, value, interactableElement)
+      dom.matchesUpTo(element, value, interactableElement)
 }
 
 /* eslint-disable multiline-ternary */
 // eslint-disable-next-line @typescript-eslint/consistent-type-imports
-function initCursors (browser: typeof import('@interactjs/utils/browser').default) {
+function initCursors(browser: typeof import('@interactjs/utils/browser').default) {
   return browser.isIe9
     ? {
-      x: 'e-resize',
-      y: 's-resize',
-      xy: 'se-resize',
+        x: 'e-resize',
+        y: 's-resize',
+        xy: 'se-resize',
 
-      top: 'n-resize',
-      left: 'w-resize',
-      bottom: 's-resize',
-      right: 'e-resize',
-      topleft: 'se-resize',
-      bottomright: 'se-resize',
-      topright: 'ne-resize',
-      bottomleft: 'ne-resize',
-    }
+        top: 'n-resize',
+        left: 'w-resize',
+        bottom: 's-resize',
+        right: 'e-resize',
+        topleft: 'se-resize',
+        bottomright: 'se-resize',
+        topright: 'ne-resize',
+        bottomleft: 'ne-resize',
+      }
     : {
-      x: 'ew-resize',
-      y: 'ns-resize',
-      xy: 'nwse-resize',
+        x: 'ew-resize',
+        y: 'ns-resize',
+        xy: 'nwse-resize',
 
-      top: 'ns-resize',
-      left: 'ew-resize',
-      bottom: 'ns-resize',
-      right: 'ew-resize',
-      topleft: 'nwse-resize',
-      bottomright: 'nwse-resize',
-      topright: 'nesw-resize',
-      bottomleft: 'nesw-resize',
-    }
+        top: 'ns-resize',
+        left: 'ew-resize',
+        bottom: 'ns-resize',
+        right: 'ew-resize',
+        topleft: 'nwse-resize',
+        bottomright: 'nwse-resize',
+        topright: 'nesw-resize',
+        bottomleft: 'nesw-resize',
+      }
 }
 /* eslint-enable multiline-ternary */
 
-function start ({ iEvent, interaction }: { iEvent: InteractEvent<any, any>, interaction: Interaction }) {
+function start({ iEvent, interaction }: { iEvent: InteractEvent<any, any>; interaction: Interaction }) {
   if (interaction.prepared.name !== 'resize' || !interaction.prepared.edges) {
     return
   }
@@ -357,7 +357,7 @@ function start ({ iEvent, interaction }: { iEvent: InteractEvent<any, any>, inte
   resizeEvent.deltaRect = interaction._rects.delta
 }
 
-function move ({ iEvent, interaction }: { iEvent: InteractEvent<any, any>, interaction: Interaction }) {
+function move({ iEvent, interaction }: { iEvent: InteractEvent<any, any>; interaction: Interaction }) {
   if (interaction.prepared.name !== 'resize' || !interaction.prepared.edges) return
 
   const resizeEvent = iEvent as ResizeEvent
@@ -409,7 +409,7 @@ function move ({ iEvent, interaction }: { iEvent: InteractEvent<any, any>, inter
   resizeEvent.deltaRect = deltaRect
 }
 
-function end ({ iEvent, interaction }: { iEvent: InteractEvent<any, any>, interaction: Interaction }) {
+function end({ iEvent, interaction }: { iEvent: InteractEvent<any, any>; interaction: Interaction }) {
   if (interaction.prepared.name !== 'resize' || !interaction.prepared.edges) return
 
   const resizeEvent = iEvent as ResizeEvent
@@ -419,7 +419,7 @@ function end ({ iEvent, interaction }: { iEvent: InteractEvent<any, any>, intera
   resizeEvent.deltaRect = interaction._rects.delta
 }
 
-function updateEventAxes ({
+function updateEventAxes({
   iEvent,
   interaction,
 }: {
@@ -493,7 +493,7 @@ const resize: Plugin = {
 
   cursors: null as ReturnType<typeof initCursors>,
 
-  getCursor ({ edges, axis, name }: ActionProps) {
+  getCursor({ edges, axis, name }: ActionProps) {
     const cursors = resize.cursors
     let result: string = null
 

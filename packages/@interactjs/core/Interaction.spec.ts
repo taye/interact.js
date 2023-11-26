@@ -1,9 +1,10 @@
 import drag from '@interactjs/actions/drag/plugin'
 import drop from '@interactjs/actions/drop/plugin'
 import autoStart from '@interactjs/auto-start/base'
-import type { PointerType } from '@interactjs/core/types'
 import extend from '@interactjs/utils/extend'
 import * as pointerUtils from '@interactjs/utils/pointerUtils'
+
+import type { PointerType } from '@interactjs/core/types'
 
 import type { EventPhase } from './InteractEvent'
 import { InteractEvent } from './InteractEvent'
@@ -428,7 +429,7 @@ describe('core/Interaction', () => {
 
     interactable.draggable({
       listeners: {
-        start (event) {
+        start(event) {
           stoppedBeforeStartFired = interaction._stopped
 
           // interaction.move() doesn't throw from start event

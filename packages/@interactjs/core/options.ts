@@ -10,7 +10,7 @@ export interface Defaults {
 export interface ActionDefaults {}
 
 export interface BaseDefaults {
-  preventDefault?: 'auto' | 'never' | string
+  preventDefault?: 'always' | 'never' | 'auto'
   deltaSource?: 'page' | 'client'
   context?: Node
   getRect?: (element: Element) => Rect
@@ -25,9 +25,9 @@ export interface PerActionDefaults {
 }
 
 export type Options = Partial<BaseDefaults> &
-Partial<PerActionDefaults> & {
-  [P in keyof ActionDefaults]?: Partial<ActionDefaults[P]>
-}
+  Partial<PerActionDefaults> & {
+    [P in keyof ActionDefaults]?: Partial<ActionDefaults[P]>
+  }
 
 export interface OptionsArg extends BaseDefaults, OrBoolean<Partial<ActionDefaults>> {}
 

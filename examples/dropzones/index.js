@@ -12,12 +12,12 @@ interact.maxInteractions(Infinity)
 // setup draggable elements.
 interact('.js-drag').draggable({
   listeners: {
-    start (event) {
+    start(event) {
       const position = dragPositions[event.target.id]
       position.x = parseInt(event.target.getAttribute('data-x'), 10) || 0
       position.y = parseInt(event.target.getAttribute('data-y'), 10) || 0
     },
-    move (event) {
+    move(event) {
       const position = dragPositions[event.target.id]
       position.x += event.dx
       position.y += event.dy
@@ -29,7 +29,7 @@ interact('.js-drag').draggable({
         event.target.style.top = position.y + 'px'
       }
     },
-    end (event) {
+    end(event) {
       const position = dragPositions[event.target.id]
       event.target.setAttribute('data-x', position.x)
       event.target.setAttribute('data-y', position.y)
@@ -51,10 +51,10 @@ setupDropzone('.js-drop', '#drag3')
  * @param {HTMLElement|String} target
  * @param {String} accept
  */
-function setupDropzone (target, accept) {
+function setupDropzone(target, accept) {
   interact(target)
     .dropzone({
-      accept: accept,
+      accept,
       ondropactivate: function (event) {
         addClass(event.relatedTarget, '-drop-possible')
       },
@@ -99,7 +99,7 @@ function setupDropzone (target, accept) {
     })
 }
 
-function addClass (element, className) {
+function addClass(element, className) {
   if (element.classList) {
     return element.classList.add(className)
   } else {
@@ -107,7 +107,7 @@ function addClass (element, className) {
   }
 }
 
-function removeClass (element, className) {
+function removeClass(element, className) {
   if (element.classList) {
     return element.classList.remove(className)
   } else {

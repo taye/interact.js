@@ -16,7 +16,7 @@ test('inertia', () => {
   const changeModifier = {
     options: { endOnly: false },
     methods: {
-      set ({ coords: modifierCoords, phase }: any) {
+      set({ coords: modifierCoords, phase }: any) {
         modifierCoords.x = modifierChange
         modifierCoords.y = modifierChange
         modifierCallPhases.push(phase)
@@ -90,7 +90,7 @@ test('inertia', () => {
       {
         options: { endOnly: true },
         methods: {
-          set ({ coords: modifiedCoords, phase }) {
+          set({ coords: modifiedCoords, phase }) {
             extend(modifiedCoords, { x: 300, y: 400 })
             modifierCallPhases.push(phase)
           },
@@ -157,7 +157,7 @@ test('inertia', () => {
 
   interaction.stop()
 
-  function downStartMoveUp ({ x, y, dt }: any) {
+  function downStartMoveUp({ x, y, dt }: any) {
     fired = []
     modifierCallPhases = []
     coords.timeStamp = 0
@@ -174,7 +174,7 @@ test('inertia', () => {
     up()
   }
 
-  function lastEvent () {
+  function lastEvent() {
     return fired[fired.length - 1]
   }
 })

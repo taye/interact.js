@@ -82,8 +82,7 @@ describe('@dev-tools/prod/babel-plugin-prod', () => {
       [
         'import "@interactjs/a/a.prod";',
         'import a, { b } from "@interactjs/a/a.prod";',
-        'import _b from "@interactjs/a/a.prod";',
-        'export { _b as b };',
+        'export { default as b } from "@interactjs/a/a.prod";',
         'export * from "@interactjs/a/a.prod";',
       ].join('\n'),
     )

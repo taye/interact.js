@@ -35,7 +35,7 @@ export interface AutoScrollOptions {
   enabled?: boolean
 }
 
-function install (scope: Scope) {
+function install(scope: Scope) {
   const { defaults, actions } = scope
 
   scope.autoScroll = autoScroll
@@ -71,7 +71,7 @@ const autoScroll = {
   margin: 0,
   speed: 0,
 
-  start (interaction: Interaction) {
+  start(interaction: Interaction) {
     autoScroll.isScrolling = true
     raf.cancel(autoScroll.i)
 
@@ -81,7 +81,7 @@ const autoScroll = {
     autoScroll.i = raf.request(autoScroll.scroll)
   },
 
-  stop () {
+  stop() {
     autoScroll.isScrolling = false
     if (autoScroll.interaction) {
       autoScroll.interaction.autoScroll = null
@@ -90,7 +90,7 @@ const autoScroll = {
   },
 
   // scroll the window by the values in scroll.x/y
-  scroll () {
+  scroll() {
     const { interaction } = autoScroll
     const { interactable, element } = interaction
     const actionName = interaction.prepared.name
@@ -144,12 +144,12 @@ const autoScroll = {
       autoScroll.i = raf.request(autoScroll.scroll)
     }
   },
-  check (interactable: Interactable, actionName: ActionName) {
+  check(interactable: Interactable, actionName: ActionName) {
     const options = interactable.options
 
     return options[actionName].autoScroll?.enabled
   },
-  onInteractionMove<T extends ActionName> ({
+  onInteractionMove<T extends ActionName>({
     interaction,
     pointer,
   }: {
@@ -204,13 +204,13 @@ const autoScroll = {
   },
 }
 
-export function getContainer (value: any, interactable: Interactable, element: Element) {
+export function getContainer(value: any, interactable: Interactable, element: Element) {
   return (
     (is.string(value) ? getStringOptionResult(value, interactable, element) : value) || getWindow(element)
   )
 }
 
-export function getScroll (container: any) {
+export function getScroll(container: any) {
   if (is.window(container)) {
     container = window.document.body
   }
@@ -218,7 +218,7 @@ export function getScroll (container: any) {
   return { x: container.scrollLeft, y: container.scrollTop }
 }
 
-export function getScrollSize (container: any) {
+export function getScrollSize(container: any) {
   if (is.window(container)) {
     container = window.document.body
   }
@@ -226,7 +226,7 @@ export function getScrollSize (container: any) {
   return { x: container.scrollWidth, y: container.scrollHeight }
 }
 
-export function getScrollSizeDelta<T extends ActionName> (
+export function getScrollSizeDelta<T extends ActionName>(
   {
     interaction,
     element,

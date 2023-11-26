@@ -1,10 +1,11 @@
-import type { Scope } from '@interactjs/core/scope'
-import type { Element } from '@interactjs/core/types'
 import * as arr from '@interactjs/utils/arr'
 import * as domUtils from '@interactjs/utils/domUtils'
 import is from '@interactjs/utils/is'
 import pExtend from '@interactjs/utils/pointerExtend'
 import * as pointerUtils from '@interactjs/utils/pointerUtils'
+
+import type { Scope } from '@interactjs/core/scope'
+import type { Element } from '@interactjs/core/types'
 
 import type { NativeEventTarget } from './NativeTypes'
 
@@ -21,9 +22,9 @@ interface EventOptions {
 
 type PartialEventTarget = Partial<NativeEventTarget>
 
-type ListenerEntry = { func: (event: Event | FakeEvent) => any, options: EventOptions }
+type ListenerEntry = { func: (event: Event | FakeEvent) => any; options: EventOptions }
 
-function install (scope: Scope) {
+function install(scope: Scope) {
   const targets: Array<{
     eventTarget: PartialEventTarget
     events: { [type: string]: ListenerEntry[] }
@@ -58,17 +59,17 @@ function install (scope: Scope) {
 
   // check if browser supports passive events and options arg
   scope.document?.createElement('div').addEventListener('test', null, {
-    get capture () {
+    get capture() {
       return (eventsMethods.supportsOptions = true)
     },
-    get passive () {
+    get passive() {
       return (eventsMethods.supportsPassive = true)
     },
   })
 
   scope.events = eventsMethods
 
-  function add (
+  function add(
     eventTarget: PartialEventTarget,
     type: string,
     listener: ListenerEntry['func'],
@@ -102,7 +103,7 @@ function install (scope: Scope) {
     }
   }
 
-  function remove (
+  function remove(
     eventTarget: PartialEventTarget,
     type: string,
     listener?: 'all' | ListenerEntry['func'],
@@ -165,7 +166,7 @@ function install (scope: Scope) {
     }
   }
 
-  function addDelegate (
+  function addDelegate(
     selector: string,
     context: Node,
     type: string,
@@ -194,7 +195,7 @@ function install (scope: Scope) {
     delegate.listeners.push({ func: listener, options })
   }
 
-  function removeDelegate (
+  function removeDelegate(
     selector: string,
     context: Document | Element,
     type: string,
@@ -249,7 +250,7 @@ function install (scope: Scope) {
 
   // bound to the interactable context when a DOM event
   // listener is added to a selector interactable
-  function delegateListener (event: Event | FakeEvent, optionalArg?: any) {
+  function delegateListener(event: Event | FakeEvent, optionalArg?: any) {
     const options = getOptions(optionalArg)
     const fakeEvent = new FakeEvent(event as Event)
     const delegates = delegatedEvents[event.type]
@@ -283,7 +284,7 @@ function install (scope: Scope) {
     }
   }
 
-  function delegateUseCapture (this: Element, event: Event | FakeEvent) {
+  function delegateUseCapture(this: Element, event: Event | FakeEvent) {
     return delegateListener.call(this, event, true)
   }
 
@@ -296,26 +297,26 @@ class FakeEvent implements Partial<Event> {
   originalEvent: Event
   type: string
 
-  constructor (originalEvent: Event) {
+  constructor(originalEvent: Event) {
     this.originalEvent = originalEvent
     // duplicate the event so that currentTarget can be changed
     pExtend(this, originalEvent)
   }
 
-  preventOriginalDefault () {
+  preventOriginalDefault() {
     this.originalEvent.preventDefault()
   }
 
-  stopPropagation () {
+  stopPropagation() {
     this.originalEvent.stopPropagation()
   }
 
-  stopImmediatePropagation () {
+  stopImmediatePropagation() {
     this.originalEvent.stopImmediatePropagation()
   }
 }
 
-function getOptions (param: { [index: string]: any } | boolean): { capture: boolean, passive: boolean } {
+function getOptions(param: { [index: string]: any } | boolean): { capture: boolean; passive: boolean } {
   if (!is.object(param)) {
     return { capture: !!param, passive: false }
   }
@@ -326,7 +327,7 @@ function getOptions (param: { [index: string]: any } | boolean): { capture: bool
   }
 }
 
-function optionsMatch (a: Partial<EventOptions> | boolean, b: Partial<EventOptions>) {
+function optionsMatch(a: Partial<EventOptions> | boolean, b: Partial<EventOptions>) {
   if (a === b) return true
 
   if (typeof a === 'boolean') return !!b.capture === a && !!b.passive === false

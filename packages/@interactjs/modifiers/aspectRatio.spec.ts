@@ -25,7 +25,7 @@ test('modifiers/aspectRatio', () => {
     edges: { left: true, top: true, right: true, bottom: true },
     modifiers: [aspectRatio(options)],
     listeners: {
-      move (e) {
+      move(e) {
         lastRect = e.rect
       },
     },
@@ -72,7 +72,7 @@ test('modifiers/aspectRatio', () => {
   // equalDelta: false, ratio: 2, edges: right & top
   expect(lastRect).toEqual(ltrbwh(0, 10, 5, 20, 5, 10))
 
-  function downStartMoveUp ({ x, y, edges }: { x: number, y: number, edges: EdgeOptions }) {
+  function downStartMoveUp({ x, y, edges }: { x: number; y: number; edges: EdgeOptions }) {
     coords.timeStamp = 0
     interaction.stop()
     lastRect = null

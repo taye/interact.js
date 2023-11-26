@@ -1,11 +1,6 @@
-// eslint-disable-next-line import/no-extraneous-dependencies, import/no-duplicates
-import '@interactjs/dev-tools/visualizer/plugin'
-
 import type Interaction from '@interactjs/core/Interaction'
 import type { Scope, Plugin } from '@interactjs/core/scope'
 import type { Element, OptionMethod } from '@interactjs/core/types'
-// eslint-disable-next-line import/no-extraneous-dependencies, import/no-duplicates
-import visualizer from '@interactjs/dev-tools/visualizer/plugin'
 import domObjects from '@interactjs/utils/domObjects'
 import { parentNode } from '@interactjs/utils/domUtils'
 import extend from '@interactjs/utils/extend'
@@ -13,6 +8,11 @@ import is from '@interactjs/utils/is'
 import isNonNativeEvent from '@interactjs/utils/isNonNativeEvent'
 import normalizeListeners from '@interactjs/utils/normalizeListeners'
 import * as win from '@interactjs/utils/window'
+
+/* eslint-disable import/no-duplicates -- for typescript module augmentations */
+import './visualizer/plugin'
+import visualizer from './visualizer/plugin'
+/* eslint-enable import/no-duplicates */
 
 declare module '@interactjs/core/scope' {
   interface Scope {
@@ -70,7 +70,7 @@ const links = {
 // eslint-disable-next-line no-undef
 const isProduction = process.env.NODE_ENV === 'production'
 
-function install (scope: Scope, { logger }: { logger?: Logger } = {}) {
+function install(scope: Scope, { logger }: { logger?: Logger } = {}) {
   const { Interactable, defaults } = scope
 
   scope.logger = logger || console
@@ -118,10 +118,10 @@ function install (scope: Scope, { logger }: { logger?: Logger } = {}) {
 const checks: Check[] = [
   {
     name: CheckName.touchAction,
-    perform ({ element }) {
+    perform({ element }) {
       return !!element && !parentHasStyle(element, 'touchAction', /pan-|pinch|none/)
     },
-    getInfo ({ element }) {
+    getInfo({ element }) {
       return [element, links.touchAction]
     },
     text: 'Consider adding CSS "touch-action: none" to this element\n',
@@ -129,7 +129,7 @@ const checks: Check[] = [
 
   {
     name: CheckName.boxSizing,
-    perform (interaction) {
+    perform(interaction) {
       const { element } = interaction
 
       return (
@@ -139,32 +139,32 @@ const checks: Check[] = [
       )
     },
     text: 'Consider adding CSS "box-sizing: border-box" to this resizable element',
-    getInfo ({ element }) {
+    getInfo({ element }) {
       return [element, links.boxSizing]
     },
   },
 
   {
     name: CheckName.noListeners,
-    perform (interaction) {
+    perform(interaction) {
       const actionName = interaction.prepared.name
       const moveListeners = interaction.interactable?.events.types[`${actionName}move`] || []
 
       return !moveListeners.length
     },
-    getInfo (interaction) {
+    getInfo(interaction) {
       return [interaction.prepared.name, interaction.interactable]
     },
     text: 'There are no listeners set for this action',
   },
 ]
 
-function hasStyle (element: HTMLElement, prop: keyof CSSStyleDeclaration, styleRe: RegExp) {
+function hasStyle(element: HTMLElement, prop: keyof CSSStyleDeclaration, styleRe: RegExp) {
   const value = element.style[prop] || win.window.getComputedStyle(element)[prop]
   return styleRe.test((value || '').toString())
 }
 
-function parentHasStyle (element: Element, prop: keyof CSSStyleDeclaration, styleRe: RegExp) {
+function parentHasStyle(element: Element, prop: keyof CSSStyleDeclaration, styleRe: RegExp) {
   let parent = element as HTMLElement
 
   while (is.element(parent)) {
@@ -182,26 +182,26 @@ const id = 'dev-tools'
 const defaultExport: Plugin = isProduction
   ? { id, install: () => {} }
   : {
-    id,
-    install,
-    listeners: {
-      'interactions:action-start': ({ interaction }, scope) => {
-        for (const check of checks) {
-          const options = interaction.interactable && interaction.interactable.options
+      id,
+      install,
+      listeners: {
+        'interactions:action-start': ({ interaction }, scope) => {
+          for (const check of checks) {
+            const options = interaction.interactable && interaction.interactable.options
 
-          if (
-            !(options && options.devTools && options.devTools.ignore[check.name]) &&
+            if (
+              !(options && options.devTools && options.devTools.ignore[check.name]) &&
               check.perform(interaction)
-          ) {
-            scope.logger.warn(prefix + check.text, ...check.getInfo(interaction))
+            ) {
+              scope.logger.warn(prefix + check.text, ...check.getInfo(interaction))
+            }
           }
-        }
+        },
       },
-    },
-    checks,
-    CheckName,
-    links,
-    prefix,
-  }
+      checks,
+      CheckName,
+      links,
+      prefix,
+    }
 
 export default defaultExport

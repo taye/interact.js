@@ -15,14 +15,21 @@ module.exports = ({ stdio = 'inherit' } = {}) => {
 
   fs.removeSync(destination)
 
-  require('child_process').spawnSync('npx', ['jsdoc', '-c', 'jsdoc.conf.js'], {
-    stdio,
-    cwd: __dirname,
-  })
+  try {
+    const { error, status } = require('child_process').spawnSync('npx', ['jsdoc', '-c', 'jsdoc.conf.js'], {
+      stdio,
+      cwd: __dirname,
+    })
 
-  fs.copySync(path.join(confPath, '../../img'), `${destination}/img`)
+    if (error || status) throw error || new Error(`Command exited with code ${status}`)
 
-  console.log(' done.')
+    fs.copySync(path.join(confPath, '../../img'), `${destination}/img`)
+
+    console.log(' done.')
+  } catch (error) {
+    console.error(error)
+    process.exit(1)
+  }
 }
 
 if (!module.parent) {

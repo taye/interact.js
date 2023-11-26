@@ -4,7 +4,7 @@ const combineSourceMap = require('combine-source-map')
 
 const { getRelativeToRoot } = require('./utils')
 
-module.exports = function combine (options) {
+module.exports = function combine(options) {
   const headerContent = options.content || ''
   const { destDir, filename } = options
   const combiner = combineSourceMap.create()
@@ -53,7 +53,7 @@ module.exports = function combine (options) {
   }
 }
 
-function newlinesIn (src) {
+function newlinesIn(src) {
   if (!src) {
     return 0
   }

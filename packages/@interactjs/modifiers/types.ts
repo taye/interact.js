@@ -1,5 +1,5 @@
-import type { EventPhase } from '@interactjs/core/InteractEvent'
 import type { Interactable } from '@interactjs/core/Interactable'
+import type { EventPhase } from '@interactjs/core/InteractEvent'
 import type Interaction from '@interactjs/core/Interaction'
 import type { EdgeOptions, FullRect, Point, Rect } from '@interactjs/core/types'
 

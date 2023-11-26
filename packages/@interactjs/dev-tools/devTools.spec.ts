@@ -6,23 +6,26 @@ import type { Check, Logger } from './plugin'
 import devTools from './plugin'
 
 const { checks, links, prefix } = devTools
-const checkMap = checks.reduce((acc, check) => {
-  acc[check.name] = check
-  return acc
-}, {} as { [name: string]: Check })
+const checkMap = checks.reduce(
+  (acc, check) => {
+    acc[check.name] = check
+    return acc
+  },
+  {} as { [name: string]: Check },
+)
 
 test('devTools', () => {
   const devToolsWithLogger = {
     install: (s) =>
       s.usePlugin(devTools, {
         logger: {
-          warn (...args: any[]) {
+          warn(...args: any[]) {
             log(args, 'warn')
           },
-          log (...args: any[]) {
+          log(...args: any[]) {
             log(args, 'log')
           },
-          error (...args: any[]) {
+          error(...args: any[]) {
             log(args, 'error')
           },
         },
@@ -42,9 +45,9 @@ test('devTools', () => {
     plugins: [devToolsWithLogger, drag, resize],
   })
 
-  const logs: Array<{ args: any[], type: keyof Logger }> = []
+  const logs: Array<{ args: any[]; type: keyof Logger }> = []
 
-  function log (args: any, type: any) {
+  function log(args: any, type: any) {
     logs.push({ args, type })
   }
 

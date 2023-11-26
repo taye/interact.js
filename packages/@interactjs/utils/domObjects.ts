@@ -24,11 +24,11 @@ const domObjects: {
   PointerEvent: null,
 }
 
-function blank () {}
+function blank() {}
 
 export default domObjects
 
-function init (window: Window) {
+function init(window: Window) {
   const win = window as any
 
   domObjects.document = win.document

@@ -98,7 +98,7 @@ describe('core/Interactable', () => {
     const scope = helpers.mockScope()
 
     let fired: any[] = []
-    function addToFired (event: any) {
+    function addToFired(event: any) {
       fired.push(event)
     }
 

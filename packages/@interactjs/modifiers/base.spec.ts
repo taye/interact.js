@@ -123,10 +123,10 @@ test('modifiers/base', () => {
 })
 
 const targetModifier = {
-  start ({ state }: any) {
+  start({ state }: any) {
     state.options.started = true
   },
-  set ({ state, coords }: any) {
+  set({ state, coords }: any) {
     const { target } = state.options
 
     coords.x = target.x
@@ -134,7 +134,7 @@ const targetModifier = {
 
     state.options.setted = true
   },
-  stop ({ state }: any) {
+  stop({ state }: any) {
     state.options.stopped = true
     delete state.options.started
     delete state.options.setted
@@ -142,8 +142,8 @@ const targetModifier = {
 }
 
 const doubleModifier = {
-  start () {},
-  set ({ coords }: any) {
+  start() {},
+  set({ coords }: any) {
     coords.x *= 2
     coords.y *= 2
   },

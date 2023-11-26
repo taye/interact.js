@@ -1,4 +1,4 @@
-export default function setInteractables () {
+export default function setInteractables() {
   interact('.draggable', { context: document }).draggable({
     onmove: onMove,
     inertia: { enabled: true },
@@ -10,7 +10,7 @@ export default function setInteractables () {
     autoScroll: true,
   })
 
-  function onMove (event) {
+  function onMove(event) {
     const target = event.target
     const x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx
     const y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy

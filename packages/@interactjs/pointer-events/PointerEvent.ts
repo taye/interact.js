@@ -3,7 +3,7 @@ import type Interaction from '@interactjs/core/Interaction'
 import type { PointerEventType, PointerType, Point } from '@interactjs/core/types'
 import * as pointerUtils from '@interactjs/utils/pointerUtils'
 
-export default class PointerEvent<T extends string = any> extends BaseEvent<never> {
+export class PointerEvent<T extends string = any> extends BaseEvent<never> {
   declare type: T
   declare originalEvent: PointerEventType
   declare pointerId: number
@@ -17,8 +17,7 @@ export default class PointerEvent<T extends string = any> extends BaseEvent<neve
   declare eventable: any;
   [key: string]: any
 
-  /** */
-  constructor (
+  constructor(
     type: T,
     pointer: PointerType | PointerEvent<any>,
     event: PointerEventType,
@@ -58,7 +57,7 @@ export default class PointerEvent<T extends string = any> extends BaseEvent<neve
     }
   }
 
-  _subtractOrigin ({ x: originX, y: originY }: Point) {
+  _subtractOrigin({ x: originX, y: originY }: Point) {
     this.pageX -= originX
     this.pageY -= originY
     this.clientX -= originX
@@ -67,7 +66,7 @@ export default class PointerEvent<T extends string = any> extends BaseEvent<neve
     return this
   }
 
-  _addOrigin ({ x: originX, y: originY }: Point) {
+  _addOrigin({ x: originX, y: originY }: Point) {
     this.pageX += originX
     this.pageY += originY
     this.clientX += originX
@@ -79,9 +78,7 @@ export default class PointerEvent<T extends string = any> extends BaseEvent<neve
   /**
    * Prevent the default behaviour of the original Event
    */
-  preventDefault () {
+  preventDefault() {
     this.originalEvent.preventDefault()
   }
 }
-
-export { PointerEvent }

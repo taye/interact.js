@@ -2,7 +2,7 @@ import type { ActionName, ActionProps } from '@interactjs/core/types'
 
 import { window } from './window'
 
-export function warnOnce<T> (this: T, method: (...args: any[]) => any, message: string) {
+export function warnOnce<T>(this: T, method: (...args: any[]) => any, message: string) {
   let warned = false
 
   return function (this: T) {
@@ -15,7 +15,7 @@ export function warnOnce<T> (this: T, method: (...args: any[]) => any, message: 
   }
 }
 
-export function copyAction<T extends ActionName> (dest: ActionProps<any>, src: ActionProps<T>) {
+export function copyAction<T extends ActionName>(dest: ActionProps<any>, src: ActionProps<T>) {
   dest.name = src.name
   dest.axis = src.axis
   dest.edges = src.edges

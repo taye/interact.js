@@ -12,7 +12,7 @@ import { closest, getElementRect, parentNode } from './domUtils'
 import extend from './extend'
 import is from './is'
 
-export function getStringOptionResult (value: any, target: HasGetRect, element: Node) {
+export function getStringOptionResult(value: any, target: HasGetRect, element: Node) {
   if (value === 'parent') {
     return parentNode(element)
   }
@@ -24,7 +24,7 @@ export function getStringOptionResult (value: any, target: HasGetRect, element: 
   return closest(element, value)
 }
 
-export function resolveRectLike<T extends any[]> (
+export function resolveRectLike<T extends any[]>(
   value: RectResolvable<T>,
   target?: HasGetRect,
   element?: Node,
@@ -44,7 +44,7 @@ export function resolveRectLike<T extends any[]> (
   return returnValue as Rect
 }
 
-export function toFullRect (rect: Rect): FullRect {
+export function toFullRect(rect: Rect): FullRect {
   const { top, left, bottom, right } = rect
   const width = rect.width ?? rect.right - rect.left
   const height = rect.height ?? rect.bottom - rect.top
@@ -52,7 +52,7 @@ export function toFullRect (rect: Rect): FullRect {
   return { top, left, bottom, right, width, height }
 }
 
-export function rectToXY (rect: Rect | Point) {
+export function rectToXY(rect: Rect | Point) {
   return (
     rect && {
       x: 'x' in rect ? rect.x : rect.left,
@@ -61,7 +61,7 @@ export function rectToXY (rect: Rect | Point) {
   )
 }
 
-export function xywhToTlbr<T extends Partial<Rect & Point>> (rect: T) {
+export function xywhToTlbr<T extends Partial<Rect & Point>>(rect: T) {
   if (rect && !('left' in rect && 'top' in rect)) {
     rect = extend({}, rect)
 
@@ -74,7 +74,7 @@ export function xywhToTlbr<T extends Partial<Rect & Point>> (rect: T) {
   return rect as Rect & T
 }
 
-export function tlbrToXywh (rect: Rect & Partial<Point>) {
+export function tlbrToXywh(rect: Rect & Partial<Point>) {
   if (rect && !('x' in rect && 'y' in rect)) {
     rect = extend({}, rect)
 
@@ -87,7 +87,7 @@ export function tlbrToXywh (rect: Rect & Partial<Point>) {
   return rect as FullRect & Point
 }
 
-export function addEdges (edges: EdgeOptions, rect: Rect, delta: Point) {
+export function addEdges(edges: EdgeOptions, rect: Rect, delta: Point) {
   if (edges.left) {
     rect.left += delta.x
   }

@@ -4,10 +4,10 @@ const path = require('path')
 const shell = require('shelljs')
 
 module.exports = {
-  modular (modulesDir) {
+  modular(modulesDir) {
     shell.exec(`npx tsc -p types.tsconfig.json --outDir ${modulesDir}/@interactjs`)
   },
-  async combined (outDir) {
+  async combined(outDir) {
     const outFile = path.join(outDir, 'index.d.ts')
 
     // await del(path.join(typesOutDir, outBasename))

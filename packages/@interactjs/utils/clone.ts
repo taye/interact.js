@@ -2,7 +2,7 @@ import * as arr from './arr'
 import is from './is'
 
 // tslint:disable-next-line ban-types
-export default function clone<T extends Object> (source: T): Partial<T> {
+export default function clone<T extends Object>(source: T): Partial<T> {
   const dest = {} as Partial<T>
 
   for (const prop in source) {
