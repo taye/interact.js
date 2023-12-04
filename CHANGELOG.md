@@ -1,3 +1,7 @@
+## v1.10.25
+
+- fix: bundle to ES5 syntax
+
 ## v1.10.24
 
 - chore: generate api docs
