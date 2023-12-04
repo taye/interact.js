@@ -1,0 +1,15 @@
+{
+	"version": 3,
+	"names": [
+		"exports",
+		"default",
+		"_default"
+	],
+	"sources": [
+		"edgeTarget.ts"
+	],
+	"sourcesContent": [
+		"export default () => {}\n"
+	],
+	"mappings": "8EAAuBA,QAAAC,QAARC"
+}

@@ -1,0 +1,48 @@
+{
+	"version": 3,
+	"names": [
+		"pointerEvents",
+		"e",
+		"r",
+		"__esModule",
+		"default",
+		"t",
+		"_getRequireWildcardCache",
+		"has",
+		"get",
+		"n",
+		"__proto__",
+		"a",
+		"Object",
+		"defineProperty",
+		"getOwnPropertyDescriptor",
+		"u",
+		"prototype",
+		"hasOwnProperty",
+		"call",
+		"i",
+		"set",
+		"_interopRequireWildcard",
+		"require",
+		"_holdRepeat",
+		"_interopRequireDefault",
+		"_interactableTargets",
+		"obj",
+		"WeakMap",
+		"plugin",
+		"id",
+		"install",
+		"scope",
+		"usePlugin",
+		"holdRepeat",
+		"interactableTargets",
+		"exports"
+	],
+	"sources": [
+		"plugin.ts"
+	],
+	"sourcesContent": [
+		"import type { Plugin } from '@interactjs/core/scope'\n\n/* eslint-disable import/no-duplicates -- for typescript module augmentations */\nimport './base'\nimport './holdRepeat'\nimport './interactableTargets'\n\nimport * as pointerEvents from './base'\nimport holdRepeat from './holdRepeat'\nimport interactableTargets from './interactableTargets'\n/* eslint-enable import/no-duplicates */\n\nconst plugin: Plugin = {\n  id: 'pointer-events',\n  install(scope) {\n    scope.usePlugin(pointerEvents)\n    scope.usePlugin(holdRepeat)\n    scope.usePlugin(interactableTargets)\n  },\n}\n\nexport default plugin\n"
+	],
+	"mappings": "8EAGA,IAAAA,EAE8B,EAAAC,EAAAC,KAAA,GAAAD,KAAAE,WAAA,OAAAF,EAAA,UAAAA,GAAA,iBAAAA,GAAA,mBAAAA,EAAA,OAAAG,QAAAH,GAAA,IAAAI,EAAAC,EAAAJ,GAAA,GAAAG,KAAAE,IAAAN,GAAA,OAAAI,EAAAG,IAAAP,GAAA,IAAAQ,EAAA,CAAAC,UAAA,MAAAC,EAAAC,OAAAC,gBAAAD,OAAAE,yBAAA,QAAAC,KAAAd,EAAA,eAAAc,GAAAH,OAAAI,UAAAC,eAAAC,KAAAjB,EAAAc,GAAA,KAAAI,EAAAR,EAAAC,OAAAE,yBAAAb,EAAAc,GAAA,KAAAI,MAAAX,KAAAW,EAAAC,KAAAR,OAAAC,eAAAJ,EAAAM,EAAAI,GAAAV,EAAAM,GAAAd,EAAAc,EAAA,QAAAN,EAAAL,QAAAH,EAAAI,KAAAe,IAAAnB,EAAAQ,IAAA,EAF9BY,CAAAC,QAAA,WACAC,EAAAC,EAAAF,QAAA,iBACAG,EAAAD,EAAAF,QAAA,0BAA8B,SAAAE,EAAAE,GAAA,OAAAA,KAAAvB,WAAAuB,EAAA,CAAAtB,QAAAsB,EAAA,UAAApB,EAAAL,GAAA,sBAAA0B,QAAA,gBAAAzB,EAAA,IAAAyB,QAAAtB,EAAA,IAAAsB,QAAA,OAAArB,EAAAL,KAAAI,EAAAH,GAAAD,EAAA,CAO9B,MAAM2B,EAAiB,CACrBC,GAAI,iBACJC,QAAQC,GACNA,EAAMC,UAAUhC,GAChB+B,EAAMC,UAAUC,WAChBF,EAAMC,UAAUE,UAClB,GACDC,QAAA/B,QAEcwB"
+}

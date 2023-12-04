@@ -1,0 +1,39 @@
+{
+	"version": 3,
+	"names": [
+		"normalize",
+		"type",
+		"listeners",
+		"filter",
+		"_typeOrPrefix",
+		"result",
+		"is",
+		"string",
+		"search",
+		"split",
+		"array",
+		"forEach",
+		"t",
+		"object",
+		"func",
+		"push",
+		"l",
+		"prefix",
+		"combinedTypes",
+		"map",
+		"p",
+		"obj",
+		"_is",
+		"require",
+		"__esModule",
+		"default",
+		"trim"
+	],
+	"sources": [
+		"normalizeListeners.ts"
+	],
+	"sourcesContent": [
+		"import type { EventTypes, Listener, ListenersArg } from '@interactjs/core/types'\n\nimport is from './is'\n\nexport interface NormalizedListeners {\n  [type: string]: Listener[]\n}\n\nexport default function normalize(\n  type: EventTypes,\n  listeners?: ListenersArg | ListenersArg[] | null,\n  filter = (_typeOrPrefix: string) => true,\n  result?: NormalizedListeners,\n): NormalizedListeners {\n  result = result || {}\n\n  if (is.string(type) && type.search(' ') !== -1) {\n    type = split(type)\n  }\n\n  if (is.array(type)) {\n    type.forEach((t) => normalize(t, listeners, filter, result))\n    return result\n  }\n\n  // before:  type = [{ drag: () => {} }], listeners = undefined\n  // after:   type = ''                  , listeners = [{ drag: () => {} }]\n  if (is.object(type)) {\n    listeners = type\n    type = ''\n  }\n\n  if (is.func(listeners) && filter(type)) {\n    result[type] = result[type] || []\n    result[type].push(listeners)\n  } else if (is.array(listeners)) {\n    for (const l of listeners) {\n      normalize(type, l, filter, result)\n    }\n  } else if (is.object(listeners)) {\n    for (const prefix in listeners) {\n      const combinedTypes = split(prefix).map((p) => `${type}${p}`)\n\n      normalize(combinedTypes, listeners[prefix], filter, result)\n    }\n  }\n\n  return result as NormalizedListeners\n}\n\nfunction split(type: string) {\n  return type.trim().split(/ +/)\n}\n"
+	],
+	"mappings": "uEAQe,SAASA,EACtBC,EACAC,EACAC,EAAUC,KAA0B,GACpCC,GAQA,GANAA,EAASA,GAAU,CAAC,EAEhBC,UAAGC,OAAON,KAA+B,IAAtBA,EAAKO,OAAO,OACjCP,EAAOQ,EAAMR,IAGXK,UAAGI,MAAMT,GAEX,OADAA,EAAKU,SAASC,GAAMZ,EAAUY,EAAGV,EAAWC,EAAQE,KAC7CA,EAUT,GALIC,UAAGO,OAAOZ,KACZC,EAAYD,EACZA,EAAO,IAGLK,UAAGQ,KAAKZ,IAAcC,EAAOF,GAC/BI,EAAOJ,GAAQI,EAAOJ,IAAS,GAC/BI,EAAOJ,GAAMc,KAAKb,QACb,GAAII,UAAGI,MAAMR,GAClB,IAAK,MAAMc,KAAKd,EACdF,EAAUC,EAAMe,EAAGb,EAAQE,QAExB,GAAIC,UAAGO,OAAOX,GACnB,IAAK,MAAMe,KAAUf,EAAW,CAC9B,MAAMgB,EAAgBT,EAAMQ,GAAQE,KAAKC,GAAO,GAAEnB,IAAOmB,MAEzDpB,EAAUkB,EAAehB,EAAUe,GAASd,EAAQE,EACtD,CAGF,OAAOA,CACT,EA9CA,IAAqBgB,EAArBC,GAAqBD,EAArBE,QAAA,UAAqBF,EAAAG,WAAAH,EAAA,CAAAI,QAAAJ,GAgDrB,SAASZ,EAAMR,GACb,OAAOA,EAAKyB,OAAOjB,MAAM,KAC3B"
+}

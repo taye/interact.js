@@ -1,0 +1,18 @@
+{
+	"version": 3,
+	"names": [
+		"_noop",
+		"_interopRequireDefault",
+		"require",
+		"obj",
+		"__esModule",
+		"default"
+	],
+	"sources": [
+		"avoid.ts"
+	],
+	"sourcesContent": [
+		"export { default } from '../noop'\n"
+	],
+	"mappings": ";;;;;;;;;;;AAAA,IAAAA,KAAA,GAAAC,sBAAA,CAAAC,OAAA;AAAiC,SAAAD,uBAAAE,GAAA,WAAAA,GAAA,IAAAA,GAAA,CAAAC,UAAA,GAAAD,GAAA,KAAAE,OAAA,EAAAF,GAAA"
+}

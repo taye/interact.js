@@ -1,0 +1,2 @@
+Object.defineProperty(exports,"__esModule",{value:!0}),exports.default=void 0;let e,t,n=0;exports.default={request:t=>e(t),cancel:e=>t(e),init(a){if(e=a.requestAnimationFrame,t=a.cancelAnimationFrame,!e){const n=["ms","moz","webkit","o"];for(const o of n)e=a[o+"RequestAnimationFrame"],t=a[o+"CancelAnimationFrame"]||a[o+"CancelRequestAnimationFrame"]}e=e&&e.bind(a),t=t&&t.bind(a),e||(e=e=>{const t=Date.now(),o=Math.max(0,16-(t-n)),i=a.setTimeout((()=>{e(t+o)}),o);return n=t+o,i},t=e=>clearTimeout(e))}};
+//# sourceMappingURL=raf.prod.js.map

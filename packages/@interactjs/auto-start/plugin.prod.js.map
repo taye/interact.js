@@ -1,0 +1,28 @@
+{
+	"version": 3,
+	"names": [
+		"_base",
+		"_interopRequireDefault",
+		"require",
+		"_dragAxis",
+		"_hold",
+		"obj",
+		"__esModule",
+		"default",
+		"exports",
+		"id",
+		"install",
+		"scope",
+		"usePlugin",
+		"autoStart",
+		"hold",
+		"dragAxis"
+	],
+	"sources": [
+		"plugin.ts"
+	],
+	"sourcesContent": [
+		"import type { Scope } from '@interactjs/core/scope'\n\n/* eslint-disable import/no-duplicates -- for typescript module augmentations */\nimport './base'\nimport './dragAxis'\nimport './hold'\n\nimport autoStart from './base'\nimport dragAxis from './dragAxis'\nimport hold from './hold'\n/* eslint-enable import/no-duplicates */\n\nexport default {\n  id: 'auto-start',\n  install(scope: Scope) {\n    scope.usePlugin(autoStart)\n    scope.usePlugin(hold)\n    scope.usePlugin(dragAxis)\n  },\n}\n"
+	],
+	"mappings": "8EAGA,IAAAA,EAAAC,EAAAC,QAAA,WACAC,EAAAF,EAAAC,QAAA,eACAE,EAAAH,EAAAC,QAAA,WAAe,SAAAD,EAAAI,GAAA,OAAAA,KAAAC,WAAAD,EAAA,CAAAE,QAAAF,EAAA,CAKfG,QAAAD,QAEe,CACbE,GAAI,aACJC,QAAQC,GACNA,EAAMC,UAAUC,WAChBF,EAAMC,UAAUE,WAChBH,EAAMC,UAAUG,UAClB"
+}

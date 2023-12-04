@@ -1,0 +1,49 @@
+{
+	"version": 3,
+	"names": [
+		"pointerEvents",
+		"_interopRequireWildcard",
+		"require",
+		"_holdRepeat",
+		"_interopRequireDefault",
+		"_interactableTargets",
+		"obj",
+		"__esModule",
+		"default",
+		"_getRequireWildcardCache",
+		"e",
+		"WeakMap",
+		"r",
+		"t",
+		"has",
+		"get",
+		"n",
+		"__proto__",
+		"a",
+		"Object",
+		"defineProperty",
+		"getOwnPropertyDescriptor",
+		"u",
+		"prototype",
+		"hasOwnProperty",
+		"call",
+		"i",
+		"set",
+		"plugin",
+		"id",
+		"install",
+		"scope",
+		"usePlugin",
+		"holdRepeat",
+		"interactableTargets",
+		"_default",
+		"exports"
+	],
+	"sources": [
+		"plugin.ts"
+	],
+	"sourcesContent": [
+		"import type { Plugin } from '@interactjs/core/scope'\n\n/* eslint-disable import/no-duplicates -- for typescript module augmentations */\nimport './base'\nimport './holdRepeat'\nimport './interactableTargets'\n\nimport * as pointerEvents from './base'\nimport holdRepeat from './holdRepeat'\nimport interactableTargets from './interactableTargets'\n/* eslint-enable import/no-duplicates */\n\nconst plugin: Plugin = {\n  id: 'pointer-events',\n  install(scope) {\n    scope.usePlugin(pointerEvents)\n    scope.usePlugin(holdRepeat)\n    scope.usePlugin(interactableTargets)\n  },\n}\n\nexport default plugin\n"
+	],
+	"mappings": ";;;;;;AAGA,IAAAA,aAAA,GAAAC,uBAAA,CAAAC,OAAA;AACA,IAAAC,WAAA,GAAAC,sBAAA,CAAAF,OAAA;AACA,IAAAG,oBAAA,GAAAD,sBAAA,CAAAF,OAAA;AAA8B,SAAAE,uBAAAE,GAAA,WAAAA,GAAA,IAAAA,GAAA,CAAAC,UAAA,GAAAD,GAAA,KAAAE,OAAA,EAAAF,GAAA;AAAA,SAAAG,yBAAAC,CAAA,6BAAAC,OAAA,mBAAAC,CAAA,OAAAD,OAAA,IAAAE,CAAA,OAAAF,OAAA,YAAAF,wBAAA,YAAAA,CAAAC,CAAA,WAAAA,CAAA,GAAAG,CAAA,GAAAD,CAAA,KAAAF,CAAA;AAAA,SAAAT,wBAAAS,CAAA,EAAAE,CAAA,SAAAA,CAAA,IAAAF,CAAA,IAAAA,CAAA,CAAAH,UAAA,SAAAG,CAAA,eAAAA,CAAA,uBAAAA,CAAA,yBAAAA,CAAA,WAAAF,OAAA,EAAAE,CAAA,QAAAG,CAAA,GAAAJ,wBAAA,CAAAG,CAAA,OAAAC,CAAA,IAAAA,CAAA,CAAAC,GAAA,CAAAJ,CAAA,UAAAG,CAAA,CAAAE,GAAA,CAAAL,CAAA,OAAAM,CAAA,KAAAC,SAAA,UAAAC,CAAA,GAAAC,MAAA,CAAAC,cAAA,IAAAD,MAAA,CAAAE,wBAAA,WAAAC,CAAA,IAAAZ,CAAA,oBAAAY,CAAA,IAAAH,MAAA,CAAAI,SAAA,CAAAC,cAAA,CAAAC,IAAA,CAAAf,CAAA,EAAAY,CAAA,SAAAI,CAAA,GAAAR,CAAA,GAAAC,MAAA,CAAAE,wBAAA,CAAAX,CAAA,EAAAY,CAAA,UAAAI,CAAA,KAAAA,CAAA,CAAAX,GAAA,IAAAW,CAAA,CAAAC,GAAA,IAAAR,MAAA,CAAAC,cAAA,CAAAJ,CAAA,EAAAM,CAAA,EAAAI,CAAA,IAAAV,CAAA,CAAAM,CAAA,IAAAZ,CAAA,CAAAY,CAAA,YAAAN,CAAA,CAAAR,OAAA,GAAAE,CAAA,EAAAG,CAAA,IAAAA,CAAA,CAAAc,GAAA,CAAAjB,CAAA,EAAAM,CAAA,GAAAA,CAAA;AAH9B;;AAQA;;AAEA,MAAMY,MAAc,GAAG;EACrBC,EAAE,EAAE,gBAAgB;EACpBC,OAAOA,CAACC,KAAK,EAAE;IACbA,KAAK,CAACC,SAAS,CAAChC,aAAa,CAAC;IAC9B+B,KAAK,CAACC,SAAS,CAACC,mBAAU,CAAC;IAC3BF,KAAK,CAACC,SAAS,CAACE,4BAAmB,CAAC;EACtC;AACF,CAAC;AAAA,IAAAC,QAAA,GAAAC,OAAA,CAAA5B,OAAA,GAEcoB,MAAM"
+}

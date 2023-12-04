@@ -1,0 +1,2 @@
+Object.defineProperty(exports,"__esModule",{value:!0}),exports.default=void 0;var e=s(require("../snappers/plugin.prod.js")),t=s(require("./all")),u=s(require("./base"));function s(e){return e&&e.__esModule?e:{default:e}}const r={id:"modifiers",install(s){const{interactStatic:r}=s;s.usePlugin(u.default),s.usePlugin(e.default),r.modifiers=t.default;for(const e in t.default){const{_defaults:u,_methods:r}=t.default[e];u._methods=r,s.defaults.perAction[e]=u}}};exports.default=r;
+//# sourceMappingURL=plugin.prod.js.map

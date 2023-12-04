@@ -1,0 +1,31 @@
+{
+	"version": 3,
+	"names": [
+		"domObjects",
+		"init",
+		"document",
+		"DocumentFragment",
+		"SVGElement",
+		"SVGSVGElement",
+		"SVGElementInstance",
+		"Element",
+		"HTMLElement",
+		"Event",
+		"Touch",
+		"PointerEvent",
+		"blank",
+		"_default",
+		"exports",
+		"default",
+		"window",
+		"win",
+		"MSPointerEvent"
+	],
+	"sources": [
+		"domObjects.ts"
+	],
+	"sourcesContent": [
+		"const domObjects: {\n  init: any\n  document: Document\n  DocumentFragment: typeof DocumentFragment\n  SVGElement: typeof SVGElement\n  SVGSVGElement: typeof SVGSVGElement\n  SVGElementInstance: any\n  Element: typeof Element\n  HTMLElement: typeof HTMLElement\n  Event: typeof Event\n  Touch: typeof Touch\n  PointerEvent: typeof PointerEvent\n} = {\n  init,\n  document: null,\n  DocumentFragment: null,\n  SVGElement: null,\n  SVGSVGElement: null,\n  SVGElementInstance: null,\n  Element: null,\n  HTMLElement: null,\n  Event: null,\n  Touch: null,\n  PointerEvent: null,\n}\n\nfunction blank() {}\n\nexport default domObjects\n\nfunction init(window: Window) {\n  const win = window as any\n\n  domObjects.document = win.document\n  domObjects.DocumentFragment = win.DocumentFragment || blank\n  domObjects.SVGElement = win.SVGElement || blank\n  domObjects.SVGSVGElement = win.SVGSVGElement || blank\n  domObjects.SVGElementInstance = win.SVGElementInstance || blank\n  domObjects.Element = win.Element || blank\n  domObjects.HTMLElement = win.HTMLElement || domObjects.Element\n\n  domObjects.Event = win.Event\n  domObjects.Touch = win.Touch || blank\n  domObjects.PointerEvent = win.PointerEvent || win.MSPointerEvent\n}\n"
+	],
+	"mappings": ";;;;;;AAAA,MAAMA,UAYL,GAAG;EACFC,IAAI;EACJC,QAAQ,EAAE,IAAI;EACdC,gBAAgB,EAAE,IAAI;EACtBC,UAAU,EAAE,IAAI;EAChBC,aAAa,EAAE,IAAI;EACnBC,kBAAkB,EAAE,IAAI;EACxBC,OAAO,EAAE,IAAI;EACbC,WAAW,EAAE,IAAI;EACjBC,KAAK,EAAE,IAAI;EACXC,KAAK,EAAE,IAAI;EACXC,YAAY,EAAE;AAChB,CAAC;AAED,SAASC,KAAKA,CAAA,EAAG,CAAC;AAAC,IAAAC,QAAA,GAAAC,OAAA,CAAAC,OAAA,GAEJf,UAAU;AAEzB,SAASC,IAAIA,CAACe,MAAc,EAAE;EAC5B,MAAMC,GAAG,GAAGD,MAAa;EAEzBhB,UAAU,CAACE,QAAQ,GAAGe,GAAG,CAACf,QAAQ;EAClCF,UAAU,CAACG,gBAAgB,GAAGc,GAAG,CAACd,gBAAgB,IAAIS,KAAK;EAC3DZ,UAAU,CAACI,UAAU,GAAGa,GAAG,CAACb,UAAU,IAAIQ,KAAK;EAC/CZ,UAAU,CAACK,aAAa,GAAGY,GAAG,CAACZ,aAAa,IAAIO,KAAK;EACrDZ,UAAU,CAACM,kBAAkB,GAAGW,GAAG,CAACX,kBAAkB,IAAIM,KAAK;EAC/DZ,UAAU,CAACO,OAAO,GAAGU,GAAG,CAACV,OAAO,IAAIK,KAAK;EACzCZ,UAAU,CAACQ,WAAW,GAAGS,GAAG,CAACT,WAAW,IAAIR,UAAU,CAACO,OAAO;EAE9DP,UAAU,CAACS,KAAK,GAAGQ,GAAG,CAACR,KAAK;EAC5BT,UAAU,CAACU,KAAK,GAAGO,GAAG,CAACP,KAAK,IAAIE,KAAK;EACrCZ,UAAU,CAACW,YAAY,GAAGM,GAAG,CAACN,YAAY,IAAIM,GAAG,CAACC,cAAc;AAClE"
+}

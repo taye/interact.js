@@ -1,0 +1,17 @@
+{
+	"version": 3,
+	"names": [
+		"obj",
+		"_noop",
+		"require",
+		"__esModule",
+		"default"
+	],
+	"sources": [
+		"rubberband.ts"
+	],
+	"sourcesContent": [
+		"export { default } from '../noop'\n"
+	],
+	"mappings": "kIAAA,IAAiCA,EAAjCC,GAAiCD,EAAjCE,QAAA,aAAiCF,EAAAG,WAAAH,EAAA,CAAAI,QAAAJ"
+}

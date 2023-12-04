@@ -1,0 +1,14 @@
+{
+	"version": 3,
+	"names": [
+		"NativePointerEvent",
+		"exports"
+	],
+	"sources": [
+		"NativeTypes.ts"
+	],
+	"sourcesContent": [
+		"export const NativePointerEvent = null as unknown as InstanceType<typeof PointerEvent>\nexport type NativeEventTarget = EventTarget\nexport type NativeElement = Element\n"
+	],
+	"mappings": ";;;;;;AAAO,MAAMA,kBAAkB,GAAAC,OAAA,CAAAD,kBAAA,GAAG,IAAoD"
+}

@@ -1,0 +1,49 @@
+{
+	"version": 3,
+	"names": [
+		"_base",
+		"_interopRequireDefault",
+		"require",
+		"obj",
+		"__esModule",
+		"default",
+		"install",
+		"scope",
+		"defaults",
+		"usePlugin",
+		"basePlugin",
+		"perAction",
+		"hold",
+		"delay",
+		"getHoldDuration",
+		"interaction",
+		"actionName",
+		"prepared",
+		"name",
+		"options",
+		"interactable",
+		"id",
+		"listeners",
+		"interactions:new",
+		"autoStartHoldTimer",
+		"autoStart:prepared",
+		"setTimeout",
+		"start",
+		"element",
+		"interactions:move",
+		"duplicate",
+		"pointerWasMoved",
+		"clearTimeout",
+		"autoStart:before-start",
+		"holdDuration",
+		"_default",
+		"exports"
+	],
+	"sources": [
+		"hold.ts"
+	],
+	"sourcesContent": [
+		"import type Interaction from '@interactjs/core/Interaction'\nimport type { Scope, Plugin } from '@interactjs/core/scope'\n\n/* eslint-disable import/no-duplicates -- for typescript module augmentations */\nimport './base'\nimport basePlugin from './base'\n/* eslint-enable */\n\ndeclare module '@interactjs/core/options' {\n  interface PerActionDefaults {\n    hold?: number\n    delay?: number\n  }\n}\n\ndeclare module '@interactjs/core/Interaction' {\n  interface Interaction {\n    autoStartHoldTimer?: any\n  }\n}\n\nfunction install(scope: Scope) {\n  const { defaults } = scope\n\n  scope.usePlugin(basePlugin)\n\n  defaults.perAction.hold = 0\n  defaults.perAction.delay = 0\n}\n\nfunction getHoldDuration(interaction: Interaction) {\n  const actionName = interaction.prepared && interaction.prepared.name\n\n  if (!actionName) {\n    return null\n  }\n\n  const options = interaction.interactable.options\n\n  return options[actionName].hold || options[actionName].delay\n}\n\nconst hold: Plugin = {\n  id: 'auto-start/hold',\n  install,\n  listeners: {\n    'interactions:new': ({ interaction }) => {\n      interaction.autoStartHoldTimer = null\n    },\n\n    'autoStart:prepared': ({ interaction }) => {\n      const hold = getHoldDuration(interaction)\n\n      if (hold > 0) {\n        interaction.autoStartHoldTimer = setTimeout(() => {\n          interaction.start(interaction.prepared, interaction.interactable, interaction.element)\n        }, hold)\n      }\n    },\n\n    'interactions:move': ({ interaction, duplicate }) => {\n      if (interaction.autoStartHoldTimer && interaction.pointerWasMoved && !duplicate) {\n        clearTimeout(interaction.autoStartHoldTimer)\n        interaction.autoStartHoldTimer = null\n      }\n    },\n\n    // prevent regular down->move autoStart\n    'autoStart:before-start': ({ interaction }) => {\n      const holdDuration = getHoldDuration(interaction)\n\n      if (holdDuration > 0) {\n        interaction.prepared.name = null\n      }\n    },\n  },\n  getHoldDuration,\n}\nexport default hold\n"
+	],
+	"mappings": ";;;;;;AAIA,IAAAA,KAAA,GAAAC,sBAAA,CAAAC,OAAA;AAAe,SAAAD,uBAAAE,GAAA,WAAAA,GAAA,IAAAA,GAAA,CAAAC,UAAA,GAAAD,GAAA,KAAAE,OAAA,EAAAF,GAAA;AADf;;AAGA;;AAeA,SAASG,OAAOA,CAACC,KAAY,EAAE;EAC7B,MAAM;IAAEC;EAAS,CAAC,GAAGD,KAAK;EAE1BA,KAAK,CAACE,SAAS,CAACC,aAAU,CAAC;EAE3BF,QAAQ,CAACG,SAAS,CAACC,IAAI,GAAG,CAAC;EAC3BJ,QAAQ,CAACG,SAAS,CAACE,KAAK,GAAG,CAAC;AAC9B;AAEA,SAASC,eAAeA,CAACC,WAAwB,EAAE;EACjD,MAAMC,UAAU,GAAGD,WAAW,CAACE,QAAQ,IAAIF,WAAW,CAACE,QAAQ,CAACC,IAAI;EAEpE,IAAI,CAACF,UAAU,EAAE;IACf,OAAO,IAAI;EACb;EAEA,MAAMG,OAAO,GAAGJ,WAAW,CAACK,YAAY,CAACD,OAAO;EAEhD,OAAOA,OAAO,CAACH,UAAU,CAAC,CAACJ,IAAI,IAAIO,OAAO,CAACH,UAAU,CAAC,CAACH,KAAK;AAC9D;AAEA,MAAMD,IAAY,GAAG;EACnBS,EAAE,EAAE,iBAAiB;EACrBf,OAAO;EACPgB,SAAS,EAAE;IACT,kBAAkB,EAAEC,CAAC;MAAER;IAAY,CAAC,KAAK;MACvCA,WAAW,CAACS,kBAAkB,GAAG,IAAI;IACvC,CAAC;IAED,oBAAoB,EAAEC,CAAC;MAAEV;IAAY,CAAC,KAAK;MACzC,MAAMH,IAAI,GAAGE,eAAe,CAACC,WAAW,CAAC;MAEzC,IAAIH,IAAI,GAAG,CAAC,EAAE;QACZG,WAAW,CAACS,kBAAkB,GAAGE,UAAU,CAAC,MAAM;UAChDX,WAAW,CAACY,KAAK,CAACZ,WAAW,CAACE,QAAQ,EAAEF,WAAW,CAACK,YAAY,EAAEL,WAAW,CAACa,OAAO,CAAC;QACxF,CAAC,EAAEhB,IAAI,CAAC;MACV;IACF,CAAC;IAED,mBAAmB,EAAEiB,CAAC;MAAEd,WAAW;MAAEe;IAAU,CAAC,KAAK;MACnD,IAAIf,WAAW,CAACS,kBAAkB,IAAIT,WAAW,CAACgB,eAAe,IAAI,CAACD,SAAS,EAAE;QAC/EE,YAAY,CAACjB,WAAW,CAACS,kBAAkB,CAAC;QAC5CT,WAAW,CAACS,kBAAkB,GAAG,IAAI;MACvC;IACF,CAAC;IAED;IACA,wBAAwB,EAAES,CAAC;MAAElB;IAAY,CAAC,KAAK;MAC7C,MAAMmB,YAAY,GAAGpB,eAAe,CAACC,WAAW,CAAC;MAEjD,IAAImB,YAAY,GAAG,CAAC,EAAE;QACpBnB,WAAW,CAACE,QAAQ,CAACC,IAAI,GAAG,IAAI;MAClC;IACF;EACF,CAAC;EACDJ;AACF,CAAC;AAAA,IAAAqB,QAAA,GAAAC,OAAA,CAAA/B,OAAA,GACcO,IAAI"
+}

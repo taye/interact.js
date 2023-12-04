@@ -1,0 +1,2 @@
+Object.defineProperty(exports,"__esModule",{value:!0}),Object.defineProperty(exports,"default",{enumerable:!0,get:()=>r.default});var e,r=(e=require("../noop"))&&e.__esModule?e:{default:e};
+//# sourceMappingURL=rubberband.prod.js.map

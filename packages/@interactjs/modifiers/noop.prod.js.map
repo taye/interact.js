@@ -1,0 +1,16 @@
+{
+	"version": 3,
+	"names": [
+		"noop",
+		"_defaults",
+		"exports",
+		"default"
+	],
+	"sources": [
+		"noop.ts"
+	],
+	"sourcesContent": [
+		"import type { ModifierFunction } from './types'\n\nconst noop = (() => {}) as unknown as ModifierFunction<any, any, 'noop'>\n\nnoop._defaults = {}\n\nexport default noop\n"
+	],
+	"mappings": "8EAEA,MAAMA,EAAQA,OAEdA,EAAKC,UAAY,CAAC,EAACC,QAAAC,QAEJH"
+}

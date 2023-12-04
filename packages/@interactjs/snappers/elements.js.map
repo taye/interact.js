@@ -1,0 +1,15 @@
+{
+	"version": 3,
+	"names": [
+		"_default",
+		"exports",
+		"default"
+	],
+	"sources": [
+		"elements.ts"
+	],
+	"sourcesContent": [
+		"export default () => {}\n"
+	],
+	"mappings": ";;;;;;eAAeA,CAAA,KAAM,CAAC,CAAC;AAAAC,OAAA,CAAAC,OAAA,GAAAF,QAAA"
+}

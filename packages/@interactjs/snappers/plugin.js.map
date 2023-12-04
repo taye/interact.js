@@ -1,0 +1,51 @@
+{
+	"version": 3,
+	"names": [
+		"_extend",
+		"_interopRequireDefault",
+		"require",
+		"allSnappers",
+		"_interopRequireWildcard",
+		"_getRequireWildcardCache",
+		"e",
+		"WeakMap",
+		"r",
+		"t",
+		"__esModule",
+		"default",
+		"has",
+		"get",
+		"n",
+		"__proto__",
+		"a",
+		"Object",
+		"defineProperty",
+		"getOwnPropertyDescriptor",
+		"u",
+		"prototype",
+		"hasOwnProperty",
+		"call",
+		"i",
+		"set",
+		"obj",
+		"snappersPlugin",
+		"id",
+		"install",
+		"scope",
+		"interactStatic",
+		"interact",
+		"snappers",
+		"extend",
+		"createSnapGrid",
+		"grid",
+		"_default",
+		"exports"
+	],
+	"sources": [
+		"plugin.ts"
+	],
+	"sourcesContent": [
+		"import type { Plugin } from '@interactjs/core/scope'\nimport extend from '@interactjs/utils/extend'\n\nimport * as allSnappers from './all'\n\ndeclare module '@interactjs/core/InteractStatic' {\n  export interface InteractStatic {\n    snappers: typeof allSnappers\n    createSnapGrid: typeof allSnappers.grid\n  }\n}\n\nconst snappersPlugin: Plugin = {\n  id: 'snappers',\n  install(scope) {\n    const { interactStatic: interact } = scope\n\n    interact.snappers = extend(interact.snappers || {}, allSnappers)\n    interact.createSnapGrid = interact.snappers.grid\n  },\n}\n\nexport default snappersPlugin\n"
+	],
+	"mappings": ";;;;;;AACA,IAAAA,OAAA,GAAAC,sBAAA,CAAAC,OAAA;AAEA,IAAAC,WAAA,GAAAC,uBAAA,CAAAF,OAAA;AAAoC,SAAAG,yBAAAC,CAAA,6BAAAC,OAAA,mBAAAC,CAAA,OAAAD,OAAA,IAAAE,CAAA,OAAAF,OAAA,YAAAF,wBAAA,YAAAA,CAAAC,CAAA,WAAAA,CAAA,GAAAG,CAAA,GAAAD,CAAA,KAAAF,CAAA;AAAA,SAAAF,wBAAAE,CAAA,EAAAE,CAAA,SAAAA,CAAA,IAAAF,CAAA,IAAAA,CAAA,CAAAI,UAAA,SAAAJ,CAAA,eAAAA,CAAA,uBAAAA,CAAA,yBAAAA,CAAA,WAAAK,OAAA,EAAAL,CAAA,QAAAG,CAAA,GAAAJ,wBAAA,CAAAG,CAAA,OAAAC,CAAA,IAAAA,CAAA,CAAAG,GAAA,CAAAN,CAAA,UAAAG,CAAA,CAAAI,GAAA,CAAAP,CAAA,OAAAQ,CAAA,KAAAC,SAAA,UAAAC,CAAA,GAAAC,MAAA,CAAAC,cAAA,IAAAD,MAAA,CAAAE,wBAAA,WAAAC,CAAA,IAAAd,CAAA,oBAAAc,CAAA,IAAAH,MAAA,CAAAI,SAAA,CAAAC,cAAA,CAAAC,IAAA,CAAAjB,CAAA,EAAAc,CAAA,SAAAI,CAAA,GAAAR,CAAA,GAAAC,MAAA,CAAAE,wBAAA,CAAAb,CAAA,EAAAc,CAAA,UAAAI,CAAA,KAAAA,CAAA,CAAAX,GAAA,IAAAW,CAAA,CAAAC,GAAA,IAAAR,MAAA,CAAAC,cAAA,CAAAJ,CAAA,EAAAM,CAAA,EAAAI,CAAA,IAAAV,CAAA,CAAAM,CAAA,IAAAd,CAAA,CAAAc,CAAA,YAAAN,CAAA,CAAAH,OAAA,GAAAL,CAAA,EAAAG,CAAA,IAAAA,CAAA,CAAAgB,GAAA,CAAAnB,CAAA,EAAAQ,CAAA,GAAAA,CAAA;AAAA,SAAAb,uBAAAyB,GAAA,WAAAA,GAAA,IAAAA,GAAA,CAAAhB,UAAA,GAAAgB,GAAA,KAAAf,OAAA,EAAAe,GAAA;AASpC,MAAMC,cAAsB,GAAG;EAC7BC,EAAE,EAAE,UAAU;EACdC,OAAOA,CAACC,KAAK,EAAE;IACb,MAAM;MAAEC,cAAc,EAAEC;IAAS,CAAC,GAAGF,KAAK;IAE1CE,QAAQ,CAACC,QAAQ,GAAG,IAAAC,eAAM,EAACF,QAAQ,CAACC,QAAQ,IAAI,CAAC,CAAC,EAAE9B,WAAW,CAAC;IAChE6B,QAAQ,CAACG,cAAc,GAAGH,QAAQ,CAACC,QAAQ,CAACG,IAAI;EAClD;AACF,CAAC;AAAA,IAAAC,QAAA,GAAAC,OAAA,CAAA3B,OAAA,GAEcgB,cAAc"
+}

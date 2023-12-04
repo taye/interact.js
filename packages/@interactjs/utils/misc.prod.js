@@ -1,0 +1,2 @@
+Object.defineProperty(exports,"__esModule",{value:!0}),exports.copyAction=(e,n)=>(e.name=n.name,e.axis=n.axis,e.edges=n.edges,e),exports.sign=void 0,exports.warnOnce=function(n,o){let r=!1;return function(){return r||(e.window.console.warn(o),r=!0),n.apply(this,arguments)}};var e=require("./window");exports.sign=e=>e>=0?1:-1;
+//# sourceMappingURL=misc.prod.js.map

@@ -1,0 +1,34 @@
+{
+	"version": 3,
+	"names": [
+		"_isWindow",
+		"_interopRequireDefault",
+		"require",
+		"obj",
+		"__esModule",
+		"default",
+		"realWindow",
+		"exports",
+		"undefined",
+		"win",
+		"window",
+		"init",
+		"el",
+		"document",
+		"createTextNode",
+		"ownerDocument",
+		"wrap",
+		"getWindow",
+		"node",
+		"isWindow",
+		"rootNode",
+		"defaultView"
+	],
+	"sources": [
+		"window.ts"
+	],
+	"sourcesContent": [
+		"import isWindow from './isWindow'\n\nexport let realWindow = undefined as Window\n\nlet win = undefined as Window\nexport { win as window }\n\nexport function init(window: Window & { wrap?: (...args: any[]) => any }) {\n  // get wrapped window if using Shadow DOM polyfill\n\n  realWindow = window\n\n  // create a TextNode\n  const el = window.document.createTextNode('')\n\n  // check if it's wrapped by a polyfill\n  if (el.ownerDocument !== window.document && typeof window.wrap === 'function' && window.wrap(el) === el) {\n    // use wrapped window\n    window = window.wrap(window)\n  }\n\n  win = window\n}\n\nif (typeof window !== 'undefined' && !!window) {\n  init(window)\n}\n\nexport function getWindow(node: any) {\n  if (isWindow(node)) {\n    return node\n  }\n\n  const rootNode = node.ownerDocument || node\n\n  return rootNode.defaultView || win.window\n}\n"
+	],
+	"mappings": ";;;;;;;;AAAA,IAAAA,SAAA,GAAAC,sBAAA,CAAAC,OAAA;AAAiC,SAAAD,uBAAAE,GAAA,WAAAA,GAAA,IAAAA,GAAA,CAAAC,UAAA,GAAAD,GAAA,KAAAE,OAAA,EAAAF,GAAA;AAE1B,IAAIG,UAAU,GAAAC,OAAA,CAAAD,UAAA,GAAGE,SAAmB;AAE3C,IAAIC,GAAG,GAAAF,OAAA,CAAAG,MAAA,GAAGF,SAAmB;AAGtB,SAASG,IAAIA,CAACD,MAAmD,EAAE;EACxE;;EAEAH,OAAA,CAAAD,UAAA,GAAAA,UAAU,GAAGI,MAAM;;EAEnB;EACA,MAAME,EAAE,GAAGF,MAAM,CAACG,QAAQ,CAACC,cAAc,CAAC,EAAE,CAAC;;EAE7C;EACA,IAAIF,EAAE,CAACG,aAAa,KAAKL,MAAM,CAACG,QAAQ,IAAI,OAAOH,MAAM,CAACM,IAAI,KAAK,UAAU,IAAIN,MAAM,CAACM,IAAI,CAACJ,EAAE,CAAC,KAAKA,EAAE,EAAE;IACvG;IACAF,MAAM,GAAGA,MAAM,CAACM,IAAI,CAACN,MAAM,CAAC;EAC9B;EAEAH,OAAA,CAAAG,MAAA,GAAAD,GAAG,GAAGC,MAAM;AACd;AAEA,IAAI,OAAOA,MAAM,KAAK,WAAW,IAAI,CAAC,CAACA,MAAM,EAAE;EAC7CC,IAAI,CAACD,MAAM,CAAC;AACd;AAEO,SAASO,SAASA,CAACC,IAAS,EAAE;EACnC,IAAI,IAAAC,iBAAQ,EAACD,IAAI,CAAC,EAAE;IAClB,OAAOA,IAAI;EACb;EAEA,MAAME,QAAQ,GAAGF,IAAI,CAACH,aAAa,IAAIG,IAAI;EAE3C,OAAOE,QAAQ,CAACC,WAAW,IAAIZ,GAAG,CAACC,MAAM;AAC3C"
+}

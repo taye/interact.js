@@ -1,0 +1,2 @@
+Object.defineProperty(exports,"__esModule",{value:!0}),exports.default=(r,o,t)=>{const i=t&&r.options[t],n=i&&i.origin||r.options.origin,s=(0,e.resolveRectLike)(n,r,o,[r&&o]);return(0,e.rectToXY)(s)||{x:0,y:0}};var e=require("./rect");
+//# sourceMappingURL=getOriginXY.prod.js.map

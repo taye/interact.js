@@ -1,0 +1,2 @@
+Object.defineProperty(exports,"__esModule",{value:!0}),exports.PointerInfo=void 0,exports.PointerInfo=class{id;pointer;event;downTime;downTarget;constructor(e,t,o,i,n){this.id=e,this.pointer=t,this.event=o,this.downTime=i,this.downTarget=n}};
+//# sourceMappingURL=PointerInfo.prod.js.map

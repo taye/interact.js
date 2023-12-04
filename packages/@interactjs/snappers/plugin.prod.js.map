@@ -1,0 +1,49 @@
+{
+	"version": 3,
+	"names": [
+		"obj",
+		"_extendProd",
+		"require",
+		"__esModule",
+		"default",
+		"allSnappers",
+		"e",
+		"r",
+		"t",
+		"_getRequireWildcardCache",
+		"has",
+		"get",
+		"n",
+		"__proto__",
+		"a",
+		"Object",
+		"defineProperty",
+		"getOwnPropertyDescriptor",
+		"u",
+		"prototype",
+		"hasOwnProperty",
+		"call",
+		"i",
+		"set",
+		"_interopRequireWildcard",
+		"WeakMap",
+		"snappersPlugin",
+		"id",
+		"install",
+		"scope",
+		"interactStatic",
+		"interact",
+		"snappers",
+		"extend",
+		"createSnapGrid",
+		"grid",
+		"exports"
+	],
+	"sources": [
+		"plugin.ts"
+	],
+	"sourcesContent": [
+		"import type { Plugin } from '@interactjs/core/scope'\nimport extend from '@interactjs/utils/extend'\n\nimport * as allSnappers from './all'\n\ndeclare module '@interactjs/core/InteractStatic' {\n  export interface InteractStatic {\n    snappers: typeof allSnappers\n    createSnapGrid: typeof allSnappers.grid\n  }\n}\n\nconst snappersPlugin: Plugin = {\n  id: 'snappers',\n  install(scope) {\n    const { interactStatic: interact } = scope\n\n    interact.snappers = extend(interact.snappers || {}, allSnappers)\n    interact.createSnapGrid = interact.snappers.grid\n  },\n}\n\nexport default snappersPlugin\n"
+	],
+	"mappings": "8EACA,IAEoCA,EAFpCC,GAEoCD,EAFpCE,QAAA,6BAEoCF,EAAAG,WAAAH,EAAA,CAAAI,QAAAJ,GAApCK,EAAoC,EAAAC,EAAAC,KAAA,GAAAD,KAAAH,WAAA,OAAAG,EAAA,UAAAA,GAAA,iBAAAA,GAAA,mBAAAA,EAAA,OAAAF,QAAAE,GAAA,IAAAE,EAAAC,EAAAF,GAAA,GAAAC,KAAAE,IAAAJ,GAAA,OAAAE,EAAAG,IAAAL,GAAA,IAAAM,EAAA,CAAAC,UAAA,MAAAC,EAAAC,OAAAC,gBAAAD,OAAAE,yBAAA,QAAAC,KAAAZ,EAAA,eAAAY,GAAAH,OAAAI,UAAAC,eAAAC,KAAAf,EAAAY,GAAA,KAAAI,EAAAR,EAAAC,OAAAE,yBAAAX,EAAAY,GAAA,KAAAI,MAAAX,KAAAW,EAAAC,KAAAR,OAAAC,eAAAJ,EAAAM,EAAAI,GAAAV,EAAAM,GAAAZ,EAAAY,EAAA,QAAAN,EAAAR,QAAAE,EAAAE,KAAAe,IAAAjB,EAAAM,IAAA,EAApCY,CAAAtB,QAAA,UAAoC,SAAAO,EAAAH,GAAA,sBAAAmB,QAAA,gBAAAlB,EAAA,IAAAkB,QAAAjB,EAAA,IAAAiB,QAAA,OAAAhB,EAAAH,KAAAE,EAAAD,GAAAD,EAAA,CASpC,MAAMoB,EAAyB,CAC7BC,GAAI,WACJC,QAAQC,GACN,MAAQC,eAAgBC,GAAaF,EAErCE,EAASC,UAAW,EAAAC,WAAOF,EAASC,UAAY,CAAC,EAAG3B,GACpD0B,EAASG,eAAiBH,EAASC,SAASG,IAC9C,GACDC,QAAAhC,QAEcsB"
+}

@@ -1,0 +1,2 @@
+Object.defineProperty(exports,"__esModule",{value:!0}),exports.restrictRect=exports.default=void 0;var e,t=(e=require("../../utils/extend.prod.js"))&&e.__esModule?e:{default:e},r=require("../base"),s=require("./pointer");const i=(0,t.default)({get elementRect(){return{top:0,left:0,bottom:1,right:1}},set elementRect(e){}},s.restrict.defaults),o=exports.restrictRect={start:s.restrict.start,set:s.restrict.set,defaults:i};exports.default=(0,r.makeModifier)(o,"restrictRect");
+//# sourceMappingURL=rect.prod.js.map

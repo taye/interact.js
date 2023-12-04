@@ -1,0 +1,21 @@
+{
+	"version": 3,
+	"names": [
+		"obj",
+		"_indexProd",
+		"require",
+		"__esModule",
+		"default",
+		"exports",
+		"interact",
+		"module",
+		"_unused"
+	],
+	"sources": [
+		"index.ts"
+	],
+	"sourcesContent": [
+		"// eslint-disable-next-line import/no-extraneous-dependencies\nimport interact from '@interactjs/interactjs'\n\nexport default interact\n\nif (typeof module === 'object' && !!module) {\n  try {\n    module.exports = interact\n  } catch {}\n}\n\n;(interact as any).default = interact\n"
+	],
+	"mappings": "8EACA,IAA6CA,EAA7CC,GAA6CD,EAA7CE,QAAA,6CAA6CF,EAAAG,WAAAH,EAAA,CAAAI,QAAAJ,GAI7C,GALAK,QAAAD,QAGeE,UAEO,iBAAXC,QAAyBA,OAClC,IACEA,OAAOF,QAAUC,SACnB,CAAE,MAAAE,GAAO,CAGTF,UAAiBF,QAAUE"
+}

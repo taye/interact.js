@@ -1,0 +1,2 @@
+Object.defineProperty(exports,"__esModule",{value:!0}),exports.default=(e,r)=>{if(r.phaselessTypes[e])return!0;for(const s in r.map)if(0===e.indexOf(s)&&e.substr(s.length)in r.phases)return!0;return!1};
+//# sourceMappingURL=isNonNativeEvent.prod.js.map

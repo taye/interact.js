@@ -1,0 +1,31 @@
+{
+	"version": 3,
+	"names": [
+		"node",
+		"isWindow",
+		"ownerDocument",
+		"defaultView",
+		"win",
+		"window",
+		"obj",
+		"_isWindow",
+		"require",
+		"__esModule",
+		"default",
+		"realWindow",
+		"exports",
+		"undefined",
+		"init",
+		"el",
+		"document",
+		"createTextNode",
+		"wrap"
+	],
+	"sources": [
+		"window.ts"
+	],
+	"sourcesContent": [
+		"import isWindow from './isWindow'\n\nexport let realWindow = undefined as Window\n\nlet win = undefined as Window\nexport { win as window }\n\nexport function init(window: Window & { wrap?: (...args: any[]) => any }) {\n  // get wrapped window if using Shadow DOM polyfill\n\n  realWindow = window\n\n  // create a TextNode\n  const el = window.document.createTextNode('')\n\n  // check if it's wrapped by a polyfill\n  if (el.ownerDocument !== window.document && typeof window.wrap === 'function' && window.wrap(el) === el) {\n    // use wrapped window\n    window = window.wrap(window)\n  }\n\n  win = window\n}\n\nif (typeof window !== 'undefined' && !!window) {\n  init(window)\n}\n\nexport function getWindow(node: any) {\n  if (isWindow(node)) {\n    return node\n  }\n\n  const rootNode = node.ownerDocument || node\n\n  return rootNode.defaultView || win.window\n}\n"
+	],
+	"mappings": "yEA4B0BA,IACpB,EAAAC,WAASD,GACJA,GAGQA,EAAKE,eAAiBF,GAEvBG,aAAeC,EAAIC,O,wDAnCrC,IAAiCC,EAAjCC,GAAiCD,EAAjCE,QAAA,gBAAiCF,EAAAG,WAAAH,EAAA,CAAAI,QAAAJ,GAE1B,IAAIK,EAAUC,QAAAD,gBAAGE,EAEpBT,EAAGQ,QAAAP,YAAGQ,EAGH,SAASC,EAAKT,GAGnBO,QAAAD,aAAaN,EAGb,MAAMU,EAAKV,EAAOW,SAASC,eAAe,IAGtCF,EAAGb,gBAAkBG,EAAOW,UAAmC,mBAAhBX,EAAOa,MAAuBb,EAAOa,KAAKH,KAAQA,IAEnGV,EAASA,EAAOa,KAAKb,IAGvBO,QAAAP,OAAAD,EAAMC,CACR,CAEsB,oBAAXA,QAA4BA,QACrCS,EAAKT"
+}

@@ -1,0 +1,29 @@
+{
+	"version": 3,
+	"names": [
+		"exports",
+		"contains",
+		"array",
+		"target",
+		"indexOf",
+		"remove",
+		"splice",
+		"merge",
+		"source",
+		"item",
+		"push",
+		"from",
+		"findIndex",
+		"func",
+		"i",
+		"length",
+		"find"
+	],
+	"sources": [
+		"arr.ts"
+	],
+	"sourcesContent": [
+		"type Filter<T> = (element: T, index: number, array: T[]) => boolean\n\nexport const contains = <T>(array: T[], target: T) => array.indexOf(target) !== -1\n\nexport const remove = <T>(array: T[], target: T) => array.splice(array.indexOf(target), 1)\n\nexport const merge = <T, U>(target: Array<T | U>, source: U[]) => {\n  for (const item of source) {\n    target.push(item)\n  }\n\n  return target\n}\n\nexport const from = <T = any>(source: ArrayLike<T>) => merge([] as T[], source as T[])\n\nexport const findIndex = <T>(array: T[], func: Filter<T>) => {\n  for (let i = 0; i < array.length; i++) {\n    if (func(array[i], i, array)) {\n      return i\n    }\n  }\n\n  return -1\n}\n\nexport const find = <T = any>(array: T[], func: Filter<T>): T | undefined => array[findIndex(array, func)]\n"
+	],
+	"mappings": "wJAEkFA,QAAAC,SAA1DA,CAAIC,EAAYC,KAAyC,IAA3BD,EAAME,QAAQD,GAEsBH,QAAAK,OAApEA,CAAIH,EAAYC,IAAcD,EAAMI,OAAOJ,EAAME,QAAQD,GAAS,GAEjF,MAAMI,EAAQA,CAAOJ,EAAsBK,KAChD,IAAK,MAAMC,KAAQD,EACjBL,EAAOO,KAAKD,GAGd,OAAON,CAAM,EACdH,QAAAO,QAEqFP,QAAAW,KAAxDH,GAAyBD,EAAM,GAAWC,GAEjE,MAAMI,EAAYA,CAAIV,EAAYW,KACvC,IAAK,IAAIC,EAAI,EAAGA,EAAIZ,EAAMa,OAAQD,IAChC,GAAID,EAAKX,EAAMY,GAAIA,EAAGZ,GACpB,OAAOY,EAIX,OAAQ,CAAC,EACVd,QAAAY,YAEyGZ,QAAAgB,KAAtFA,CAAUd,EAAYW,IAAmCX,EAAMU,EAAUV,EAAOW"
+}

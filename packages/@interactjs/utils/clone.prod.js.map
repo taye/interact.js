@@ -1,0 +1,47 @@
+{
+	"version": 3,
+	"names": [
+		"clone",
+		"source",
+		"dest",
+		"prop",
+		"value",
+		"is",
+		"plainObject",
+		"array",
+		"arr",
+		"from",
+		"obj",
+		"e",
+		"r",
+		"__esModule",
+		"default",
+		"t",
+		"_getRequireWildcardCache",
+		"has",
+		"get",
+		"n",
+		"__proto__",
+		"a",
+		"Object",
+		"defineProperty",
+		"getOwnPropertyDescriptor",
+		"u",
+		"prototype",
+		"hasOwnProperty",
+		"call",
+		"i",
+		"set",
+		"_interopRequireWildcard",
+		"require",
+		"_is",
+		"WeakMap"
+	],
+	"sources": [
+		"clone.ts"
+	],
+	"sourcesContent": [
+		"import * as arr from './arr'\nimport is from './is'\n\n// tslint:disable-next-line ban-types\nexport default function clone<T extends Object>(source: T): Partial<T> {\n  const dest = {} as Partial<T>\n\n  for (const prop in source) {\n    const value = source[prop]\n\n    if (is.plainObject(value)) {\n      dest[prop] = clone(value) as any\n    } else if (is.array(value)) {\n      dest[prop] = arr.from(value) as typeof value\n    } else {\n      dest[prop] = value\n    }\n  }\n\n  return dest\n}\n"
+	],
+	"mappings": "uEAIe,SAASA,EAAwBC,GAC9C,MAAMC,EAAO,CAAC,EAEd,IAAK,MAAMC,KAAQF,EAAQ,CACzB,MAAMG,EAAQH,EAAOE,GAEjBE,UAAGC,YAAYF,GACjBF,EAAKC,GAAQH,EAAMI,GACVC,UAAGE,MAAMH,GAClBF,EAAKC,GAAQK,EAAIC,KAAKL,GAEtBF,EAAKC,GAAQC,CAEjB,CAEA,OAAOF,CACT,EApBA,IACqBQ,EADrBF,EACqB,EAAAG,EAAAC,KAAA,GAAAD,KAAAE,WAAA,OAAAF,EAAA,UAAAA,GAAA,iBAAAA,GAAA,mBAAAA,EAAA,OAAAG,QAAAH,GAAA,IAAAI,EAAAC,EAAAJ,GAAA,GAAAG,KAAAE,IAAAN,GAAA,OAAAI,EAAAG,IAAAP,GAAA,IAAAQ,EAAA,CAAAC,UAAA,MAAAC,EAAAC,OAAAC,gBAAAD,OAAAE,yBAAA,QAAAC,KAAAd,EAAA,eAAAc,GAAAH,OAAAI,UAAAC,eAAAC,KAAAjB,EAAAc,GAAA,KAAAI,EAAAR,EAAAC,OAAAE,yBAAAb,EAAAc,GAAA,KAAAI,MAAAX,KAAAW,EAAAC,KAAAR,OAAAC,eAAAJ,EAAAM,EAAAI,GAAAV,EAAAM,GAAAd,EAAAc,EAAA,QAAAN,EAAAL,QAAAH,EAAAI,KAAAe,IAAAnB,EAAAQ,IAAA,EADrBY,CAAAC,QAAA,UACAC,GAAqBvB,EAArBsB,QAAA,UAAqBtB,EAAAG,WAAAH,EAAA,CAAAI,QAAAJ,GAAA,SAAAM,EAAAL,GAAA,sBAAAuB,QAAA,gBAAAtB,EAAA,IAAAsB,QAAAnB,EAAA,IAAAmB,QAAA,OAAAlB,EAAAL,KAAAI,EAAAH,GAAAD,EAAA"
+}

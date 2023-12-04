@@ -1,0 +1,30 @@
+{
+	"version": 3,
+	"names": [
+		"_plugin",
+		"_interopRequireDefault",
+		"require",
+		"_plugin2",
+		"_plugin3",
+		"_plugin4",
+		"obj",
+		"__esModule",
+		"default",
+		"exports",
+		"id",
+		"install",
+		"scope",
+		"usePlugin",
+		"gesture",
+		"resize",
+		"drag",
+		"drop"
+	],
+	"sources": [
+		"plugin.ts"
+	],
+	"sourcesContent": [
+		"import type { Scope } from '@interactjs/core/scope'\n\n/* eslint-disable import/no-duplicates -- for typescript module augmentations */\nimport './drag/plugin'\nimport './drop/plugin'\nimport './gesture/plugin'\nimport './resize/plugin'\n\nimport drag from './drag/plugin'\nimport drop from './drop/plugin'\nimport gesture from './gesture/plugin'\nimport resize from './resize/plugin'\n/* eslint-enable import/no-duplicates */\n\nexport default {\n  id: 'actions',\n  install(scope: Scope) {\n    scope.usePlugin(gesture)\n    scope.usePlugin(resize)\n    scope.usePlugin(drag)\n    scope.usePlugin(drop)\n  },\n}\n"
+	],
+	"mappings": "8EAGA,IAAAA,EAAAC,EAAAC,QAAA,kBACAC,EAAAF,EAAAC,QAAA,kBACAE,EAAAH,EAAAC,QAAA,qBACAG,EAAAJ,EAAAC,QAAA,oBAAwB,SAAAD,EAAAK,GAAA,OAAAA,KAAAC,WAAAD,EAAA,CAAAE,QAAAF,EAAA,CAMxBG,QAAAD,QAEe,CACbE,GAAI,UACJC,QAAQC,GACNA,EAAMC,UAAUC,WAChBF,EAAMC,UAAUE,WAChBH,EAAMC,UAAUG,WAChBJ,EAAMC,UAAUI,UAClB"
+}

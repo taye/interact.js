@@ -1,0 +1,37 @@
+{
+	"version": 3,
+	"names": [
+		"_plugin",
+		"_interopRequireDefault",
+		"require",
+		"_all",
+		"_base",
+		"obj",
+		"__esModule",
+		"default",
+		"modifiers",
+		"id",
+		"install",
+		"scope",
+		"interactStatic",
+		"interact",
+		"usePlugin",
+		"base",
+		"snappers",
+		"all",
+		"type",
+		"_defaults",
+		"_methods",
+		"defaults",
+		"perAction",
+		"_default",
+		"exports"
+	],
+	"sources": [
+		"plugin.ts"
+	],
+	"sourcesContent": [
+		"import type { Plugin } from '@interactjs/core/scope'\nimport snappers from '@interactjs/snappers/plugin'\n\n/* eslint-disable import/no-duplicates -- for typescript module augmentations */\nimport './all'\nimport './base'\n\nimport all from './all'\nimport base from './base'\n/* eslint-enable import/no-duplicates */\n\ndeclare module '@interactjs/core/InteractStatic' {\n  export interface InteractStatic {\n    modifiers: typeof all\n  }\n}\n\nconst modifiers: Plugin = {\n  id: 'modifiers',\n  install(scope) {\n    const { interactStatic: interact } = scope\n\n    scope.usePlugin(base)\n    scope.usePlugin(snappers)\n\n    interact.modifiers = all\n\n    // for backwrads compatibility\n    for (const type in all) {\n      const { _defaults, _methods } = all[type as keyof typeof all]\n\n      ;(_defaults as any)._methods = _methods\n      ;(scope.defaults.perAction as any)[type] = _defaults\n    }\n  },\n}\n\nexport default modifiers\n"
+	],
+	"mappings": ";;;;;;AACA,IAAAA,OAAA,GAAAC,sBAAA,CAAAC,OAAA;AAGA,IAAAC,IAAA,GAAAF,sBAAA,CAAAC,OAAA;AACA,IAAAE,KAAA,GAAAH,sBAAA,CAAAC,OAAA;AAAe,SAAAD,uBAAAI,GAAA,WAAAA,GAAA,IAAAA,GAAA,CAAAC,UAAA,GAAAD,GAAA,KAAAE,OAAA,EAAAF,GAAA;AAFf;;AAMA;;AAQA,MAAMG,SAAiB,GAAG;EACxBC,EAAE,EAAE,WAAW;EACfC,OAAOA,CAACC,KAAK,EAAE;IACb,MAAM;MAAEC,cAAc,EAAEC;IAAS,CAAC,GAAGF,KAAK;IAE1CA,KAAK,CAACG,SAAS,CAACC,aAAI,CAAC;IACrBJ,KAAK,CAACG,SAAS,CAACE,eAAQ,CAAC;IAEzBH,QAAQ,CAACL,SAAS,GAAGS,YAAG;;IAExB;IACA,KAAK,MAAMC,IAAI,IAAID,YAAG,EAAE;MACtB,MAAM;QAAEE,SAAS;QAAEC;MAAS,CAAC,GAAGH,YAAG,CAACC,IAAI,CAAqB;MAE3DC,SAAS,CAASC,QAAQ,GAAGA,QAAQ;MACrCT,KAAK,CAACU,QAAQ,CAACC,SAAS,CAASJ,IAAI,CAAC,GAAGC,SAAS;IACtD;EACF;AACF,CAAC;AAAA,IAAAI,QAAA,GAAAC,OAAA,CAAAjB,OAAA,GAEcC,SAAS"
+}

@@ -1,0 +1,34 @@
+{
+	"version": 3,
+	"names": [
+		"request",
+		"cancel",
+		"lastTime",
+		"exports",
+		"default",
+		"callback",
+		"token",
+		"init",
+		"global",
+		"requestAnimationFrame",
+		"cancelAnimationFrame",
+		"vendors",
+		"vendor",
+		"bind",
+		"currTime",
+		"Date",
+		"now",
+		"timeToCall",
+		"Math",
+		"max",
+		"setTimeout",
+		"clearTimeout"
+	],
+	"sources": [
+		"raf.ts"
+	],
+	"sourcesContent": [
+		"let lastTime = 0\nlet request: typeof requestAnimationFrame\nlet cancel: typeof cancelAnimationFrame\n\nfunction init(global: Window | typeof globalThis) {\n  request = global.requestAnimationFrame\n  cancel = global.cancelAnimationFrame\n\n  if (!request) {\n    const vendors = ['ms', 'moz', 'webkit', 'o']\n\n    for (const vendor of vendors) {\n      request = global[`${vendor}RequestAnimationFrame` as 'requestAnimationFrame']\n      cancel =\n        global[`${vendor}CancelAnimationFrame` as 'cancelAnimationFrame'] ||\n        global[`${vendor}CancelRequestAnimationFrame` as 'cancelAnimationFrame']\n    }\n  }\n\n  request = request && request.bind(global)\n  cancel = cancel && cancel.bind(global)\n\n  if (!request) {\n    request = (callback) => {\n      const currTime = Date.now()\n      const timeToCall = Math.max(0, 16 - (currTime - lastTime))\n      const token = global.setTimeout(() => {\n        // eslint-disable-next-line n/no-callback-literal\n        callback(currTime + timeToCall)\n      }, timeToCall)\n\n      lastTime = currTime + timeToCall\n      return token as any\n    }\n\n    cancel = (token) => clearTimeout(token)\n  }\n}\n\nexport default {\n  request: (callback: FrameRequestCallback) => request(callback),\n  cancel: (token: number) => cancel(token),\n  init,\n}\n"
+	],
+	"mappings": "8EAAA,IACIA,EACAC,EAFAC,EAAW,EAqCdC,QAAAC,QAEc,CACbJ,QAAUK,GAAmCL,EAAQK,GACrDJ,OAASK,GAAkBL,EAAOK,GAClCC,KAtCYC,GAIZ,GAHAR,EAAUQ,EAAOC,sBACjBR,EAASO,EAAOE,sBAEXV,EAAS,CACZ,MAAMW,EAAU,CAAC,KAAM,MAAO,SAAU,KAExC,IAAK,MAAMC,KAAUD,EACnBX,EAAUQ,EAAUI,EAAF,yBAClBX,EACEO,EAAUI,EAAF,yBACRJ,EAAUI,EAAF,8BAEd,CAEAZ,EAAUA,GAAWA,EAAQa,KAAKL,GAClCP,EAASA,GAAUA,EAAOY,KAAKL,GAE1BR,IACHA,EAAWK,IACT,MAAMS,EAAWC,KAAKC,MAChBC,EAAaC,KAAKC,IAAI,EAAG,IAAML,EAAWZ,IAC1CI,EAAQE,EAAOY,YAAW,KAE9Bf,EAASS,EAAWG,EAAW,GAC9BA,GAGH,OADAf,EAAWY,EAAWG,EACfX,CAAK,EAGdL,EAAUK,GAAUe,aAAaf,GAErC"
+}

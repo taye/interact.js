@@ -1,0 +1,40 @@
+{
+	"version": 3,
+	"names": [
+		"_is",
+		"_interopRequireDefault",
+		"require",
+		"obj",
+		"__esModule",
+		"default",
+		"normalize",
+		"type",
+		"listeners",
+		"filter",
+		"_typeOrPrefix",
+		"result",
+		"is",
+		"string",
+		"search",
+		"split",
+		"array",
+		"forEach",
+		"t",
+		"object",
+		"func",
+		"push",
+		"l",
+		"prefix",
+		"combinedTypes",
+		"map",
+		"p",
+		"trim"
+	],
+	"sources": [
+		"normalizeListeners.ts"
+	],
+	"sourcesContent": [
+		"import type { EventTypes, Listener, ListenersArg } from '@interactjs/core/types'\n\nimport is from './is'\n\nexport interface NormalizedListeners {\n  [type: string]: Listener[]\n}\n\nexport default function normalize(\n  type: EventTypes,\n  listeners?: ListenersArg | ListenersArg[] | null,\n  filter = (_typeOrPrefix: string) => true,\n  result?: NormalizedListeners,\n): NormalizedListeners {\n  result = result || {}\n\n  if (is.string(type) && type.search(' ') !== -1) {\n    type = split(type)\n  }\n\n  if (is.array(type)) {\n    type.forEach((t) => normalize(t, listeners, filter, result))\n    return result\n  }\n\n  // before:  type = [{ drag: () => {} }], listeners = undefined\n  // after:   type = ''                  , listeners = [{ drag: () => {} }]\n  if (is.object(type)) {\n    listeners = type\n    type = ''\n  }\n\n  if (is.func(listeners) && filter(type)) {\n    result[type] = result[type] || []\n    result[type].push(listeners)\n  } else if (is.array(listeners)) {\n    for (const l of listeners) {\n      normalize(type, l, filter, result)\n    }\n  } else if (is.object(listeners)) {\n    for (const prefix in listeners) {\n      const combinedTypes = split(prefix).map((p) => `${type}${p}`)\n\n      normalize(combinedTypes, listeners[prefix], filter, result)\n    }\n  }\n\n  return result as NormalizedListeners\n}\n\nfunction split(type: string) {\n  return type.trim().split(/ +/)\n}\n"
+	],
+	"mappings": ";;;;;;AAEA,IAAAA,GAAA,GAAAC,sBAAA,CAAAC,OAAA;AAAqB,SAAAD,uBAAAE,GAAA,WAAAA,GAAA,IAAAA,GAAA,CAAAC,UAAA,GAAAD,GAAA,KAAAE,OAAA,EAAAF,GAAA;AAMN,SAASG,SAASA,CAC/BC,IAAgB,EAChBC,SAAgD,EAChDC,MAAM,GAAIC,aAAqB,IAAK,IAAI,EACxCC,MAA4B,EACP;EACrBA,MAAM,GAAGA,MAAM,IAAI,CAAC,CAAC;EAErB,IAAIC,WAAE,CAACC,MAAM,CAACN,IAAI,CAAC,IAAIA,IAAI,CAACO,MAAM,CAAC,GAAG,CAAC,KAAK,CAAC,CAAC,EAAE;IAC9CP,IAAI,GAAGQ,KAAK,CAACR,IAAI,CAAC;EACpB;EAEA,IAAIK,WAAE,CAACI,KAAK,CAACT,IAAI,CAAC,EAAE;IAClBA,IAAI,CAACU,OAAO,CAAEC,CAAC,IAAKZ,SAAS,CAACY,CAAC,EAAEV,SAAS,EAAEC,MAAM,EAAEE,MAAM,CAAC,CAAC;IAC5D,OAAOA,MAAM;EACf;;EAEA;EACA;EACA,IAAIC,WAAE,CAACO,MAAM,CAACZ,IAAI,CAAC,EAAE;IACnBC,SAAS,GAAGD,IAAI;IAChBA,IAAI,GAAG,EAAE;EACX;EAEA,IAAIK,WAAE,CAACQ,IAAI,CAACZ,SAAS,CAAC,IAAIC,MAAM,CAACF,IAAI,CAAC,EAAE;IACtCI,MAAM,CAACJ,IAAI,CAAC,GAAGI,MAAM,CAACJ,IAAI,CAAC,IAAI,EAAE;IACjCI,MAAM,CAACJ,IAAI,CAAC,CAACc,IAAI,CAACb,SAAS,CAAC;EAC9B,CAAC,MAAM,IAAII,WAAE,CAACI,KAAK,CAACR,SAAS,CAAC,EAAE;IAC9B,KAAK,MAAMc,CAAC,IAAId,SAAS,EAAE;MACzBF,SAAS,CAACC,IAAI,EAAEe,CAAC,EAAEb,MAAM,EAAEE,MAAM,CAAC;IACpC;EACF,CAAC,MAAM,IAAIC,WAAE,CAACO,MAAM,CAACX,SAAS,CAAC,EAAE;IAC/B,KAAK,MAAMe,MAAM,IAAIf,SAAS,EAAE;MAC9B,MAAMgB,aAAa,GAAGT,KAAK,CAACQ,MAAM,CAAC,CAACE,GAAG,CAAEC,CAAC,IAAM,GAAEnB,IAAK,GAAEmB,CAAE,EAAC,CAAC;MAE7DpB,SAAS,CAACkB,aAAa,EAAEhB,SAAS,CAACe,MAAM,CAAC,EAAEd,MAAM,EAAEE,MAAM,CAAC;IAC7D;EACF;EAEA,OAAOA,MAAM;AACf;AAEA,SAASI,KAAKA,CAACR,IAAY,EAAE;EAC3B,OAAOA,IAAI,CAACoB,IAAI,CAAC,CAAC,CAACZ,KAAK,CAAC,IAAI,CAAC;AAChC"
+}

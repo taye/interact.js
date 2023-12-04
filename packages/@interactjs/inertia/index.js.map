@@ -1,0 +1,22 @@
+{
+	"version": 3,
+	"names": [
+		"_plugin",
+		"_interopRequireDefault",
+		"require",
+		"_index",
+		"obj",
+		"__esModule",
+		"default",
+		"interact",
+		"use",
+		"plugin"
+	],
+	"sources": [
+		"index.ts"
+	],
+	"sourcesContent": [
+		"/* eslint-disable no-console, eol-last, import/no-duplicates,  import/no-extraneous-dependencies, import/order */\nimport '@interactjs/inertia/plugin'\nimport interact from '@interactjs/interact/index'\nimport plugin from '@interactjs/inertia/plugin'\ninteract.use(plugin)"
+	],
+	"mappings": ";;AACA,IAAAA,OAAA,GAAAC,sBAAA,CAAAC,OAAA;AACA,IAAAC,MAAA,GAAAF,sBAAA,CAAAC,OAAA;AAAiD,SAAAD,uBAAAG,GAAA,WAAAA,GAAA,IAAAA,GAAA,CAAAC,UAAA,GAAAD,GAAA,KAAAE,OAAA,EAAAF,GAAA;AAFjD;;AAIAG,cAAQ,CAACC,GAAG,CAACC,eAAM,CAAC"
+}

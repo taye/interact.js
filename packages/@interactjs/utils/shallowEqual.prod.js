@@ -1,0 +1,2 @@
+Object.defineProperty(exports,"__esModule",{value:!0}),exports.default=(e,t)=>{if(e===t)return!0;if(!e||!t)return!1;const r=Object.keys(e);if(r.length!==Object.keys(t).length)return!1;for(const n of r)if(e[n]!==t[n])return!1;return!0};
+//# sourceMappingURL=shallowEqual.prod.js.map

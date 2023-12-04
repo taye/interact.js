@@ -1,0 +1,2 @@
+Object.defineProperty(exports,"__esModule",{value:!0}),exports.default=void 0;var e=r(require("./base")),u=r(require("./dragAxis")),t=r(require("./hold"));function r(e){return e&&e.__esModule?e:{default:e}}exports.default={id:"auto-start",install(r){r.usePlugin(e.default),r.usePlugin(t.default),r.usePlugin(u.default)}};
+//# sourceMappingURL=plugin.prod.js.map

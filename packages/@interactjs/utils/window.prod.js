@@ -1,0 +1,2 @@
+Object.defineProperty(exports,"__esModule",{value:!0}),exports.getWindow=e=>(0,o.default)(e)?e:(e.ownerDocument||e).defaultView||n.window,exports.init=d,exports.window=exports.realWindow=void 0;var e,o=(e=require("./isWindow"))&&e.__esModule?e:{default:e};let t=exports.realWindow=void 0,n=exports.window=void 0;function d(e){exports.realWindow=t=e;const o=e.document.createTextNode("");o.ownerDocument!==e.document&&"function"==typeof e.wrap&&e.wrap(o)===o&&(e=e.wrap(e)),exports.window=n=e}"undefined"!=typeof window&&window&&d(window);
+//# sourceMappingURL=window.prod.js.map

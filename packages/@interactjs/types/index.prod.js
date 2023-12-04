@@ -1,0 +1,2 @@
+Object.defineProperty(exports,"__esModule",{value:!0}),require("../interactjs/index.prod.js");var e=require("../core/types.prod.js");Object.keys(e).forEach((r=>{"default"!==r&&"__esModule"!==r&&(r in exports&&exports[r]===e[r]||Object.defineProperty(exports,r,{enumerable:!0,get:()=>e[r]}))}));
+//# sourceMappingURL=index.prod.js.map

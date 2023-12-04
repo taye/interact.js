@@ -1,0 +1,2 @@
+Object.defineProperty(exports,"__esModule",{value:!0}),exports.remove=exports.merge=exports.from=exports.findIndex=exports.find=exports.contains=void 0,exports.contains=(e,r)=>-1!==e.indexOf(r),exports.remove=(e,r)=>e.splice(e.indexOf(r),1);const e=(e,r)=>{for(const o of r)e.push(o);return e};exports.merge=e,exports.from=r=>e([],r);const r=(e,r)=>{for(let o=0;o<e.length;o++)if(r(e[o],o,e))return o;return-1};exports.findIndex=r,exports.find=(e,o)=>e[r(e,o)];
+//# sourceMappingURL=arr.prod.js.map

@@ -1,0 +1,48 @@
+{
+	"version": 3,
+	"names": [
+		"arr",
+		"_interopRequireWildcard",
+		"require",
+		"_is",
+		"_interopRequireDefault",
+		"obj",
+		"__esModule",
+		"default",
+		"_getRequireWildcardCache",
+		"e",
+		"WeakMap",
+		"r",
+		"t",
+		"has",
+		"get",
+		"n",
+		"__proto__",
+		"a",
+		"Object",
+		"defineProperty",
+		"getOwnPropertyDescriptor",
+		"u",
+		"prototype",
+		"hasOwnProperty",
+		"call",
+		"i",
+		"set",
+		"clone",
+		"source",
+		"dest",
+		"prop",
+		"value",
+		"is",
+		"plainObject",
+		"array",
+		"from"
+	],
+	"sources": [
+		"clone.ts"
+	],
+	"sourcesContent": [
+		"import * as arr from './arr'\nimport is from './is'\n\n// tslint:disable-next-line ban-types\nexport default function clone<T extends Object>(source: T): Partial<T> {\n  const dest = {} as Partial<T>\n\n  for (const prop in source) {\n    const value = source[prop]\n\n    if (is.plainObject(value)) {\n      dest[prop] = clone(value) as any\n    } else if (is.array(value)) {\n      dest[prop] = arr.from(value) as typeof value\n    } else {\n      dest[prop] = value\n    }\n  }\n\n  return dest\n}\n"
+	],
+	"mappings": ";;;;;;AAAA,IAAAA,GAAA,GAAAC,uBAAA,CAAAC,OAAA;AACA,IAAAC,GAAA,GAAAC,sBAAA,CAAAF,OAAA;AAAqB,SAAAE,uBAAAC,GAAA,WAAAA,GAAA,IAAAA,GAAA,CAAAC,UAAA,GAAAD,GAAA,KAAAE,OAAA,EAAAF,GAAA;AAAA,SAAAG,yBAAAC,CAAA,6BAAAC,OAAA,mBAAAC,CAAA,OAAAD,OAAA,IAAAE,CAAA,OAAAF,OAAA,YAAAF,wBAAA,YAAAA,CAAAC,CAAA,WAAAA,CAAA,GAAAG,CAAA,GAAAD,CAAA,KAAAF,CAAA;AAAA,SAAAR,wBAAAQ,CAAA,EAAAE,CAAA,SAAAA,CAAA,IAAAF,CAAA,IAAAA,CAAA,CAAAH,UAAA,SAAAG,CAAA,eAAAA,CAAA,uBAAAA,CAAA,yBAAAA,CAAA,WAAAF,OAAA,EAAAE,CAAA,QAAAG,CAAA,GAAAJ,wBAAA,CAAAG,CAAA,OAAAC,CAAA,IAAAA,CAAA,CAAAC,GAAA,CAAAJ,CAAA,UAAAG,CAAA,CAAAE,GAAA,CAAAL,CAAA,OAAAM,CAAA,KAAAC,SAAA,UAAAC,CAAA,GAAAC,MAAA,CAAAC,cAAA,IAAAD,MAAA,CAAAE,wBAAA,WAAAC,CAAA,IAAAZ,CAAA,oBAAAY,CAAA,IAAAH,MAAA,CAAAI,SAAA,CAAAC,cAAA,CAAAC,IAAA,CAAAf,CAAA,EAAAY,CAAA,SAAAI,CAAA,GAAAR,CAAA,GAAAC,MAAA,CAAAE,wBAAA,CAAAX,CAAA,EAAAY,CAAA,UAAAI,CAAA,KAAAA,CAAA,CAAAX,GAAA,IAAAW,CAAA,CAAAC,GAAA,IAAAR,MAAA,CAAAC,cAAA,CAAAJ,CAAA,EAAAM,CAAA,EAAAI,CAAA,IAAAV,CAAA,CAAAM,CAAA,IAAAZ,CAAA,CAAAY,CAAA,YAAAN,CAAA,CAAAR,OAAA,GAAAE,CAAA,EAAAG,CAAA,IAAAA,CAAA,CAAAc,GAAA,CAAAjB,CAAA,EAAAM,CAAA,GAAAA,CAAA;AAErB;AACe,SAASY,KAAKA,CAAmBC,MAAS,EAAc;EACrE,MAAMC,IAAI,GAAG,CAAC,CAAe;EAE7B,KAAK,MAAMC,IAAI,IAAIF,MAAM,EAAE;IACzB,MAAMG,KAAK,GAAGH,MAAM,CAACE,IAAI,CAAC;IAE1B,IAAIE,WAAE,CAACC,WAAW,CAACF,KAAK,CAAC,EAAE;MACzBF,IAAI,CAACC,IAAI,CAAC,GAAGH,KAAK,CAACI,KAAK,CAAQ;IAClC,CAAC,MAAM,IAAIC,WAAE,CAACE,KAAK,CAACH,KAAK,CAAC,EAAE;MAC1BF,IAAI,CAACC,IAAI,CAAC,GAAG9B,GAAG,CAACmC,IAAI,CAACJ,KAAK,CAAiB;IAC9C,CAAC,MAAM;MACLF,IAAI,CAACC,IAAI,CAAC,GAAGC,KAAK;IACpB;EACF;EAEA,OAAOF,IAAI;AACb"
+}

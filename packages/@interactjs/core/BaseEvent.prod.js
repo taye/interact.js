@@ -1,0 +1,2 @@
+Object.defineProperty(exports,"__esModule",{value:!0}),exports.BaseEvent=void 0;class t{immediatePropagationStopped=!1;propagationStopped=!1;constructor(t){this._interaction=t}preventDefault(){}stopPropagation(){this.propagationStopped=!0}stopImmediatePropagation(){this.immediatePropagationStopped=this.propagationStopped=!0}}exports.BaseEvent=t,Object.defineProperty(t.prototype,"interaction",{get(){return this._interaction._proxy},set(){}});
+//# sourceMappingURL=BaseEvent.prod.js.map

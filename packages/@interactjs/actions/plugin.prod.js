@@ -1,0 +1,2 @@
+Object.defineProperty(exports,"__esModule",{value:!0}),exports.default=void 0;var e=i(require("./drag/plugin")),u=i(require("./drop/plugin")),l=i(require("./gesture/plugin")),r=i(require("./resize/plugin"));function i(e){return e&&e.__esModule?e:{default:e}}exports.default={id:"actions",install(i){i.usePlugin(l.default),i.usePlugin(r.default),i.usePlugin(e.default),i.usePlugin(u.default)}};
+//# sourceMappingURL=plugin.prod.js.map
