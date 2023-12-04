@@ -7,7 +7,9 @@ const { getModuleDirectories } = require('./utils')
 
 const moduleDirectory = getModuleDirectories()
 
-module.exports = async ({ source, destDir }) => {
+const destDir = path.join(__dirname, '..', 'dist', 'shims')
+
+module.exports = async ({ source }) => {
   const sourcePath = resolveSync(source, {
     moduleDirectory,
     extensions: ['.ts', '.tsx', '.js', '.jsx'],

@@ -1,12 +1,9 @@
 const os = require('os')
-const path = require('path')
 
 const { default: PQueue } = require('p-queue')
 
 const bundleShim = require('../shimBundler')
 const { getShims, errorExit } = require('../utils')
-
-const destDir = path.join(__dirname, '..', 'dist', 'shims')
 
 const queue = new PQueue({ concurrency: os.cpus().length })
 
@@ -23,7 +20,7 @@ async function bundle(shimConfig) {
 
   console.log(`Bundling ${source}`)
 
-  await bundleShim({ ...shimConfig, destDir })
+  await bundleShim({ ...shimConfig })
 }
 
 queue.onIdle().then((bundled) => {

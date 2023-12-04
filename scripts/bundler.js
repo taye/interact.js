@@ -44,8 +44,12 @@ const createRollupConfigs = async ({
       {
         babelrc: false,
         configFile: false,
-        browserslistConfigFile: false,
-        targets: format === 'es' ? undefined : { ie: 9 },
+        ...(format === 'es'
+          ? {}
+          : {
+              browserslistConfigFile: false,
+              targets: { ie: 9 },
+            }),
         babelHelpers: 'bundled',
         skipPreflightCheck: true,
         extensions: ['.ts', '.tsx', '.js', '.jsx', '.vue'],

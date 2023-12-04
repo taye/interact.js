@@ -96,7 +96,7 @@ async function runBuild() {
     // bundle interactjs
     shell.exec('npm run build:bundle')
     // ensure that the output is valid ES5 syntax
-    shell.exec('acord --silent --ecma5 packages/interactjs/dist/**/*.js')
+    shell.exec('acorn --silent --ecma5 packages/interactjs/dist/**/*.js')
 
     // generate docs
     shell.exec('npm run build:docs')
@@ -120,7 +120,7 @@ async function runBuild() {
 function commit() {
   // commit and add new version tag
   shell.exec('git add --all .')
-  shell.exec('git add --force packages dist/docs')
+  shell.exec('git add --force packages dist/api')
   shell.exec('git reset **/node_modules')
   shell.exec(`git commit --no-verify -m ${gitTag}`)
 }
