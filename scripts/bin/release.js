@@ -96,7 +96,7 @@ async function runBuild() {
     // bundle interactjs
     shell.exec('npm run build:bundle')
     // ensure that the output is valid ES5 syntax
-    shell.exec('acorn --silent --ecma5 packages/interactjs/dist/**/*.js')
+    shell.exec('acorn --silent --ecma5 packages/interactjs/dist/*.js')
 
     // generate docs
     shell.exec('npm run build:docs')
