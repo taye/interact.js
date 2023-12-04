@@ -36,7 +36,7 @@ const config = {
   readme: 'none',
   disableSources: isPro,
   plugin: ['typedoc-plugin-markdown'],
-  out: './dist/docs',
+  out: './dist/api',
 }
 
 module.exports = config
