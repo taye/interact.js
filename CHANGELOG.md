@@ -1,3 +1,7 @@
+## v1.10.24
+
+- chore: generate api docs
+
 ## v1.10.23
 
 - fix: transform nullish coalescing; fix symbol-tree build
@@ -522,7 +526,7 @@ Full list of [changes on Github](https://github.com/taye/interact.js/compare/v1.
 ### resize.preserveAspectRatio
 
 ```javascript
-interact(target).resizable({ preserveAspectRatio: true });
+interact(target).resizable({ preserveAspectRatio: true })
 ```
 
 See [PR #260](https://github.com/taye/interact.js/pull/260).
@@ -665,10 +669,10 @@ Multiple interactions have been enabled by default. For example:
 
 ```javascript
 interact('.drag-element').draggable({
-    enabled: true,
- // max          : Infinity,  // default
- // maxPerElement: 1,         // default
-});
+  enabled: true,
+  // max          : Infinity,  // default
+  // maxPerElement: 1,         // default
+})
 ```
 
 will allow multiple `.drag-element` to be dragged simultaneously without having
@@ -693,17 +697,17 @@ dimensions of the given grid.
 ```javascript
 interact(target).draggable({
   snap: {
-    targets: [ {x: 300, y: 300} ],
+    targets: [{ x: 300, y: 300 }],
     relativePoints: [
-      { x: 0, y: 0 },  // snap relative to the top left of the element
-      { x: 1, y: 1 },  // and also to the bottom right
+      { x: 0, y: 0 }, // snap relative to the top left of the element
+      { x: 1, y: 1 }, // and also to the bottom right
     ],
 
     // offset the snap target coordinates
     // can be an object with x/y or 'startCoords'
-    offset: { x: 50, y: 50 }
-  }
-});
+    offset: { x: 50, y: 50 },
+  },
+})
 ```
 
 #### snap function interaction arg
@@ -713,11 +717,13 @@ The current `Interaction` is now passed as the third parameter to snap functions
 ```js
 interact(target).draggable({
   snap: {
-    targets: [function (x, y, interaction) {
-      if (!interaction.dropTarget) {
-        return { x: 0, y: 0 }
-      }
-    }],
+    targets: [
+      function (x, y, interaction) {
+        if (!interaction.dropTarget) {
+          return { x: 0, y: 0 }
+        }
+      },
+    ],
   },
 })
 ```
@@ -753,18 +759,18 @@ Methods for these settings on the `interact` object (`interact.snap()`,
 ### Space-separated string and array event list and eventType:listener object
 
 ```javascript
-function logEventType (event) {
-  console.log(event.type, event.target);
+function logEventType(event) {
+  console.log(event.type, event.target)
 }
 
-interact(target).on('down tap dragstart gestureend', logEventType);
+interact(target).on('down tap dragstart gestureend', logEventType)
 
-interact(target).on(['move', 'resizestart'], logEventType);
+interact(target).on(['move', 'resizestart'], logEventType)
 
 interact(target).on({
   dragmove: logEvent,
-  keydown : logEvent
-});
+  keydown: logEvent,
+})
 ```
 
 ### Interactable actionChecker
@@ -774,13 +780,14 @@ an object. The object should have a `name` and can also have an `axis`
 property. For example, to resize horizontally:
 
 ```javascript
-interact(target).resizeable(true)
+interact(target)
+  .resizeable(true)
   .actionChecker(function (pointer, defaultAction, interactable, element) {
     return {
       name: 'resize',
       axis: 'x',
-    };
-  });
+    }
+  })
 ```
 
 ### Plain drop event objects
