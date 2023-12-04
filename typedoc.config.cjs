@@ -35,6 +35,7 @@ const config = {
   titleLink: '/',
   readme: 'none',
   disableSources: isPro,
+  plugin: ['typedoc-plugin-markdown'],
   out: './dist/docs',
 }
 
