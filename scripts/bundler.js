@@ -7,7 +7,7 @@ const terser = require('@rollup/plugin-terser')
 const { rollup, defineConfig } = require('rollup')
 const cjs = require('rollup-plugin-cjs-es')
 
-const { getModuleDirectories, getBabelConfig, extendBabelOptions, errorExit } = require('./utils')
+const { getModuleDirectories, extendBabelOptions, errorExit, getEsnextBabelOptions } = require('./utils')
 
 process.env.NODE_PATH = `${process.env.NODE_PATH || ''}:${path.resolve(__dirname, '..', 'node_modules')}`
 require('module').Module._initPaths()
@@ -44,12 +44,19 @@ const createRollupConfigs = async ({
       {
         babelrc: false,
         configFile: false,
+        browserslistConfigFile: false,
+        targets: format === 'es' ? undefined : { ie: 9 },
         babelHelpers: 'bundled',
         skipPreflightCheck: true,
         extensions: ['.ts', '.tsx', '.js', '.jsx', '.vue'],
-        plugins: [require.resolve('@babel/plugin-transform-logical-assignment-operators')].filter(Boolean),
+        plugins: [
+          [
+            require.resolve('@babel/plugin-transform-runtime'),
+            { helpers: false, regenerator: format !== 'es' },
+          ],
+        ],
       },
-      getBabelConfig(),
+      getEsnextBabelOptions(format === 'es' ? { exclude: ['transform-regenerator'] } : {}),
     )
 
     return defineConfig({
@@ -69,7 +76,7 @@ const createRollupConfigs = async ({
           preventAssignment: true,
           values: Object.entries({
             npm_package_version: process.env.npm_package_version,
-            IJS_BUNDLE: 'true',
+            IJS_BUNDLE: '1',
             ...env,
           }).reduce((acc, [key, value]) => {
             acc[`process.env.${key}`] = JSON.stringify(value)

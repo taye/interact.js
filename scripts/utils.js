@@ -35,31 +35,30 @@ const getBuiltJsFiles = ({ cwd = process.cwd() } = {}) =>
     nodir: true,
   })
 
-function getBabelConfig() {
-  let babelConfig
-
-  try {
-    babelConfig = require(path.join(process.cwd(), 'babel.config.js'))
-  } catch (e) {
-    babelConfig = require('../babel.config.js')
-  }
-
-  return babelConfig
-}
-
-function getEsnextBabelOptions() {
+function getEsnextBabelOptions(presetEnvOptions) {
   return {
     babelrc: false,
     configFile: false,
     sourceMaps: true,
     presets: [
-      [require.resolve('@babel/preset-typescript'), { allExtensions: true, allowDeclareFields: true }],
+      [require.resolve('@babel/preset-env'), presetEnvOptions],
+      [
+        require.resolve('@babel/preset-typescript'),
+        { isTSX: false, onlyRemoveTypeImports: true, allExtensions: true, allowDeclareFields: true },
+      ],
     ],
     plugins: [
       require.resolve('./babel/vue-sfc'),
       require.resolve('@babel/plugin-proposal-optional-catch-binding'),
-      [require.resolve('@babel/plugin-proposal-optional-chaining'), { loose: true }],
+      require.resolve('@babel/plugin-proposal-optional-chaining'),
+      require.resolve('@babel/plugin-transform-nullish-coalescing-operator'),
+      require.resolve('@babel/plugin-transform-logical-assignment-operators'),
     ],
+    assumptions: {
+      iterableIsArray: true,
+      noDocumentAll: true,
+      noNewArrows: true,
+    },
   }
 }
 
@@ -202,7 +201,6 @@ module.exports = {
   sourcesIgnoreGlobs,
   lintIgnoreGlobs,
   getBuiltJsFiles,
-  getBabelConfig,
   getEsnextBabelOptions,
   extendBabelOptions,
   getDevPackageDir,
