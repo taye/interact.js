@@ -1,0 +1,13 @@
+{
+	"version": 3,
+	"names": [
+		"default"
+	],
+	"sources": [
+		"avoid.ts"
+	],
+	"sourcesContent": [
+		"export { default } from '../noop'\n"
+	],
+	"mappings": "OAASA,YAAe"
+}

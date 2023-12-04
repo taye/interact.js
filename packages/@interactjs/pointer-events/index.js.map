@@ -1,0 +1,15 @@
+{
+	"version": 3,
+	"names": [
+		"interact",
+		"plugin",
+		"use"
+	],
+	"sources": [
+		"index.ts"
+	],
+	"sourcesContent": [
+		"/* eslint-disable no-console, eol-last, import/no-duplicates,  import/no-extraneous-dependencies, import/order */\nimport '@interactjs/pointer-events/plugin'\nimport interact from '@interactjs/interact/index'\nimport plugin from '@interactjs/pointer-events/plugin'\ninteract.use(plugin)"
+	],
+	"mappings": "AAAA;AACA,OAAO,aAAmC;AAC1C,OAAOA,QAAQ,MAAM,sBAA4B;AACjD,OAAOC,MAAM,MAAM,aAAmC;AACtDD,QAAQ,CAACE,GAAG,CAACD,MAAM,CAAC"
+}

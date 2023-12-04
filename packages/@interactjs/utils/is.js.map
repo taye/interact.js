@@ -1,0 +1,35 @@
+{
+	"version": 3,
+	"names": [
+		"isWindow",
+		"win",
+		"window",
+		"thing",
+		"docFrag",
+		"object",
+		"nodeType",
+		"func",
+		"number",
+		"bool",
+		"string",
+		"element",
+		"_window",
+		"getWindow",
+		"test",
+		"Element",
+		"nodeName",
+		"plainObject",
+		"constructor",
+		"toString",
+		"array",
+		"length",
+		"splice"
+	],
+	"sources": [
+		"is.ts"
+	],
+	"sourcesContent": [
+		"import isWindow from './isWindow'\nimport * as win from './window'\n\nconst window = (thing: any): thing is Window => thing === win.window || isWindow(thing)\n\nconst docFrag = (thing: any): thing is DocumentFragment => object(thing) && thing.nodeType === 11\n\nconst object = (thing: any): thing is { [index: string]: any } => !!thing && typeof thing === 'object'\n\nconst func = (thing: any): thing is (...args: any[]) => any => typeof thing === 'function'\n\nconst number = (thing: any): thing is number => typeof thing === 'number'\n\nconst bool = (thing: any): thing is boolean => typeof thing === 'boolean'\n\nconst string = (thing: any): thing is string => typeof thing === 'string'\n\nconst element = (thing: any): thing is HTMLElement | SVGElement => {\n  if (!thing || typeof thing !== 'object') {\n    return false\n  }\n\n  const _window = win.getWindow(thing) || win.window\n\n  return /object|function/.test(typeof Element)\n    ? thing instanceof Element || thing instanceof _window.Element\n    : thing.nodeType === 1 && typeof thing.nodeName === 'string'\n}\n\nconst plainObject: typeof object = (thing: any): thing is { [index: string]: any } =>\n  object(thing) && !!thing.constructor && /function Object\\b/.test(thing.constructor.toString())\n\nconst array = <T extends unknown>(thing: any): thing is T[] =>\n  object(thing) && typeof thing.length !== 'undefined' && func(thing.splice)\n\nexport default {\n  window,\n  docFrag,\n  object,\n  func,\n  number,\n  bool,\n  string,\n  element,\n  plainObject,\n  array,\n}\n"
+	],
+	"mappings": "AAAA,OAAOA,QAAQ,MAAM,YAAY;AACjC,OAAO,KAAKC,GAAG,MAAM,UAAU;AAE/B,MAAMC,MAAM,GAAIC,KAAU,IAAsBA,KAAK,KAAKF,GAAG,CAACC,MAAM,IAAIF,QAAQ,CAACG,KAAK,CAAC;AAEvF,MAAMC,OAAO,GAAID,KAAU,IAAgCE,MAAM,CAACF,KAAK,CAAC,IAAIA,KAAK,CAACG,QAAQ,KAAK,EAAE;AAEjG,MAAMD,MAAM,GAAIF,KAAU,IAAwC,CAAC,CAACA,KAAK,IAAI,OAAOA,KAAK,KAAK,QAAQ;AAEtG,MAAMI,IAAI,GAAIJ,KAAU,IAAuC,OAAOA,KAAK,KAAK,UAAU;AAE1F,MAAMK,MAAM,GAAIL,KAAU,IAAsB,OAAOA,KAAK,KAAK,QAAQ;AAEzE,MAAMM,IAAI,GAAIN,KAAU,IAAuB,OAAOA,KAAK,KAAK,SAAS;AAEzE,MAAMO,MAAM,GAAIP,KAAU,IAAsB,OAAOA,KAAK,KAAK,QAAQ;AAEzE,MAAMQ,OAAO,GAAIR,KAAU,IAAwC;EACjE,IAAI,CAACA,KAAK,IAAI,OAAOA,KAAK,KAAK,QAAQ,EAAE;IACvC,OAAO,KAAK;EACd;EAEA,MAAMS,OAAO,GAAGX,GAAG,CAACY,SAAS,CAACV,KAAK,CAAC,IAAIF,GAAG,CAACC,MAAM;EAElD,OAAO,iBAAiB,CAACY,IAAI,CAAC,OAAOC,OAAO,CAAC,GACzCZ,KAAK,YAAYY,OAAO,IAAIZ,KAAK,YAAYS,OAAO,CAACG,OAAO,GAC5DZ,KAAK,CAACG,QAAQ,KAAK,CAAC,IAAI,OAAOH,KAAK,CAACa,QAAQ,KAAK,QAAQ;AAChE,CAAC;AAED,MAAMC,WAA0B,GAAId,KAAU,IAC5CE,MAAM,CAACF,KAAK,CAAC,IAAI,CAAC,CAACA,KAAK,CAACe,WAAW,IAAI,mBAAmB,CAACJ,IAAI,CAACX,KAAK,CAACe,WAAW,CAACC,QAAQ,CAAC,CAAC,CAAC;AAEhG,MAAMC,KAAK,GAAuBjB,KAAU,IAC1CE,MAAM,CAACF,KAAK,CAAC,IAAI,OAAOA,KAAK,CAACkB,MAAM,KAAK,WAAW,IAAId,IAAI,CAACJ,KAAK,CAACmB,MAAM,CAAC;AAE5E,eAAe;EACbpB,MAAM;EACNE,OAAO;EACPC,MAAM;EACNE,IAAI;EACJC,MAAM;EACNC,IAAI;EACJC,MAAM;EACNC,OAAO;EACPM,WAAW;EACXG;AACF,CAAC"
+}

@@ -1,0 +1,32 @@
+{
+	"version": 3,
+	"names": [
+		"lastTime",
+		"request",
+		"cancel",
+		"init",
+		"global",
+		"requestAnimationFrame",
+		"cancelAnimationFrame",
+		"vendors",
+		"vendor",
+		"bind",
+		"callback",
+		"currTime",
+		"Date",
+		"now",
+		"timeToCall",
+		"Math",
+		"max",
+		"token",
+		"setTimeout",
+		"clearTimeout"
+	],
+	"sources": [
+		"raf.ts"
+	],
+	"sourcesContent": [
+		"let lastTime = 0\nlet request: typeof requestAnimationFrame\nlet cancel: typeof cancelAnimationFrame\n\nfunction init(global: Window | typeof globalThis) {\n  request = global.requestAnimationFrame\n  cancel = global.cancelAnimationFrame\n\n  if (!request) {\n    const vendors = ['ms', 'moz', 'webkit', 'o']\n\n    for (const vendor of vendors) {\n      request = global[`${vendor}RequestAnimationFrame` as 'requestAnimationFrame']\n      cancel =\n        global[`${vendor}CancelAnimationFrame` as 'cancelAnimationFrame'] ||\n        global[`${vendor}CancelRequestAnimationFrame` as 'cancelAnimationFrame']\n    }\n  }\n\n  request = request && request.bind(global)\n  cancel = cancel && cancel.bind(global)\n\n  if (!request) {\n    request = (callback) => {\n      const currTime = Date.now()\n      const timeToCall = Math.max(0, 16 - (currTime - lastTime))\n      const token = global.setTimeout(() => {\n        // eslint-disable-next-line n/no-callback-literal\n        callback(currTime + timeToCall)\n      }, timeToCall)\n\n      lastTime = currTime + timeToCall\n      return token as any\n    }\n\n    cancel = (token) => clearTimeout(token)\n  }\n}\n\nexport default {\n  request: (callback: FrameRequestCallback) => request(callback),\n  cancel: (token: number) => cancel(token),\n  init,\n}\n"
+	],
+	"mappings": "AAAA,IAAIA,QAAQ,GAAG,CAAC;AAChB,IAAIC,OAAqC;AACzC,IAAIC,MAAmC;AAEvC,SAASC,IAAIA,CAACC,MAAkC,EAAE;EAChDH,OAAO,GAAGG,MAAM,CAACC,qBAAqB;EACtCH,MAAM,GAAGE,MAAM,CAACE,oBAAoB;EAEpC,IAAI,CAACL,OAAO,EAAE;IACZ,MAAMM,OAAO,GAAG,CAAC,IAAI,EAAE,KAAK,EAAE,QAAQ,EAAE,GAAG,CAAC;IAE5C,KAAK,MAAMC,MAAM,IAAID,OAAO,EAAE;MAC5BN,OAAO,GAAGG,MAAM,CAAE,GAAEI,MAAO,uBAAsB,CAA4B;MAC7EN,MAAM,GACJE,MAAM,CAAE,GAAEI,MAAO,sBAAqB,CAA2B,IACjEJ,MAAM,CAAE,GAAEI,MAAO,6BAA4B,CAA2B;IAC5E;EACF;EAEAP,OAAO,GAAGA,OAAO,IAAIA,OAAO,CAACQ,IAAI,CAACL,MAAM,CAAC;EACzCF,MAAM,GAAGA,MAAM,IAAIA,MAAM,CAACO,IAAI,CAACL,MAAM,CAAC;EAEtC,IAAI,CAACH,OAAO,EAAE;IACZA,OAAO,GAAIS,QAAQ,IAAK;MACtB,MAAMC,QAAQ,GAAGC,IAAI,CAACC,GAAG,CAAC,CAAC;MAC3B,MAAMC,UAAU,GAAGC,IAAI,CAACC,GAAG,CAAC,CAAC,EAAE,EAAE,IAAIL,QAAQ,GAAGX,QAAQ,CAAC,CAAC;MAC1D,MAAMiB,KAAK,GAAGb,MAAM,CAACc,UAAU,CAAC,MAAM;QACpC;QACAR,QAAQ,CAACC,QAAQ,GAAGG,UAAU,CAAC;MACjC,CAAC,EAAEA,UAAU,CAAC;MAEdd,QAAQ,GAAGW,QAAQ,GAAGG,UAAU;MAChC,OAAOG,KAAK;IACd,CAAC;IAEDf,MAAM,GAAIe,KAAK,IAAKE,YAAY,CAACF,KAAK,CAAC;EACzC;AACF;AAEA,eAAe;EACbhB,OAAO,EAAGS,QAA8B,IAAKT,OAAO,CAACS,QAAQ,CAAC;EAC9DR,MAAM,EAAGe,KAAa,IAAKf,MAAM,CAACe,KAAK,CAAC;EACxCd;AACF,CAAC"
+}

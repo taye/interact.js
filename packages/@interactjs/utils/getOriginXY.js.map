@@ -1,0 +1,25 @@
+{
+	"version": 3,
+	"names": [
+		"rectToXY",
+		"resolveRectLike",
+		"getOriginXY",
+		"target",
+		"element",
+		"actionName",
+		"actionOptions",
+		"options",
+		"actionOrigin",
+		"origin",
+		"originRect",
+		"x",
+		"y"
+	],
+	"sources": [
+		"getOriginXY.ts"
+	],
+	"sourcesContent": [
+		"import type { PerActionDefaults } from '@interactjs/core/options'\nimport type { ActionName, HasGetRect } from '@interactjs/core/types'\n\nimport { rectToXY, resolveRectLike } from './rect'\n\nexport default function getOriginXY(\n  target: HasGetRect & { options: PerActionDefaults },\n  element: Node,\n  actionName?: ActionName,\n) {\n  const actionOptions = actionName && (target.options as any)[actionName]\n  const actionOrigin = actionOptions && actionOptions.origin\n  const origin = actionOrigin || target.options.origin\n\n  const originRect = resolveRectLike(origin, target, element, [target && element])\n\n  return rectToXY(originRect) || { x: 0, y: 0 }\n}\n"
+	],
+	"mappings": "AAGA,SAASA,QAAQ,EAAEC,eAAe,QAAQ,QAAQ;AAElD,eAAe,SAASC,WAAWA,CACjCC,MAAmD,EACnDC,OAAa,EACbC,UAAuB,EACvB;EACA,MAAMC,aAAa,GAAGD,UAAU,IAAKF,MAAM,CAACI,OAAO,CAASF,UAAU,CAAC;EACvE,MAAMG,YAAY,GAAGF,aAAa,IAAIA,aAAa,CAACG,MAAM;EAC1D,MAAMA,MAAM,GAAGD,YAAY,IAAIL,MAAM,CAACI,OAAO,CAACE,MAAM;EAEpD,MAAMC,UAAU,GAAGT,eAAe,CAACQ,MAAM,EAAEN,MAAM,EAAEC,OAAO,EAAE,CAACD,MAAM,IAAIC,OAAO,CAAC,CAAC;EAEhF,OAAOJ,QAAQ,CAACU,UAAU,CAAC,IAAI;IAAEC,CAAC,EAAE,CAAC;IAAEC,CAAC,EAAE;EAAE,CAAC;AAC/C"
+}

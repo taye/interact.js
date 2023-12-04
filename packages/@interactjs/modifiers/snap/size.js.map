@@ -1,0 +1,48 @@
+{
+	"version": 3,
+	"names": [
+		"extend",
+		"is",
+		"makeModifier",
+		"snap",
+		"start",
+		"arg",
+		"state",
+		"edges",
+		"options",
+		"targets",
+		"relativePoints",
+		"x",
+		"left",
+		"y",
+		"top",
+		"offset",
+		"origin",
+		"range",
+		"targetFields",
+		"offsets",
+		"set",
+		"interaction",
+		"coords",
+		"relative",
+		"snapTarget",
+		"target",
+		"func",
+		"xField",
+		"yField",
+		"push",
+		"returnValue",
+		"defaults",
+		"Infinity",
+		"endOnly",
+		"enabled",
+		"snapSize"
+	],
+	"sources": [
+		"size.ts"
+	],
+	"sourcesContent": [
+		"// This modifier allows snapping of the size of targets during resize\n// interactions.\n\nimport extend from '@interactjs/utils/extend'\nimport is from '@interactjs/utils/is'\n\nimport { makeModifier } from '../base'\nimport type { ModifierArg } from '../types'\n\nimport type { SnapOptions, SnapState } from './pointer'\nimport { snap } from './pointer'\n\nexport type SnapSizeOptions = Pick<SnapOptions, 'targets' | 'offset' | 'endOnly' | 'range' | 'enabled'>\n\nfunction start(arg: ModifierArg<SnapState>) {\n  const { state, edges } = arg\n  const { options } = state\n\n  if (!edges) {\n    return null\n  }\n\n  arg.state = {\n    options: {\n      targets: null,\n      relativePoints: [\n        {\n          x: edges.left ? 0 : 1,\n          y: edges.top ? 0 : 1,\n        },\n      ],\n      offset: options.offset || 'self',\n      origin: { x: 0, y: 0 },\n      range: options.range,\n    },\n  }\n\n  state.targetFields = state.targetFields || [\n    ['width', 'height'],\n    ['x', 'y'],\n  ]\n\n  snap.start(arg)\n  state.offsets = arg.state.offsets\n\n  arg.state = state\n}\n\nfunction set(arg) {\n  const { interaction, state, coords } = arg\n  const { options, offsets } = state\n  const relative = {\n    x: coords.x - offsets[0].x,\n    y: coords.y - offsets[0].y,\n  }\n\n  state.options = extend({}, options)\n  state.options.targets = []\n\n  for (const snapTarget of options.targets || []) {\n    let target\n\n    if (is.func(snapTarget)) {\n      target = snapTarget(relative.x, relative.y, interaction)\n    } else {\n      target = snapTarget\n    }\n\n    if (!target) {\n      continue\n    }\n\n    for (const [xField, yField] of state.targetFields) {\n      if (xField in target || yField in target) {\n        target.x = target[xField]\n        target.y = target[yField]\n\n        break\n      }\n    }\n\n    state.options.targets.push(target)\n  }\n\n  const returnValue = snap.set(arg)\n\n  state.options = options\n\n  return returnValue\n}\n\nconst defaults: SnapSizeOptions = {\n  range: Infinity,\n  targets: null,\n  offset: null,\n  endOnly: false,\n  enabled: false,\n}\n\nconst snapSize = {\n  start,\n  set,\n  defaults,\n}\n\nexport default makeModifier(snapSize, 'snapSize')\nexport { snapSize }\n"
+	],
+	"mappings": "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"
+}

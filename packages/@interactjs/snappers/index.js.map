@@ -1,0 +1,15 @@
+{
+	"version": 3,
+	"names": [
+		"interact",
+		"plugin",
+		"use"
+	],
+	"sources": [
+		"index.ts"
+	],
+	"sourcesContent": [
+		"/* eslint-disable no-console, eol-last, import/no-duplicates,  import/no-extraneous-dependencies, import/order */\nimport '@interactjs/snappers/plugin'\nimport interact from '@interactjs/interact/index'\nimport plugin from '@interactjs/snappers/plugin'\ninteract.use(plugin)"
+	],
+	"mappings": "AAAA;AACA,OAAO,aAA6B;AACpC,OAAOA,QAAQ,MAAM,sBAA4B;AACjD,OAAOC,MAAM,MAAM,aAA6B;AAChDD,QAAQ,CAACE,GAAG,CAACD,MAAM,CAAC"
+}
