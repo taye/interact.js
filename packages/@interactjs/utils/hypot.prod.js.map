@@ -1,0 +1,1 @@
+{"version":3,"file":"hypot.prod.js","sources":["hypot.ts"],"sourcesContent":["export default (x: number, y: number) => Math.sqrt(x * x + y * y)\n"],"names":["hypot","x","y","sqrt"],"mappings":";;AAAA,IAAAA,MAAA,CAAeC,EAAYC,SAAkBC,KAAKF,EAAKA,IAAKC"}

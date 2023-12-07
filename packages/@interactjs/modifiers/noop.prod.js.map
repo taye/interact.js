@@ -1,0 +1,1 @@
+{"version":3,"file":"noop.prod.js","sources":["noop.ts"],"sourcesContent":["import type { ModifierFunction } from './types'\n\nconst noop = (() => {}) as unknown as ModifierFunction<any, any, 'noop'>\n\nnoop._defaults = {}\n\nexport default noop\n"],"names":["noop","_defaults"],"mappings":";;AAEA,MAAMA,KAAQA,OAEdA,KAAKC,UAAY,CAAE"}
