@@ -14,7 +14,8 @@
     "@interactjs/utils": "1.10.25"
   },
   "optionalDependencies": {
-    "@interactjs/interact": "1.10.25"
+    "@interactjs/interact": "1.10.25",
+    "vue": "3"
   },
   "devDependencies": {
     "vue": "next"

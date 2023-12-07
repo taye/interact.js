@@ -109,7 +109,9 @@ async function runBuild() {
   shell.exec('npx _types')
 
   // generate esnext .js modules
-  shell.exec('npx _esnext')
+  shell.exec('rollup -c esnext.rollup.config.cjs')
+  // ensure that the output is valid ES2018 syntax
+  shell.exec('acorn --silent --module --ecma2018 packages/**/*.js')
 
   // set publishConfig
   await editPackageJsons((pkg) => {

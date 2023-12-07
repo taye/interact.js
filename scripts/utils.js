@@ -41,7 +41,13 @@ function getEsnextBabelOptions(presetEnvOptions) {
     configFile: false,
     sourceMaps: true,
     presets: [
-      [require.resolve('@babel/preset-env'), presetEnvOptions],
+      [
+        require.resolve('@babel/preset-env'),
+        {
+          shippedProposals: true,
+          ...presetEnvOptions,
+        },
+      ],
       [
         require.resolve('@babel/preset-typescript'),
         { isTSX: false, onlyRemoveTypeImports: true, allExtensions: true, allowDeclareFields: true },
@@ -58,6 +64,7 @@ function getEsnextBabelOptions(presetEnvOptions) {
       iterableIsArray: true,
       noDocumentAll: true,
       noNewArrows: true,
+      setPublicClassFields: true,
     },
   }
 }

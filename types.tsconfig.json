@@ -1,17 +1,10 @@
 {
-  "include": [
-    "packages/@interactjs"
-  ],
-  "exclude": [
-    "**/*.spec.ts"
-  ],
+  "include": ["packages/@interactjs", "shims.d.ts"],
+  "exclude": ["**/*.spec.ts"],
   "compilerOptions": {
     "target": "esnext",
     "module": "esnext",
-    "lib": [
-      "esnext",
-      "dom"
-    ],
+    "lib": ["esnext", "dom"],
     "moduleResolution": "node",
     "esModuleInterop": true,
 

@@ -1,4 +1,2 @@
-maintained node versions
-last 5 versions
-> 2%
-not dead
+defaults and fully supports es6-module
+node >= 16

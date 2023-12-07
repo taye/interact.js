@@ -9,20 +9,9 @@ import isNonNativeEvent from '@interactjs/utils/isNonNativeEvent'
 import normalizeListeners from '@interactjs/utils/normalizeListeners'
 import * as win from '@interactjs/utils/window'
 
-/* eslint-disable import/no-duplicates -- for typescript module augmentations */
-import './visualizer/plugin'
-import visualizer from './visualizer/plugin'
-/* eslint-enable import/no-duplicates */
-
 declare module '@interactjs/core/scope' {
   interface Scope {
     logger: Logger
-  }
-}
-
-declare module '@interactjs/core/InteractStatic' {
-  export interface InteractStatic {
-    visializer: typeof visualizer
   }
 }
 
@@ -112,7 +101,6 @@ function install(scope: Scope, { logger }: { logger?: Logger } = {}) {
 
     return _onOff.call(this, method, normalizedListeners, options)
   }
-  scope.usePlugin(visualizer)
 }
 
 const checks: Check[] = [
