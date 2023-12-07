@@ -1,3 +1,7 @@
+## v1.10.26
+
+- fix: improve build; check output for ES2018 compatibility
+
 ## v1.10.25
 
 - fix: bundle to ES5 syntax
