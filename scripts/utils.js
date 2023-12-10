@@ -6,7 +6,7 @@ const glob = promisify(require('glob'))
 const resolveSync = require('resolve').sync
 
 const sourcesGlob = 'packages/{,@}interactjs/**/**/*{.ts,.tsx,.vue}'
-const lintSourcesGlob = `{${sourcesGlob},{scripts,examples,jsdoc}/**/*.{js,cjs},bin/**/*}`
+const lintSourcesGlob = `{${sourcesGlob},{scripts,examples,docs}/**/*.{js,cjs,md},bin/**/*}`
 const commonIgnoreGlobs = ['**/node_modules/**', '**/*_*', '**/*.d.ts', '**/dist/**', 'examples/js/**']
 const lintIgnoreGlobs = [...commonIgnoreGlobs]
 const sourcesIgnoreGlobs = [...commonIgnoreGlobs, '**/*.spec.ts']
