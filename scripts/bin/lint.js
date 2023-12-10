@@ -1,6 +1,7 @@
 const { existsSync, promises: fs } = require('fs')
 
 const { ESLint } = require('eslint')
+const { glob } = require('glob')
 const prettier = require('prettier')
 const yargs = require('yargs')
 
@@ -52,8 +53,6 @@ async function formatWithPrettier(filepath) {
 }
 
 async function getSources() {
-  const glob = require('util').promisify(require('glob'))
-
   const sources = await glob(lintSourcesGlob, {
     ignore: lintIgnoreGlobs,
     silent: true,

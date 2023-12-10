@@ -2,7 +2,7 @@
 import path from 'path'
 
 import * as execTypes from '@interactjs/_dev/scripts/execTypes'
-import mkdirp from 'mkdirp'
+import { mkdirp } from 'mkdirp'
 import * as shell from 'shelljs'
 import temp from 'temp'
 

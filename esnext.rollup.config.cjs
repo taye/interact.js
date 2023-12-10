@@ -1,6 +1,5 @@
 /* eslint-disable import/no-extraneous-dependencies */
 const { resolve, basename, dirname, relative, extname } = require('path')
-const { promisify } = require('util')
 
 const { transformAsync } = require('@babel/core')
 const babel = require('@rollup/plugin-babel')
@@ -8,8 +7,8 @@ const commonjs = require('@rollup/plugin-commonjs')
 const nodeResolve = require('@rollup/plugin-node-resolve')
 const replace = require('@rollup/plugin-replace')
 const terser = require('@rollup/plugin-terser')
+const { glob } = require('glob')
 const { defineConfig } = require('rollup')
-const glob = promisify(require('glob'))
 
 const headers = require('./scripts/headers')
 const {

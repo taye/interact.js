@@ -1,8 +1,7 @@
 const fs = require('fs')
 const path = require('path')
-const { promisify } = require('util')
 
-const glob = promisify(require('glob'))
+const { glob } = require('glob')
 const resolveSync = require('resolve').sync
 
 const sourcesGlob = 'packages/{,@}interactjs/**/**/*{.ts,.tsx,.vue}'
