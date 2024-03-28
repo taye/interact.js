@@ -1,0 +1,20 @@
+on:
+  pull_request:
+  workflow_dispatch:
+  workflow_call:
+
+jobs:
+  test:
+    name: '🧪 Test'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ianwalter/playwright-container@43940dfa7d309fe3569b9df407ae9e84dcbf2e7f
+      - name: ⚙ bootstrap
+        run: 'npm run bootstrap && npx _check_deps && npx _add_plugin_indexes'
+      - name: 📐 types
+        run: npx tsc -b -f
+      - name: 🔍 lint
+        run: npx _lint
+      - name: 🧪 tests
+        run: npm test
