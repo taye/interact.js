@@ -1,6 +1,6 @@
 {
   "include": ["packages/@interactjs", "shims.d.ts"],
-  "exclude": ["**/*.spec.ts"],
+  "exclude": ["**/*.spec.ts", "packages/@interactjs/vue", "packages/@interactjs/react"],
   "compilerOptions": {
     "target": "esnext",
     "module": "esnext",

@@ -4,7 +4,7 @@
     "module": "commonjs",
     "lib": ["dom", "esnext"],
     "strict": true,
-    "skipLibCheck": true,
+    "skipLibCheck": false,
     "esModuleInterop": true,
     "noEmit": true
   }

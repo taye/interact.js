@@ -1911,11 +1911,6 @@
   resolved "https://registry.npmjs.org/@types/stack-utils/-/stack-utils-2.0.3.tgz#6209321eb2c1712a7e7466422b8cb1fc0d9dd5d8"
   integrity sha512-9aEbYZ3TbYMznPdcdr3SmIrLXwC/AKZXQeCf9Pgao5CKb8CyHuEX5jzWPTkvregvhRJHcpRO6BFoGW9ycaOkYw==
 
-"@types/symbol-tree@^3.2.3":
-  version "3.2.5"
-  resolved "https://registry.npmjs.org/@types/symbol-tree/-/symbol-tree-3.2.5.tgz#70a848c75bccdbcededd259493cee33bcb57b097"
-  integrity sha512-zXnnyENt1TYQcS21MkPaJCVjfcPq7p7yc5mo5JACuumXp6sly5jnlS0IokHd+xmmuCbx6V7JqkMBpswR+nZAcw==
-
 "@types/testing-library__jest-dom@^5.9.1":
   version "5.14.9"
   resolved "https://registry.npmjs.org/@types/testing-library__jest-dom/-/testing-library__jest-dom-5.14.9.tgz#0fb1e6a0278d87b6737db55af5967570b67cb466"

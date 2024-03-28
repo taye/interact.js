@@ -20,7 +20,7 @@ const {
   isPro,
 } = require('./scripts/utils')
 
-const BUNDLED_DEPS = ['rebound', 'symbol-tree']
+const BUNDLED_DEPS = ['rebound']
 const INPUT_EXTENSIONS = ['.ts', '.tsx', '.vue']
 const moduleDirectory = getModuleDirectories()
 

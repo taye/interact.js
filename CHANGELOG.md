@@ -1,3 +1,7 @@
+## v1.10.27
+
+- fix(types): fix issues with `skipLibCheck: false`
+
 ## v1.10.26
 
 - fix: improve build; check output for ES2018 compatibility

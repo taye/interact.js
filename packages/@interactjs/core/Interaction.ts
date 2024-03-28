@@ -100,7 +100,7 @@ declare module '@interactjs/core/scope' {
 
 export type InteractionProxy<T extends ActionName | null = never> = Pick<
   Interaction<T>,
-  keyof typeof _ProxyValues | keyof typeof _ProxyMethods
+  Exclude<keyof typeof _ProxyValues | keyof typeof _ProxyMethods, '_proxy'>
 >
 
 let idCounter = 0

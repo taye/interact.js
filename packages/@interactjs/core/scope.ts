@@ -44,7 +44,6 @@ interface DocSignalArg {
   options: Record<string, any>
 }
 
-/** @internal */
 export interface Plugin {
   [key: string]: any
   id?: string
@@ -255,6 +254,11 @@ export class Scope {
   now() {
     return (((this.window as any).Date as typeof Date) || Date).now()
   }
+}
+
+// Keep Scope class internal, but expose minimal interface to avoid broken types when Scope is stripped out
+export interface Scope {
+  fire<T extends ListenerName>(name: T, arg: SignalArgs[T]): void | false
 }
 
 /** @internal */

@@ -36,7 +36,7 @@ export class BaseEvent<T extends ActionName | null = never> {
 
 // defined outside of class definition to avoid assignment of undefined during
 // construction
-export interface BaseEvent<T extends ActionName> {
+export interface BaseEvent<T extends ActionName | null = never> {
   interaction: InteractionProxy<T>
 }
 
