@@ -1,0 +1,4 @@
+/* interact.js 1.10.27 | https://raw.github.com/taye/interact.js/main/LICENSE */
+
+import isWindow from"./isWindow.prod.js";import{window as win,getWindow}from"./window.prod.js";const window=o=>o===win||isWindow(o),docFrag=o=>object(o)&&11===o.nodeType,object=o=>!!o&&"object"==typeof o,func=o=>"function"==typeof o,number=o=>"number"==typeof o,bool=o=>"boolean"==typeof o,string=o=>"string"==typeof o,element=o=>{if(!o||"object"!=typeof o)return!1;const e=getWindow(o)||win;return/object|function/.test(typeof Element)?o instanceof Element||o instanceof e.Element:1===o.nodeType&&"string"==typeof o.nodeName},plainObject=o=>object(o)&&!!o.constructor&&/function Object\b/.test(o.constructor.toString()),array=o=>object(o)&&void 0!==o.length&&func(o.splice);var is={window:window,docFrag:docFrag,object:object,func:func,number:number,bool:bool,string:string,element:element,plainObject:plainObject,array:array};export{is as default};
+//# sourceMappingURL=is.prod.js.map

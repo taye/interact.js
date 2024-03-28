@@ -111,5 +111,8 @@
       "stylelint --fix"
     ]
   },
-  "license": "MIT"
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  }
 }

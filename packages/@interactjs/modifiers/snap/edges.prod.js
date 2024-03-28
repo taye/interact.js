@@ -1,0 +1,4 @@
+/* interact.js 1.10.27 | https://raw.github.com/taye/interact.js/main/LICENSE */
+
+import clone from"../../utils/clone.prod.js";import extend from"../../utils/extend.prod.js";import{makeModifier}from"../base.prod.js";import{snapSize}from"./size.prod.js";import"../Modification.prod.js";import"../../utils/rect.prod.js";import"../../utils/is.prod.js";import"./pointer.prod.js";import"../../utils/getOriginXY.prod.js";import"../../utils/hypot.prod.js";function start(t){const{edges:s}=t;return s?(t.state.targetFields=t.state.targetFields||[[s.left?"left":"right",s.top?"top":"bottom"]],snapSize.start(t)):null}const snapEdges={start:start,set:snapSize.set,defaults:extend(clone(snapSize.defaults),{targets:void 0,range:void 0,offset:{x:0,y:0}})};var snapEdges$1=makeModifier(snapEdges,"snapEdges");export{snapEdges$1 as default,snapEdges};
+//# sourceMappingURL=edges.prod.js.map

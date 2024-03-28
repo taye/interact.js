@@ -1,0 +1,4 @@
+/* interact.js 1.10.27 | https://raw.github.com/taye/interact.js/main/LICENSE */
+
+import modifiers from"./plugin.prod.js";import interact from"../interact/index.prod.js";import"../snappers/plugin.prod.js";import"./all.prod.js";import"./aspectRatio.prod.js";import"../utils/extend.prod.js";import"../utils/rect.prod.js";import"./base.prod.js";import"./Modification.prod.js";import"../utils/clone.prod.js";import"./restrict/edges.prod.js";import"./restrict/pointer.prod.js";import"../utils/is.prod.js";import"./restrict/rect.prod.js";import"./restrict/size.prod.js";import"./snap/edges.prod.js";import"./snap/size.prod.js";import"./snap/pointer.prod.js";import"../utils/getOriginXY.prod.js";import"../utils/hypot.prod.js";import"./noop.prod.js";interact.use(modifiers);
+//# sourceMappingURL=index.prod.js.map

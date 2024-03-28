@@ -1,0 +1,1 @@
+{"version":3,"file":"isWindow.prod.js","sources":["isWindow.ts"],"sourcesContent":["export default (thing: any) => !!(thing && thing.Window) && thing instanceof thing.Window\n"],"names":["isWindow","thing","Window"],"mappings":";;AAAA,IAAAA,SAAAC,MAAgCA,IAAWA,EAAKC,SAAYD,aAAiBA,EAAKC"}
