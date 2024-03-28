@@ -121,7 +121,8 @@ async function runBuild() {
 function commit() {
   // commit and add new version tag
   shell.exec('git add --all .')
-  shell.exec('git add --force packages dist/api')
+  shell.exec('git add --force packages')
+  if (!isPro) shell.exec('git add --force dist/api')
   shell.exec('git reset **/node_modules')
   shell.exec(`git commit --no-verify -m ${gitTag}`)
 }
