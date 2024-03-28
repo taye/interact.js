@@ -1,9 +1,7 @@
-name: Workflow
-
 on:
-  push:
   pull_request:
   workflow_dispatch:
+  workflow_call:
 
 jobs:
   test:
@@ -20,22 +18,3 @@ jobs:
         run: npx _lint
       - name: 🧪 tests
         run: npm test
-
-  publish-npm:
-    name: '📦 Build and Publish 🚀'
-    if: ${{ github.repository == 'taye/interact.js' && (github.ref_name == 'latest' || github.ref_name == 'next') }}
-    needs: test
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 16
-          registry-url: https://registry.npmjs.org/
-          cache: yarn
-      - name: ⚙ bootstrap
-        run: 'npm run bootstrap && git fetch --tags'
-      - name: 📦 build and publish 🚀
-        run: npx _release
-        env:
-          NODE_AUTH_TOKEN: ${{secrets.npm_token}}

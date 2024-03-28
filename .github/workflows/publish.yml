@@ -1,0 +1,28 @@
+on:
+  push:
+    branches:
+      - main
+      - next
+
+jobs:
+  test:
+    uses: ./.github/workflows/test.yml
+
+  publish-npm:
+    name: '📦 Build and Publish 🚀'
+    needs: [test]
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+          registry-url: https://registry.npmjs.org/
+          cache: yarn
+      - name: ⚙ bootstrap
+        run: 'npm run bootstrap && git fetch --tags'
+      - name: 📦 build and publish 🚀
+        run: npx _release
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.npm_token}}
