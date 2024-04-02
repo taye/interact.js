@@ -67,7 +67,7 @@ function checkAndPreventDefault(interactable: Interactable, scope: Scope, event:
   }
 
   // don't preventDefault of pointerdown events
-  if (/^(mouse|pointer|touch)*(down|start)/i.test(event.type)) {
+  if (/^(mouse|pointer|touch)*(down|start|end)/i.test(event.type)) {
     return
   }
 
