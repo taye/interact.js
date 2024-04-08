@@ -213,8 +213,8 @@ export function getElementClientRect(element: Element): Required<Rect> {
   const clientRect =
     element instanceof domObjects.SVGElement ? element.getBoundingClientRect() : element.getClientRects()[0]
 
-  return (
-    clientRect && {
+  if (clientRect) {
+    return {
       left: clientRect.left,
       right: clientRect.right,
       top: clientRect.top,
@@ -222,7 +222,16 @@ export function getElementClientRect(element: Element): Required<Rect> {
       width: clientRect.width || clientRect.right - clientRect.left,
       height: clientRect.height || clientRect.bottom - clientRect.top,
     }
-  )
+  }
+
+  return {
+    left: 0,
+    right: 0,
+    top: 0,
+    bottom: 0,
+    width: 0,
+    height: 0,
+  }
 }
 
 export function getElementRect(element: Element) {
