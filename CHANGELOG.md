@@ -51,7 +51,7 @@
 
 ## v1.10.16
 
-- remove vue and react deps fron pro `@interactjs/interactjs` package
+- remove vue and react deps from pro `@interactjs/interactjs` package
 
 ## v1.10.15
 
@@ -180,7 +180,7 @@
 
 ## v1.9.12
 
-- fixed regression breaking commonjs imports withotu .default
+- fixed regression breaking commonjs imports without .default
 
 ## v1.9.11
 
@@ -451,7 +451,7 @@ issues and pull requests.
 
 # v1.4.0
 
-Most notablly:
+Most notably:
 
 - `interactable.reflow(action)` to re-run modifiers, drop, etc [PR #610](https://github.com/taye/interact.js/pull/610)
 - `dropEvent.reject()` [PR #613](https://github.com/taye/interact.js/pull/613)
@@ -843,5 +843,5 @@ when different contexts have been used.
 ### iFrames
 
 [Added basic support](https://github.com/taye/interact.js/pull/98) for sharing
-one instance of interact.js between multiplie windows/frames. There are still
+one instance of interact.js between multiple windows/frames. There are still
 some issues.
