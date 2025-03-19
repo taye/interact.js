@@ -17,4 +17,6 @@ jobs:
       - name: 🔍 lint
         run: npx _lint
       - name: 🧪 tests
-        run: npm test
+        run: |
+          export PATH=`pwd`/node_modules/puppeteer/.local-chromium/linux-901912/chrome-linux:$PATH
+          npm test
