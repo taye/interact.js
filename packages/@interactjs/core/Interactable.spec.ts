@@ -189,4 +189,18 @@ describe('core/Interactable', () => {
     selectorInteractable.fire({ type: 'dragstart' })
     expect(fired).toEqual([])
   })
+
+  test('Interactable.checker', () => {
+    const scope = helpers.mockScope()
+
+    const div = scope.document.createElement('div')
+    const interactable = scope.interactables.new(div)
+    const checker = jest.fn()
+
+    interactable.rectChecker(checker)
+    interactable.getRect(div)
+    expect(checker).toHaveBeenCalledWith(div)
+
+    div.remove()
+  })
 })

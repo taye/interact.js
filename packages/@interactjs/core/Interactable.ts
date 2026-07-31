@@ -188,7 +188,7 @@ export class Interactable implements Partial<Eventable> {
   rectChecker(checker?: (element: Element) => any) {
     if (is.func(checker)) {
       this.getRect = (element) => {
-        const rect = extend({}, checker.apply(this, element))
+        const rect = extend({}, checker.call(this, element))
 
         if (!(('width' in rect) as unknown)) {
           rect.width = rect.right - rect.left
