@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: ianwalter/playwright-container@43940dfa7d309fe3569b9df407ae9e84dcbf2e7f
+      - uses: ianwalter/playwright-container@0aab01e763905bd04a7cc7f79a390db801cf0410
       - name: ⚙ bootstrap
         run: 'npm run bootstrap && npx _check_deps && npx _add_plugin_indexes'
       - name: 📐 types
