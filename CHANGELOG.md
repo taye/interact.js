@@ -1,3 +1,7 @@
+## v1.10.28
+
+- fix(core): pass element arg to rect checker correctly
+
 ## v1.10.27
 
 - fix(types): fix issues with `skipLibCheck: false`
