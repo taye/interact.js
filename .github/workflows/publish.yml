@@ -5,9 +5,6 @@ on:
       - next
 
 jobs:
-  test:
-    uses: ./.github/workflows/test.yml
-
   publish-npm:
     name: '📦 Build and Publish 🚀'
     needs: [test]
