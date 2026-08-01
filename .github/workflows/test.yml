@@ -2,6 +2,9 @@ on:
   pull_request:
   workflow_dispatch:
   workflow_call:
+  push:
+    branches:
+      - main
 
 jobs:
   test:
