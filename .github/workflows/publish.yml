@@ -1,7 +1,7 @@
 on:
   push:
     branches:
-      - main
+      - latest
       - next
 
 jobs:
@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     environment: production
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v6
       - uses: actions/setup-node@v4
         with:
           node-version-file: '.nvmrc'
