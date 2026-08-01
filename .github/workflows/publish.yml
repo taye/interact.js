@@ -7,7 +7,6 @@ on:
 jobs:
   publish-npm:
     name: '📦 Build and Publish 🚀'
-    needs: [test]
     runs-on: ubuntu-latest
     environment: production
     steps:
