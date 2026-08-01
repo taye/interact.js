@@ -8,8 +8,13 @@ jobs:
     name: '🧪 Test'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: browser-actions/setup-chrome@0eb8bbcc1e243e1d5290b6dcfe362aa5936e74e2
+      - uses: actions/checkout@v6
+      - uses: browser-actions/setup-chrome@2e1d749697dd1612b833dba4a722266286fbefcd
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+          registry-url: https://registry.npmjs.org/
+          cache: yarn
       - name: ⚙ bootstrap
         run: 'npm run bootstrap && npx _check_deps && npx _add_plugin_indexes'
         env:
