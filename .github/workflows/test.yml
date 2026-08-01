@@ -9,12 +9,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: ianwalter/playwright-container@0aab01e763905bd04a7cc7f79a390db801cf0410
+      - uses: browser-actions/setup-chrome@v2
       - name: ⚙ bootstrap
         run: 'npm run bootstrap && npx _check_deps && npx _add_plugin_indexes'
+        env:
+          ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD: true
       - name: 📐 types
         run: npx tsc -b -f
       - name: 🔍 lint
         run: npx _lint
       - name: 🧪 tests
         run: npm test
+        env:
+          PUPPETEER_EXECUTABLE_PATH: ${{ steps.setup-chrome.outputs.chrome-path }}

@@ -1,6 +1,6 @@
 module.exports = {
   launch: {
-    executablePath: 'chromium',
+    // executablePath: 'chromium',
     // devtools: true,
     // slowMo: 1000,
   },
