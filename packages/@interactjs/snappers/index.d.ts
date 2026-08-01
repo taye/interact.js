@@ -1,0 +1,1 @@
+import '@interactjs/snappers/plugin';

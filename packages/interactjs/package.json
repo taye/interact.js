@@ -44,5 +44,8 @@
     "**/index.js",
     "**/index.prod.js"
   ],
-  "license": "MIT"
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  }
 }

@@ -1,0 +1,13 @@
+import '@interactjs/actions/plugin';
+import '@interactjs/auto-scroll/plugin';
+import '@interactjs/auto-start/plugin';
+import '@interactjs/core/interactablePreventDefault';
+import '@interactjs/dev-tools/plugin';
+import '@interactjs/inertia/plugin';
+import '@interactjs/interact';
+import '@interactjs/modifiers/plugin';
+import '@interactjs/offset/plugin';
+import '@interactjs/pointer-events/plugin';
+import '@interactjs/reflow/plugin';
+import interact from '@interactjs/interact';
+export default interact;
