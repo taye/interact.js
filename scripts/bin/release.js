@@ -144,7 +144,7 @@ async function pushAndPublish() {
   const { deleteAsync } = await import('del')
   if (isPro) await deleteAsync('packages/**/*.map')
 
-  const npmPublishCommand = 'npm publish' + (NPM_TAG ? ` --tag ${NPM_TAG}` : '')
+  const npmPublishCommand = 'npm stage publish' + (NPM_TAG ? ` --tag ${NPM_TAG}` : '')
   const packagesToPublish = isPro ? packages.filter((p) => /@interactjs\//.test(p)) : packages
 
   for (const pkg of packagesToPublish) {
