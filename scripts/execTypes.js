@@ -14,10 +14,9 @@ module.exports = {
     shell.exec(`npx tsc -p types.tsconfig.json --rootDir packages --outFile ${outFile}`)
 
     const namespaceDeclaration = `
-import * as Interact from '@interactjs/types/index'
-
-export as namespace Interact
-export = Interact
+declare module '@interactjs/types' {
+  export * from '@interactjs/types/index';
+}
 `.trimStart()
 
     await fs.promises.writeFile(path.join(outDir, 'typings.d.ts'), namespaceDeclaration)
