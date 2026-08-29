@@ -27,7 +27,8 @@ import type {
 import { Eventable } from './Eventable'
 import type { ActionDefaults, Defaults, OptionsArg, PerActionDefaults, Options } from './options'
 
-type IgnoreValue = string | Element | boolean
+type IgnoreValue = string | Element | boolean | ((targetNode: Node, eventTarget: Node) => boolean)
+type AllowValue = string | Element | boolean | ((targetNode: Node, eventTarget: Node) => boolean)
 type DeltaSource = 'page' | 'client'
 
 const enum OnOffMethod {
@@ -291,7 +292,7 @@ export class Interactable implements Partial<Eventable> {
   /** @internal */
   testIgnoreAllow(
     this: Interactable,
-    options: { ignoreFrom?: IgnoreValue; allowFrom?: IgnoreValue },
+    options: { ignoreFrom?: IgnoreValue; allowFrom?: AllowValue },
     targetNode: Node,
     eventTarget: Node,
   ) {
@@ -302,7 +303,7 @@ export class Interactable implements Partial<Eventable> {
   }
 
   /** @internal */
-  testAllow(this: Interactable, allowFrom: IgnoreValue | undefined, targetNode: Node, element: Node) {
+  testAllow(this: Interactable, allowFrom: AllowValue | undefined, targetNode: Node, element: Node) {
     if (!allowFrom) {
       return true
     }
@@ -315,6 +316,8 @@ export class Interactable implements Partial<Eventable> {
       return matchesUpTo(element, allowFrom, targetNode)
     } else if (is.element(allowFrom)) {
       return nodeContains(allowFrom, element)
+    } else if (is.func(allowFrom)) {
+      return allowFrom(targetNode, element)
     }
 
     return false
@@ -330,6 +333,8 @@ export class Interactable implements Partial<Eventable> {
       return matchesUpTo(element, ignoreFrom, targetNode)
     } else if (is.element(ignoreFrom)) {
       return nodeContains(ignoreFrom, element)
+    } else if (is.func(ignoreFrom)) {
+      return ignoreFrom(targetNode, element)
     }
 
     return false
