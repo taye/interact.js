@@ -168,7 +168,7 @@ function install(scope: Scope) {
 
   function addDelegate(
     selector: string,
-    context: Node,
+    context: Document | Element,
     type: string,
     listener: ListenerEntry['func'],
     optionalArg?: any,

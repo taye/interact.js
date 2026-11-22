@@ -15,14 +15,6 @@ require('../addPluginIndexes')([
   'reflow/plugin',
   'snappers/plugin',
   ...(isPro
-    ? [
-      'react/plugin',
-      'vue/plugin',
-      'multi-target/plugin',
-      'feedback/plugin',
-      'clone/plugin',
-      'arrange/plugin',
-      'iframes/plugin',
-    ]
+    ? ['react/plugin', 'vue/plugin', 'feedback/plugin', 'clone/plugin', 'arrange/plugin', 'iframes/plugin']
     : []),
 ])

@@ -3,6 +3,8 @@ import * as win from './window'
 
 const window = (thing: any): thing is Window => thing === win.window || isWindow(thing)
 
+const document = (thing: any): thing is Document => object(thing) && thing.nodeType === 9
+
 const docFrag = (thing: any): thing is DocumentFragment => object(thing) && thing.nodeType === 11
 
 const object = (thing: any): thing is { [index: string]: any } => !!thing && typeof thing === 'object'
@@ -35,6 +37,7 @@ const array = <T extends unknown>(thing: any): thing is T[] =>
 
 export default {
   window,
+  document,
   docFrag,
   object,
   func,

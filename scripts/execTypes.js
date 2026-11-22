@@ -11,7 +11,7 @@ module.exports = {
     const outFile = path.join(outDir, 'index.d.ts')
 
     // await del(path.join(typesOutDir, outBasename))
-    shell.exec(`npx tsc -p types.tsconfig.json --rootDir packages --outFile ${outFile}`)
+    shell.exec(`yarn tsc -p types.tsconfig.json --rootDir packages --outFile ${outFile}`)
 
     const namespaceDeclaration = `
 import * as Interact from '@interactjs/types/index'

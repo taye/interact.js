@@ -2,7 +2,14 @@
 import * as arr from '@interactjs/utils/arr'
 import browser from '@interactjs/utils/browser'
 import clone from '@interactjs/utils/clone'
-import { getElementRect, matchesUpTo, nodeContains, trySelector } from '@interactjs/utils/domUtils'
+import {
+  getElementRect,
+  matchesSelector,
+  matchesUpTo,
+  nodeContains,
+  parentNode,
+  trySelector,
+} from '@interactjs/utils/domUtils'
 import extend from '@interactjs/utils/extend'
 import is from '@interactjs/utils/is'
 import isNonNativeEvent from '@interactjs/utils/isNonNativeEvent'
@@ -17,6 +24,7 @@ import type {
   Actions,
   Context,
   Element,
+  EventTarget,
   EventTypes,
   Listeners,
   ListenersArg,
@@ -60,7 +68,8 @@ export class Interactable implements Partial<Eventable> {
   /** @internal */ readonly options!: Required<Options>
   /** @internal */ readonly _actions: Actions
   /** @internal */ readonly events = new Eventable()
-  /** @internal */ readonly _context: Context
+  /** @internal */ readonly _context: Context | Context[]
+  /** @internal */ readonly _unique: boolean
   /** @internal */ readonly _win: Window
   /** @internal */ readonly _doc: Document
   /** @internal */ readonly _scopeEvents: Scope['events']
@@ -73,6 +82,7 @@ export class Interactable implements Partial<Eventable> {
   ) {
     this._actions = options.actions
     this.target = target
+    this._unique = !!options.unique
     this._context = options.context || defaultContext
     this._win = getWindow(trySelector(target) ? this._context : target)
     this._doc = this._win.document
@@ -168,8 +178,12 @@ export class Interactable implements Partial<Eventable> {
   getRect(element: Element) {
     element = element || (is.element(this.target) ? this.target : null)
 
-    if (is.string(this.target)) {
-      element = element || this._context.querySelector(this.target)
+    if (is.string(this.target) && !element) {
+      const { _context } = this
+
+      if (is.array(_context)) {
+        for (const context of _context) if ((element = context.querySelector(this.target))) break
+      } else element = _context.querySelector(this.target)
     }
 
     return getElementRect(element)
@@ -264,7 +278,10 @@ export class Interactable implements Partial<Eventable> {
     const { target } = this
 
     if (is.string(target)) {
-      return Array.from(this._context.querySelectorAll(target))
+      const { _context } = this
+      if (is.array(_context))
+        return Array.from(new Set(_context.flatMap((c) => Array.from(c.querySelectorAll(target)))))
+      else return Array.from(_context.querySelectorAll(target))
     }
 
     if (is.func(target) && (target as any).getAllElements) {
@@ -284,9 +301,32 @@ export class Interactable implements Partial<Eventable> {
     return this._context
   }
 
-  inContext(element: Document | Node) {
-    return this._context === element.ownerDocument || nodeContains(this._context, element)
+  inContext(element: EventTarget) {
+    let _context = this._context as Context | Context[]
+
+    if (typeof Set !== 'undefined' && _context instanceof Set) {
+      _context = Array.from(_context)
+    }
+
+    if (is.array(_context)) {
+      return _context.some((context) => inContext(element, context))
+    }
+
+    // TODO: this is only to allow arrangeable with string target being
+    // set as its children draggable's context. Find a better/more general solution?
+    if (is.string(_context) && 'parentNode' in element) {
+      return !!matchesSelector(parentNode(element) as Element, _context)
+    }
+
+    return inContext(element, _context)
   }
+
+  /** @internal */
+  _matches(target: Target, context = this._context) {
+    return matches(this, target, context, this.target)
+  }
+
+  // TODO: prevent delegated events for multi-target and multi-context
 
   /** @internal */
   testIgnoreAllow(
@@ -376,9 +416,13 @@ export class Interactable implements Partial<Eventable> {
         }
         // delegated event
         else if (is.string(this.target)) {
+          const { _context } = this
+          if (is.array(_context))
+            throw new Error(`Can't add delegated event to interactable with array context.`)
+
           this._scopeEvents[method === OnOffMethod.On ? 'addDelegate' : 'removeDelegate'](
             this.target,
-            this._context,
+            _context,
             type,
             listener,
             options,
@@ -472,24 +516,27 @@ export class Interactable implements Partial<Eventable> {
   unset() {
     if (is.string(this.target)) {
       // remove delegated events
-      for (const type in this._scopeEvents.delegatedEvents) {
-        const delegated = this._scopeEvents.delegatedEvents[type]
 
-        for (let i = delegated.length - 1; i >= 0; i--) {
-          const { selector, context, listeners } = delegated[i]
+      if (!is.array(this._context)) {
+        for (const type in this._scopeEvents.delegatedEvents) {
+          const delegated = this._scopeEvents.delegatedEvents[type]
 
-          if (selector === this.target && context === this._context) {
-            delegated.splice(i, 1)
-          }
+          for (let i = delegated.length - 1; i >= 0; i--) {
+            const { selector, context, listeners } = delegated[i]
 
-          for (let l = listeners.length - 1; l >= 0; l--) {
-            this._scopeEvents.removeDelegate(
-              this.target,
-              this._context,
-              type,
-              listeners[l][0],
-              listeners[l][1],
-            )
+            if (selector === this.target && context === this._context) {
+              delegated.splice(i, 1)
+            }
+
+            for (let l = listeners.length - 1; l >= 0; l--) {
+              this._scopeEvents.removeDelegate(
+                this.target,
+                this._context,
+                type,
+                listeners[l][0],
+                listeners[l][1],
+              )
+            }
           }
         }
       }
@@ -497,4 +544,34 @@ export class Interactable implements Partial<Eventable> {
       this._scopeEvents.remove(this.target, 'all')
     }
   }
+}
+
+function inContext(target: Node | Window, context: Context) {
+  if (is.window(target)) return context.ownerDocument.defaultView === target
+  return context === target.ownerDocument || nodeContains(context, target)
+}
+
+export function matches(
+  self: Interactable,
+  targetCandidate: Target,
+  context: Context | Context[],
+  targetOption: Target,
+) {
+  if (self._context !== context) return false
+
+  // target is the selector string or Element/EventTarget
+  if (targetCandidate === targetOption) return true
+  // string or custom candidate differs from interactable target
+  if (is.string(targetCandidate) || is.func(targetCandidate)) return false
+
+  // target is a selector and the element matches
+  if (is.string(targetOption)) {
+    return is.element(targetCandidate) && matchesSelector(targetCandidate, targetOption)
+  }
+
+  if (is.func(targetOption)) {
+    return targetOption(targetCandidate, self)
+  }
+
+  return false
 }

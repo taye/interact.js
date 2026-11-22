@@ -2,7 +2,7 @@ import type Interaction from '@interactjs/core/Interaction'
 
 import type { Interactable } from './Interactable'
 import type { PhaseMap, InteractEvent } from './InteractEvent'
-import type { NativePointerEvent as NativePointerEvent_ } from './NativeTypes'
+import type { NativeEventTarget, NativePointerEvent as NativePointerEvent_ } from './NativeTypes'
 
 export type OrBoolean<T> = {
   [P in keyof T]: T[P] | boolean
@@ -11,7 +11,13 @@ export type OrBoolean<T> = {
 export type Element = HTMLElement | SVGElement
 export type Context = Document | Element
 export type EventTarget = Window | Document | Element
-export type Target = EventTarget | string
+export type CustomTarget = {
+  (target: EventTarget, interactable: Interactable): boolean
+  addEventListener?: NativeEventTarget['addEventListener']
+  removeEventListener?: NativeEventTarget['removeEventListener']
+  getAllElements?: () => Element[]
+}
+export type Target = EventTarget | string | CustomTarget
 
 export interface Point {
   x: number

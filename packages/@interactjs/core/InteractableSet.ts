@@ -1,5 +1,4 @@
 import * as arr from '@interactjs/utils/arr'
-import * as domUtils from '@interactjs/utils/domUtils'
 import extend from '@interactjs/utils/extend'
 import is from '@interactjs/utils/is'
 
@@ -80,40 +79,37 @@ export class InteractableSet {
   }
 
   getExisting(target: Target, options?: Options) {
+    if (options?.unique) return undefined
+
     const context = (options && options.context) || this.scope.document
     const isSelector = is.string(target)
-    const interactablesOnTarget: Interactable[] = isSelector
+    const targetMappings = isSelector
       ? this.selectorMap[target as string]
-      : (target as any)[this.scope.id]
+      : (target[this.scope.id] as Interactable[])
 
-    if (!interactablesOnTarget) return undefined
+    if (!targetMappings) return undefined
 
     return arr.find(
-      interactablesOnTarget,
+      targetMappings,
       (interactable) =>
-        interactable._context === context && (isSelector || interactable.inContext(target as any)),
+        interactable._context === context &&
+        (isSelector || !is.element(target) || interactable.inContext(target)) &&
+        !interactable._unique,
     )
   }
 
-  forEachMatch<T>(node: Node, callback: (interactable: Interactable) => T): T | void {
+  forEachMatch<T>(target: Target, callback: (interactable: Interactable) => T): T | void {
     for (const interactable of this.list) {
-      let ret: T
+      let ret: T | undefined
 
       if (
-        (is.string(interactable.target)
-          ? // target is a selector and the element matches
-            is.element(node) && domUtils.matchesSelector(node, interactable.target)
-          : // target is the element
-            node === interactable.target) &&
-        // the element is in context
-        interactable.inContext(node)
+        interactable._matches(target) &&
+        (is.string(target) || is.func(target) || interactable.inContext(target))
       ) {
         ret = callback(interactable)
       }
 
-      if (ret !== undefined) {
-        return ret
-      }
+      if (ret !== undefined) return ret
     }
   }
 }

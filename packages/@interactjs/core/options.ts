@@ -13,6 +13,7 @@ export interface BaseDefaults {
   preventDefault?: 'always' | 'never' | 'auto'
   deltaSource?: 'page' | 'client'
   context?: Node
+  unique?: boolean
   getRect?: (element: Element) => Rect
 }
 

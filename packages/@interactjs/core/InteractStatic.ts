@@ -6,7 +6,7 @@ import { warnOnce } from '@interactjs/utils/misc'
 import * as pointerUtils from '@interactjs/utils/pointerUtils'
 
 import type { Scope, Plugin } from '@interactjs/core/scope'
-import type { Context, EventTypes, Listener, ListenersArg, Target } from '@interactjs/core/types'
+import type { Context, EventTarget, EventTypes, Listener, ListenersArg, Target } from '@interactjs/core/types'
 
 import type { Interactable } from './Interactable'
 import type { Options } from './options'
@@ -35,7 +35,9 @@ import type { Options } from './options'
  * @return {Interactable}
  */
 export interface InteractStatic {
+  /** @internal */
   (target: Target, options?: Options): Interactable
+  (target: EventTarget | string, options?: Options): Interactable
   getPointerAverage: typeof pointerUtils.pointerAverage
   getTouchBBox: typeof pointerUtils.touchBBox
   getTouchDistance: typeof pointerUtils.touchDistance
@@ -129,8 +131,16 @@ export function createInteractStatic(scope: Scope): InteractStatic {
     return this
   }
 
-  interact.isSet = function (target: Target, options?: { context?: Context }): boolean {
-    return !!this.scope.interactables.get(target, options && options.context)
+  interact.isSet = function (target: Target, options?: { context?: Context; unique?: boolean }): boolean {
+    if (options?.unique) return false
+
+    const context = (options && options.context) || scope.document
+
+    for (const interactable of scope.interactables.list) {
+      if (!interactable._unique && interactable._matches(target, context)) return true
+    }
+
+    return false
   }
 
   interact.on = warnOnce(function on(type: string | EventTypes, listener: ListenersArg, options?: object) {
