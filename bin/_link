@@ -26,4 +26,7 @@ for package in $(cd $ROOT/packages/@interactjs && ls -d *); do
 done
 
 # link all bins from this repo and from CWD
-cd node_modules/.bin && ln -sf $ROOT/bin/* ../../bin/* .
+cd node_modules/.bin && {
+  ln -sf $ROOT/bin/* .
+  ln -sf ../../bin/* .
+}
