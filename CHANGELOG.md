@@ -1,3 +1,7 @@
+## v1.10.29
+
+- feat(core): support custom targets and unique interactables (experimental)
+
 ## v1.10.28
 
 - fix(core): pass element arg to rect checker correctly
