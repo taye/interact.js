@@ -1,0 +1,1 @@
+import '@interactjs/modifiers/plugin';

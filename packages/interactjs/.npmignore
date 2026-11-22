@@ -1,5 +1,6 @@
 *.ts
 !*.d.ts
+*.map.*
 *.spec.ts
 *.spec.js
 dist/docs

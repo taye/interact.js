@@ -10,24 +10,17 @@
   },
   "dependencies": {
     "@interactjs/actions": "1.10.29",
-    "@interactjs/arrange": "1.10.29",
     "@interactjs/auto-scroll": "1.10.29",
     "@interactjs/auto-start": "1.10.29",
-    "@interactjs/clone": "1.10.29",
     "@interactjs/core": "1.10.29",
     "@interactjs/dev-tools": "1.10.29",
-    "@interactjs/feedback": "1.10.29",
     "@interactjs/inertia": "1.10.29",
     "@interactjs/interact": "1.10.29",
     "@interactjs/modifiers": "1.10.29",
     "@interactjs/offset": "1.10.29",
     "@interactjs/pointer-events": "1.10.29",
-    "@interactjs/react": "1.10.29",
-    "@interactjs/rebound": "1.10.29",
-    "@interactjs/symbol-tree": "1.10.29",
     "@interactjs/reflow": "1.10.29",
-    "@interactjs/utils": "1.10.29",
-    "@interactjs/vue": "1.10.29"
+    "@interactjs/utils": "1.10.29"
   },
   "publishConfig": {
     "access": "public"

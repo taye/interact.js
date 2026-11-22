@@ -1,0 +1,1 @@
+{"version":3,"file":"edgeTarget.prod.js","sources":["edgeTarget.ts"],"sourcesContent":["export default () => {}\n"],"names":["edgeTarget"],"mappings":";;AAAA,IAAeA,WAAA"}

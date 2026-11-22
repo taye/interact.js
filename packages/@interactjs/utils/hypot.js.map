@@ -1,0 +1,1 @@
+{"version":3,"file":"hypot.js","sources":["hypot.ts"],"sourcesContent":["export default (x: number, y: number) => Math.sqrt(x * x + y * y)\n"],"names":["x","y","Math","sqrt"],"mappings":";;;;;;;;AAAA,YAAA,CAAe,CAACA,CAAS,EAAEC,CAAS,KAAKC,IAAI,CAACC,IAAI,CAACH,CAAC,GAAGA,CAAC,GAAGC,CAAC,GAAGA,CAAC,CAAC;;;;"}
