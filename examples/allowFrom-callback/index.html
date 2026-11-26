@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>InteractJS - allowFrom Callback Example</title>
+    <style>
+        .draggable {
+            width: 250px;
+            height: 200px;
+            background: #e3f2fd;
+            border: 2px solid #1976d2;
+            margin: 20px;
+            padding: 10px;
+            border-radius: 8px;
+            position: relative;
+        }
+
+        .drag-handle {
+            background: #1976d2;
+            color: white;
+            padding: 8px;
+            margin-bottom: 10px;
+            cursor: move;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+
+        .drag-handle:hover {
+            background: #1565c0;
+        }
+
+        .content-area {
+            background: white;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 5px 0;
+            min-height: 60px;
+        }
+
+        .admin-only {
+            background: #ffeb3b;
+            padding: 5px;
+            margin: 5px 0;
+            border-radius: 3px;
+            border: 1px dashed #f57c00;
+        }
+
+        .editor-area {
+            background: #f3e5f5;
+            padding: 5px;
+            margin: 5px 0;
+            border-radius: 3px;
+            border: 1px dashed #7b1fa2;
+        }
+
+        .no-drag-zone {
+            background: #ffcdd2;
+            padding: 5px;
+            margin: 5px 0;
+            border-radius: 3px;
+            cursor: not-allowed;
+        }
+
+        input, textarea, select {
+            width: 100%;
+            margin: 5px 0;
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #fafafa;
+        }
+
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+
+        .info {
+            background: #e8f5e8;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border: 1px solid #4caf50;
+        }
+
+        .role-selector {
+            text-align: center;
+            margin: 20px 0;
+            padding: 10px;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+        }
+
+        .role-btn {
+            margin: 0 5px;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .role-btn.admin { background: #4caf50; color: white; }
+        .role-btn.editor { background: #ff9800; color: white; }
+        .role-btn.viewer { background: #9e9e9e; color: white; }
+        .role-btn.active { box-shadow: 0 0 0 2px #333; }
+
+        .demo-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>InteractJS - allowFrom with Callback Function</h1>
+    
+    <div class="info">
+        <p><strong>Demonstration of the `allowFrom` option with callback:</strong></p>
+        <ul>
+            <li>Only certain areas allow drag initiation</li>
+            <li>Logic is fully customizable via a callback function</li>
+            <li>Change your role below to see different behaviors</li>
+        </ul>
+    </div>
+
+    <div class="role-selector">
+        <span><strong>Your role: </strong></span>
+        <button class="role-btn admin active" data-role="admin">👑 Admin</button>
+        <button class="role-btn editor" data-role="editor">✏️ Editor</button>
+        <button class="role-btn viewer" data-role="viewer">👁️ Viewer</button>
+    </div>
+
+    <div class="demo-container">
+        <div class="draggable" id="handle-only">
+            <div class="drag-handle">✋ Handle Only</div>
+            <div class="content-area">
+                <p>This container can only be moved by grabbing the blue handle above.</p>
+                <input type="text" placeholder="Non-draggable area">
+                <p>Try clicking here... it won't work!</p>
+            </div>
+        </div>
+
+        <div class="draggable" id="role-based">
+            <div class="drag-handle">🔐 Role-based Access</div>
+            <div class="admin-only" data-role-required="admin">
+                👑 Admin Only Zone - Drag allowed if role = Admin
+            </div>
+            <div class="editor-area" data-role-required="editor">
+                ✏️ Editor+ Zone - Drag allowed if role = Admin or Editor
+            </div>
+            <div class="no-drag-zone">
+                ⛔ Forbidden Zone - No dragging possible
+            </div>
+        </div>
+
+        <div class="draggable" id="advanced-logic">
+            <div class="drag-handle">🧠 Advanced Logic</div>
+            <div class="content-area">
+                <div data-draggable="conditional">📝 Conditional zone (role-based)</div>
+                <input type="text" placeholder="Input never draggable">
+                <div class="admin-only" data-special="admin-feature">
+                    🔧 Admin special feature
+                </div>
+                <select>
+                    <option>Select never draggable</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/interactjs/dist/interact.min.js"></script>
+    <script>
+        let currentRole = 'admin';
+
+        // Role button management
+        document.querySelectorAll('.role-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.role-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentRole = btn.dataset.role;
+                console.log('Role changed:', currentRole);
+            });
+        });
+
+        // Configuration for "handle-only" draggable
+        interact('#handle-only').draggable({
+            allowFrom: function(targetNode, eventTarget) {
+                // Only allow dragging from the handle
+                if (eventTarget.classList.contains('drag-handle')) {
+                    console.log('✅ Drag allowed: handle detected');
+                    return true;
+                }
+                console.log('❌ Drag denied: not on handle');
+                return false;
+            },
+            
+            listeners: {
+                start: function(event) {
+                    event.target.style.opacity = 0.8;
+                    event.target.style.transform += ' scale(1.05)';
+                },
+                move: dragMoveListener,
+                end: function(event) {
+                    event.target.style.opacity = '';
+                    event.target.style.transform = event.target.style.transform.replace(' scale(1.05)', '');
+                }
+            }
+        });
+
+        // Configuration for "role-based" draggable
+        interact('#role-based').draggable({
+            allowFrom: function(targetNode, eventTarget) {
+                // Always allow from handle
+                if (eventTarget.classList.contains('drag-handle')) {
+                    console.log('✅ Drag allowed: handle');
+                    return true;
+                }
+
+                // Check role requirements
+                const roleRequired = eventTarget.getAttribute('data-role-required');
+                if (roleRequired) {
+                    const allowed = checkRoleAccess(currentRole, roleRequired);
+                    console.log(`${allowed ? '✅' : '❌'} Role ${currentRole} for ${roleRequired} zone: ${allowed ? 'allowed' : 'denied'}`);
+                    return allowed;
+                }
+
+                // Explicitly forbid certain zones
+                if (eventTarget.classList.contains('no-drag-zone')) {
+                    console.log('❌ Explicitly forbidden zone');
+                    return false;
+                }
+
+                console.log('❌ Zone not allowed by default');
+                return false;
+            },
+            
+            listeners: {
+                start: function(event) {
+                    event.target.style.opacity = 0.8;
+                    event.target.style.boxShadow = '0 8px 16px rgba(0,0,0,0.3)';
+                },
+                move: dragMoveListener,
+                end: function(event) {
+                    event.target.style.opacity = '';
+                    event.target.style.boxShadow = '';
+                }
+            }
+        });
+
+        // Configuration for "advanced-logic" draggable
+        interact('#advanced-logic').draggable({
+            allowFrom: function(targetNode, eventTarget) {
+                // Handle always OK
+                if (eventTarget.classList.contains('drag-handle')) {
+                    return true;
+                }
+
+                // Never allow inputs/selects
+                if (['INPUT', 'SELECT', 'TEXTAREA'].includes(eventTarget.tagName)) {
+                    console.log('❌ Form element forbidden');
+                    return false;
+                }
+
+                // Conditional logic
+                if (eventTarget.hasAttribute('data-draggable')) {
+                    const condition = eventTarget.getAttribute('data-draggable');
+                    if (condition === 'conditional') {
+                        const allowed = currentRole === 'admin' || currentRole === 'editor';
+                        console.log(`${allowed ? '✅' : '❌'} Conditional draggable for ${currentRole}`);
+                        return allowed;
+                    }
+                }
+
+                // Admin special features
+                if (eventTarget.hasAttribute('data-special')) {
+                    const allowed = currentRole === 'admin';
+                    console.log(`${allowed ? '✅' : '❌'} Special feature for ${currentRole}`);
+                    return allowed;
+                }
+
+                return false;
+            },
+            
+            listeners: {
+                start: function(event) {
+                    event.target.style.opacity = 0.8;
+                    event.target.style.border = '2px solid #4caf50';
+                },
+                move: dragMoveListener,
+                end: function(event) {
+                    event.target.style.opacity = '';
+                    event.target.style.border = '2px solid #1976d2';
+                }
+            }
+        });
+
+        function checkRoleAccess(userRole, requiredRole) {
+            const roles = { viewer: 0, editor: 1, admin: 2 };
+            return roles[userRole] >= roles[requiredRole];
+        }
+
+        function dragMoveListener(event) {
+            var target = event.target;
+            var x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx;
+            var y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy;
+
+            target.style.transform = 'translate(' + x + 'px, ' + y + 'px)';
+            target.setAttribute('data-x', x);
+            target.setAttribute('data-y', y);
+        }
+    </script>
+</body>
+</html>

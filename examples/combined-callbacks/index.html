@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>InteractJS - allowFrom & ignoreFrom Callbacks Combined</title>
+    <style>
+        .draggable {
+            width: 300px;
+            height: 250px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: 2px solid #333;
+            margin: 20px;
+            padding: 15px;
+            border-radius: 12px;
+            position: relative;
+            color: white;
+        }
+
+        .drag-handle {
+            background: rgba(255,255,255,0.9);
+            color: #333;
+            padding: 10px;
+            margin-bottom: 15px;
+            cursor: move;
+            border-radius: 6px;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .allowed-zone {
+            background: rgba(76, 175, 80, 0.3);
+            border: 2px dashed #4caf50;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 6px;
+            cursor: move;
+        }
+
+        .ignored-zone {
+            background: rgba(244, 67, 54, 0.3);
+            border: 2px dashed #f44336;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 6px;
+            cursor: not-allowed;
+        }
+
+        .neutral-zone {
+            background: rgba(255, 152, 0, 0.3);
+            border: 2px dashed #ff9800;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 6px;
+        }
+
+        .priority-zone {
+            background: rgba(156, 39, 176, 0.3);
+            border: 2px dashed #9c27b0;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 6px;
+            position: relative;
+        }
+
+        .priority-zone .allowed-nested {
+            background: rgba(76, 175, 80, 0.5);
+            border: 1px solid #4caf50;
+            padding: 5px;
+            margin: 5px 0;
+            border-radius: 3px;
+            cursor: move;
+        }
+
+        .priority-zone .ignored-nested {
+            background: rgba(244, 67, 54, 0.5);
+            border: 1px solid #f44336;
+            padding: 5px;
+            margin: 5px 0;
+            border-radius: 3px;
+            cursor: not-allowed;
+        }
+
+        input, textarea {
+            width: 95%;
+            margin: 5px 0;
+            padding: 5px;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #f0f0f0;
+        }
+
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+
+        .info {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .legend {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin: 5px;
+        }
+
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+            margin-right: 8px;
+            border: 2px solid #333;
+        }
+
+        .demo-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .log-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 300px;
+            height: 200px;
+            background: rgba(0,0,0,0.9);
+            color: #00ff00;
+            padding: 10px;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 12px;
+            overflow-y: auto;
+            z-index: 1000;
+        }
+
+        .log-container h4 {
+            color: white;
+            margin: 0 0 10px 0;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <h1>InteractJS - allowFrom & ignoreFrom with Callbacks</h1>
+    
+    <div class="info">
+        <p><strong>Advanced demonstration combining allowFrom and ignoreFrom:</strong></p>
+        <p>This example shows how to use both options together with callback functions to create sophisticated access control logic.</p>
+        <p><strong>Logic:</strong> allowFrom determines allowed zones, then ignoreFrom can override and forbid specific zones.</p>
+    </div>
+
+    <div class="legend">
+        <div class="legend-item">
+            <div class="legend-color" style="background: rgba(76, 175, 80, 0.3); border-color: #4caf50;"></div>
+            <span>Allowed zone (allowFrom)</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color" style="background: rgba(244, 67, 54, 0.3); border-color: #f44336;"></div>
+            <span>Ignored zone (ignoreFrom)</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color" style="background: rgba(255, 152, 0, 0.3); border-color: #ff9800;"></div>
+            <span>Neutral zone</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color" style="background: rgba(156, 39, 176, 0.3); border-color: #9c27b0;"></div>
+            <span>Priority zone</span>
+        </div>
+    </div>
+
+    <div class="demo-container">
+        <div class="draggable" id="complex-draggable">
+            <div class="drag-handle">🎯 Complex Access Control</div>
+            
+            <div class="allowed-zone" data-allow="basic">
+                ✅ Basic allowed zone
+                <input type="text" placeholder="Input in allowed zone (ignored)">
+            </div>
+
+            <div class="ignored-zone" data-ignore="always">
+                ❌ Always ignored zone
+                <div class="allowed-zone" data-allow="nested">
+                    Even if nested in allowed, it's ignored
+                </div>
+            </div>
+
+            <div class="neutral-zone">
+                ⚪ Neutral zone (not allowed by default)
+            </div>
+
+            <div class="priority-zone" data-context="priority">
+                🔥 Priority management zone
+                <div class="allowed-nested" data-priority="high">
+                    ✨ High priority (allowed)
+                </div>
+                <div class="ignored-nested" data-maintenance="true">
+                    🔧 Under maintenance (ignored)
+                </div>
+            </div>
+        </div>
+
+        <div class="draggable" id="role-permissions">
+            <div class="drag-handle">👥 Role-based Permissions</div>
+            
+            <div class="allowed-zone" data-min-role="user">
+                👤 User zone (all roles)
+            </div>
+
+            <div class="priority-zone" data-min-role="admin">
+                👑 Admin only zone
+                <div class="ignored-zone" data-ignore="sensitive">
+                    🔒 Sensitive data (always ignored)
+                </div>
+                <div class="allowed-nested" data-allow="admin-tools">
+                    🛠️ Admin tools
+                </div>
+            </div>
+
+            <textarea placeholder="TextArea always ignored"></textarea>
+        </div>
+    </div>
+
+    <div class="log-container" id="logContainer">
+        <h4>📊 Decision Log</h4>
+        <div id="logContent"></div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/interactjs/dist/interact.min.js"></script>
+    <script>
+        let currentRole = 'admin'; // Simulate user role
+        
+        function log(message, type = 'info') {
+            const logContent = document.getElementById('logContent');
+            const timestamp = new Date().toLocaleTimeString();
+            const colors = {
+                allow: '#4caf50',
+                ignore: '#f44336',
+                info: '#00ff00'
+            };
+            
+            logContent.innerHTML += `<div style="color: ${colors[type] || colors.info}">[${timestamp}] ${message}</div>`;
+            logContent.scrollTop = logContent.scrollHeight;
+            
+            // Keep only the last 20 messages
+            const messages = logContent.children;
+            while (messages.length > 20) {
+                logContent.removeChild(messages[0]);
+            }
+        }
+
+        // Configuration for complex draggable
+        interact('#complex-draggable').draggable({
+            allowFrom: function(targetNode, eventTarget) {
+                log(`🔍 allowFrom check: ${eventTarget.className || eventTarget.tagName}`);
+                
+                // Always allow handle
+                if (eventTarget.classList.contains('drag-handle')) {
+                    log('✅ Handle detected - ALLOWED', 'allow');
+                    return true;
+                }
+
+                // Allow explicitly marked zones
+                if (eventTarget.hasAttribute('data-allow')) {
+                    log(`✅ Allowed zone: ${eventTarget.getAttribute('data-allow')}`, 'allow');
+                    return true;
+                }
+
+                // Allow based on priority
+                if (eventTarget.hasAttribute('data-priority')) {
+                    const priority = eventTarget.getAttribute('data-priority');
+                    const allowed = priority === 'high';
+                    log(`${allowed ? '✅' : '❌'} Priority ${priority}: ${allowed ? 'ALLOWED' : 'DENIED'}`, allowed ? 'allow' : 'ignore');
+                    return allowed;
+                }
+
+                // Check parents
+                let parent = eventTarget.parentElement;
+                while (parent && parent !== targetNode) {
+                    if (parent.hasAttribute('data-allow')) {
+                        log(`✅ Allowed parent found: ${parent.getAttribute('data-allow')}`, 'allow');
+                        return true;
+                    }
+                    parent = parent.parentElement;
+                }
+
+                log('❌ No authorization found - DENIED', 'ignore');
+                return false;
+            },
+
+            ignoreFrom: function(targetNode, eventTarget) {
+                log(`🔍 ignoreFrom check: ${eventTarget.className || eventTarget.tagName}`);
+                
+                // Always ignore inputs
+                if (['INPUT', 'TEXTAREA', 'SELECT'].includes(eventTarget.tagName)) {
+                    log('❌ Form element - IGNORED', 'ignore');
+                    return true;
+                }
+
+                // Ignore explicitly marked zones
+                if (eventTarget.hasAttribute('data-ignore')) {
+                    log(`❌ Ignored zone: ${eventTarget.getAttribute('data-ignore')}`, 'ignore');
+                    return true;
+                }
+
+                // Ignore maintenance elements
+                if (eventTarget.hasAttribute('data-maintenance')) {
+                    log('❌ Under maintenance - IGNORED', 'ignore');
+                    return true;
+                }
+
+                // Check parents for ignore
+                let parent = eventTarget.parentElement;
+                while (parent && parent !== targetNode) {
+                    if (parent.hasAttribute('data-ignore')) {
+                        log(`❌ Ignored parent found: ${parent.getAttribute('data-ignore')}`, 'ignore');
+                        return true;
+                    }
+                    parent = parent.parentElement;
+                }
+
+                log('✅ No ignore rule - NOT IGNORED');
+                return false;
+            },
+            
+            listeners: {
+                start: function(event) {
+                    log('🚀 Drag started', 'allow');
+                    event.target.style.opacity = 0.8;
+                    event.target.style.transform += ' scale(1.02) rotate(1deg)';
+                    event.target.style.boxShadow = '0 10px 20px rgba(0,0,0,0.3)';
+                },
+                move: dragMoveListener,
+                end: function(event) {
+                    log('🏁 Drag ended', 'info');
+                    event.target.style.opacity = '';
+                    event.target.style.transform = event.target.style.transform
+                        .replace(' scale(1.02)', '')
+                        .replace(' rotate(1deg)', '');
+                    event.target.style.boxShadow = '';
+                }
+            }
+        });
+
+        // Configuration for role-based draggable
+        interact('#role-permissions').draggable({
+            allowFrom: function(targetNode, eventTarget) {
+                // Always allow handle
+                if (eventTarget.classList.contains('drag-handle')) {
+                    return true;
+                }
+
+                // Check minimum role requirements
+                const minRole = eventTarget.getAttribute('data-min-role') || 
+                               eventTarget.closest('[data-min-role]')?.getAttribute('data-min-role');
+                
+                if (minRole) {
+                    const allowed = checkRolePermission(currentRole, minRole);
+                    log(`${allowed ? '✅' : '❌'} Role ${currentRole} for ${minRole} zone: ${allowed ? 'ALLOWED' : 'DENIED'}`, allowed ? 'allow' : 'ignore');
+                    return allowed;
+                }
+
+                return false;
+            },
+
+            ignoreFrom: function(targetNode, eventTarget) {
+                // Ignore forms
+                if (['INPUT', 'TEXTAREA', 'SELECT'].includes(eventTarget.tagName)) {
+                    return true;
+                }
+
+                // Ignore sensitive data
+                if (eventTarget.hasAttribute('data-ignore') && 
+                    eventTarget.getAttribute('data-ignore') === 'sensitive') {
+                    log('❌ Sensitive data - ALWAYS IGNORED', 'ignore');
+                    return true;
+                }
+
+                return false;
+            },
+            
+            listeners: {
+                start: function(event) {
+                    event.target.style.opacity = 0.8;
+                    event.target.style.filter = 'brightness(1.1)';
+                },
+                move: dragMoveListener,
+                end: function(event) {
+                    event.target.style.opacity = '';
+                    event.target.style.filter = '';
+                }
+            }
+        });
+
+        function checkRolePermission(userRole, requiredRole) {
+            const hierarchy = { user: 1, admin: 2 };
+            return (hierarchy[userRole] || 0) >= (hierarchy[requiredRole] || 0);
+        }
+
+        function dragMoveListener(event) {
+            var target = event.target;
+            var x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx;
+            var y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy;
+
+            target.style.transform = target.style.transform.replace(/translate\([^)]+\)/g, '') + 
+                                   ` translate(${x}px, ${y}px)`;
+            target.setAttribute('data-x', x);
+            target.setAttribute('data-y', y);
+        }
+
+        // Initial log
+        log('🎯 allowFrom/ignoreFrom callback system initialized');
+        log(`👤 Current role: ${currentRole}`);
+    </script>
+</body>
+</html>
